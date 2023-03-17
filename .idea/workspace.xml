@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e4311679-b9e6-4efc-b07e-d150fa65cdd7" name="Changes" comment="initial commit" />
+    <list default="true" id="e4311679-b9e6-4efc-b07e-d150fa65cdd7" name="Changes" comment="README + LICENCE">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -49,7 +51,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "C:/Users/VMorozkin/IdeaProjects/github/yojo-generator/src/main/java/ru/yojo/yamltopojo",
+    "last_opened_file_path": "C:/Users/VMorozkin/IdeaProjects/github/yojo-generator",
     "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.26091954",
@@ -59,6 +61,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\VMorozkin\IdeaProjects\github\yojo-generator" />
       <recent name="C:\Users\VMorozkin\IdeaProjects\github\yojo-generator\src\main\java\ru\yojo\yamltopojo" />
     </key>
   </component>
@@ -91,7 +94,7 @@
       <option name="presentableId" value="Default" />
       <updated>1679052818743</updated>
       <workItem from="1679052820017" duration="4572000" />
-      <workItem from="1679057420645" duration="4777000" />
+      <workItem from="1679057420645" duration="6088000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <created>1679063167574</created>
@@ -100,7 +103,14 @@
       <option name="project" value="LOCAL" />
       <updated>1679063167574</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="README + LICENCE">
+      <created>1679063495159</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1679063495159</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -119,6 +129,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="initial commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="initial commit" />
+    <MESSAGE value="README + LICENCE" />
+    <option name="LAST_COMMIT_MESSAGE" value="README + LICENCE" />
   </component>
 </project>
