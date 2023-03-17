@@ -240,5 +240,5 @@ See examples [here](./examples)
 ## 💻 Developers
 * 😎 Vladimir Morozkin
   * 💬 Contacts:
-    * 📧 Email: vmorozkin@it-one.ru
+    * 📧 Email: jvmorozkin@gmail.com
     * 📟 Telegram: @vmorozkin
