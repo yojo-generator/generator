@@ -4,23 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e4311679-b9e6-4efc-b07e-d150fa65cdd7" name="Changes" comment="initial commit">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/yojo/yamltopojo/constants/ConstantsEnum.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/yojo/yamltopojo/domain/LombokProperties.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/yojo/yamltopojo/domain/Schema.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/yojo/yamltopojo/domain/SchemaProperties.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/yojo/yamltopojo/domain/VariableProperties.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/yojo/yamltopojo/generator/Generator.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/yojo/yamltopojo/generator/YojoGenerator.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/yojo/yamltopojo/mapper/SchemaMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/ru/yojo/yamltopojo/util/MapperUtil.java" afterDir="false" />
-    </list>
+    <list default="true" id="e4311679-b9e6-4efc-b07e-d150fa65cdd7" name="Changes" comment="initial commit" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -107,8 +91,16 @@
       <option name="presentableId" value="Default" />
       <updated>1679052818743</updated>
       <workItem from="1679052820017" duration="4572000" />
-      <workItem from="1679057420645" duration="4476000" />
+      <workItem from="1679057420645" duration="4777000" />
     </task>
+    <task id="LOCAL-00001" summary="initial commit">
+      <created>1679063167574</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1679063167574</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
