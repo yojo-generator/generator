@@ -4,8 +4,51 @@ plugins {
     id 'maven-publish'
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 group 'ru.yojo'
-version '0.0.2'
+version '0.0.1'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "yojo-generator"
+            groupId = "ru.yojo.yamltopojo"
+            version = "0.0.1"
+            from(components["java"])
+            pom {
+                packaging = "jar"
+                name.set("YOJO Generator Core")
+                url.set("https://github.com/JVMisAlive/yojo-generator")
+                description.set("This is Core of YOJO")
+
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+
+                scm {
+                    connection.set("scm:https://github.com/JVMisAlive/yojo-generator.git")
+                    developerConnection.set("scm:git@github.com:JVMisAlive/yojo-generator.git")
+                    url.set("https://github.com/JVMisAlive/yojo-generator.git")
+                }
+
+                developers {
+                    developer {
+                        id.set("YOJO")
+                        name.set("Vladimir Morozkin")
+                        email.set("jvmorozkin@gmail.com")
+                    }
+                }
+            }
+        }
+    }
+}
 
 repositories {
     mavenCentral()
