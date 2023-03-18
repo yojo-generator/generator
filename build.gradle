@@ -18,7 +18,7 @@ publishing {
             artifactId = "yojo-generator"
             groupId = "ru.yojo.yamltopojo"
             version = "0.0.1"
-            from(components["java"])
+            from components.java
             pom {
                 packaging = "jar"
                 name.set("YOJO Generator Core")
@@ -78,7 +78,7 @@ jar {
     }
     zip64 = true
     from {
-        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') && it.name.endsWith('zip') }.collect { zipTree(it) }
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
         duplicatesStrategy(DuplicatesStrategy.INCLUDE)
     }
 }
