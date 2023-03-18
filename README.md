@@ -1,4 +1,4 @@
-![Screenshot](./src/main/resources/css/yojo.png)
+![Screenshot](./yojo.png)
 ### YOJO
 #### YAML to POJO generator 
 
@@ -237,7 +237,7 @@ See examples [here](./examples)
     * @AllArgsConstructor
     * @Accessors(fluent = true, chain = true)
 
-## 💻 Developers
+## Developers
 * 😎 Vladimir Morozkin
   * 💬 Contacts:
     * 📧 Email: jvmorozkin@gmail.com
