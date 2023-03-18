@@ -1,0 +1,48 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.springframework.boot' version '2.6.3'
+}
+
+group 'ru.yojo'
+version '0.0.1'
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    junitVersion = '5.8.2'
+}
+
+sourceCompatibility = '11'
+targetCompatibility = '11'
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+application {
+    mainModule = 'ru.yojo.yamltopojo'
+    mainClass = 'ru.yojo.yamltopojo.YojoCLI'
+}
+
+mainClassName = "ru.yojo.yamltopojo.YojoCLI"
+
+jar {
+    manifest {
+        attributes "Main-Class": "$mainClassName"
+    }
+    zip64 = true
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') && it.name.endsWith('zip') }.collect { zipTree(it) }
+        duplicatesStrategy(DuplicatesStrategy.INCLUDE)
+    }
+}
+
+dependencies {
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2'
+    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'org.springframework:spring-context:5.3.25'
+    implementation 'org.yaml:snakeyaml:2.0'
+}
