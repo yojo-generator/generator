@@ -1,7 +1,6 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.springframework.boot' version '2.6.3'
 }
 
 group 'ru.yojo'
