@@ -231,14 +231,14 @@ See examples [here](./examples)
 * 📈 Added getters and setters
 * 📈 Added Lombok
   * If a lombok is selected, the following annotations will be annotated:
-    * @Data 
-    * @NoArgsConstructor
+    * `@Data` 
+    * `@NoArgsConstructor`
   * Added optionally annotations: 
-    * @AllArgsConstructor
-    * @Accessors(fluent = true, chain = true)
+    * `@AllArgsConstructor`
+    * `@Accessors(fluent = true, chain = true)`
 
 ## Developers
 * 😎 Vladimir Morozkin
   * 💬 Contacts:
-    * 📧 Email: jvmorozkin@gmail.com
-    * 📟 Telegram: @vmorozkin
+    * 📧 Email: `jvmorozkin@gmail.com`
+    * 📟 Telegram: `@vmorozkin`
