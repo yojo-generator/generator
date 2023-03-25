@@ -1,13 +1,13 @@
-package ru.yojo.yamltopojo.domain;
+package ru.yojo.codegen.domain;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static java.lang.System.lineSeparator;
-import static ru.yojo.yamltopojo.constants.ConstantsEnum.*;
-import static ru.yojo.yamltopojo.util.MapperUtil.generateGetter;
-import static ru.yojo.yamltopojo.util.MapperUtil.generateSetter;
+import static ru.yojo.codegen.constants.ConstantsEnum.*;
+import static ru.yojo.codegen.util.MapperUtil.generateGetter;
+import static ru.yojo.codegen.util.MapperUtil.generateSetter;
 
 public class Schema {
 

@@ -1,4 +1,4 @@
-package ru.yojo.yamltopojo.constants;
+package ru.yojo.codegen.constants;
 
 import java.util.List;
 import java.util.Map;

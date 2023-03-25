@@ -1,6 +1,6 @@
-package ru.yojo.yamltopojo.util;
+package ru.yojo.codegen.util;
 
-import ru.yojo.yamltopojo.constants.ConstantsEnum;
+import ru.yojo.codegen.constants.ConstantsEnum;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,7 +9,7 @@ import java.util.Set;
 
 import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.StringUtils.capitalize;
-import static ru.yojo.yamltopojo.constants.ConstantsEnum.*;
+import static ru.yojo.codegen.constants.ConstantsEnum.*;
 
 @SuppressWarnings("all")
 public class MapperUtil {

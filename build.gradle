@@ -14,7 +14,7 @@ version '0.0.1'
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
+        maven(MavenPublication) {
             artifactId = "yojo-generator"
             groupId = "ru.yojo.yamltopojo"
             version = "0.0.1"
@@ -58,19 +58,17 @@ ext {
     junitVersion = '5.8.2'
 }
 
-sourceCompatibility = '11'
-targetCompatibility = '11'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
 application {
-    mainModule = 'ru.yojo.yamltopojo'
-    mainClass = 'ru.yojo.yamltopojo.YojoCLI'
+    mainModule = 'ru.yojo.codegen'
+    mainClass = 'ru.yojo.codegen.YojoCLI'
 }
 
-mainClassName = "ru.yojo.yamltopojo.YojoCLI"
+mainClassName = "ru.yojo.codegen.YojoCLI"
 
 jar {
     manifest {
@@ -88,4 +86,11 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'org.springframework:spring-context:5.3.25'
     implementation 'org.yaml:snakeyaml:2.0'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.10'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
+}
+
+test {
+    useJUnitPlatform()
 }

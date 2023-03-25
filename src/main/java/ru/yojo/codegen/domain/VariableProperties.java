@@ -1,4 +1,4 @@
-package ru.yojo.yamltopojo.domain;
+package ru.yojo.codegen.domain;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -8,7 +8,7 @@ import java.util.Set;
 import static java.lang.System.lineSeparator;
 import static org.apache.commons.lang3.StringUtils.isNoneEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static ru.yojo.yamltopojo.constants.ConstantsEnum.*;
+import static ru.yojo.codegen.constants.ConstantsEnum.*;
 
 @SuppressWarnings("all")
 public class VariableProperties {

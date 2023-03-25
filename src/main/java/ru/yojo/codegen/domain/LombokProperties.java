@@ -1,4 +1,4 @@
-package ru.yojo.yamltopojo.domain;
+package ru.yojo.codegen.domain;
 
 public final class LombokProperties {
     private final boolean enableLombok;

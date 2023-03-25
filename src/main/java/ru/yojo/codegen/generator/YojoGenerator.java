@@ -1,17 +1,17 @@
-package ru.yojo.yamltopojo.generator;
+package ru.yojo.codegen.generator;
 
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
-import ru.yojo.yamltopojo.domain.LombokProperties;
-import ru.yojo.yamltopojo.domain.Schema;
-import ru.yojo.yamltopojo.mapper.SchemaMapper;
+import ru.yojo.codegen.domain.LombokProperties;
+import ru.yojo.codegen.domain.Schema;
+import ru.yojo.codegen.mapper.SchemaMapper;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
-import static ru.yojo.yamltopojo.util.MapperUtil.castObjectToMap;
+import static ru.yojo.codegen.util.MapperUtil.castObjectToMap;
 
 /**
  * POJO Generator

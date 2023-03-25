@@ -1,17 +1,17 @@
-package ru.yojo.yamltopojo.mapper;
+package ru.yojo.codegen.mapper;
 
 import org.springframework.stereotype.Component;
-import ru.yojo.yamltopojo.domain.LombokProperties;
-import ru.yojo.yamltopojo.domain.Schema;
-import ru.yojo.yamltopojo.domain.SchemaProperties;
-import ru.yojo.yamltopojo.domain.VariableProperties;
+import ru.yojo.codegen.domain.LombokProperties;
+import ru.yojo.codegen.domain.Schema;
+import ru.yojo.codegen.domain.SchemaProperties;
+import ru.yojo.codegen.domain.VariableProperties;
 
 import java.util.*;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
 import static org.apache.commons.lang3.StringUtils.uncapitalize;
-import static ru.yojo.yamltopojo.constants.ConstantsEnum.*;
-import static ru.yojo.yamltopojo.util.MapperUtil.*;
+import static ru.yojo.codegen.constants.ConstantsEnum.*;
+import static ru.yojo.codegen.util.MapperUtil.*;
 
 @Component
 public class SchemaMapper {
