@@ -16,7 +16,7 @@ publishing {
     publications {
         maven(MavenPublication) {
             artifactId = "yojo-generator"
-            groupId = "ru.yojo.yamltopojo"
+            groupId = "ru.yojo.codegen"
             version = "0.0.1"
             from components.java
             pom {
