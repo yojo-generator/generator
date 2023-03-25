@@ -202,7 +202,7 @@ public class SaveGoodsResponse {
 See examples [here](./examples)
 
 ## Releases
-### 💥 Release 0.1.0:
+### 💥 Release 0.0.1:
 ##### Currently implemented the following 📈 features:
 * 📈 Support for the following keywords:
   * `type`
