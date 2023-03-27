@@ -5,39 +5,46 @@ import java.util.List;
 import java.util.Set;
 
 import static java.lang.System.lineSeparator;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.uncapitalize;
 import static ru.yojo.codegen.constants.ConstantsEnum.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
-public class Schema {
+public class Message {
 
-    private String schemaName;
-
+    private String messageName;
+    private MessageProperties messageProperties;
     private LombokProperties lombokProperties;
 
-    private SchemaProperties schemaProperties;
-
-    public String getSchemaName() {
-        return schemaName;
+    public MessageProperties getMessageProperties() {
+        return messageProperties;
     }
 
-    public void setSchemaName(String schemaName) {
-        this.schemaName = schemaName;
+    public void setMessageProperties(MessageProperties messageProperties) {
+        this.messageProperties = messageProperties;
+    }
+
+    public LombokProperties getLombokProperties() {
+        return lombokProperties;
     }
 
     public void setLombokProperties(LombokProperties lombokProperties) {
         this.lombokProperties = lombokProperties;
     }
 
-    public void setSchemaProperties(SchemaProperties schemaProperties) {
-        this.schemaProperties = schemaProperties;
+    public String getMessageName() {
+        return messageName;
+    }
+
+    public void setMessageName(String messageName) {
+        this.messageName = messageName;
     }
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = getClassBuilder(schemaName)
-                .append(schemaProperties)
-                .append(lineSeparator());
-
+        StringBuilder stringBuilder = getClassBuilder(messageName)
+                        .append(messageProperties)
+                        .append(lineSeparator());
         Set<String> requiredImports = new HashSet<>();
         StringBuilder lombokAnnotationBuilder = new StringBuilder();
 
@@ -60,20 +67,26 @@ public class Schema {
             }
         }
 
-        schemaProperties.getVariableProperties().stream()
-                .flatMap(variableProperties -> {
-                    Set<String> i = variableProperties.getRequiredImports();
-                    if (!lombokProperties.enableLombok()) {
-                        stringBuilder
-                                .append(lineSeparator())
-                                .append(generateSetter(variableProperties.getType(), variableProperties.getName()))
-                                .append(lineSeparator())
-                                .append(generateGetter(variableProperties.getType(), variableProperties.getName()));
-                    }
-                    return i.stream();
-                }).forEach(requiredImports::add);
+        if (!lombokProperties.enableLombok()) {
+            String reference = messageProperties.getPayload().getReference();
+            stringBuilder
+                    .append(lineSeparator())
+                    .append(generateSetter(reference, uncapitalize(reference)))
+                    .append(lineSeparator())
+                    .append(generateGetter(reference, uncapitalize(reference)));
+        }
 
         stringBuilder.insert(0, lombokAnnotationBuilder);
+
+        if (isNotBlank(messageProperties.getSummary())) {
+            StringBuilder javadoc = new StringBuilder();
+            javadoc.append(lineSeparator()).append(JAVA_DOC_CLASS_START.getValue());
+            javadoc.append(lineSeparator()).append(formatString(JAVA_DOC_CLASS_LINE, messageProperties.getSummary()));
+            javadoc.append(lineSeparator()).append(JAVA_DOC_CLASS_END.getValue());
+            javadoc.append(lineSeparator());
+
+            stringBuilder.insert(0, javadoc);
+        }
 
         StringBuilder importBuilder = new StringBuilder();
         requiredImports.forEach(requiredImport -> importBuilder
@@ -81,7 +94,7 @@ public class Schema {
                 .append(requiredImport)
                 .append(lineSeparator()));
         stringBuilder.insert(0, importBuilder.append(lineSeparator()));
-        
+
         return stringBuilder
                 .append(lineSeparator())
                 .append("}")

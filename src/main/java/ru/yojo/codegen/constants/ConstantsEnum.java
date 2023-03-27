@@ -26,6 +26,10 @@ public enum ConstantsEnum {
     ENUMERATION("enum"),
     ARRAY("array"),
     OBJECT("object"),
+    NAME("name"),
+    TITLE("title"),
+    SUMMARY("summary"),
+    PAYLOAD("payload"),
 
     /**
      * Annotations
@@ -78,7 +82,9 @@ public enum ConstantsEnum {
     JAVA_DOC_LINE("     * %s"),
     JAVA_DOC_EXAMPLE("     * Example: %s"),
     LIST_TYPE("List<%s>"),
-
+    JAVA_DOC_CLASS_START("/**"),
+    JAVA_DOC_CLASS_END("*/"),
+    JAVA_DOC_CLASS_LINE("* %s"),
     GETTER("    public %s get%s() {" +
             lineSeparator() +
             "        return %s;" +
@@ -86,7 +92,8 @@ public enum ConstantsEnum {
     SETTER("    public void set%s(%s %s) {" +
             lineSeparator() +
             "        this.%s = %s;" +
-            lineSeparator() + "    }");
+            lineSeparator() + "    }"),
+    DELIMETER("/");
 
     public String getValue() {
         return value;
