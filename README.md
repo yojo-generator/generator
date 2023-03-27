@@ -236,6 +236,9 @@ See examples [here](./examples)
   * Added optionally annotations: 
     * `@AllArgsConstructor`
     * `@Accessors(fluent = true, chain = true)`
+ * 📈 Added generating messages
+    * Schemas generates to "common" directory
+    * Messages generates to "messages" directory
 
 ## Developers
 * 😎 Vladimir Morozkin
