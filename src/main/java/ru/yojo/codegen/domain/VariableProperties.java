@@ -59,6 +59,9 @@ public class VariableProperties {
             this.type = LOCAL_DATE.getValue();
             requiredImports.add(LOCAL_DATE_IMPORT.getValue());
         }
+        if ("int64".equals(format)) {
+            this.type = LONG.getValue();
+        }
         this.format = format;
     }
 

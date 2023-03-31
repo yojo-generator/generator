@@ -63,7 +63,6 @@ public class YojoGenerator implements Generator {
         Map<String, Object> schemasMap = castObjectToMap(castObjectToMap(castObjectToMap(obj.get("components"))).get("schemas"));
         List<Schema> schemaList = schemaMapper.mapSchemasToObjects(castObjectToMap(schemasMap), lombokProperties);
         writeSchemas(output, schemaList);
-
     }
 
     /**

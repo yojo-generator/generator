@@ -66,6 +66,7 @@ public enum ConstantsEnum {
      */
     IMPORT("import "),
     LOCAL_DATE("LocalDate"),
+    LONG("Long"),
     LOCAL_DATE_IMPORT("java.time.LocalDate;"),
     NOT_BLANK_IMPORT("javax.validation.constraints.NotBlank;"),
     NOT_EMPTY_IMPORT("javax.validation.constraints.NotEmpty;"),
