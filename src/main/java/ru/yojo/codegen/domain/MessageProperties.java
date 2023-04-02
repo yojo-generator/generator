@@ -1,10 +1,6 @@
 package ru.yojo.codegen.domain;
 
-import static java.lang.System.lineSeparator;
-import static org.apache.commons.lang3.StringUtils.uncapitalize;
-import static ru.yojo.codegen.constants.ConstantsEnum.FIELD;
-import static ru.yojo.codegen.constants.ConstantsEnum.formatString;
-
+@SuppressWarnings("all")
 public class MessageProperties {
 
     private String name;
@@ -46,7 +42,6 @@ public class MessageProperties {
 
     @Override
     public String toString() {
-        return lineSeparator() +
-                formatString(FIELD, payload.getReference(), uncapitalize(payload.getReference()));
+        return payload.toString();
     }
 }

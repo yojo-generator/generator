@@ -1,14 +1,31 @@
 package ru.yojo.codegen.domain;
 
+import java.util.List;
+
+import static java.lang.System.lineSeparator;
+
+@SuppressWarnings("all")
 public class MessagePayload {
 
-    private final String reference;
+    private List<MessageVariableProperties> variableProperties;
 
-    public MessagePayload(String reference) {
-        this.reference = reference;
+    public MessagePayload(List<MessageVariableProperties> variableProperties) {
+        this.variableProperties = variableProperties;
     }
 
-    public String getReference() {
-        return reference;
+    public void setVariableProperties(List<MessageVariableProperties> variableProperties) {
+        this.variableProperties = variableProperties;
+    }
+    public List<MessageVariableProperties> getVariableProperties() {
+        return variableProperties;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        variableProperties.forEach(variableProperties ->
+        stringBuilder.append(lineSeparator())
+                .append(variableProperties.toString()));
+        return stringBuilder.toString();
     }
 }

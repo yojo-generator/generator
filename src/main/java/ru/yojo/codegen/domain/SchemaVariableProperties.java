@@ -12,7 +12,7 @@ import static ru.yojo.codegen.constants.ConstantsEnum.*;
 import static ru.yojo.codegen.util.MapperUtil.generateJavaDoc;
 
 @SuppressWarnings("all")
-public class VariableProperties {
+public class SchemaVariableProperties {
 
     private String name;
 
@@ -55,12 +55,24 @@ public class VariableProperties {
     }
 
     public void setFormat(String format) {
-        if ("date".equals(format)) {
-            this.type = LOCAL_DATE.getValue();
-            requiredImports.add(LOCAL_DATE_IMPORT.getValue());
-        }
-        if ("int64".equals(format)) {
-            this.type = LONG.getValue();
+        if (format != null) {
+            switch (format) {
+                case "date":
+                    this.type = LOCAL_DATE.getValue();
+                    requiredImports.add(LOCAL_DATE_IMPORT.getValue());
+                    break;
+                case "date-time":
+                    this.type = LOCAL_DATE_TIME.getValue();
+                    requiredImports.add(LOCAL_DATE_TIME_IMPORT.getValue());
+                case "int64":
+                    this.type = LONG.getValue();
+                case "uuid":
+                    this.type = UUID.getValue();
+                    requiredImports.add(UUID_IMPORT.getValue());
+                case "bigDecimal":
+                    this.type = BIG_DECIMAL.getValue();
+                    requiredImports.add(BIG_DECIMAL_IMPORT.getValue());
+            }
         }
         this.format = format;
     }

@@ -10,6 +10,7 @@ import static org.apache.commons.lang3.StringUtils.uncapitalize;
 import static ru.yojo.codegen.constants.ConstantsEnum.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
+@SuppressWarnings("all")
 public class Message {
 
     private String messageName;
@@ -68,12 +69,14 @@ public class Message {
         }
 
         if (!lombokProperties.enableLombok()) {
-            String reference = messageProperties.getPayload().getReference();
-            stringBuilder
-                    .append(lineSeparator())
-                    .append(generateSetter(reference, uncapitalize(reference)))
-                    .append(lineSeparator())
-                    .append(generateGetter(reference, uncapitalize(reference)));
+            messageProperties.getPayload().getVariableProperties().forEach(vp -> {
+                String reference = vp.getReference();
+                stringBuilder
+                        .append(lineSeparator())
+                        .append(generateSetter(reference, uncapitalize(reference)))
+                        .append(lineSeparator())
+                        .append(generateGetter(reference, uncapitalize(reference)));
+            });
         }
 
         stringBuilder.insert(0, lombokAnnotationBuilder);

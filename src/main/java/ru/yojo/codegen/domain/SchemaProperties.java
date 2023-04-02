@@ -6,20 +6,20 @@ import static java.lang.System.lineSeparator;
 
 public class SchemaProperties {
 
-    private List<VariableProperties> variableProperties;
+    private List<SchemaVariableProperties> schemaVariableProperties;
 
-    public List<VariableProperties> getVariableProperties() {
-        return variableProperties;
+    public List<SchemaVariableProperties> getVariableProperties() {
+        return schemaVariableProperties;
     }
 
-    public void setVariableProperties(List<VariableProperties> variableProperties) {
-        this.variableProperties = variableProperties;
+    public void setVariableProperties(List<SchemaVariableProperties> schemaVariableProperties) {
+        this.schemaVariableProperties = schemaVariableProperties;
     }
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        variableProperties.forEach(vp ->
+        schemaVariableProperties.forEach(vp ->
                 stringBuilder
                         .append(lineSeparator())
                         .append(vp));

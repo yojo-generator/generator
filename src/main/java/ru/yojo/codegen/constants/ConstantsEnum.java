@@ -66,8 +66,14 @@ public enum ConstantsEnum {
      */
     IMPORT("import "),
     LOCAL_DATE("LocalDate"),
+    LOCAL_DATE_TIME("LocalDateTime"),
     LONG("Long"),
+    UUID("UUID"),
+    BIG_DECIMAL("BigDecimal"),
+    BIG_DECIMAL_IMPORT("java.math.BigDecimal;"),
     LOCAL_DATE_IMPORT("java.time.LocalDate;"),
+    LOCAL_DATE_TIME_IMPORT("java.time.LocalDateTime;"),
+    UUID_IMPORT("java.util.UUID;"),
     NOT_BLANK_IMPORT("javax.validation.constraints.NotBlank;"),
     NOT_EMPTY_IMPORT("javax.validation.constraints.NotEmpty;"),
     NOT_NULL_IMPORT("javax.validation.constraints.NotNull;"),
@@ -107,8 +113,11 @@ public enum ConstantsEnum {
     public static final Map<String, String> JAVA_TYPES_REQUIRED_ANNOTATIONS = Map.of(
             "String", NOT_BLANK_ANNOTATION.getValue(),
             "Integer", NOT_NULL_ANNOTATION.getValue(),
+            "Long", NOT_NULL_ANNOTATION.getValue(),
             "Boolean", NOT_NULL_ANNOTATION.getValue(),
             "LocalDate", NOT_NULL_ANNOTATION.getValue(),
+            "LocalDateTime", NOT_NULL_ANNOTATION.getValue(),
+            "BigDecimal", NOT_NULL_ANNOTATION.getValue(),
             "Object", NOT_NULL_ANNOTATION.getValue());
 
     public static final Map<String, String> JAVA_TYPES_REQUIRED_IMPORTS = Map.of(
@@ -120,7 +129,7 @@ public enum ConstantsEnum {
             VALID_ANNOTATION.getValue(), VALID_IMPORT.getValue());
 
     public static final List<String> JAVA_DEFAULT_TYPES = List.of(
-            "String", "Integer", "Long", "Boolean", "BigDecimal", "LocalDate"
+            "String", "Integer", "Long", "Boolean", "BigDecimal", "LocalDate", "UUID", "LocalDateTime"
     );
     private final String value;
 
