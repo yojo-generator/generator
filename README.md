@@ -156,8 +156,8 @@ Based on this example, we are silencing several files with the extension `.java`
 Examples of the main generated files:
 * SaveGoodsRequest.java
 ```
-import javax.validation.constrains.Size
-import javax.validation.constrains.NotBlank
+import javax.validation.constraints.Size
+import javax.validation.constraints.NotBlank
 import javax.validation.Valid
 import java.util.List
 
