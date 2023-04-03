@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import static java.lang.System.lineSeparator;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static org.apache.commons.lang3.StringUtils.uncapitalize;
 import static ru.yojo.codegen.constants.ConstantsEnum.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
@@ -14,6 +12,8 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 public class Message {
 
     private String messageName;
+    private String messagePackageName;
+    private String commonPackageName;
     private MessageProperties messageProperties;
     private LombokProperties lombokProperties;
 
@@ -41,11 +41,23 @@ public class Message {
         this.messageName = messageName;
     }
 
+    public void setMessagePackageName(String messagePackageName) {
+        this.messagePackageName = messagePackageName;
+    }
+
+    public String getCommonPackageName() {
+        return commonPackageName;
+    }
+
+    public void setCommonPackageName(String commonPackageName) {
+        this.commonPackageName = commonPackageName;
+    }
+
     @Override
     public String toString() {
         StringBuilder stringBuilder = getClassBuilder(messageName)
-                        .append(messageProperties)
-                        .append(lineSeparator());
+                .append(messageProperties)
+                .append(lineSeparator());
         Set<String> requiredImports = new HashSet<>();
         StringBuilder lombokAnnotationBuilder = new StringBuilder();
 
@@ -92,11 +104,24 @@ public class Message {
         }
 
         StringBuilder importBuilder = new StringBuilder();
-        requiredImports.forEach(requiredImport -> importBuilder
-                .append(IMPORT.getValue())
-                .append(requiredImport)
-                .append(lineSeparator()));
+        if (messageProperties.getPayload().isNeededCommonImport()) {
+            importBuilder
+                    .append(IMPORT.getValue())
+                    .append(commonPackageName.replace(";", ".*;"))
+                    .append(lineSeparator());
+        }
+        requiredImports.forEach(requiredImport -> {
+            importBuilder
+                    .append(IMPORT.getValue())
+                    .append(requiredImport)
+                    .append(lineSeparator());
+        });
         stringBuilder.insert(0, importBuilder.append(lineSeparator()));
+
+        stringBuilder.insert(0, new StringBuilder("package ")
+                .append(messagePackageName)
+                .append(lineSeparator())
+                .append(lineSeparator()));
 
         return stringBuilder
                 .append(lineSeparator())

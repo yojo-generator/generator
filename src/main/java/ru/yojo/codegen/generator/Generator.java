@@ -14,6 +14,7 @@ public interface Generator {
      * @param filePath         - path to yaml file
      * @param outputDirectory  - output directory for pojos
      * @param lombokProperties - lombok annotation properties
+     * @param packageLocation  - location of generated pojo
      */
-    void generate(String filePath, String outputDirectory, LombokProperties lombokProperties);
+    void generate(String filePath, String outputDirectory, String packageLocation, LombokProperties lombokProperties);
 }

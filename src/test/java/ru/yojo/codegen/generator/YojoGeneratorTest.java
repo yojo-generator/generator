@@ -19,7 +19,7 @@ public class YojoGeneratorTest {
     @Test
     @SuppressWarnings("all")
     public void generateTest() {
-        yojoGenerator.generate("src/test/resources/example.yaml", "src/test/resources/testSrc/", new LombokProperties(true, true, true));
+        yojoGenerator.generate("src/test/resources/example.yaml", "src/test/resources/testSrc/","ru.yojo.codegen", new LombokProperties(true, true, true));
         Assertions.assertTrue(new File("src/test/resources/testSrc/example").listFiles().length != 0);
     }
 }

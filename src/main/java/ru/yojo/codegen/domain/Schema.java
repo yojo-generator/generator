@@ -12,6 +12,8 @@ public class Schema {
 
     private String schemaName;
 
+    private String packageName;
+
     private LombokProperties lombokProperties;
 
     private SchemaProperties schemaProperties;
@@ -30,6 +32,10 @@ public class Schema {
 
     public void setSchemaProperties(SchemaProperties schemaProperties) {
         this.schemaProperties = schemaProperties;
+    }
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
     }
 
     @Override
@@ -81,7 +87,13 @@ public class Schema {
                 .append(requiredImport)
                 .append(lineSeparator()));
         stringBuilder.insert(0, importBuilder.append(lineSeparator()));
-        
+
+
+        stringBuilder.insert(0, new StringBuilder("package ")
+                .append(packageName)
+                .append(lineSeparator())
+                .append(lineSeparator()));
+
         return stringBuilder
                 .append(lineSeparator())
                 .append("}")

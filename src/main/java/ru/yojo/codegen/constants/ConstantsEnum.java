@@ -70,6 +70,7 @@ public enum ConstantsEnum {
     LONG("Long"),
     UUID("UUID"),
     BIG_DECIMAL("BigDecimal"),
+
     BIG_DECIMAL_IMPORT("java.math.BigDecimal;"),
     LOCAL_DATE_IMPORT("java.time.LocalDate;"),
     LOCAL_DATE_TIME_IMPORT("java.time.LocalDateTime;"),
@@ -81,17 +82,19 @@ public enum ConstantsEnum {
     PATTERN_IMPORT("javax.validation.constraints.Pattern;"),
     VALID_IMPORT("javax.validation.Valid;"),
     LIST_IMPORT("java.util.List;"),
+
     ARRAY_LIST("    private List<%s> %s;"),
     FIELD("    private %s %s;"),
+    LIST_TYPE("List<%s>"),
 
     JAVA_DOC_START("    /**"),
     JAVA_DOC_END("     */"),
     JAVA_DOC_LINE("     * %s"),
     JAVA_DOC_EXAMPLE("     * Example: %s"),
-    LIST_TYPE("List<%s>"),
     JAVA_DOC_CLASS_START("/**"),
     JAVA_DOC_CLASS_END("*/"),
     JAVA_DOC_CLASS_LINE("* %s"),
+
     GETTER("    public %s get%s() {" +
             lineSeparator() +
             "        return %s;" +
@@ -100,7 +103,9 @@ public enum ConstantsEnum {
             lineSeparator() +
             "        this.%s = %s;" +
             lineSeparator() + "    }"),
-    DELIMETER("/");
+    DELIMETER("/"),
+    MESSAGE_PACKAGE_IMPORT("messages;"),
+    COMMON_PACKAGE_IMPORT("common;");
 
     public String getValue() {
         return value;

@@ -1,15 +1,12 @@
 package ru.yojo.codegen.domain;
 
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import static java.lang.System.lineSeparator;
-import static org.apache.commons.lang3.StringUtils.isNoneEmpty;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static ru.yojo.codegen.constants.ConstantsEnum.*;
-import static ru.yojo.codegen.util.MapperUtil.generateJavaDoc;
+import static ru.yojo.codegen.util.MapperUtil.*;
 
 @SuppressWarnings("all")
 public class SchemaVariableProperties {
@@ -64,14 +61,18 @@ public class SchemaVariableProperties {
                 case "date-time":
                     this.type = LOCAL_DATE_TIME.getValue();
                     requiredImports.add(LOCAL_DATE_TIME_IMPORT.getValue());
+                    break;
                 case "int64":
                     this.type = LONG.getValue();
+                    break;
                 case "uuid":
                     this.type = UUID.getValue();
                     requiredImports.add(UUID_IMPORT.getValue());
+                    break;
                 case "bigDecimal":
                     this.type = BIG_DECIMAL.getValue();
                     requiredImports.add(BIG_DECIMAL_IMPORT.getValue());
+                    break;
             }
         }
         this.format = format;
@@ -80,7 +81,7 @@ public class SchemaVariableProperties {
     public void setPattern(String pattern) {
         if (pattern != null) {
             annotationSet.add(String.format(PATTERN_ANNOTATION.getValue(), pattern));
-            requiredImports.add(JAVA_TYPES_REQUIRED_IMPORTS.get(StringUtils.substringBefore(PATTERN_ANNOTATION.getValue(), "(")));
+            requiredImports.add(JAVA_TYPES_REQUIRED_IMPORTS.get(substringBefore(PATTERN_ANNOTATION.getValue(), "(")));
         }
         this.pattern = pattern;
     }
@@ -108,7 +109,7 @@ public class SchemaVariableProperties {
         if (isNoneEmpty(min) || isNoneEmpty(max)) {
             annotationSet.add(generateSizeAnnotation(min, max));
             requiredImports.add(
-                    JAVA_TYPES_REQUIRED_IMPORTS.get(StringUtils.substringBefore(
+                    JAVA_TYPES_REQUIRED_IMPORTS.get(substringBefore(
                             SIZE_MIN_MAX_ANNOTATION.getValue(), "(")));
         }
         this.minLength = min;

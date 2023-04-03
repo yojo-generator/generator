@@ -82,8 +82,6 @@ jar {
 }
 
 dependencies {
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2'
-    implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'org.springframework:spring-context:5.3.25'
     implementation 'org.yaml:snakeyaml:2.0'
 
