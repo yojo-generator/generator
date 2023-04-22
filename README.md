@@ -27,7 +27,7 @@ As such, any keyword available for those vocabularies is by definition available
 8. [ ] `exclusiveMinimum`
 9. [x] `maxLength`
 10. [x] `minLength`
-11. [ ] `pattern` (This string SHOULD be a valid regular expression, according to the ECMA 262 regular expression dialect)
+11. [x] `pattern` (This string SHOULD be a valid regular expression, according to the ECMA 262 regular expression dialect)
 12. [ ] `maxItems`
 13. [ ] `minItems`
 14. [ ] `uniqueItems`
@@ -239,6 +239,21 @@ See examples [here](./examples)
  * 📈 Added generating messages
     * Schemas generates to "common" directory
     * Messages generates to "messages" directory
+
+### 💥 Release 1.0.0:
+* 📈 Added function to add implementation of class
+  * Use messageImplementation config
+* 📈 Added function to add extends of class.
+  * Use tags field of message to fill extends
+    * Example : `tags: - extends SomeClass`
+* 📈 Added custom bigDecimal format
+  * Added annotation @Digits 
+    * Use title attribute to fill(Example: `title: integer = 2, fraction = 3`)
+* 📈 Updated Accessors annotation: now you can configure it.
+* 📈 Added Logs to Console
+* 📈 Unbound from apache lang dependencies
+* 📈 Added support inner schemas
+* 📈 Optimization code by abstract of variable properties
 
 ## Developers
 * 😎 Vladimir Morozkin
