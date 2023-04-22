@@ -1,6 +1,5 @@
 package ru.yojo.codegen.domain;
 
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,7 +8,7 @@ import static ru.yojo.codegen.constants.ConstantsEnum.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 @SuppressWarnings("all")
-public class SchemaVariableProperties {
+public class VariableProperties {
 
     private String name;
 
@@ -31,6 +30,10 @@ public class SchemaVariableProperties {
 
     private String items;
 
+    private String reference;
+
+    private String title;
+
     private Set<String> annotationSet = new HashSet<>();
 
     private Set<String> requiredImports = new HashSet<>();
@@ -51,31 +54,111 @@ public class SchemaVariableProperties {
         this.type = type;
     }
 
+    public String getMinLength() {
+        return minLength;
+    }
+
+    public void setMinLength(String minLength) {
+        this.minLength = minLength;
+    }
+
+    public String getMaxLength() {
+        return maxLength;
+    }
+
+    public void setMaxLength(String maxLength) {
+        this.maxLength = maxLength;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public String getPattern() {
+        return pattern;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getEnumeration() {
+        return enumeration;
+    }
+
+    public void setEnumeration(String enumeration) {
+        this.enumeration = enumeration;
+    }
+
+    public String getExample() {
+        return example;
+    }
+
+    public String getReference() {
+        return reference;
+    }
+
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
+
+    public void setAnnotationSet(Set<String> annotationSet) {
+        this.annotationSet = annotationSet;
+    }
+
+    public void setRequiredImports(Set<String> requiredImports) {
+        this.requiredImports = requiredImports;
+    }
+
     public void setFormat(String format) {
         if (format != null) {
             switch (format) {
                 case "date":
                     this.type = LOCAL_DATE.getValue();
                     requiredImports.add(LOCAL_DATE_IMPORT.getValue());
+                    if (items != null) {
+                        this.items = LOCAL_DATE.getValue();
+                        this.type = String.format(LIST_TYPE.getValue(), LOCAL_DATE.getValue());
+                    }
                     break;
                 case "date-time":
                     this.type = LOCAL_DATE_TIME.getValue();
                     requiredImports.add(LOCAL_DATE_TIME_IMPORT.getValue());
+                    if (items != null) {
+                        this.items = LOCAL_DATE_TIME.getValue();
+                        this.type = String.format(LIST_TYPE.getValue(), LOCAL_DATE_TIME.getValue());
+                    }
                     break;
                 case "int64":
                     this.type = LONG.getValue();
+                    if (items != null) {
+                        this.items = LONG.getValue();
+                        this.type = String.format(LIST_TYPE.getValue(), LONG.getValue());
+                    }
                     break;
                 case "uuid":
                     this.type = UUID.getValue();
                     requiredImports.add(UUID_IMPORT.getValue());
+                    if (items != null) {
+                        this.items = UUID.getValue();
+                        this.type = String.format(LIST_TYPE.getValue(), UUID.getValue());
+                    }
                     break;
                 case "bigDecimal":
                     this.type = BIG_DECIMAL.getValue();
                     requiredImports.add(BIG_DECIMAL_IMPORT.getValue());
+                    if (items != null) {
+                        this.items = BIG_DECIMAL.getValue();
+                        this.type = String.format(LIST_TYPE.getValue(), BIG_DECIMAL.getValue());
+                    }
+                    if (title != null) {
+                        requiredImports.add(DIGITS_IMPORT.getValue());
+                        annotationSet.add(String.format(DIGITS_ANNOTATION.getValue(), title));
+                    }
                     break;
             }
+            this.format = format;
         }
-        this.format = format;
     }
 
     public void setPattern(String pattern) {
@@ -124,32 +207,23 @@ public class SchemaVariableProperties {
         return requiredImports;
     }
 
-    @Override
-    public String toString() {
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String toWrite() {
         StringBuilder stringBuilder = new StringBuilder();
-        generateJavaDoc(stringBuilder, description, enumeration, example);
-        annotationSet.forEach(annotation -> {
+        generateJavaDoc(stringBuilder, getDescription(), getEnumeration(), getExample());
+        getAnnotationSet().forEach(annotation -> {
             stringBuilder.append(lineSeparator())
                     .append(TABULATION.getValue())
                     .append(annotation);
         });
         return stringBuilder.append(lineSeparator())
-                .append(formatString(FIELD, type, name)).toString();
-    }
-
-    /**
-     * The method adds the Size annotation
-     *
-     * @param minLength minLength
-     * @param maxLength maxLength
-     */
-    private static String generateSizeAnnotation(String minLength, String maxLength) {
-        if (isNotBlank(minLength) && isNotBlank(maxLength)) {
-            return formatString(SIZE_MIN_MAX_ANNOTATION, minLength, maxLength);
-        } else if (isNotBlank(minLength)) {
-            return formatString(SIZE_MIN_ANNOTATION, minLength);
-        } else {
-            return formatString(SIZE_MAX_ANNOTATION, maxLength);
-        }
+                .append(formatString(FIELD, getType(), getName())).toString();
     }
 }

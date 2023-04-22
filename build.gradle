@@ -58,6 +58,14 @@ ext {
     junitVersion = '5.8.2'
 }
 
+//Uncomment this if you need to test by YojoCLI
+//sourceSets {
+//    main {
+//        java {
+//            srcDir "${buildDir}/generated-sources"
+//        }
+//    }
+//}
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -84,6 +92,8 @@ jar {
 dependencies {
     implementation 'org.springframework:spring-context:5.3.25'
     implementation 'org.yaml:snakeyaml:2.0'
+    //implementation 'javax.validation:validation-api:2.0.1.Final'
+    //compileOnly 'org.projectlombok:lombok:1.18.26'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.10'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'

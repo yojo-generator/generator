@@ -1,21 +1,32 @@
 package ru.yojo.codegen.mapper;
 
+import org.springframework.stereotype.Component;
+import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.LombokProperties;
-import ru.yojo.codegen.domain.Schema;
-import ru.yojo.codegen.domain.SchemaProperties;
-import ru.yojo.codegen.domain.SchemaVariableProperties;
+import ru.yojo.codegen.domain.VariableProperties;
+import ru.yojo.codegen.domain.schema.Schema;
+import ru.yojo.codegen.exception.SchemaFillException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static ru.yojo.codegen.constants.ConstantsEnum.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
-
+@SuppressWarnings("all")
+@Component
 public class SchemaMapper {
 
-    public List<Schema> mapSchemasToObjects(Map<String, Object> schemas, LombokProperties lombokProperties, String commonPackage) {
+    public List<Schema> mapSchemasToObjects(Map<String, Object> schemas,
+                                            LombokProperties lombokProperties,
+                                            String commonPackage) {
         List<Schema> schemaList = new ArrayList<>();
+        Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
         schemas.forEach((schemaName, schemaValues) -> {
+            System.out.println("START MAPPING OF SCHEMA " + schemaName);
             Map<String, Object> schemaMap = castObjectToMap(schemaValues);
             String schemaType = getStringValueIfExistOrElseNull(TYPE, schemaMap);
             if (schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
@@ -23,74 +34,53 @@ public class SchemaMapper {
                 schema.setSchemaName(capitalize(schemaName));
                 schema.setLombokProperties(lombokProperties);
                 schema.setPackageName(commonPackage);
-                schema.setSchemaProperties(getProperties(getSetValueIfExistsOrElseEmptySet(REQUIRED.getValue(), schemaMap), schemas, castObjectToMap(schemaMap.get(PROPERTIES.getValue()))));
+                schema.setFillParameters(getSchemaVariableProperties(
+                        getSetValueIfExistsOrElseEmptySet(REQUIRED.getValue(), schemaMap),
+                        schemas,
+                        castObjectToMap(schemaMap.get(PROPERTIES.getValue())), commonPackage, innerSchemas)
+                );
                 schemaList.add(schema);
+            } else if (schemaType != null && JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
+                System.out.println("SKIP SCHEMA BECAUSE TYPE IS: " + schemaType);
+            } else {
+                throw new SchemaFillException("NOT DEFINED TYPE OF SCHEMA! Schema: " + schemaName);
             }
         });
+        if (!innerSchemas.isEmpty()) {
+            innerSchemas.forEach((schemaName, schemaValues) -> {
+                System.out.println("START MAPPING OF INNER SCHEMA: " + schemaName);
+                Map<String, Object> schemaMap = castObjectToMap(schemaValues);
+                String schemaType = getStringValueIfExistOrElseNull(TYPE, schemaMap);
+                if (schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
+                    Schema schema = new Schema();
+                    schema.setSchemaName(capitalize(schemaName));
+                    schema.setLombokProperties(lombokProperties);
+                    schema.setPackageName(commonPackage);
+                    schema.setFillParameters(getSchemaVariableProperties(
+                            getSetValueIfExistsOrElseEmptySet(REQUIRED.getValue(), schemaMap),
+                            innerSchemas,
+                            castObjectToMap(schemaMap.get(PROPERTIES.getValue())), commonPackage, innerSchemas)
+                    );
+                    schemaList.add(schema);
+                } else {
+                    throw new SchemaFillException("NOT DEFINED TYPE OF INNER SCHEMA! Schema: " + schemaName);
+                }
+            });
+        }
         return schemaList;
     }
 
-    private SchemaProperties getProperties(Set<String> requiredAttributes, Map<String, Object> schemas, Map<String, Object> properties) {
-        List<SchemaVariableProperties> schemaVariableProperties = new ArrayList<>();
+    public FillParameters getSchemaVariableProperties(Set<String> requiredAttributes, Map<String, Object> schemas, Map<String, Object> properties, String commonPackage, Map<String, Object> innerSchemas) {
+        List<VariableProperties> variableProperties = new ArrayList<>();
 
+        if (!requiredAttributes.isEmpty()) {
+            System.out.println("REQUIRED ATTRIBUTES: " + requiredAttributes);
+        }
         properties.forEach((propertyName, propertyValue) -> {
-            SchemaVariableProperties vp = new SchemaVariableProperties();
-            fillProperties(vp, requiredAttributes, schemas, propertyName, castObjectToMap(propertyValue));
-            schemaVariableProperties.add(vp);
+            VariableProperties vp = new VariableProperties();
+            fillProperties(vp, requiredAttributes, schemas, propertyName, castObjectToMap(propertyValue), commonPackage, innerSchemas);
+            variableProperties.add(vp);
         });
-
-        SchemaProperties schemaProperties = new SchemaProperties();
-        schemaProperties.setVariableProperties(schemaVariableProperties);
-        return schemaProperties;
-
-    }
-
-    private void fillProperties(SchemaVariableProperties schemaVariableProperties, Set<String> requiredAttributes, Map<String, Object> schemas, String propertyName, Map<String, Object> propertiesMap) {
-        schemaVariableProperties.setName(propertyName);
-        schemaVariableProperties.setType(capitalize(getStringValueIfExistOrElseNull(TYPE, propertiesMap)));
-        schemaVariableProperties.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, propertiesMap));
-        schemaVariableProperties.setExample(getStringValueIfExistOrElseNull(EXAMPLE, propertiesMap));
-        schemaVariableProperties.setFormat(getStringValueIfExistOrElseNull(FORMAT, propertiesMap));
-        schemaVariableProperties.setPattern(getStringValueIfExistOrElseNull(PATTERN, propertiesMap));
-        schemaVariableProperties.setMinMaxLength(getStringValueIfExistOrElseNull(MIN_LENGTH, propertiesMap), getStringValueIfExistOrElseNull(MAX_LENGTH, propertiesMap));
-
-        if (ARRAY.getValue().equals(uncapitalize(schemaVariableProperties.getType()))) {
-            schemaVariableProperties.setItems(refReplace(propertiesMap.get(ITEMS.getValue()).toString().replaceFirst(".$", "")));
-            schemaVariableProperties.setType(String.format(refReplace(LIST_TYPE.getValue()), schemaVariableProperties.getItems()));
-        } else if (getStringValueIfExistOrElseNull(REFERENCE, propertiesMap) != null && !ARRAY.getValue().equals(uncapitalize(schemaVariableProperties.getType()))) {
-            String referenceObject = propertiesMap.get(REFERENCE.getValue()).toString();
-            Map<String, Object> stringObjectMap = castObjectToMap(schemas.get(referenceObject.replaceAll(".+/", "")));
-            String objectType = getStringValueIfExistOrElseNull(TYPE, stringObjectMap);
-            if (JAVA_DEFAULT_TYPES.contains(capitalize(objectType))) {
-                fillProperties(schemaVariableProperties, requiredAttributes, schemas, propertyName, stringObjectMap);
-            }
-            if (schemaVariableProperties.getType() == null || capitalize(OBJECT.getValue()).equals(schemaVariableProperties.getType())) {
-                schemaVariableProperties.setType(refReplace(referenceObject));
-            }
-        }
-        Set<String> annotationSet = new HashSet<>();
-        Set<String> importSet = new HashSet<>();
-        requiredAttributes.forEach(requiredAttribute -> {
-            if (requiredAttribute.contains(propertyName)) {
-                if (schemaVariableProperties.getItems() != null) {
-                    importSet.add(JAVA_TYPES_REQUIRED_IMPORTS.get(NOT_EMPTY_ANNOTATION.getValue()));
-                    annotationSet.add(NOT_EMPTY_ANNOTATION.getValue());
-                } else {
-                    String annotation = JAVA_TYPES_REQUIRED_ANNOTATIONS.get(schemaVariableProperties.getType());
-                    importSet.add(JAVA_TYPES_REQUIRED_IMPORTS.get(annotation));
-                    annotationSet.add(annotation);
-                }
-            }
-            if (schemaVariableProperties.getType() != null && !JAVA_DEFAULT_TYPES.contains(schemaVariableProperties.getType())) {
-                importSet.add(JAVA_TYPES_REQUIRED_IMPORTS.get(VALID_ANNOTATION.getValue()));
-                annotationSet.add(VALID_ANNOTATION.getValue());
-            }
-        });
-        if (schemaVariableProperties.getType() != null && !JAVA_DEFAULT_TYPES.contains(schemaVariableProperties.getType())) {
-            importSet.add(JAVA_TYPES_REQUIRED_IMPORTS.get(VALID_ANNOTATION.getValue()));
-            annotationSet.add(VALID_ANNOTATION.getValue());
-        }
-        schemaVariableProperties.getRequiredImports().addAll(importSet);
-        schemaVariableProperties.getAnnotationSet().addAll(annotationSet);
+        return new FillParameters(variableProperties);
     }
 }

@@ -1,4 +1,6 @@
-package ru.yojo.codegen.domain;
+package ru.yojo.codegen.domain.message;
+
+import ru.yojo.codegen.domain.FillParameters;
 
 @SuppressWarnings("all")
 public class MessageProperties {
@@ -6,7 +8,14 @@ public class MessageProperties {
     private String name;
     private String title;
     private String summary;
-    private MessagePayload payload;
+    private FillParameters fillParameters;
+
+    public MessageProperties() {
+    }
+
+    public MessageProperties(FillParameters fillParameters) {
+        this.fillParameters = fillParameters;
+    }
 
     public String getName() {
         return name;
@@ -32,16 +41,15 @@ public class MessageProperties {
         this.summary = summary;
     }
 
-    public MessagePayload getPayload() {
-        return payload;
+    public FillParameters getPayload() {
+        return fillParameters;
     }
 
-    public void setPayload(MessagePayload payload) {
-        this.payload = payload;
+    public void setPayload(FillParameters fillParameters) {
+        this.fillParameters = fillParameters;
     }
 
-    @Override
-    public String toString() {
-        return payload.toString();
+    public String toWrite() {
+        return fillParameters.toWrite();
     }
 }

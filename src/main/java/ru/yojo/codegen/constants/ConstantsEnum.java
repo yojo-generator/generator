@@ -7,8 +7,6 @@ import static java.lang.System.lineSeparator;
 
 public enum ConstantsEnum {
 
-    TABULATION("    "),
-
     /**
      * Attributes Yaml
      */
@@ -30,6 +28,20 @@ public enum ConstantsEnum {
     TITLE("title"),
     SUMMARY("summary"),
     PAYLOAD("payload"),
+    TAGS("tags"),
+
+    /**
+     * Schema Types
+     */
+    ST_LOCAL_DATE("date"),
+    ST_LOCAL_DATE_TIME("date-time"),
+    ST_LONG("long"),
+    ST_INTEGER("integer"),
+    ST_UUID("uuid"),
+    ST_BOOLEAN("boolean"),
+    ST_STRING("string"),
+    ST_OBJECT_TYPE("object"),
+    ST_BIG_DECIMAL("bigDecimal"),
 
     /**
      * Annotations
@@ -44,6 +56,7 @@ public enum ConstantsEnum {
     PATTERN_ANNOTATION("@Pattern(regexp = \"%s\")"),
     PATTERN_ANNOTATION_WITHOUT_REGEXP("@Pattern"),
     VALID_ANNOTATION("@Valid"),
+    DIGITS_ANNOTATION("@Digits(%s)"),
 
     /**
      * Lombok annotations
@@ -52,9 +65,12 @@ public enum ConstantsEnum {
     LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION("@NoArgsConstructor"),
     LOMBOK_DATA_ANNOTATION("@Data"),
     LOMBOK_ACCESSORS_ANNOTATION("@Accessors(fluent = true, chain = true)"),
+    LOMBOK_ACCESSORS_EMPTY_ANNOTATION("@Accessors"),
+    LOMBOK_ACCESSORS_FLUENT_ANNOTATION("@Accessors(fluent = true)"),
+    LOMBOK_ACCESSORS_CHAIN_ANNOTATION("@Accessors(chain = true)"),
 
     /**
-     * Lombok imports
+     * Lombok Imports
      */
     LOMBOK_ALL_ARGS_CONSTRUCTOR_IMPORT("lombok.AllArgsConstructor;"),
     LOMBOK_NO_ARGS_CONSTRUCTOR_IMPORT("lombok.NoArgsConstructor;"),
@@ -62,15 +78,21 @@ public enum ConstantsEnum {
     LOMBOK_ACCESSORS_IMPORT("lombok.experimental.Accessors;"),
 
     /**
-     * Other
+     * Java Types
      */
-    IMPORT("import "),
     LOCAL_DATE("LocalDate"),
     LOCAL_DATE_TIME("LocalDateTime"),
     LONG("Long"),
+    INTEGER("Integer"),
     UUID("UUID"),
+    BOOLEAN("Boolean"),
+    STRING("String"),
+    OBJECT_TYPE("Object"),
     BIG_DECIMAL("BigDecimal"),
 
+    /**
+     * Packages
+     */
     BIG_DECIMAL_IMPORT("java.math.BigDecimal;"),
     LOCAL_DATE_IMPORT("java.time.LocalDate;"),
     LOCAL_DATE_TIME_IMPORT("java.time.LocalDateTime;"),
@@ -82,11 +104,11 @@ public enum ConstantsEnum {
     PATTERN_IMPORT("javax.validation.constraints.Pattern;"),
     VALID_IMPORT("javax.validation.Valid;"),
     LIST_IMPORT("java.util.List;"),
+    DIGITS_IMPORT("javax.validation.constraints.Digits;"),
 
-    ARRAY_LIST("    private List<%s> %s;"),
-    FIELD("    private %s %s;"),
-    LIST_TYPE("List<%s>"),
-
+    /**
+     * Java Doc
+     */
     JAVA_DOC_START("    /**"),
     JAVA_DOC_END("     */"),
     JAVA_DOC_LINE("     * %s"),
@@ -95,6 +117,9 @@ public enum ConstantsEnum {
     JAVA_DOC_CLASS_END("*/"),
     JAVA_DOC_CLASS_LINE("* %s"),
 
+    /**
+     * Getters and Setters
+     */
     GETTER("    public %s get%s() {" +
             lineSeparator() +
             "        return %s;" +
@@ -103,7 +128,15 @@ public enum ConstantsEnum {
             lineSeparator() +
             "        this.%s = %s;" +
             lineSeparator() + "    }"),
+
+    /**
+     * Others
+     */
+    FIELD("    private %s %s;"),
+    LIST_TYPE("List<%s>"),
     DELIMETER("/"),
+    TABULATION("    "),
+    IMPORT("import "),
     MESSAGE_PACKAGE_IMPORT("messages;"),
     COMMON_PACKAGE_IMPORT("common;");
 
@@ -116,25 +149,44 @@ public enum ConstantsEnum {
     }
 
     public static final Map<String, String> JAVA_TYPES_REQUIRED_ANNOTATIONS = Map.of(
-            "String", NOT_BLANK_ANNOTATION.getValue(),
-            "Integer", NOT_NULL_ANNOTATION.getValue(),
-            "Long", NOT_NULL_ANNOTATION.getValue(),
-            "Boolean", NOT_NULL_ANNOTATION.getValue(),
-            "LocalDate", NOT_NULL_ANNOTATION.getValue(),
-            "LocalDateTime", NOT_NULL_ANNOTATION.getValue(),
-            "BigDecimal", NOT_NULL_ANNOTATION.getValue(),
-            "Object", NOT_NULL_ANNOTATION.getValue());
+            STRING.value, NOT_BLANK_ANNOTATION.value,
+            INTEGER.value, NOT_NULL_ANNOTATION.value,
+            LONG.value, NOT_NULL_ANNOTATION.value,
+            BOOLEAN.value, NOT_NULL_ANNOTATION.value,
+            LOCAL_DATE.value, NOT_NULL_ANNOTATION.value,
+            LOCAL_DATE_TIME.value, NOT_NULL_ANNOTATION.value,
+            BIG_DECIMAL.value, NOT_NULL_ANNOTATION.value,
+            UUID.value, NOT_NULL_ANNOTATION.value,
+            OBJECT_TYPE.value, NOT_NULL_ANNOTATION.value);
 
     public static final Map<String, String> JAVA_TYPES_REQUIRED_IMPORTS = Map.of(
-            NOT_BLANK_ANNOTATION.getValue(), NOT_BLANK_IMPORT.getValue(),
-            NOT_EMPTY_ANNOTATION.getValue(), NOT_EMPTY_IMPORT.getValue(),
-            NOT_NULL_ANNOTATION.getValue(), NOT_NULL_IMPORT.getValue(),
-            SIZE_ANNOTATION.getValue(), SIZE_IMPORT.getValue(),
-            PATTERN_ANNOTATION_WITHOUT_REGEXP.getValue(), PATTERN_IMPORT.getValue(),
-            VALID_ANNOTATION.getValue(), VALID_IMPORT.getValue());
+            NOT_BLANK_ANNOTATION.value, NOT_BLANK_IMPORT.value,
+            NOT_EMPTY_ANNOTATION.value, NOT_EMPTY_IMPORT.value,
+            NOT_NULL_ANNOTATION.value, NOT_NULL_IMPORT.value,
+            SIZE_ANNOTATION.value, SIZE_IMPORT.value,
+            PATTERN_ANNOTATION_WITHOUT_REGEXP.value, PATTERN_IMPORT.value,
+            VALID_ANNOTATION.value, VALID_IMPORT.value);
 
     public static final List<String> JAVA_DEFAULT_TYPES = List.of(
-            "String", "Integer", "Long", "Boolean", "BigDecimal", "LocalDate", "UUID", "LocalDateTime"
+            STRING.value,
+            INTEGER.value,
+            LONG.value,
+            BOOLEAN.value,
+            BIG_DECIMAL.value,
+            LOCAL_DATE.value,
+            LOCAL_DATE_TIME.value,
+            UUID.value
+    );
+
+    public static final List<String> JAVA_DEFAULT_SCHEMA_TYPES = List.of(
+            ST_STRING.value,
+            ST_INTEGER.value,
+            ST_LONG.value,
+            ST_BOOLEAN.value,
+            ST_BIG_DECIMAL.value,
+            ST_LOCAL_DATE.value,
+            ST_LOCAL_DATE_TIME.value,
+            ST_UUID.value
     );
     private final String value;
 
