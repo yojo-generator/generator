@@ -2,13 +2,14 @@ package ru.yojo.codegen.domain.schema;
 
 import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.LombokProperties;
+import ru.yojo.codegen.domain.VariableProperties;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import static java.lang.System.lineSeparator;
-import static ru.yojo.codegen.constants.ConstantsEnum.LOMBOK_DATA_ANNOTATION;
-import static ru.yojo.codegen.constants.ConstantsEnum.LOMBOK_DATA_IMPORT;
+import static ru.yojo.codegen.constants.ConstantsEnum.*;
+import static ru.yojo.codegen.constants.ConstantsEnum.LOMBOK_ALL_ARGS_CONSTRUCTOR_IMPORT;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 public class Schema {
@@ -42,42 +43,87 @@ public class Schema {
     }
 
     public String toWrite() {
-        StringBuilder stringBuilder = getClassBuilder(schemaName)
-                .append(fillParameters.toWrite())
-                .append(lineSeparator());
+        if (fillParameters.getVariableProperties().stream().anyMatch(variableProperties -> variableProperties.getEnumeration() == null)) {
+            StringBuilder stringBuilder = getClassBuilder(schemaName)
+                    .append(fillParameters.toWrite())
+                    .append(lineSeparator());
 
-        Set<String> requiredImports = new HashSet<>();
-        StringBuilder lombokAnnotationBuilder = new StringBuilder();
+            Set<String> requiredImports = new HashSet<>();
+            StringBuilder lombokAnnotationBuilder = new StringBuilder();
 
-        if (lombokProperties.enableLombok()) {
-            if (schemaName.equals("Data") || fillParameters.getVariableProperties().stream().anyMatch(prop -> "Data".equals(prop.getType()))) {
-                lombokAnnotationBuilder
-                        .append(LOMBOK_DATA_ANNOTATION.getValue().replace("@", "@lombok."))
+            if (lombokProperties.enableLombok()) {
+                if (schemaName.equals("Data") || fillParameters.getVariableProperties().stream().anyMatch(prop -> "Data".equals(prop.getType()))) {
+                    lombokAnnotationBuilder
+                            .append(LOMBOK_DATA_ANNOTATION.getValue().replace("@", "@lombok."))
+                            .append(lineSeparator());
+                } else {
+                    lombokAnnotationBuilder
+                            .append(LOMBOK_DATA_ANNOTATION.getValue())
+                            .append(lineSeparator());
+                    requiredImports.add(LOMBOK_DATA_IMPORT.getValue());
+                }
+                buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder);
+            }
+
+            fillParameters.getVariableProperties().stream()
+                    .flatMap(variableProperties -> {
+                        Set<String> i = variableProperties.getRequiredImports();
+                        if (!lombokProperties.enableLombok()) {
+                            stringBuilder
+                                    .append(lineSeparator())
+                                    .append(generateSetter(variableProperties.getType(), variableProperties.getName()))
+                                    .append(lineSeparator())
+                                    .append(generateGetter(variableProperties.getType(), variableProperties.getName()));
+                        }
+                        return i.stream();
+                    }).forEach(requiredImports::add);
+
+            stringBuilder.insert(0, lombokAnnotationBuilder);
+
+            return finishBuild(stringBuilder, requiredImports, packageName);
+        } else {
+            StringBuilder stringBuilder = getEnumClassBuilder(schemaName);
+            fillParameters.getVariableProperties().forEach(vp -> vp.getRequiredImports().remove(VALID_IMPORT.getValue()));
+            if (fillParameters.getVariableProperties().stream()
+                    .anyMatch(variableProperties -> variableProperties.getEnumNames() != null)) {
+                VariableProperties description = new VariableProperties();
+                description.setType(STRING.getValue());
+                description.setName("description");
+                if (lombokProperties.enableLombok()) {
+                    description.getRequiredImports().add(LOMBOK_GETTER_IMPORT.getValue());
+                    description.getAnnotationSet().add(LOMBOK_GETTER_ANNOTATION.getValue());
+                }
+                fillParameters.getVariableProperties().add(description);
+                stringBuilder.append(fillParameters.toWrite())
                         .append(lineSeparator());
             } else {
-                lombokAnnotationBuilder
-                        .append(LOMBOK_DATA_ANNOTATION.getValue())
+                stringBuilder.append(fillParameters.toWrite())
                         .append(lineSeparator());
-                requiredImports.add(LOMBOK_DATA_IMPORT.getValue());
             }
-            buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder);
+
+            Set<String> requiredImports = new HashSet<>();
+            StringBuilder lombokAnnotationBuilder = new StringBuilder();
+
+            if (lombokProperties.enableLombok() && lombokProperties.allArgsConstructor() && fillParameters.getVariableProperties().stream()
+                    .anyMatch(variableProperties -> variableProperties.getEnumNames() != null)) {
+                lombokAnnotationBuilder.append(LOMBOK_ALL_ARGS_CONSTRUCTOR_ANNOTATION.getValue())
+                        .append(lineSeparator());
+                requiredImports.add(LOMBOK_ALL_ARGS_CONSTRUCTOR_IMPORT.getValue());
+            }
+            fillParameters.getVariableProperties().stream()
+                    .flatMap(variableProperties -> {
+                        Set<String> i = variableProperties.getRequiredImports();
+                        if (!lombokProperties.enableLombok()) {
+                            stringBuilder
+                                    .append(lineSeparator())
+                                    .append(generateGetter(variableProperties.getType(), variableProperties.getName()));
+                        }
+                        return i.stream();
+                    }).forEach(requiredImports::add);
+
+            stringBuilder.insert(0, lombokAnnotationBuilder);
+
+            return finishBuild(stringBuilder, requiredImports, packageName);
         }
-
-        fillParameters.getVariableProperties().stream()
-                .flatMap(variableProperties -> {
-                    Set<String> i = variableProperties.getRequiredImports();
-                    if (!lombokProperties.enableLombok()) {
-                        stringBuilder
-                                .append(lineSeparator())
-                                .append(generateSetter(variableProperties.getType(), variableProperties.getName()))
-                                .append(lineSeparator())
-                                .append(generateGetter(variableProperties.getType(), variableProperties.getName()));
-                    }
-                    return i.stream();
-                }).forEach(requiredImports::add);
-
-        stringBuilder.insert(0, lombokAnnotationBuilder);
-
-        return finishBuild(stringBuilder, requiredImports, packageName);
     }
 }

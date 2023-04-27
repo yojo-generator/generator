@@ -42,6 +42,13 @@ public class MapperUtil {
         return (Map<String, Object>) map;
     }
 
+    public static ArrayList<String> castObjectToList(Object list) {
+        if (list == null) {
+            return new ArrayList<>();
+        }
+        return (ArrayList<String>) list;
+    }
+
     public static String refReplace(String ref) {
         return capitalize(ref.replaceAll(".+/", ""));
     }
@@ -63,6 +70,15 @@ public class MapperUtil {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder
                 .append("public class ")
+                .append(schemaName)
+                .append(" {");
+        return stringBuilder;
+    }
+
+    public static StringBuilder getEnumClassBuilder(String schemaName) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append("public enum ")
                 .append(schemaName)
                 .append(" {");
         return stringBuilder;
@@ -106,20 +122,16 @@ public class MapperUtil {
      *
      * @param stringBuilder StringBuilder
      * @param description   Description
-     * @param enumeration   Enum
      * @param example       Example
      */
-    public static void generateJavaDoc(StringBuilder stringBuilder, String description, String enumeration, String example) {
-        if (isNoneEmpty(description) || isNoneEmpty(enumeration) || isNoneEmpty(example)) {
+    public static void generateJavaDoc(StringBuilder stringBuilder, String description, String example) {
+        if (isNoneEmpty(description) || isNoneEmpty(example)) {
             stringBuilder.append(lineSeparator()).append(JAVA_DOC_START.getValue());
             if (isNotBlank(description)) {
                 stringBuilder.append(lineSeparator()).append(formatString(JAVA_DOC_LINE, description));
             }
             if (isNotBlank(example)) {
                 stringBuilder.append(lineSeparator()).append(formatString(JAVA_DOC_EXAMPLE, example));
-            }
-            if (isNotBlank(enumeration)) {
-                stringBuilder.append(lineSeparator()).append(formatString(JAVA_DOC_LINE, enumeration));
             }
             stringBuilder.append(lineSeparator()).append(JAVA_DOC_END.getValue());
         }
@@ -166,6 +178,8 @@ public class MapperUtil {
         variableProperties.setFormat(getStringValueIfExistOrElseNull(FORMAT, propertiesMap));
         variableProperties.setPattern(getStringValueIfExistOrElseNull(PATTERN, propertiesMap));
         variableProperties.setMinMaxLength(getStringValueIfExistOrElseNull(MIN_LENGTH, propertiesMap), getStringValueIfExistOrElseNull(MAX_LENGTH, propertiesMap));
+        variableProperties.setEnumeration(getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap));
+        variableProperties.setEnumNames(getStringValueIfExistOrElseNull(X_ENUM_NAMES, propertiesMap));
 
         recursivelyFillProperties(variableProperties, requiredAttributes, schemas, propertyName, propertiesMap, commonPackage, innerSchemas);
         Set<String> annotationSet = new HashSet<>();
@@ -201,7 +215,7 @@ public class MapperUtil {
             String referenceObject = propertiesMap.get(REFERENCE.getValue()).toString();
             Map<String, Object> stringObjectMap = castObjectToMap(schemas.get(referenceObject.replaceAll(".+/", "")));
             String objectType = getStringValueIfExistOrElseNull(TYPE, stringObjectMap);
-            if (objectType != null && JAVA_DEFAULT_SCHEMA_TYPES.contains(capitalize(objectType))) {
+            if (objectType != null && JAVA_DEFAULT_SCHEMA_TYPES.containsKey(objectType)) {
                 //Recursive Fill
                 System.out.println();
                 System.out.println("Start Recursive fillProperties " + propertyName);
@@ -220,7 +234,76 @@ public class MapperUtil {
             variableProperties.setType(capitalize(propertyName));
             variableProperties.getRequiredImports().add(commonPackage.replace(";", "." + capitalize(propertyName) + ";"));
             innerSchemas.put(propertyName, propertiesMap);
+        } else if (OBJECT_TYPE.getValue().equals(variableProperties.getType()) && getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap) != null) {
+            System.out.println("ENUMERATION FOUND");
+            fillEnumSchema(propertyName, propertiesMap, innerSchemas);
+            variableProperties.setType(capitalize(propertyName));
+            variableProperties.setEnumNames(null);
+            variableProperties.setEnumeration(null);
+            variableProperties.setEnum(true);
+            variableProperties.getRequiredImports().add(commonPackage.replace(";", "." + capitalize(propertyName) + ";"));
+        } else if (getStringValueIfExistOrElseNull(ADDITIONAL_PROPERTIES, propertiesMap) != null) {
+            System.out.println();
+            System.out.println("ADDITIONAL PROPERTIES");
+            String type = getStringValueIfExistOrElseNull(TYPE, castObjectToMap(propertiesMap.get(ADDITIONAL_PROPERTIES.getValue())));
+            if (JAVA_DEFAULT_SCHEMA_TYPES.containsKey(type)) {
+                System.out.println("CORRECT TYPE!");
+                variableProperties.setType(String.format(MAP_TYPE.getValue(), JAVA_DEFAULT_SCHEMA_TYPES.get(type)));
+            } else if (OBJECT.getValue().equals(type)) {
+                variableProperties.setType(String.format(MAP_TYPE.getValue(), OBJECT_TYPE.getValue()));
+            }
+            System.out.println();
         }
+    }
+
+    private static void fillEnumSchema(String propertyName, Map<String, Object> propertiesMap, Map<String, Object> innerSchemas) {
+        if (getStringValueIfExistOrElseNull(X_ENUM_NAMES, propertiesMap) != null) {
+            Map<String, Object> enumerationMap = castObjectToMap(propertiesMap.get(X_ENUM_NAMES.getValue()));
+            Map<String, Object> enums = new HashMap<>();
+            Map<String, Object> enumWithDescription = fillByEnumWithDescription(enumerationMap);
+            innerSchemas.put(propertyName, enumWithDescription);
+        } else if (getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap) != null) {
+            List<String> enums = castObjectToList(propertiesMap.get(ENUMERATION.getValue()));
+            Map<String, Object> enumsMap = fillByEnum(enums);
+            innerSchemas.put(propertyName, enumsMap);
+        }
+    }
+
+    private static Map<String, Object> fillByEnumWithDescription(Map<String, Object> enums) {
+        Map<String, Object> result = new ConcurrentHashMap<>();
+        Map<String, Object> vp = new ConcurrentHashMap<>();
+        Map<String, Object> type = new ConcurrentHashMap<>();
+        Map<String, Object> properties = new ConcurrentHashMap<>(){};
+        type.put(TYPE.getValue(), OBJECT.getValue());
+        enums.forEach((enumName, enumDescription) -> {
+            Map<String, Object> prop = new ConcurrentHashMap<>();
+            prop.put(TYPE.getValue(), formatString(ENUM_TYPE, enumName, enumDescription));
+            prop.put(X_ENUM_NAMES.getValue(), enumDescription);
+            prop.put(ENUMERATION.getValue(), enumName);
+            vp.put(enumName, prop);
+        });
+        properties.put(PROPERTIES.getValue(), vp);
+        result.putAll(type);
+        result.putAll(properties);
+        return result;
+    }
+
+    private static Map<String, Object> fillByEnum(List<String> enums) {
+        Map<String, Object> result = new ConcurrentHashMap<>();
+        Map<String, Object> vp = new ConcurrentHashMap<>();
+        Map<String, Object> type = new ConcurrentHashMap<>();
+        Map<String, Object> properties = new ConcurrentHashMap<>(){};
+        type.put(TYPE.getValue(), OBJECT.getValue());
+        enums.forEach(enumName -> {
+            Map<String, Object> prop = new ConcurrentHashMap<>();
+            prop.put(TYPE.getValue(), enumName);
+            prop.put(ENUMERATION.getValue(), enumName);
+            vp.put(enumName, prop);
+        });
+        properties.put(PROPERTIES.getValue(), vp);
+        result.putAll(type);
+        result.putAll(properties);
+        return result;
     }
 
     /**
@@ -256,12 +339,12 @@ public class MapperUtil {
                     annotationSet.add(annotation);
                 }
             }
-            if (variableProperties.getType() != null && !JAVA_DEFAULT_TYPES.contains(variableProperties.getType())) {
+            if (variableProperties.isEnum() == false && variableProperties.getType() != null && !JAVA_DEFAULT_TYPES.contains(variableProperties.getType())) {
                 importSet.add(JAVA_TYPES_REQUIRED_IMPORTS.get(VALID_ANNOTATION.getValue()));
                 annotationSet.add(VALID_ANNOTATION.getValue());
             }
         });
-        if (variableProperties.getType() != null && !JAVA_DEFAULT_TYPES.contains(variableProperties.getType())) {
+        if (variableProperties.isEnum() == false && variableProperties.getType() != null && !JAVA_DEFAULT_TYPES.contains(variableProperties.getType())) {
             importSet.add(JAVA_TYPES_REQUIRED_IMPORTS.get(VALID_ANNOTATION.getValue()));
             annotationSet.add(VALID_ANNOTATION.getValue());
         }

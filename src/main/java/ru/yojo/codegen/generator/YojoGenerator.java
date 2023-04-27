@@ -65,8 +65,14 @@ public class YojoGenerator implements Generator {
         String messagePackage = getPackage(packageLocation, outputDirectoryName, MESSAGE_PACKAGE_IMPORT);
         String commonPackage = getPackage(packageLocation, outputDirectoryName, COMMON_PACKAGE_IMPORT);
 
-        Map<String, Object> messagesMap = castObjectToMap(castObjectToMap(castObjectToMap(obj.get("components"))).get("messages"));
-        Map<String, Object> schemasMap = castObjectToMap(castObjectToMap(castObjectToMap(obj.get("components"))).get("schemas"));
+        Map<String, Object> messagesMap =
+                castObjectToMap(
+                castObjectToMap(
+                        castObjectToMap(obj.get("components"))).get("messages"));
+        Map<String, Object> schemasMap =
+                castObjectToMap(
+                        castObjectToMap(
+                                castObjectToMap(obj.get("components"))).get("schemas"));
 
         analyzeSchemas(filePath, schemasMap);
 
@@ -120,6 +126,7 @@ public class YojoGenerator implements Generator {
         System.out.println("Starting Analyze AsyncAPI: " + filePath);
         schemasMap.forEach((schemaName, schemaValues) -> {
             System.out.println("ANALYZING OF SCHEMA: " + schemaName);
+            System.out.println(schemaValues);
             Map<String, Object> schemaMap = castObjectToMap(schemaValues);
             String schemaType = getStringValueIfExistOrElseNull(TYPE, schemaMap);
             if (schemaType != null) {

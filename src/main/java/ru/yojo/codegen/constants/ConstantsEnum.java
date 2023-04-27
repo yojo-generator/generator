@@ -22,6 +22,7 @@ public enum ConstantsEnum {
     ITEMS("items"),
     PATTERN("pattern"),
     ENUMERATION("enum"),
+    X_ENUM_NAMES("x-enumNames"),
     ARRAY("array"),
     OBJECT("object"),
     NAME("name"),
@@ -29,6 +30,7 @@ public enum ConstantsEnum {
     SUMMARY("summary"),
     PAYLOAD("payload"),
     TAGS("tags"),
+    ADDITIONAL_PROPERTIES("additionalProperties"),
 
     /**
      * Schema Types
@@ -64,6 +66,7 @@ public enum ConstantsEnum {
     LOMBOK_ALL_ARGS_CONSTRUCTOR_ANNOTATION("@AllArgsConstructor"),
     LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION("@NoArgsConstructor"),
     LOMBOK_DATA_ANNOTATION("@Data"),
+    LOMBOK_GETTER_ANNOTATION("@Getter"),
     LOMBOK_ACCESSORS_ANNOTATION("@Accessors(fluent = true, chain = true)"),
     LOMBOK_ACCESSORS_EMPTY_ANNOTATION("@Accessors"),
     LOMBOK_ACCESSORS_FLUENT_ANNOTATION("@Accessors(fluent = true)"),
@@ -75,6 +78,7 @@ public enum ConstantsEnum {
     LOMBOK_ALL_ARGS_CONSTRUCTOR_IMPORT("lombok.AllArgsConstructor;"),
     LOMBOK_NO_ARGS_CONSTRUCTOR_IMPORT("lombok.NoArgsConstructor;"),
     LOMBOK_DATA_IMPORT("lombok.Data;"),
+    LOMBOK_GETTER_IMPORT("lombok.Getter;"),
     LOMBOK_ACCESSORS_IMPORT("lombok.experimental.Accessors;"),
 
     /**
@@ -104,6 +108,7 @@ public enum ConstantsEnum {
     PATTERN_IMPORT("javax.validation.constraints.Pattern;"),
     VALID_IMPORT("javax.validation.Valid;"),
     LIST_IMPORT("java.util.List;"),
+    MAP_IMPORT("java.util.Map;"),
     DIGITS_IMPORT("javax.validation.constraints.Digits;"),
 
     /**
@@ -133,7 +138,10 @@ public enum ConstantsEnum {
      * Others
      */
     FIELD("    private %s %s;"),
+    FIELD_ENUM_WITH_DESCRIPTION("    private String description;"),
     LIST_TYPE("List<%s>"),
+    MAP_TYPE("Map<String, %s>"),
+    ENUM_TYPE("%s(\"%s\")"),
     DELIMETER("/"),
     TABULATION("    "),
     IMPORT("import "),
@@ -178,15 +186,15 @@ public enum ConstantsEnum {
             UUID.value
     );
 
-    public static final List<String> JAVA_DEFAULT_SCHEMA_TYPES = List.of(
-            ST_STRING.value,
-            ST_INTEGER.value,
-            ST_LONG.value,
-            ST_BOOLEAN.value,
-            ST_BIG_DECIMAL.value,
-            ST_LOCAL_DATE.value,
-            ST_LOCAL_DATE_TIME.value,
-            ST_UUID.value
+    public static final Map<String, Object> JAVA_DEFAULT_SCHEMA_TYPES = Map.of(
+            ST_STRING.value, STRING.value,
+            ST_INTEGER.value, INTEGER.value,
+            ST_LONG.value, LONG.value,
+            ST_BOOLEAN.value, BOOLEAN.value,
+            ST_BIG_DECIMAL.value, BIG_DECIMAL.value,
+            ST_LOCAL_DATE.value, LOCAL_DATE.value,
+            ST_LOCAL_DATE_TIME.value, LOCAL_DATE_TIME.value,
+            ST_UUID.value, UUID.value
     );
     private final String value;
 

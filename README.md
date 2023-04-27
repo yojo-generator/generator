@@ -255,6 +255,10 @@ See examples [here](./examples)
 * 📈 Added support inner schemas
 * 📈 Optimization code by abstract of variable properties
 
+### 💥 Release 1.0.1:
+* 📈 Added support of generation `Enum` classes
+* 📈 Added support of generation `Map<String, Object>` or other default types
+
 ## Developers
 * 😎 Vladimir Morozkin
   * 💬 Contacts:

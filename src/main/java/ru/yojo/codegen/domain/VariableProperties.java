@@ -34,6 +34,10 @@ public class VariableProperties {
 
     private String title;
 
+    private String enumNames;
+
+    private boolean isEnum = false;
+
     private Set<String> annotationSet = new HashSet<>();
 
     private Set<String> requiredImports = new HashSet<>();
@@ -86,8 +90,24 @@ public class VariableProperties {
         return enumeration;
     }
 
+    public boolean isEnum() {
+        return isEnum;
+    }
+
+    public void setEnum(boolean anEnum) {
+        isEnum = anEnum;
+    }
+
     public void setEnumeration(String enumeration) {
         this.enumeration = enumeration;
+    }
+
+    public String getEnumNames() {
+        return enumNames;
+    }
+
+    public void setEnumNames(String enumNames) {
+        this.enumNames = enumNames;
     }
 
     public String getExample() {
@@ -217,7 +237,7 @@ public class VariableProperties {
 
     public String toWrite() {
         StringBuilder stringBuilder = new StringBuilder();
-        generateJavaDoc(stringBuilder, getDescription(), getEnumeration(), getExample());
+        generateJavaDoc(stringBuilder, getDescription(), getExample());
         getAnnotationSet().forEach(annotation -> {
             stringBuilder.append(lineSeparator())
                     .append(TABULATION.getValue())
