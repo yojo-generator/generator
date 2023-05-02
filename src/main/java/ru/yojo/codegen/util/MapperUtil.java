@@ -175,12 +175,12 @@ public class MapperUtil {
      * Fill properties
      *
      * @param variableProperties variableProperties
-     * @param requiredAttributes requiredAttributes
+     * @param currentSchema      currentSchema
      * @param schemas            schemas
      * @param propertyName       propertyName
      * @param propertiesMap      propertiesMap
      * @param commonPackage      commonPackage
-     * @param innerSchemas
+     * @param innerSchemas       innerSchemas
      */
     public static void fillProperties(VariableProperties variableProperties, Map<String, Object> currentSchema, Map<String, Object> schemas, String propertyName, Map<String, Object> propertiesMap, String commonPackage, Map<String, Object> innerSchemas) {
         variableProperties.setName(propertyName);
@@ -207,12 +207,12 @@ public class MapperUtil {
      * Recursive Filling from $ref Objects
      *
      * @param variableProperties variableProperties
-     * @param requiredAttributes requiredAttributes
+     * @param currentSchema      currentSchema
      * @param schemas            schemas
      * @param propertyName       propertyName
      * @param propertiesMap      propertiesMap
      * @param commonPackage      commonPackage
-     * @param innerSchemas
+     * @param innerSchemas       innerSchemas
      */
     public static void recursivelyFillProperties(VariableProperties variableProperties, Map<String, Object> currentSchema, Map<String, Object> schemas, String propertyName, Map<String, Object> propertiesMap, String commonPackage, Map<String, Object> innerSchemas) {
         if (ARRAY.getValue().equals(uncapitalize(variableProperties.getType()))) {
@@ -337,7 +337,7 @@ public class MapperUtil {
      * Method filling required annotations and imports
      *
      * @param variableProperties variableProperties
-     * @param requiredAttributes requiredAttributes
+     * @param currentSchema      currentSchema
      * @param propertyName       propertyName
      */
     public static void fillRequiredAnnotationsAndImports(VariableProperties variableProperties, Map<String, Object> currentSchema, String propertyName) {
