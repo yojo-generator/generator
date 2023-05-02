@@ -1,6 +1,8 @@
 package ru.yojo.codegen.domain;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static java.lang.System.lineSeparator;
 import static ru.yojo.codegen.constants.ConstantsEnum.*;
@@ -12,6 +14,25 @@ public class FillParameters {
     }
 
     private List<VariableProperties> variableProperties;
+
+    private Set<String> validationGroups = new HashSet<>();
+    private Set<String> validationGroupsImports = new HashSet<>();
+
+    public Set<String> getValidationGroups() {
+        return validationGroups;
+    }
+
+    public void setValidationGroups(Set<String> validationGroups) {
+        this.validationGroups = validationGroups;
+    }
+
+    public Set<String> getValidationGroupsImports() {
+        return validationGroupsImports;
+    }
+
+    public void setValidationGroupsImports(Set<String> validationGroupsImports) {
+        this.validationGroupsImports = validationGroupsImports;
+    }
 
     public FillParameters(List<VariableProperties> variableProperties) {
         this.variableProperties = variableProperties;

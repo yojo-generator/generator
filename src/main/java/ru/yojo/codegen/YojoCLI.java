@@ -1,7 +1,6 @@
 package ru.yojo.codegen;
 
 import ru.yojo.codegen.domain.LombokProperties;
-import ru.yojo.codegen.domain.MessageImplementationProperties;
 import ru.yojo.codegen.generator.YojoGenerator;
 import ru.yojo.codegen.mapper.MessageMapper;
 import ru.yojo.codegen.mapper.SchemaMapper;
@@ -24,10 +23,9 @@ public class YojoCLI {
                     "build/generated-sources/ru/yojo/codegen",
                     "ru.yojo.codegen",
                     new LombokProperties(lombokEnabled, allArgsConstr,
-                            new LombokProperties.Accessors(true, false, true)),
-                    new MessageImplementationProperties("ru.yojo.codegen.message", "Message"));
+                            new LombokProperties.Accessors(true, false, true)));
         } else {
-            throw new RuntimeException("Arguments not found: Expected arguments: filePath, outputDirectory, lombokProperties - 3 values(enable, allArgsConstr, accessors), messageImplProperties");
+            throw new RuntimeException("Arguments not found: Expected arguments: filePath, outputDirectory, lombokProperties - 3 values(enable, allArgsConstr, accessors)");
         }
     }
 }

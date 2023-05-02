@@ -23,6 +23,9 @@ public enum ConstantsEnum {
     PATTERN("pattern"),
     ENUMERATION("enum"),
     X_ENUM_NAMES("x-enumNames"),
+    DIGITS("digits"),
+    MINIMUM("minimum"),
+    MAXIMUM("maximum"),
     ARRAY("array"),
     OBJECT("object"),
     NAME("name"),
@@ -31,6 +34,21 @@ public enum ConstantsEnum {
     PAYLOAD("payload"),
     TAGS("tags"),
     ADDITIONAL_PROPERTIES("additionalProperties"),
+    DEFAULT("default"),
+
+    /**
+     * Custom YAML attributes
+     */
+    REALIZATION("realization"),
+    PRIMITIVE("primitive"),
+    VALIDATION_GROUPS("validationGroups"),
+    VALIDATION_GROUPS_IMPORTS("validationGroupsImports"),
+    VALIDATE_BY_GROUPS("validateByGroups"),
+    EXTENDS("extends"),
+    IMPLEMENTS("implements"),
+    FROM_CLASS("fromClass"),
+    FROM_PACKAGE("fromPackage"),
+    FROM_INTERFACE("fromInterface"),
 
     /**
      * Schema Types
@@ -59,6 +77,8 @@ public enum ConstantsEnum {
     PATTERN_ANNOTATION_WITHOUT_REGEXP("@Pattern"),
     VALID_ANNOTATION("@Valid"),
     DIGITS_ANNOTATION("@Digits(%s)"),
+    MINIMUM_ANNOTATION("@Min(%s)"),
+    MAXIMUM_ANNOTATION("@Max(%s)"),
 
     /**
      * Lombok annotations
@@ -86,6 +106,7 @@ public enum ConstantsEnum {
      */
     LOCAL_DATE("LocalDate"),
     LOCAL_DATE_TIME("LocalDateTime"),
+    OFFSET_DATE_TIME("OffsetDateTime"),
     LONG("Long"),
     INTEGER("Integer"),
     UUID("UUID"),
@@ -100,6 +121,7 @@ public enum ConstantsEnum {
     BIG_DECIMAL_IMPORT("java.math.BigDecimal;"),
     LOCAL_DATE_IMPORT("java.time.LocalDate;"),
     LOCAL_DATE_TIME_IMPORT("java.time.LocalDateTime;"),
+    OFFSET_DATE_TIME_IMPORT("java.time.OffsetDateTime;"),
     UUID_IMPORT("java.util.UUID;"),
     NOT_BLANK_IMPORT("javax.validation.constraints.NotBlank;"),
     NOT_EMPTY_IMPORT("javax.validation.constraints.NotEmpty;"),
@@ -108,8 +130,11 @@ public enum ConstantsEnum {
     PATTERN_IMPORT("javax.validation.constraints.Pattern;"),
     VALID_IMPORT("javax.validation.Valid;"),
     LIST_IMPORT("java.util.List;"),
+    ARRAY_LIST_IMPORT("java.util.ArrayList;"),
     MAP_IMPORT("java.util.Map;"),
     DIGITS_IMPORT("javax.validation.constraints.Digits;"),
+    MIN_IMPORT("javax.validation.constraints.Min;"),
+    MAX_IMPORT("javax.validation.constraints.Max;"),
 
     /**
      * Java Doc
@@ -138,13 +163,16 @@ public enum ConstantsEnum {
      * Others
      */
     FIELD("    private %s %s;"),
+    FIELD_WITH_DEFAULT_VALUE("    private %s %s = %s;"),
     FIELD_ENUM_WITH_DESCRIPTION("    private String description;"),
+    ARRAY_LIST_REALISATION("new ArrayList<>()"),
     LIST_TYPE("List<%s>"),
     MAP_TYPE("Map<String, %s>"),
     ENUM_TYPE("%s(\"%s\")"),
     DELIMETER("/"),
     TABULATION("    "),
     IMPORT("import "),
+    GROUPS("groups = "),
     MESSAGE_PACKAGE_IMPORT("messages;"),
     COMMON_PACKAGE_IMPORT("common;");
 

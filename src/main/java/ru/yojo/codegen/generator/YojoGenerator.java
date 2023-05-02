@@ -3,7 +3,6 @@ package ru.yojo.codegen.generator;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 import ru.yojo.codegen.domain.LombokProperties;
-import ru.yojo.codegen.domain.MessageImplementationProperties;
 import ru.yojo.codegen.domain.message.Message;
 import ru.yojo.codegen.domain.schema.Schema;
 import ru.yojo.codegen.exception.SchemaFillException;
@@ -46,7 +45,7 @@ public class YojoGenerator implements Generator {
      * Main method for generate POJO
      */
     @Override
-    public void generate(String filePath, String outputDirectory, String packageLocation, LombokProperties lombokProperties, MessageImplementationProperties messageImplementationProperties) {
+    public void generate(String filePath, String outputDirectory, String packageLocation, LombokProperties lombokProperties) {
         Map<String, Object> obj;
         try (InputStream fileInputStream = new FileInputStream(filePath)) {
             obj = new Yaml().load(fileInputStream);
@@ -76,7 +75,7 @@ public class YojoGenerator implements Generator {
 
         analyzeSchemas(filePath, schemasMap);
 
-        processMessages(lombokProperties, messageImplementationProperties, outputDirectoryName, output, messagePackage, commonPackage, messagesMap, schemasMap);
+        processMessages(lombokProperties, outputDirectoryName, output, messagePackage, commonPackage, messagesMap, schemasMap);
         processSchemas(lombokProperties, outputDirectoryName, output, commonPackage, schemasMap);
 
         System.out.println(LOG_FINISH);
@@ -100,7 +99,7 @@ public class YojoGenerator implements Generator {
         }
     }
 
-    private void processMessages(LombokProperties lombokProperties, MessageImplementationProperties messageImplementationProperties, String outputDirectoryName, String output, String messagePackage, String commonPackage, Map<String, Object> messagesMap, Map<String, Object> schemasMap) {
+    private void processMessages(LombokProperties lombokProperties, String outputDirectoryName, String output, String messagePackage, String commonPackage, Map<String, Object> messagesMap, Map<String, Object> schemasMap) {
         System.out.println(ANSI_CYAN + LOG_DELIMETER);
         List<Message> messageList =
                 messageMapper.mapMessagesToObjects(
@@ -108,8 +107,7 @@ public class YojoGenerator implements Generator {
                         schemasMap,
                         lombokProperties,
                         messagePackage,
-                        commonPackage,
-                        messageImplementationProperties);
+                        commonPackage);
         System.out.println();
         System.out.println("START WRITING JAVA CLASS FROM MESSAGES:");
         messageList.forEach(message -> System.out.println(message.getMessageName()));
