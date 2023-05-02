@@ -25,10 +25,6 @@ public class Message {
     private Set<String> implementsFrom = new HashSet<>();
     private Set<String> importSet = new HashSet<>();
 
-    public LombokProperties getLombokProperties() {
-        return lombokProperties;
-    }
-
     public void setLombokProperties(LombokProperties lombokProperties) {
         this.lombokProperties = lombokProperties;
     }
@@ -45,32 +41,16 @@ public class Message {
         this.messagePackageName = messagePackageName;
     }
 
-    public String getCommonPackageName() {
-        return commonPackageName;
-    }
-
     public void setCommonPackageName(String commonPackageName) {
         this.commonPackageName = commonPackageName;
-    }
-
-    public String getExtendsFrom() {
-        return extendsFrom;
     }
 
     public void setExtendsFrom(String extendsFrom) {
         this.extendsFrom = extendsFrom;
     }
 
-    public String getSummary() {
-        return summary;
-    }
-
     public void setSummary(String summary) {
         this.summary = summary;
-    }
-
-    public FillParameters getFillParameters() {
-        return fillParameters;
     }
 
     public void setFillParameters(FillParameters fillParameters) {
@@ -81,37 +61,22 @@ public class Message {
         return implementsFrom;
     }
 
-    public void setImplementsFrom(Set<String> implementsFrom) {
-        this.implementsFrom = implementsFrom;
-    }
-
     public Set<String> getImportSet() {
         return importSet;
-    }
-
-    public void setImportSet(Set<String> importSet) {
-        this.importSet = importSet;
     }
 
     public String toWrite() {
 
         Set<String> requiredImports = new HashSet<>();
         StringBuilder lombokAnnotationBuilder = new StringBuilder();
-        StringBuilder stringBuilder = null;
-
-        if (!implementsFrom.isEmpty() && isNotBlank(extendsFrom)) {
-            stringBuilder = getExtendsWithImplementationClassBuilder(messageName, extendsFrom, implementsFrom);
-        } else if (!implementsFrom.isEmpty() && isBlank(extendsFrom)) {
-            stringBuilder = getImplementationClassBuilder(messageName, implementsFrom);
-        } else if (implementsFrom.isEmpty() && isNotBlank(extendsFrom)) {
-            stringBuilder = getExtendsClassBuilder(messageName, extendsFrom);
-        } else {
-            stringBuilder = getClassBuilder(messageName);
-        }
-
-        requiredImports.addAll(importSet);
-        stringBuilder.append(fillParameters.toWrite())
-                .append(lineSeparator());
+        StringBuilder stringBuilder = prepareStringBuilder(
+                requiredImports,
+                implementsFrom,
+                extendsFrom,
+                messageName,
+                importSet,
+                fillParameters
+        );
 
         if (lombokProperties.enableLombok()) {
             if (fillParameters.getVariableProperties().stream()
@@ -128,10 +93,9 @@ public class Message {
             buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder);
         }
         if (!lombokProperties.enableLombok()) {
-            StringBuilder finalStringBuilder = stringBuilder;
             fillParameters.getVariableProperties().forEach(vp -> {
                 String reference = vp.getReference();
-                finalStringBuilder
+                stringBuilder
                         .append(lineSeparator())
                         .append(generateSetter(reference, uncapitalize(reference)))
                         .append(lineSeparator())

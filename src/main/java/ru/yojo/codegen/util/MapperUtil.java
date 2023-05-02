@@ -1,6 +1,7 @@
 package ru.yojo.codegen.util;
 
 import ru.yojo.codegen.constants.ConstantsEnum;
+import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.LombokProperties;
 import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.exception.SchemaFillException;
@@ -462,6 +463,25 @@ public class MapperUtil {
                 .append(lineSeparator())
                 .append("}")
                 .toString();
+    }
+
+    public static StringBuilder prepareStringBuilder(Set<String> requiredImports, Set<String> implementsFrom, String extendsFrom, String schemaName, Set<String> importSet, FillParameters fillParameters) {
+        StringBuilder stringBuilder;
+        if (!implementsFrom.isEmpty() && isNotBlank(extendsFrom)) {
+            stringBuilder = getExtendsWithImplementationClassBuilder(schemaName, extendsFrom, implementsFrom);
+        } else if (!implementsFrom.isEmpty() && isBlank(extendsFrom)) {
+            stringBuilder = getImplementationClassBuilder(schemaName, implementsFrom);
+        } else if (implementsFrom.isEmpty() && isNotBlank(extendsFrom)) {
+            stringBuilder = getExtendsClassBuilder(schemaName, extendsFrom);
+        } else {
+            stringBuilder = getClassBuilder(schemaName);
+        }
+
+        requiredImports.addAll(importSet);
+        stringBuilder
+                .append(fillParameters.toWrite())
+                .append(lineSeparator());
+        return stringBuilder;
     }
 
     /*
