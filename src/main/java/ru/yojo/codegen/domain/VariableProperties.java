@@ -34,9 +34,23 @@ public class VariableProperties {
 
     private String title;
 
+    private String digits;
+
+    private String minimum;
+
+    private String maximum;
+
+    private String defaultProperty;
+
+    private String realisation;
+
     private String enumNames;
 
     private boolean isEnum = false;
+
+    private Boolean primitive;
+
+    private String annotationParameter;
 
     private Set<String> annotationSet = new HashSet<>();
 
@@ -130,6 +144,67 @@ public class VariableProperties {
         this.requiredImports = requiredImports;
     }
 
+    public String getDigits() {
+        return digits;
+    }
+
+    public void setDigits(String digits) {
+        this.digits = digits;
+    }
+
+    public String getRealisation() {
+        return realisation;
+    }
+
+    public void setRealisation(String realisation) {
+        this.realisation = realisation;
+        if (realisation != null && realisation.startsWith("ArrayList")) {
+            requiredImports.add(ARRAY_LIST_IMPORT.getValue());
+        }
+    }
+
+    public String getMinimum() {
+        return minimum;
+    }
+
+    public void setMinimum(String minimum) {
+        this.minimum = minimum;
+        if (isNotBlank(minimum)) {
+            annotationSet.add(generateMinAnnotation(minimum));
+            requiredImports.add(MIN_IMPORT.getValue());
+        }
+    }
+
+    public String getMaximum() {
+        return maximum;
+    }
+
+    public void setMaximum(String maximum) {
+        this.maximum = maximum;
+        if (isNotBlank(maximum)) {
+            annotationSet.add(generateMaxAnnotation(maximum));
+            requiredImports.add(MAX_IMPORT.getValue());
+        }
+    }
+
+    public String getAnnotationParameter() {
+        return annotationParameter;
+    }
+
+    public void setAnnotationParameter(String annotationParameter) {
+        this.annotationParameter = annotationParameter;
+    }
+
+    public boolean isPrimitive() {
+        return primitive;
+    }
+
+    public void setPrimitive(String primitive) {
+        if (primitive != null) {
+            this.primitive = Boolean.valueOf(primitive);
+        }
+    }
+
     public void setFormat(String format) {
         if (format != null) {
             switch (format) {
@@ -147,6 +222,14 @@ public class VariableProperties {
                     if (items != null) {
                         this.items = LOCAL_DATE_TIME.getValue();
                         this.type = String.format(LIST_TYPE.getValue(), LOCAL_DATE_TIME.getValue());
+                    }
+                    break;
+                case "offsetDateTime":
+                    this.type = OFFSET_DATE_TIME.getValue();
+                    requiredImports.add(OFFSET_DATE_TIME_IMPORT.getValue());
+                    if (items != null) {
+                        this.items = OFFSET_DATE_TIME.getValue();
+                        this.type = String.format(LIST_TYPE.getValue(), OFFSET_DATE_TIME.getValue());
                     }
                     break;
                 case "int64":
@@ -171,9 +254,9 @@ public class VariableProperties {
                         this.items = BIG_DECIMAL.getValue();
                         this.type = String.format(LIST_TYPE.getValue(), BIG_DECIMAL.getValue());
                     }
-                    if (title != null) {
+                    if (digits != null) {
                         requiredImports.add(DIGITS_IMPORT.getValue());
-                        annotationSet.add(String.format(DIGITS_ANNOTATION.getValue(), title));
+                        annotationSet.add(String.format(DIGITS_ANNOTATION.getValue(), digits));
                     }
                     break;
             }
@@ -235,6 +318,14 @@ public class VariableProperties {
         this.title = title;
     }
 
+    public String getDefaultProperty() {
+        return defaultProperty;
+    }
+
+    public void setDefaultProperty(String defaultProperty) {
+        this.defaultProperty = defaultProperty;
+    }
+
     public String toWrite() {
         StringBuilder stringBuilder = new StringBuilder();
         generateJavaDoc(stringBuilder, getDescription(), getExample());
@@ -243,6 +334,42 @@ public class VariableProperties {
                     .append(TABULATION.getValue())
                     .append(annotation);
         });
+
+        if (defaultProperty != null) {
+            if (type.equals(STRING.getValue())) {
+                defaultProperty = "\"" + defaultProperty + "\"";
+            }
+            return stringBuilder.append(lineSeparator())
+                    .append(formatString(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), getDefaultProperty())).toString();
+        }
+
+        if (primitive != null) {
+            switch (type) {
+                case "Boolean":
+                    setType(ST_BOOLEAN.getValue());
+                    break;
+                case "Integer":
+                    setType("int");
+                    break;
+                case "Long":
+                    setType("long");
+                    break;
+                case "Double":
+                    setType("double");
+                    break;
+                case "Float":
+                    setType("float");
+                    break;
+            }
+        }
+
+        if (realisation != null) {
+            if (type.startsWith("List")) {
+                return stringBuilder.append(lineSeparator())
+                        .append(formatString(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), ARRAY_LIST_REALISATION.getValue())).toString();
+            }
+        }
+
         return stringBuilder.append(lineSeparator())
                 .append(formatString(FIELD, getType(), getName())).toString();
     }

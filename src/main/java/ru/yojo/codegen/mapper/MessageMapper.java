@@ -3,14 +3,12 @@ package ru.yojo.codegen.mapper;
 import org.springframework.stereotype.Component;
 import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.LombokProperties;
-import ru.yojo.codegen.domain.MessageImplementationProperties;
 import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.message.Message;
-import ru.yojo.codegen.domain.message.MessageProperties;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static ru.yojo.codegen.constants.ConstantsEnum.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
@@ -19,7 +17,7 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 @Component
 public class MessageMapper {
 
-    public List<Message> mapMessagesToObjects(Map<String, Object> messages, Map<String, Object> schemasMap, LombokProperties lombokProperties, String messagePackage, String commonPackage, MessageImplementationProperties messageImplementationProperties) {
+    public List<Message> mapMessagesToObjects(Map<String, Object> messages, Map<String, Object> schemasMap, LombokProperties lombokProperties, String messagePackage, String commonPackage) {
         List<Message> messageList = new ArrayList<>();
         Set<String> removeSchemas = new HashSet<>();
         Set<String> excludeRemoveSchemas = new HashSet<>();
@@ -29,52 +27,49 @@ public class MessageMapper {
             Message message = new Message();
             message.setMessageName(capitalize(messageName));
             message.setLombokProperties(lombokProperties);
-            message.setMessageImplementationProperties(messageImplementationProperties);
 
-            Set<String> extendingSet = new HashSet<>();
-            messageMap.forEach((mk, mv) -> {
-                if (mk.equals(TAGS.getValue())) {
-                    ArrayList<HashMap<String, String>> arrayList = (ArrayList) mv;
-                    arrayList.stream().forEach(map -> {
-                        map.entrySet().stream()
-                                .forEach(entryValue -> {
-                                    if (entryValue.getValue().startsWith("extends")) {
-                                        extendingSet.add(entryValue.getValue());
-                                    }
-                                });
+            Map<String, Object> payloadMap = castObjectToMap(messageMap.get(PAYLOAD.getValue()));
+            AtomicBoolean needToFill = new AtomicBoolean(true);
+            payloadMap.forEach((mk, mv) -> {
+                if (mk.equals(EXTENDS.getValue())) {
+                    Map<String, Object> extendsMap = castObjectToMap(mv);
+                    String fromClass = getStringValueIfExistOrElseNull(FROM_CLASS, extendsMap);
+                    String fromPackage = getStringValueIfExistOrElseNull(FROM_PACKAGE, extendsMap);
+                    System.out.println("SHOULD EXTENDS FROM: " + fromClass);
+                    message.setExtendsFrom(fromClass);
+                    message.getImportSet().add(fromPackage + "." + fromClass + ";");
+                    String refObject = getStringValueIfExistOrElseNull(REFERENCE, payloadMap);
+                    if (refObject != null && refReplace(refObject).equals(fromClass)) {
+                        needToFill.set(false);
+                    }
+                }
+                if (mk.equals(IMPLEMENTS.getValue())) {
+                    Map<String, Object> implementsMap = castObjectToMap(mv);
+                    List<String> fromInterfaceList = castObjectToList(implementsMap.get(FROM_INTERFACE.getValue()));
+                    System.out.println("SHOULD IMPLEMENTS FROM: " + fromInterfaceList);
+                    fromInterfaceList.forEach(ifc -> {
+                        String[] split = ifc.split("[.]");
+                        message.getImplementsFrom().add(split[split.length - 1]);
+                        message.getImportSet().add(ifc + ";");
                     });
                 }
             });
 
-            if (!extendingSet.isEmpty()) {
-                System.out.println("SHOULD EXTEND: " + extendingSet);
-            }
-            if (!extendingSet.isEmpty()) {
-                if (extendingSet.size() > 1) {
-                    String result = null;
-                    List<String> collect = extendingSet.stream().collect(Collectors.toList());
-                    for (int i = 0; i < collect.size(); i++) {
-                        if (i == 0) {
-                            result = collect.get(i);
-                        } else {
-                            result = result + collect.get(i).replace("extends ", ", ");
-                        }
-                    }
-                } else {
-                    message.setExtendsFrom(extendingSet.stream().findFirst().get());
-                }
-                message.setMessageProperties(new MessageProperties(new FillParameters(new ArrayList<>())));
-            } else {
-                message.setMessageProperties(
-                        getProperties(
-                                messageMap,
+            if (needToFill.get()) {
+                message.setFillParameters(
+                        getFillParameters(
+                                payloadMap,
                                 commonPackage,
                                 schemasMap,
                                 removeSchemas,
-                                excludeRemoveSchemas)
+                                excludeRemoveSchemas
+                        )
                 );
+            } else {
+                message.setFillParameters(new FillParameters(new ArrayList<>()));
             }
 
+            message.setSummary(getStringValueIfExistOrElseNull(SUMMARY, messageMap));
             message.setMessagePackageName(messagePackage);
             message.setCommonPackageName(commonPackage);
             messageList.add(message);
@@ -88,42 +83,18 @@ public class MessageMapper {
         return messageList;
     }
 
-    private MessageProperties getProperties(Map<String, Object> messageMap,
-                                            String commonPackage,
-                                            Map<String, Object> schemasMap,
-                                            Set<String> removeSchemas,
-                                            Set<String> excludeRemoveSchemas) {
-        MessageProperties messageProperties = new MessageProperties();
-        messageProperties.setName(getStringValueIfExistOrElseNull(NAME, messageMap));
-        messageProperties.setTitle(getStringValueIfExistOrElseNull(TITLE, messageMap));
-        messageProperties.setSummary(getStringValueIfExistOrElseNull(SUMMARY, messageMap));
-        messageProperties.setPayload(
-                getPayload(
-                        castObjectToMap(messageMap.get(PAYLOAD.getValue())),
-                        commonPackage,
-                        schemasMap,
-                        removeSchemas,
-                        excludeRemoveSchemas
-                )
-        );
-
-        return messageProperties;
-    }
-
-    private FillParameters getPayload(Map<String, Object> payload, String commonPackage, Map<String, Object> schemasMap, Set<String> removeSchemas, Set<String> excludeRemoveSchemas) {
+    private FillParameters getFillParameters(Map<String, Object> payload, String commonPackage, Map<String, Object> schemasMap, Set<String> removeSchemas, Set<String> excludeRemoveSchemas) {
         if (getStringValueIfExistOrElseNull(PROPERTIES, payload) != null) {
             System.out.println("Properties Mapping from message");
             Map<String, Object> propertiesMap = castObjectToMap(payload.get(PROPERTIES.getValue()));
             List<VariableProperties> variableProperties = new ArrayList<>();
-            Set<String> requiredPropertiesSet = getSetValueIfExistsOrElseEmptySet(REQUIRED.getValue(), payload);
 
-            System.out.println("REQUIRED ATTRIBUTES: " + requiredPropertiesSet);
             propertiesMap.forEach((propertyName, propertyValue) -> {
 
                 VariableProperties mvp = new VariableProperties();
                 Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
 
-                fillProperties(mvp, requiredPropertiesSet, payload, propertyName, castObjectToMap(propertyValue), commonPackage, innerSchemas);
+                fillProperties(mvp, payload, payload, propertyName, castObjectToMap(propertyValue), commonPackage, innerSchemas);
 
                 if (mvp.getItems() != null && !JAVA_DEFAULT_TYPES.contains(mvp.getItems())) {
                     excludeRemoveSchemas.add(mvp.getItems());
@@ -143,13 +114,11 @@ public class MessageMapper {
 
                 Set<String> requiredPropertiesSet = getSetValueIfExistsOrElseEmptySet(REQUIRED.getValue(), schema);
                 Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
-                FillParameters parameters = schemaMapper.getSchemaVariableProperties(requiredPropertiesSet, schemasMap, castObjectToMap(schema.get(PROPERTIES.getValue())), commonPackage, innerSchemas);
+                FillParameters parameters = schemaMapper.getSchemaVariableProperties(schema, schemasMap, castObjectToMap(schema.get(PROPERTIES.getValue())), commonPackage, innerSchemas);
                 removeSchemas.add(schemaName);
                 if (!innerSchemas.isEmpty()) {
-                    //Map<String, Object> innerSchemas2 = new ConcurrentHashMap<>();
-                    innerSchemas.forEach((pk,pv) -> excludeRemoveSchemas.add(pk));
+                    innerSchemas.forEach((pk, pv) -> excludeRemoveSchemas.add(pk));
                     schemasMap.putAll(innerSchemas);
-                    //schemaMapper.getSchemaVariableProperties(requiredPropertiesSet, innerSchemas, castObjectToMap(schema.get(PROPERTIES.getValue())), commonPackage, innerSchemas2);
                 }
 
                 return parameters;

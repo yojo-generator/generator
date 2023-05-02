@@ -10,14 +10,14 @@ java {
 }
 
 group 'ru.yojo'
-version '1.0.1'
+version '1.0.2'
 
 publishing {
     publications {
         maven(MavenPublication) {
             artifactId = "yojo-generator"
             groupId = "ru.yojo.codegen"
-            version = "1.0.1"
+            version = "1.0.2"
             from components.java
             pom {
                 packaging = "jar"
@@ -92,8 +92,8 @@ jar {
 dependencies {
     implementation 'org.springframework:spring-context:5.3.25'
     implementation 'org.yaml:snakeyaml:2.0'
-//    implementation 'javax.validation:validation-api:2.0.1.Final'
-//    compileOnly 'org.projectlombok:lombok:1.18.26'
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+    compileOnly 'org.projectlombok:lombok:1.18.26'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.10'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'

@@ -86,14 +86,14 @@ public class Schema {
             fillParameters.getVariableProperties().forEach(vp -> vp.getRequiredImports().remove(VALID_IMPORT.getValue()));
             if (fillParameters.getVariableProperties().stream()
                     .anyMatch(variableProperties -> variableProperties.getEnumNames() != null)) {
-                VariableProperties description = new VariableProperties();
-                description.setType(STRING.getValue());
-                description.setName("description");
+                VariableProperties value = new VariableProperties();
+                value.setType(STRING.getValue());
+                value.setName("value");
                 if (lombokProperties.enableLombok()) {
-                    description.getRequiredImports().add(LOMBOK_GETTER_IMPORT.getValue());
-                    description.getAnnotationSet().add(LOMBOK_GETTER_ANNOTATION.getValue());
+                    value.getRequiredImports().add(LOMBOK_GETTER_IMPORT.getValue());
+                    value.getAnnotationSet().add(LOMBOK_GETTER_ANNOTATION.getValue());
                 }
-                fillParameters.getVariableProperties().add(description);
+                fillParameters.getVariableProperties().add(value);
                 stringBuilder.append(fillParameters.toWrite())
                         .append(lineSeparator());
             } else {

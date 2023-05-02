@@ -1,7 +1,7 @@
 package ru.yojo.codegen.domain.message;
 
+import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.LombokProperties;
-import ru.yojo.codegen.domain.MessageImplementationProperties;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,21 +13,17 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 @SuppressWarnings("all")
 public class Message {
 
+    private String summary;
+    private FillParameters fillParameters;
     private String messageName;
+
     private String messagePackageName;
     private String commonPackageName;
-    private MessageProperties messageProperties;
+
     private LombokProperties lombokProperties;
     private String extendsFrom;
-    private MessageImplementationProperties messageImplementationProperties;
-
-    public MessageProperties getMessageProperties() {
-        return messageProperties;
-    }
-
-    public void setMessageProperties(MessageProperties messageProperties) {
-        this.messageProperties = messageProperties;
-    }
+    private Set<String> implementsFrom = new HashSet<>();
+    private Set<String> importSet = new HashSet<>();
 
     public LombokProperties getLombokProperties() {
         return lombokProperties;
@@ -57,14 +53,6 @@ public class Message {
         this.commonPackageName = commonPackageName;
     }
 
-    public MessageImplementationProperties getMessageImplementationProperties() {
-        return messageImplementationProperties;
-    }
-
-    public void setMessageImplementationProperties(MessageImplementationProperties messageImplementationProperties) {
-        this.messageImplementationProperties = messageImplementationProperties;
-    }
-
     public String getExtendsFrom() {
         return extendsFrom;
     }
@@ -73,34 +61,60 @@ public class Message {
         this.extendsFrom = extendsFrom;
     }
 
+    public String getSummary() {
+        return summary;
+    }
+
+    public void setSummary(String summary) {
+        this.summary = summary;
+    }
+
+    public FillParameters getFillParameters() {
+        return fillParameters;
+    }
+
+    public void setFillParameters(FillParameters fillParameters) {
+        this.fillParameters = fillParameters;
+    }
+
+    public Set<String> getImplementsFrom() {
+        return implementsFrom;
+    }
+
+    public void setImplementsFrom(Set<String> implementsFrom) {
+        this.implementsFrom = implementsFrom;
+    }
+
+    public Set<String> getImportSet() {
+        return importSet;
+    }
+
+    public void setImportSet(Set<String> importSet) {
+        this.importSet = importSet;
+    }
+
     public String toWrite() {
 
         Set<String> requiredImports = new HashSet<>();
         StringBuilder lombokAnnotationBuilder = new StringBuilder();
         StringBuilder stringBuilder = null;
 
-        if (messageImplementationProperties != null && isNotBlank(messageImplementationProperties.getImplementationClass())) {
-            if (extendsFrom != null) {
-                stringBuilder = getExtendsWithImplementationClassBuilder(messageName, extendsFrom, messageImplementationProperties.getImplementationClass());
-                requiredImports.add(commonPackageName.replace(";", "") + "." + extendsFrom.replace("extends ", "") + ";");
-            } else {
-                stringBuilder = getImplementationClassBuilder(messageName, messageImplementationProperties.getImplementationClass());
-            }
-            if (messageImplementationProperties.getImplementationPackage() != null) {
-                requiredImports.add(messageImplementationProperties.getImplementationPackage() + "." + messageImplementationProperties.getImplementationClass() + ";");
-            }
+        if (!implementsFrom.isEmpty() && isNotBlank(extendsFrom)) {
+            stringBuilder = getExtendsWithImplementationClassBuilder(messageName, extendsFrom, implementsFrom);
+        } else if (!implementsFrom.isEmpty() && isBlank(extendsFrom)) {
+            stringBuilder = getImplementationClassBuilder(messageName, implementsFrom);
+        } else if (implementsFrom.isEmpty() && isNotBlank(extendsFrom)) {
+            stringBuilder = getExtendsClassBuilder(messageName, extendsFrom);
         } else {
-            if (extendsFrom != null && messageImplementationProperties == null && isBlank(messageImplementationProperties.getImplementationClass())) {
-                stringBuilder = getExtendsClassBuilder(messageName, extendsFrom);
-                requiredImports.add(commonPackageName + "." + extendsFrom.replace("extends ", "") + ";");
-            }
             stringBuilder = getClassBuilder(messageName);
         }
-        stringBuilder.append(messageProperties.toWrite())
+
+        requiredImports.addAll(importSet);
+        stringBuilder.append(fillParameters.toWrite())
                 .append(lineSeparator());
 
         if (lombokProperties.enableLombok()) {
-            if (messageProperties.getPayload().getVariableProperties().stream()
+            if (fillParameters.getVariableProperties().stream()
                     .anyMatch(prop -> "Data".equals(prop.getType()))) {
                 lombokAnnotationBuilder
                         .append(LOMBOK_DATA_ANNOTATION.getValue().replace("@", "@lombok."))
@@ -115,7 +129,7 @@ public class Message {
         }
         if (!lombokProperties.enableLombok()) {
             StringBuilder finalStringBuilder = stringBuilder;
-            messageProperties.getPayload().getVariableProperties().forEach(vp -> {
+            fillParameters.getVariableProperties().forEach(vp -> {
                 String reference = vp.getReference();
                 finalStringBuilder
                         .append(lineSeparator())
@@ -127,17 +141,17 @@ public class Message {
 
         stringBuilder.insert(0, lombokAnnotationBuilder);
 
-        if (isNotBlank(messageProperties.getSummary())) {
+        if (isNotBlank(summary)) {
             StringBuilder javadoc = new StringBuilder();
             javadoc.append(lineSeparator()).append(JAVA_DOC_CLASS_START.getValue());
-            javadoc.append(lineSeparator()).append(formatString(JAVA_DOC_CLASS_LINE, messageProperties.getSummary()));
+            javadoc.append(lineSeparator()).append(formatString(JAVA_DOC_CLASS_LINE, summary));
             javadoc.append(lineSeparator()).append(JAVA_DOC_CLASS_END.getValue());
             javadoc.append(lineSeparator());
 
             stringBuilder.insert(0, javadoc);
         }
 
-        messageProperties.getPayload().getVariableProperties().forEach(vp -> requiredImports.addAll(vp.getRequiredImports()));
+        fillParameters.getVariableProperties().forEach(vp -> requiredImports.addAll(vp.getRequiredImports()));
 
         return finishBuild(stringBuilder, requiredImports, messagePackageName);
     }
