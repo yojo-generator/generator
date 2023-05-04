@@ -23,7 +23,7 @@ public class YojoCLI {
                     "build/generated-sources/ru/yojo/codegen",
                     "ru.yojo.codegen",
                     new LombokProperties(lombokEnabled, allArgsConstr,
-                            new LombokProperties.Accessors(true, false, true)));
+                            new LombokProperties.Accessors(true, true, true)));
         } else {
             throw new RuntimeException("Arguments not found: Expected arguments: filePath, outputDirectory, lombokProperties - 3 values(enable, allArgsConstr, accessors)");
         }

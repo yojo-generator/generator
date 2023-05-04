@@ -425,9 +425,11 @@ public class MapperUtil {
             String accessors = null;
             if (lombokProperties.getAccessors().isChain()) {
                 accessors = LOMBOK_ACCESSORS_CHAIN_ANNOTATION.getValue();
-            } else if (lombokProperties.getAccessors().isFluent()) {
+            }
+            if (lombokProperties.getAccessors().isFluent()) {
                 accessors = LOMBOK_ACCESSORS_FLUENT_ANNOTATION.getValue();
-            } else if (lombokProperties.getAccessors().isChain() && lombokProperties.getAccessors().isFluent()) {
+            }
+            if (lombokProperties.getAccessors().isChain() && lombokProperties.getAccessors().isFluent()) {
                 accessors = LOMBOK_ACCESSORS_ANNOTATION.getValue();
             } else {
                 accessors = LOMBOK_ACCESSORS_EMPTY_ANNOTATION.getValue();
