@@ -35,6 +35,7 @@ public enum ConstantsEnum {
     TAGS("tags"),
     ADDITIONAL_PROPERTIES("additionalProperties"),
     DEFAULT("default"),
+    ALL_OF("allOf"),
 
     /**
      * Custom YAML attributes

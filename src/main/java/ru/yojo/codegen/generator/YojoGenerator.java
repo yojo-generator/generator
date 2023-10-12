@@ -11,10 +11,7 @@ import ru.yojo.codegen.mapper.SchemaMapper;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static ru.yojo.codegen.constants.ConstantsEnum.*;
 import static ru.yojo.codegen.util.LogUtils.*;
@@ -66,8 +63,8 @@ public class YojoGenerator implements Generator {
 
         Map<String, Object> messagesMap =
                 castObjectToMap(
-                castObjectToMap(
-                        castObjectToMap(obj.get("components"))).get("messages"));
+                        castObjectToMap(
+                                castObjectToMap(obj.get("components"))).get("messages"));
         Map<String, Object> schemasMap =
                 castObjectToMap(
                         castObjectToMap(
@@ -117,33 +114,43 @@ public class YojoGenerator implements Generator {
         System.out.println();
     }
 
-    private static void analyzeSchemas(String filePath, Map<String, Object> schemasMap) {
-        Set<String> incorrectFilledProperties = new HashSet<>();
+    private void analyzeSchemas(String filePath, Map<String, Object> schemasMap) {
+        List<String> incorrectFilledProperties = new ArrayList<>();
         System.out.println();
         System.out.println(ANSI_PURPLE + LOG_DELIMETER);
         System.out.println("Starting Analyze AsyncAPI: " + filePath);
+        Map<String, Object> mapAllOf = new HashMap<>();
         schemasMap.forEach((schemaName, schemaValues) -> {
             System.out.println("ANALYZING OF SCHEMA: " + schemaName);
             System.out.println(schemaValues);
             Map<String, Object> schemaMap = castObjectToMap(schemaValues);
             String schemaType = getStringValueIfExistOrElseNull(TYPE, schemaMap);
-            if (schemaType != null) {
+            String allOf = getStringValueIfExistOrElseNull(ALL_OF, schemaMap);
+            if (allOf != null) {
+                mapAllOf.put(schemaName, schemaValues);
+                System.out.println(ANSI_GREEN + schemaName + " Values: " + schemaValues + ANSI_PURPLE);
+            }
+            if (schemaType != null || allOf != null) {
                 Map<String, Object> propertiesMap = castObjectToMap(schemaMap.get(PROPERTIES.getValue()));
-                propertiesMap.forEach((propName, propValues) -> {
-                    Map<String, Object> propertyValueMap = castObjectToMap(propValues);
-                    if (getStringValueIfExistOrElseNull(TYPE, propertyValueMap) == null &&
-                            getStringValueIfExistOrElseNull(REFERENCE, propertyValueMap) == null) {
-                        incorrectFilledProperties.add("Schema: " + schemaName + " TYPE not found: " + propName);
-                    }
-                });
-            } else {
-                throw new SchemaFillException("NOT DEFINED TYPE OF SCHEMA! Schema: " + schemaName);
+                if (!propertiesMap.isEmpty() && schemaType != null) {
+                    propertiesMap.forEach((propName, propValues) -> {
+                        Map<String, Object> propertyValueMap = castObjectToMap(propValues);
+                        if (getStringValueIfExistOrElseNull(TYPE, propertyValueMap) == null &&
+                                getStringValueIfExistOrElseNull(REFERENCE, propertyValueMap) == null) {
+                            incorrectFilledProperties.add("Schema: " + schemaName + " TYPE not found: " + propName);
+                        }
+
+                    });
+                } else {
+                    incorrectFilledProperties.add("NOT DEFINED TYPE OF SCHEMA! Schema: " + schemaName);
+                }
             }
         });
 
         if (!incorrectFilledProperties.isEmpty()) {
-            incorrectFilledProperties.stream().sorted().forEach(System.err::println);
-            throw new SchemaFillException(incorrectFilledProperties.toString());
+            System.out.println();
+            System.out.println(ANSI_RED + "ANALIZE FAILED! PLEASE, CHECK CONTRACT ATTRIBUTES FILLING!");
+            throwException(incorrectFilledProperties);
         }
         System.out.println("ANALYZE FINISH SUCCESSFULLY!");
         System.out.println(LOG_DELIMETER + ANSI_RESET);
@@ -184,5 +191,8 @@ public class YojoGenerator implements Generator {
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
+    }
+    private void throwException(List<String> messages) {
+        throw new SchemaFillException(messages.toString());
     }
 }

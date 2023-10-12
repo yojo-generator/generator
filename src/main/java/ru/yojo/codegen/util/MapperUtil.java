@@ -422,18 +422,8 @@ public class MapperUtil {
         requiredImports.add(LOMBOK_NO_ARGS_CONSTRUCTOR_IMPORT.getValue());
 
         if (lombokProperties.getAccessors().isEnable()) {
-            String accessors = null;
-            if (lombokProperties.getAccessors().isChain()) {
-                accessors = LOMBOK_ACCESSORS_CHAIN_ANNOTATION.getValue();
-            }
-            if (lombokProperties.getAccessors().isFluent()) {
-                accessors = LOMBOK_ACCESSORS_FLUENT_ANNOTATION.getValue();
-            }
-            if (lombokProperties.getAccessors().isChain() && lombokProperties.getAccessors().isFluent()) {
-                accessors = LOMBOK_ACCESSORS_ANNOTATION.getValue();
-            } else {
-                accessors = LOMBOK_ACCESSORS_EMPTY_ANNOTATION.getValue();
-            }
+            String accessors = fetchAccessors(lombokProperties);
+
             lombokAnnotationBuilder.append(accessors)
                     .append(lineSeparator());
             requiredImports.add(LOMBOK_ACCESSORS_IMPORT.getValue());
@@ -445,6 +435,18 @@ public class MapperUtil {
         }
     }
 
+    private static String fetchAccessors(LombokProperties lombokProperties) {
+        if (lombokProperties.getAccessors().isChain() && lombokProperties.getAccessors().isFluent()) {
+            return LOMBOK_ACCESSORS_ANNOTATION.getValue();
+        }
+        if (lombokProperties.getAccessors().isChain()) {
+            return LOMBOK_ACCESSORS_CHAIN_ANNOTATION.getValue();
+        }
+        if (lombokProperties.getAccessors().isFluent()) {
+            return LOMBOK_ACCESSORS_FLUENT_ANNOTATION.getValue();
+        }
+        return LOMBOK_ACCESSORS_EMPTY_ANNOTATION.getValue();
+    }
 
     public static String finishBuild(StringBuilder stringBuilder, Set<String> requiredImports, String packageName) {
         StringBuilder importBuilder = new StringBuilder();
