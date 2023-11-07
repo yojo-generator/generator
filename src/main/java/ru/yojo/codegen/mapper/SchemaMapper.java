@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static ru.yojo.codegen.constants.ConstantsEnum.*;
+import static ru.yojo.codegen.constants.Dictionary.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 @SuppressWarnings("all")
@@ -37,7 +37,7 @@ public class SchemaMapper {
 
                 AtomicBoolean needToFill = new AtomicBoolean(true);
                 schemaMap.forEach((sk, sv) -> {
-                    if (sk.equals(EXTENDS.getValue())) {
+                    if (sk.equals(EXTENDS)) {
                         Map<String, Object> extendsMap = castObjectToMap(sv);
                         String fromClass = getStringValueIfExistOrElseNull(FROM_CLASS, extendsMap);
                         String fromPackage = getStringValueIfExistOrElseNull(FROM_PACKAGE, extendsMap);
@@ -49,9 +49,9 @@ public class SchemaMapper {
                             needToFill.set(false);
                         }
                     }
-                    if (sk.equals(IMPLEMENTS.getValue())) {
+                    if (sk.equals(IMPLEMENTS)) {
                         Map<String, Object> implementsMap = castObjectToMap(sv);
-                        List<String> fromInterfaceList = castObjectToList(implementsMap.get(FROM_INTERFACE.getValue()));
+                        List<String> fromInterfaceList = castObjectToList(implementsMap.get(FROM_INTERFACE));
                         System.out.println("SHOULD IMPLEMENTS FROM: " + fromInterfaceList);
                         fromInterfaceList.forEach(ifc -> {
                             String[] split = ifc.split("[.]");
@@ -66,7 +66,7 @@ public class SchemaMapper {
                             getSchemaVariableProperties(
                                     schemaMap,
                                     schemas,
-                                    castObjectToMap(schemaMap.get(PROPERTIES.getValue())),
+                                    castObjectToMap(schemaMap.get(PROPERTIES)),
                                     commonPackage,
                                     innerSchemas
                             )
@@ -95,7 +95,7 @@ public class SchemaMapper {
                             getSchemaVariableProperties(
                                     schemaMap,
                                     innerSchemas,
-                                    castObjectToMap(schemaMap.get(PROPERTIES.getValue())),
+                                    castObjectToMap(schemaMap.get(PROPERTIES)),
                                     commonPackage,
                                     innerSchemas
                             )

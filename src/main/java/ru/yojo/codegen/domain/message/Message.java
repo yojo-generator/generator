@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static java.lang.System.lineSeparator;
-import static ru.yojo.codegen.constants.ConstantsEnum.*;
+import static ru.yojo.codegen.constants.Dictionary.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 @SuppressWarnings("all")
@@ -82,13 +82,13 @@ public class Message {
             if (fillParameters.getVariableProperties().stream()
                     .anyMatch(prop -> "Data".equals(prop.getType()))) {
                 lombokAnnotationBuilder
-                        .append(LOMBOK_DATA_ANNOTATION.getValue().replace("@", "@lombok."))
+                        .append(LOMBOK_DATA_ANNOTATION.replace("@", "@lombok."))
                         .append(lineSeparator());
             } else {
                 lombokAnnotationBuilder
-                        .append(LOMBOK_DATA_ANNOTATION.getValue())
+                        .append(LOMBOK_DATA_ANNOTATION)
                         .append(lineSeparator());
-                requiredImports.add(LOMBOK_DATA_IMPORT.getValue());
+                requiredImports.add(LOMBOK_DATA_IMPORT);
             }
             buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder);
         }
@@ -107,9 +107,9 @@ public class Message {
 
         if (isNotBlank(summary)) {
             StringBuilder javadoc = new StringBuilder();
-            javadoc.append(lineSeparator()).append(JAVA_DOC_CLASS_START.getValue());
-            javadoc.append(lineSeparator()).append(formatString(JAVA_DOC_CLASS_LINE, summary));
-            javadoc.append(lineSeparator()).append(JAVA_DOC_CLASS_END.getValue());
+            javadoc.append(lineSeparator()).append(JAVA_DOC_CLASS_START);
+            javadoc.append(lineSeparator()).append(String.format(JAVA_DOC_CLASS_LINE, summary));
+            javadoc.append(lineSeparator()).append(JAVA_DOC_CLASS_END);
             javadoc.append(lineSeparator());
 
             stringBuilder.insert(0, javadoc);

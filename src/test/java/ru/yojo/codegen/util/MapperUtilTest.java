@@ -9,7 +9,7 @@ import java.util.HashSet;
 
 import static java.lang.System.lineSeparator;
 import static org.assertj.core.api.Assertions.assertThat;
-import static ru.yojo.codegen.constants.ConstantsEnum.LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION;
+import static ru.yojo.codegen.constants.Dictionary.LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION;
 
 public class MapperUtilTest {
 
@@ -26,7 +26,7 @@ public class MapperUtilTest {
 
         StringBuilder actualResultStringBuilder = new StringBuilder();
 
-        String expected = LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION.getValue() +
+        String expected = LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION +
                 lineSeparator() +
                 expectedResult.trim() +
                 lineSeparator();
@@ -42,7 +42,7 @@ public class MapperUtilTest {
         LombokProperties lombokProperties = new LombokProperties(true, false, accessors);
 
         StringBuilder actualResultStringBuilder = new StringBuilder();
-        String expected = LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION.getValue() + lineSeparator();
+        String expected = LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION + lineSeparator();
         MapperUtil.buildLombokAnnotations(lombokProperties, new HashSet<>(), actualResultStringBuilder);
 
         assertThat(actualResultStringBuilder.toString()).hasToString(expected);

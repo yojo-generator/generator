@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static java.lang.System.lineSeparator;
-import static ru.yojo.codegen.constants.ConstantsEnum.*;
+import static ru.yojo.codegen.constants.Dictionary.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 @SuppressWarnings("all")
@@ -73,13 +73,13 @@ public class Schema {
             if (lombokProperties.enableLombok()) {
                 if (schemaName.equals("Data") || fillParameters.getVariableProperties().stream().anyMatch(prop -> "Data".equals(prop.getType()))) {
                     lombokAnnotationBuilder
-                            .append(LOMBOK_DATA_ANNOTATION.getValue().replace("@", "@lombok."))
+                            .append(LOMBOK_DATA_ANNOTATION.replace("@", "@lombok."))
                             .append(lineSeparator());
                 } else {
                     lombokAnnotationBuilder
-                            .append(LOMBOK_DATA_ANNOTATION.getValue())
+                            .append(LOMBOK_DATA_ANNOTATION)
                             .append(lineSeparator());
-                    requiredImports.add(LOMBOK_DATA_IMPORT.getValue());
+                    requiredImports.add(LOMBOK_DATA_IMPORT);
                 }
                 buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder);
             }
@@ -101,15 +101,15 @@ public class Schema {
 
         } else {
             stringBuilder = getEnumClassBuilder(schemaName);
-            fillParameters.getVariableProperties().forEach(vp -> vp.getRequiredImports().remove(VALID_IMPORT.getValue()));
+            fillParameters.getVariableProperties().forEach(vp -> vp.getRequiredImports().remove(VALID_IMPORT));
             if (fillParameters.getVariableProperties().stream()
                     .anyMatch(variableProperties -> variableProperties.getEnumNames() != null)) {
                 VariableProperties value = new VariableProperties();
-                value.setType(STRING.getValue());
+                value.setType(STRING);
                 value.setName("value");
                 if (lombokProperties.enableLombok()) {
-                    value.getRequiredImports().add(LOMBOK_GETTER_IMPORT.getValue());
-                    value.getAnnotationSet().add(LOMBOK_GETTER_ANNOTATION.getValue());
+                    value.getRequiredImports().add(LOMBOK_GETTER_IMPORT);
+                    value.getAnnotationSet().add(LOMBOK_GETTER_ANNOTATION);
                 }
                 fillParameters.getVariableProperties().add(value);
                 stringBuilder.append(fillParameters.toWrite())
@@ -121,9 +121,9 @@ public class Schema {
 
             if (lombokProperties.enableLombok() && lombokProperties.allArgsConstructor() && fillParameters.getVariableProperties().stream()
                     .anyMatch(variableProperties -> variableProperties.getEnumNames() != null)) {
-                lombokAnnotationBuilder.append(LOMBOK_ALL_ARGS_CONSTRUCTOR_ANNOTATION.getValue())
+                lombokAnnotationBuilder.append(LOMBOK_ALL_ARGS_CONSTRUCTOR_ANNOTATION)
                         .append(lineSeparator());
-                requiredImports.add(LOMBOK_ALL_ARGS_CONSTRUCTOR_IMPORT.getValue());
+                requiredImports.add(LOMBOK_ALL_ARGS_CONSTRUCTOR_IMPORT);
             }
             StringBuilder finalStringBuilder = stringBuilder;
             fillParameters.getVariableProperties().stream()

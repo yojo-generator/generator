@@ -3,8 +3,9 @@ package ru.yojo.codegen.domain;
 import java.util.HashSet;
 import java.util.Set;
 
+import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
-import static ru.yojo.codegen.constants.ConstantsEnum.*;
+import static ru.yojo.codegen.constants.Dictionary.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 @SuppressWarnings("all")
@@ -159,7 +160,7 @@ public class VariableProperties {
     public void setRealisation(String realisation) {
         this.realisation = realisation;
         if (realisation != null && realisation.startsWith("ArrayList")) {
-            requiredImports.add(ARRAY_LIST_IMPORT.getValue());
+            requiredImports.add(ARRAY_LIST_IMPORT);
         }
     }
 
@@ -171,7 +172,7 @@ public class VariableProperties {
         this.minimum = minimum;
         if (isNotBlank(minimum)) {
             annotationSet.add(generateMinAnnotation(minimum));
-            requiredImports.add(MIN_IMPORT.getValue());
+            requiredImports.add(MIN_IMPORT);
         }
     }
 
@@ -183,7 +184,7 @@ public class VariableProperties {
         this.maximum = maximum;
         if (isNotBlank(maximum)) {
             annotationSet.add(generateMaxAnnotation(maximum));
-            requiredImports.add(MAX_IMPORT.getValue());
+            requiredImports.add(MAX_IMPORT);
         }
     }
 
@@ -209,54 +210,54 @@ public class VariableProperties {
         if (format != null) {
             switch (format) {
                 case "date":
-                    this.type = LOCAL_DATE.getValue();
-                    requiredImports.add(LOCAL_DATE_IMPORT.getValue());
+                    this.type = LOCAL_DATE;
+                    requiredImports.add(LOCAL_DATE_IMPORT);
                     if (items != null) {
-                        this.items = LOCAL_DATE.getValue();
-                        this.type = String.format(LIST_TYPE.getValue(), LOCAL_DATE.getValue());
+                        this.items = LOCAL_DATE;
+                        this.type = format(LIST_TYPE, LOCAL_DATE);
                     }
                     break;
                 case "date-time":
-                    this.type = LOCAL_DATE_TIME.getValue();
-                    requiredImports.add(LOCAL_DATE_TIME_IMPORT.getValue());
+                    this.type = LOCAL_DATE_TIME;
+                    requiredImports.add(LOCAL_DATE_TIME_IMPORT);
                     if (items != null) {
-                        this.items = LOCAL_DATE_TIME.getValue();
-                        this.type = String.format(LIST_TYPE.getValue(), LOCAL_DATE_TIME.getValue());
+                        this.items = LOCAL_DATE_TIME;
+                        this.type = format(LIST_TYPE, LOCAL_DATE_TIME);
                     }
                     break;
                 case "offsetDateTime":
-                    this.type = OFFSET_DATE_TIME.getValue();
-                    requiredImports.add(OFFSET_DATE_TIME_IMPORT.getValue());
+                    this.type = OFFSET_DATE_TIME;
+                    requiredImports.add(OFFSET_DATE_TIME_IMPORT);
                     if (items != null) {
-                        this.items = OFFSET_DATE_TIME.getValue();
-                        this.type = String.format(LIST_TYPE.getValue(), OFFSET_DATE_TIME.getValue());
+                        this.items = OFFSET_DATE_TIME;
+                        this.type = format(LIST_TYPE, OFFSET_DATE_TIME);
                     }
                     break;
                 case "int64":
-                    this.type = LONG.getValue();
+                    this.type = LONG;
                     if (items != null) {
-                        this.items = LONG.getValue();
-                        this.type = String.format(LIST_TYPE.getValue(), LONG.getValue());
+                        this.items = LONG;
+                        this.type = format(LIST_TYPE, LONG);
                     }
                     break;
                 case "uuid":
-                    this.type = UUID.getValue();
-                    requiredImports.add(UUID_IMPORT.getValue());
+                    this.type = UUID;
+                    requiredImports.add(UUID_IMPORT);
                     if (items != null) {
-                        this.items = UUID.getValue();
-                        this.type = String.format(LIST_TYPE.getValue(), UUID.getValue());
+                        this.items = UUID;
+                        this.type = format(LIST_TYPE, UUID);
                     }
                     break;
                 case "bigDecimal":
-                    this.type = BIG_DECIMAL.getValue();
-                    requiredImports.add(BIG_DECIMAL_IMPORT.getValue());
+                    this.type = BIG_DECIMAL;
+                    requiredImports.add(BIG_DECIMAL_IMPORT);
                     if (items != null) {
-                        this.items = BIG_DECIMAL.getValue();
-                        this.type = String.format(LIST_TYPE.getValue(), BIG_DECIMAL.getValue());
+                        this.items = BIG_DECIMAL;
+                        this.type = format(LIST_TYPE, BIG_DECIMAL);
                     }
                     if (digits != null) {
-                        requiredImports.add(DIGITS_IMPORT.getValue());
-                        annotationSet.add(String.format(DIGITS_ANNOTATION.getValue(), digits));
+                        requiredImports.add(DIGITS_IMPORT);
+                        annotationSet.add(format(DIGITS_ANNOTATION, digits));
                     }
                     break;
             }
@@ -266,8 +267,8 @@ public class VariableProperties {
 
     public void setPattern(String pattern) {
         if (pattern != null) {
-            annotationSet.add(String.format(PATTERN_ANNOTATION.getValue(), pattern));
-            requiredImports.add(JAVA_TYPES_REQUIRED_IMPORTS.get(substringBefore(PATTERN_ANNOTATION.getValue(), "(")));
+            annotationSet.add(format(PATTERN_ANNOTATION, pattern));
+            requiredImports.add(JAVA_TYPES_REQUIRED_IMPORTS.get(substringBefore(PATTERN_ANNOTATION, "(")));
         }
         this.pattern = pattern;
     }
@@ -286,7 +287,7 @@ public class VariableProperties {
 
     public void setItems(String items) {
         if (items != null) {
-            requiredImports.add(LIST_IMPORT.getValue());
+            requiredImports.add(LIST_IMPORT);
         }
         this.items = items;
     }
@@ -296,7 +297,7 @@ public class VariableProperties {
             annotationSet.add(generateSizeAnnotation(min, max));
             requiredImports.add(
                     JAVA_TYPES_REQUIRED_IMPORTS.get(substringBefore(
-                            SIZE_MIN_MAX_ANNOTATION.getValue(), "(")));
+                            SIZE_MIN_MAX_ANNOTATION, "(")));
         }
         this.minLength = min;
         this.maxLength = max;
@@ -331,22 +332,22 @@ public class VariableProperties {
         generateJavaDoc(stringBuilder, getDescription(), getExample());
         getAnnotationSet().forEach(annotation -> {
             stringBuilder.append(lineSeparator())
-                    .append(TABULATION.getValue())
+                    .append(TABULATION)
                     .append(annotation);
         });
 
         if (defaultProperty != null) {
-            if (type.equals(STRING.getValue())) {
+            if (type.equals(STRING)) {
                 defaultProperty = "\"" + defaultProperty + "\"";
             }
             return stringBuilder.append(lineSeparator())
-                    .append(formatString(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), getDefaultProperty())).toString();
+                    .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), getDefaultProperty())).toString();
         }
 
         if (primitive != null) {
             switch (type) {
                 case "Boolean":
-                    setType(ST_BOOLEAN.getValue());
+                    setType(ST_BOOLEAN);
                     break;
                 case "Integer":
                     setType("int");
@@ -366,11 +367,11 @@ public class VariableProperties {
         if (realisation != null) {
             if (type.startsWith("List")) {
                 return stringBuilder.append(lineSeparator())
-                        .append(formatString(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), ARRAY_LIST_REALISATION.getValue())).toString();
+                        .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), ARRAY_LIST_REALISATION)).toString();
             }
         }
 
         return stringBuilder.append(lineSeparator())
-                .append(formatString(FIELD, getType(), getName())).toString();
+                .append(format(FIELD, getType(), getName())).toString();
     }
 }

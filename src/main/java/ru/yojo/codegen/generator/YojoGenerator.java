@@ -13,7 +13,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static ru.yojo.codegen.constants.ConstantsEnum.*;
+import static ru.yojo.codegen.constants.Dictionary.*;
 import static ru.yojo.codegen.util.LogUtils.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
@@ -53,7 +53,7 @@ public class YojoGenerator implements Generator {
 
         String outputDirectoryName = new File(filePath).getName().replaceAll("\\..*", "");
         if (!outputDirectory.endsWith("/")) {
-            outputDirectory = outputDirectory + DELIMETER.getValue();
+            outputDirectory = outputDirectory + DELIMITER;
         }
         String output = outputDirectory + outputDirectoryName;
         new File(output).mkdirs();
@@ -131,7 +131,7 @@ public class YojoGenerator implements Generator {
                 System.out.println(ANSI_GREEN + schemaName + " Values: " + schemaValues + ANSI_PURPLE);
             }
             if (schemaType != null || allOf != null) {
-                Map<String, Object> propertiesMap = castObjectToMap(schemaMap.get(PROPERTIES.getValue()));
+                Map<String, Object> propertiesMap = castObjectToMap(schemaMap.get(PROPERTIES));
                 if (!propertiesMap.isEmpty() && schemaType != null) {
                     propertiesMap.forEach((propName, propValues) -> {
                         Map<String, Object> propertyValueMap = castObjectToMap(propValues);
@@ -164,7 +164,7 @@ public class YojoGenerator implements Generator {
     private void writeMessages(String outputDirectory, String outputDirectoryName, List<Message> messageList) {
         messageList.forEach(message -> {
             //Create a file by the name of a specific message and write then
-            String messagesPath = String.join(DELIMETER.getValue(), outputDirectory, "messages") + DELIMETER.getValue();
+            String messagesPath = String.join(DELIMITER, outputDirectory, "messages") + DELIMITER;
             writeFile(messagesPath, message.getMessageName(), message.toWrite());
         });
     }
@@ -175,7 +175,7 @@ public class YojoGenerator implements Generator {
      */
     private void writeSchemas(String outputDirectory, String outputDirectoryName, List<Schema> schemaList) {
         schemaList.forEach(schema -> {
-            String schemasPath = String.join(DELIMETER.getValue(), outputDirectory, "common") + DELIMETER.getValue();
+            String schemasPath = String.join(DELIMITER, outputDirectory, "common") + DELIMITER;
             //Create a file by the name of a specific schema and write then
             writeFile(schemasPath, schema.getSchemaName(), schema.toWrite());
         });

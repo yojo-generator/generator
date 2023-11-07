@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static ru.yojo.codegen.constants.ConstantsEnum.*;
+import static ru.yojo.codegen.constants.Dictionary.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 @SuppressWarnings("all")
@@ -28,10 +28,10 @@ public class MessageMapper {
             message.setMessageName(capitalize(messageName));
             message.setLombokProperties(lombokProperties);
 
-            Map<String, Object> payloadMap = castObjectToMap(messageMap.get(PAYLOAD.getValue()));
+            Map<String, Object> payloadMap = castObjectToMap(messageMap.get(PAYLOAD));
             AtomicBoolean needToFill = new AtomicBoolean(true);
             payloadMap.forEach((mk, mv) -> {
-                if (mk.equals(EXTENDS.getValue())) {
+                if (mk.equals(EXTENDS)) {
                     Map<String, Object> extendsMap = castObjectToMap(mv);
                     String fromClass = getStringValueIfExistOrElseNull(FROM_CLASS, extendsMap);
                     String fromPackage = getStringValueIfExistOrElseNull(FROM_PACKAGE, extendsMap);
@@ -43,9 +43,9 @@ public class MessageMapper {
                         needToFill.set(false);
                     }
                 }
-                if (mk.equals(IMPLEMENTS.getValue())) {
+                if (mk.equals(IMPLEMENTS)) {
                     Map<String, Object> implementsMap = castObjectToMap(mv);
-                    List<String> fromInterfaceList = castObjectToList(implementsMap.get(FROM_INTERFACE.getValue()));
+                    List<String> fromInterfaceList = castObjectToList(implementsMap.get(FROM_INTERFACE));
                     System.out.println("SHOULD IMPLEMENTS FROM: " + fromInterfaceList);
                     fromInterfaceList.forEach(ifc -> {
                         String[] split = ifc.split("[.]");
@@ -86,7 +86,7 @@ public class MessageMapper {
     private FillParameters getFillParameters(Map<String, Object> payload, String commonPackage, Map<String, Object> schemasMap, Set<String> removeSchemas, Set<String> excludeRemoveSchemas) {
         if (getStringValueIfExistOrElseNull(PROPERTIES, payload) != null) {
             System.out.println("Properties Mapping from message");
-            Map<String, Object> propertiesMap = castObjectToMap(payload.get(PROPERTIES.getValue()));
+            Map<String, Object> propertiesMap = castObjectToMap(payload.get(PROPERTIES));
             List<VariableProperties> variableProperties = new ArrayList<>();
 
             propertiesMap.forEach((propertyName, propertyValue) -> {
@@ -112,9 +112,9 @@ public class MessageMapper {
 
                 SchemaMapper schemaMapper = new SchemaMapper();
 
-                Set<String> requiredPropertiesSet = getSetValueIfExistsOrElseEmptySet(REQUIRED.getValue(), schema);
+                Set<String> requiredPropertiesSet = getSetValueIfExistsOrElseEmptySet(REQUIRED, schema);
                 Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
-                FillParameters parameters = schemaMapper.getSchemaVariableProperties(schema, schemasMap, castObjectToMap(schema.get(PROPERTIES.getValue())), commonPackage, innerSchemas);
+                FillParameters parameters = schemaMapper.getSchemaVariableProperties(schema, schemasMap, castObjectToMap(schema.get(PROPERTIES)), commonPackage, innerSchemas);
                 removeSchemas.add(schemaName);
                 if (!innerSchemas.isEmpty()) {
                     innerSchemas.forEach((pk, pv) -> excludeRemoveSchemas.add(pk));

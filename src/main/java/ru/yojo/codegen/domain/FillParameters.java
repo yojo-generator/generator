@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import static java.lang.System.lineSeparator;
-import static ru.yojo.codegen.constants.ConstantsEnum.*;
+import static ru.yojo.codegen.constants.Dictionary.*;
 
 @SuppressWarnings("all")
 public class FillParameters {
@@ -54,21 +54,21 @@ public class FillParameters {
                 if (JAVA_DEFAULT_TYPES.contains(variableProperties.get(i).getType())) {
                     variableProperties.get(i).getAnnotationSet().forEach(annotation -> {
                         stringBuilder.append(lineSeparator())
-                                .append(TABULATION.getValue())
+                                .append(TABULATION)
                                 .append(annotation);
                     });
                     stringBuilder.append(lineSeparator())
-                            .append(formatString(FIELD, variableProperties.get(i).getType(), variableProperties.get(i).getName())).toString();
+                            .append(String.format(FIELD, variableProperties.get(i).getType(), variableProperties.get(i).getName())).toString();
                 } else if (variableProperties.stream().anyMatch(vp -> vp.getEnumNames() != null)) {
                     stringBuilder.append(lineSeparator())
-                            .append(TABULATION.getValue())
+                            .append(TABULATION)
                             .append(variableProperties.get(i).getType())
                             .append(i == variableProperties.size() - 2 ? ";" : ",")
                             .append(i == variableProperties.size() - 2 ? lineSeparator() : "")
                             .toString();
                 } else {
                     stringBuilder.append(lineSeparator())
-                            .append(TABULATION.getValue())
+                            .append(TABULATION)
                             .append(variableProperties.get(i).getType())
                             .append(i == variableProperties.size() - 1 ? ";" : ",")
                             .toString();
