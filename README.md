@@ -21,9 +21,9 @@ As such, any keyword available for those vocabularies is by definition available
 2. [x] `type`
 3. [x] `required`
 4. [ ] `multipleOf`
-5. [ ] `maximum`
+5. [x] `maximum`
 6. [ ] `exclusiveMaximum`
-7. [ ] `minimum`
+7. [x] `minimum`
 8. [ ] `exclusiveMinimum`
 9. [x] `maxLength`
 10. [x] `minLength`

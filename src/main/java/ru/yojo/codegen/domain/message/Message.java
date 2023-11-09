@@ -95,11 +95,26 @@ public class Message {
         if (!lombokProperties.enableLombok()) {
             fillParameters.getVariableProperties().forEach(vp -> {
                 String reference = vp.getReference();
-                stringBuilder
-                        .append(lineSeparator())
-                        .append(generateSetter(reference, uncapitalize(reference)))
-                        .append(lineSeparator())
-                        .append(generateGetter(reference, uncapitalize(reference)));
+                if (reference != null) {
+                    stringBuilder
+                            .append(lineSeparator())
+                            .append(generateSetter(reference, uncapitalize(reference)))
+                            .append(lineSeparator())
+                            .append(generateGetter(reference, uncapitalize(reference)));
+                } else {
+                    fillParameters.getVariableProperties().stream()
+                            .filter(varProp -> vp.equals(varProp))
+                            .flatMap(variableProperties -> {
+                                Set<String> i = variableProperties.getRequiredImports();
+                                stringBuilder
+                                        .append(lineSeparator())
+                                        .append(generateSetter(variableProperties.getType(), variableProperties.getName()))
+                                        .append(lineSeparator())
+                                        .append(generateGetter(variableProperties.getType(), variableProperties.getName()));
+                                return i.stream();
+                            })
+                            .forEach(requiredImports::add);
+                }
             });
         }
 

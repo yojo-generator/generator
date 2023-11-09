@@ -125,6 +125,7 @@ public class YojoGenerator implements Generator {
             System.out.println(schemaValues);
             Map<String, Object> schemaMap = castObjectToMap(schemaValues);
             String schemaType = getStringValueIfExistOrElseNull(TYPE, schemaMap);
+            String reference = getStringValueIfExistOrElseNull(REFERENCE, schemaMap);
             String allOf = getStringValueIfExistOrElseNull(ALL_OF, schemaMap);
             if (allOf != null) {
                 mapAllOf.put(schemaName, schemaValues);
@@ -142,7 +143,9 @@ public class YojoGenerator implements Generator {
 
                     });
                 } else {
-                    incorrectFilledProperties.add("NOT DEFINED TYPE OF SCHEMA! Schema: " + schemaName);
+                    if (schemaType == null) {
+                        incorrectFilledProperties.add("NOT DEFINED TYPE OF SCHEMA! Schema: " + schemaName);
+                    }
                 }
             }
         });
