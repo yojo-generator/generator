@@ -189,7 +189,7 @@ public class SaveGoodsResponse {
     private String status;
 
     /**
-     * Номер товара
+     * Number
      * Example: 2143512341234
      */
     private String data;
@@ -202,20 +202,31 @@ public class SaveGoodsResponse {
 See examples [here](./examples)
 
 ## Releases
-### 💥 Release 0.0.1:
+### 💥 Release 0.0.x:
 ##### Currently implemented the following 📈 features:
 * 📈 Support for the following keywords:
   * `type`
+  * `format`
+  * `example`
+  * `description`
+  * `$ref`
   * `required`
   * `maxLength`
   * `minLength`
+  * `maximum`
+  * `minimum`
+  * `digits`
+  * `pattern`
+  * `name`
+  * `title`
+  * `summary`
   * `enum`
+  * `x-enumNames`
   * `examples`
   * `properties`
   * `items`
-  * `description`
-  * `format`
-  * `$ref`
+  * `default`
+  * `additionalProperties`
 * 📈 Added the following annotations based on keywords:
   * `@NotNull`
   * `@NotEmpty`
@@ -225,6 +236,7 @@ See examples [here](./examples)
   * `@Valid`
 * 📈 Added required imports according to annotations
 * 📈 Filling JavaDoc based on keywords:
+  * `summary`
   * `description`
   * `example`
   * `enum`
@@ -239,25 +251,45 @@ See examples [here](./examples)
  * 📈 Added generating messages
     * Schemas generates to "common" directory
     * Messages generates to "messages" directory
-
-### 💥 Release 1.0.0:
-* 📈 Added function to add implementation of class
-  * Use messageImplementation config
 * 📈 Added function to add extends of class.
-  * Use tags field of message to fill extends
-    * Example : `tags: - extends SomeClass`
-* 📈 Added custom bigDecimal format
-  * Added annotation @Digits 
-    * Use title attribute to fill(Example: `title: integer = 2, fraction = 3`)
+  Example : 
+  * `extends:`
+    * `fromClass: SomeDTO`
+    * `fromPackage: ru.example.path`
+* 📈 Added function to add implements of class.
+  Example :
+  ````
+  implements:
+    fromInterface:
+      - ru.example.path.SomeInterface
+* 📈 Added custom `bigDecimal` format
+  * Added annotation `@Digits`
+    ````* Example: 
+      someCost:
+        type: number
+        description: The price of smth.
+        format: bigDecimal
+        digits: integer = 18, fraction = 2
 * 📈 Updated Accessors annotation: now you can configure it.
 * 📈 Added Logs to Console
 * 📈 Unbound from apache lang dependencies
 * 📈 Added support inner schemas
 * 📈 Optimization code by abstract of variable properties
-
-### 💥 Release 1.0.1:
 * 📈 Added support of generation `Enum` classes
 * 📈 Added support of generation `Map<String, Object>` or other default types
+* 📈 Added support of validation groups. It was added for the specific cases, when you already have groups but want to use generator. Example: 
+  * ````Example:
+    Request:
+      type: object
+      description: SomeRequest
+      validationGroups:
+        - ApplicationValidation.Application.class
+      validationGroupsImports:
+        - ru.example.path.validation.ApplicationValidation
+      validateByGroups:
+        - fieldForValidation
+        - fieldForValidation
+        - fieldForValidation
 
 ## Developers
 * 😎 Vladimir Morozkin
