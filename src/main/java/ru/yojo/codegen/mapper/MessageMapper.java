@@ -7,7 +7,6 @@ import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.message.Message;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static ru.yojo.codegen.constants.Dictionary.*;
@@ -84,15 +83,16 @@ public class MessageMapper {
     }
 
     private FillParameters getFillParameters(Map<String, Object> payload, String commonPackage, Map<String, Object> schemasMap, Set<String> removeSchemas, Set<String> excludeRemoveSchemas) {
+        FillParameters parameters = new FillParameters();
         if (getStringValueIfExistOrElseNull(PROPERTIES, payload) != null) {
             System.out.println("Properties Mapping from message");
             Map<String, Object> propertiesMap = castObjectToMap(payload.get(PROPERTIES));
-            List<VariableProperties> variableProperties = new ArrayList<>();
+            List<VariableProperties> variableProperties = new LinkedList<>();
 
             propertiesMap.forEach((propertyName, propertyValue) -> {
 
                 VariableProperties mvp = new VariableProperties();
-                Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
+                Map<String, Object> innerSchemas = new LinkedHashMap<>();
 
                 fillProperties(mvp, payload, payload, propertyName, castObjectToMap(propertyValue), commonPackage, innerSchemas);
 
@@ -113,8 +113,8 @@ public class MessageMapper {
                 SchemaMapper schemaMapper = new SchemaMapper();
 
                 Set<String> requiredPropertiesSet = getSetValueIfExistsOrElseEmptySet(REQUIRED, schema);
-                Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
-                FillParameters parameters = schemaMapper.getSchemaVariableProperties(schema, schemasMap, castObjectToMap(schema.get(PROPERTIES)), commonPackage, innerSchemas);
+                Map<String, Object> innerSchemas = new LinkedHashMap<>();
+                parameters = schemaMapper.getSchemaVariableProperties(schemaName, schema, schemasMap, castObjectToMap(schema.get(PROPERTIES)), commonPackage, innerSchemas);
                 removeSchemas.add(schemaName);
                 if (!innerSchemas.isEmpty()) {
                     innerSchemas.forEach((pk, pv) -> excludeRemoveSchemas.add(pk));

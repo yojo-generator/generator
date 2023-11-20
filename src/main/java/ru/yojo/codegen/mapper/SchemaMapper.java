@@ -7,10 +7,7 @@ import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.schema.Schema;
 import ru.yojo.codegen.exception.SchemaFillException;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static ru.yojo.codegen.constants.Dictionary.*;
@@ -24,7 +21,7 @@ public class SchemaMapper {
                                             LombokProperties lombokProperties,
                                             String commonPackage) {
         List<Schema> schemaList = new ArrayList<>();
-        Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
+        Map<String, Object> innerSchemas = new LinkedHashMap<>();
         schemas.forEach((schemaName, schemaValues) -> {
             System.out.println("START MAPPING OF SCHEMA: " + schemaName);
             Map<String, Object> schemaMap = castObjectToMap(schemaValues);
@@ -32,10 +29,15 @@ public class SchemaMapper {
             if (schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
                 Schema schema = new Schema();
                 schema.setSchemaName(capitalize(schemaName));
+                schema.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap));
                 schema.setLombokProperties(lombokProperties);
                 schema.setPackageName(commonPackage);
 
+                // Marker for extending
+                // Check, if there are no attributes other than inheritance,
+                // then do not fill the DTO with attributes of the parent class
                 AtomicBoolean needToFill = new AtomicBoolean(true);
+
                 schemaMap.forEach((sk, sv) -> {
                     if (sk.equals(EXTENDS)) {
                         Map<String, Object> extendsMap = castObjectToMap(sv);
@@ -64,6 +66,7 @@ public class SchemaMapper {
                 if (needToFill.get()) {
                     schema.setFillParameters(
                             getSchemaVariableProperties(
+                                    schemaName,
                                     schemaMap,
                                     schemas,
                                     castObjectToMap(schemaMap.get(PROPERTIES)),
@@ -89,10 +92,12 @@ public class SchemaMapper {
                 if (schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
                     Schema schema = new Schema();
                     schema.setSchemaName(capitalize(schemaName));
+                    schema.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap));
                     schema.setLombokProperties(lombokProperties);
                     schema.setPackageName(commonPackage);
                     schema.setFillParameters(
                             getSchemaVariableProperties(
+                                    schemaName,
                                     schemaMap,
                                     innerSchemas,
                                     castObjectToMap(schemaMap.get(PROPERTIES)),
@@ -109,24 +114,34 @@ public class SchemaMapper {
         return schemaList;
     }
 
-    public FillParameters getSchemaVariableProperties(Map<String, Object> currentSchema,
+    public FillParameters getSchemaVariableProperties(String schemaName,
+                                                      Map<String, Object> currentSchema,
                                                       Map<String, Object> schemas,
                                                       Map<String, Object> properties,
                                                       String commonPackage,
                                                       Map<String, Object> innerSchemas) {
-        List<VariableProperties> variableProperties = new ArrayList<>();
-        properties.forEach((propertyName, propertyValue) -> {
+        List<VariableProperties> variableProperties = new LinkedList<>();
+        if (!properties.isEmpty()) {
+            properties.forEach((propertyName, propertyValue) -> {
+                VariableProperties vp = new VariableProperties();
+                fillProperties(
+                        vp,
+                        currentSchema,
+                        schemas,
+                        propertyName,
+                        castObjectToMap(propertyValue),
+                        commonPackage,
+                        innerSchemas);
+                variableProperties.add(vp);
+            });
+        } else if (getStringValueIfExistOrElseNull(ENUMERATION, currentSchema) != null) {
+            currentSchema.get(ENUMERATION);
             VariableProperties vp = new VariableProperties();
-            fillProperties(
-                    vp,
-                    currentSchema,
-                    schemas,
-                    propertyName,
-                    castObjectToMap(propertyValue),
-                    commonPackage,
-                    innerSchemas);
+            vp.setValid(false);
+            vp.setEnum(true);
+            fillProperties(vp, currentSchema, schemas, schemaName, currentSchema, commonPackage, innerSchemas);
             variableProperties.add(vp);
-        });
+        }
         return new FillParameters(variableProperties);
     }
 }

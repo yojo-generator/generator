@@ -41,7 +41,7 @@ As such, any keyword available for those vocabularies is by definition available
 22. [ ] `writeOnly`
 23. [x] `properties`
 24. [ ] `patternProperties`
-25. [ ] `additionalProperties`
+25. [x] `additionalProperties`
 26. [ ] `additionalItems`
 27. [x] `items`
 28. [ ] `propertyNames`
@@ -55,7 +55,7 @@ The following properties are taken from the JSON Schema definition but their def
 
 1. [x] `description` - CommonMark syntax can be used for rich text representation.
 2. [x] `format` - See Data Type Formats for further details. While relying on JSON Schema's defined formats, the AsyncAPI Specification offers a few additional predefined formats.
-3. [ ] `default` - The default value represents what would be assumed by the consumer of the input as the value of the schema if one is not provided. Unlike JSON Schema, the value MUST conform to the defined type for the Schema Object defined at the same level. For example, of type is string, then default can be "foo" but cannot be 1.
+3. [x] `default` - The default value represents what would be assumed by the consumer of the input as the value of the schema if one is not provided. Unlike JSON Schema, the value MUST conform to the defined type for the Schema Object defined at the same level. For example, of type is string, then default can be "foo" but cannot be 1.
 4. [x] `$ref` - Alternatively, any time a Schema Object can be used, a Reference Object can be used in its place. This allows referencing definitions in place of defining them inline. It is appropriate to clarify that the $ref keyword MUST follow the behavior described by Reference Object instead of the one in JSON Schema definition.
 
 **Not all keywords are currently available.
@@ -249,8 +249,8 @@ See examples [here](./examples)
     * `@AllArgsConstructor`
     * `@Accessors(fluent = true, chain = true)`
  * 📈 Added generating messages
-    * Schemas generates to "common" directory
-    * Messages generates to "messages" directory
+    * Schema generates to "common" directory
+    * Message generates to "messages" directory
 * 📈 Added function to add extends of class.
   Example : 
   * `extends:`

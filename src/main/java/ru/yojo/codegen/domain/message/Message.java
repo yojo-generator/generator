@@ -95,7 +95,7 @@ public class Message {
         if (!lombokProperties.enableLombok()) {
             fillParameters.getVariableProperties().forEach(vp -> {
                 String reference = vp.getReference();
-                if (reference != null) {
+                if (reference != null && vp.getEnumeration() == null) {
                     stringBuilder
                             .append(lineSeparator())
                             .append(generateSetter(reference, uncapitalize(reference)))
@@ -106,12 +106,15 @@ public class Message {
                             .filter(varProp -> vp.equals(varProp))
                             .flatMap(variableProperties -> {
                                 Set<String> i = variableProperties.getRequiredImports();
-                                stringBuilder
-                                        .append(lineSeparator())
-                                        .append(generateSetter(variableProperties.getType(), variableProperties.getName()))
-                                        .append(lineSeparator())
-                                        .append(generateGetter(variableProperties.getType(), variableProperties.getName()));
+                                if (!variableProperties.isEnum()) {
+                                    stringBuilder
+                                            .append(lineSeparator())
+                                            .append(generateSetter(variableProperties.getType(), variableProperties.getName()))
+                                            .append(lineSeparator())
+                                            .append(generateGetter(variableProperties.getType(), variableProperties.getName()));
+                                }
                                 return i.stream();
+
                             })
                             .forEach(requiredImports::add);
                 }

@@ -1,5 +1,6 @@
 package ru.yojo.codegen.domain;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -11,50 +12,103 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 @SuppressWarnings("all")
 public class VariableProperties {
 
+    /**
+     * Property name
+     */
     private String name;
 
+    /**
+     * Property type
+     */
     private String type;
 
+    /**
+     * Property used in annotation @Size for Strings
+     */
     private String minLength;
 
+    /**
+     * Property used in annotation @Size for Strings
+     */
     private String maxLength;
 
+    /**
+     * Property used for specify type of propety
+     */
     private String format;
 
+    /**
+     * Property used in annotation @Pattern for Strings
+     */
     private String pattern;
 
+    /**
+     * Property used for JavaDoc
+     */
     private String description;
 
     private String enumeration;
 
+    /**
+     * Property used for JavaDoc
+     */
     private String example;
 
+    /**
+     * Property used for generate List of smth.
+     */
     private String items;
 
     private String reference;
 
+    /**
+     * Property used for JavaDoc
+     */
     private String title;
 
+    /**
+     * Property used in annotation @Digits for BigDecimal
+     */
     private String digits;
 
+    /**
+     * Property used in annotation @Min for Integers
+     */
     private String minimum;
 
+    /**
+     * Property used in annotation @Max for Integers
+     */
     private String maximum;
 
+    /**
+     * Property used to generate with default value
+     */
     private String defaultProperty;
 
+    /**
+     * Property used to generate with specify realisation of Collection
+     */
     private String realisation;
 
     private String enumNames;
 
     private boolean isEnum = false;
 
+    private boolean valid = true;
+    /**
+     * Property used to generate simple variable
+     */
     private Boolean primitive;
 
-    private String annotationParameter;
-
+    /**
+     * Set of required annotation for variable
+     */
     private Set<String> annotationSet = new HashSet<>();
 
+    /**
+     * Set of required imports for variable
+     */
     private Set<String> requiredImports = new HashSet<>();
 
     public String getName() {
@@ -159,9 +213,21 @@ public class VariableProperties {
 
     public void setRealisation(String realisation) {
         this.realisation = realisation;
-        if (realisation != null && realisation.startsWith("ArrayList")) {
-            requiredImports.add(ARRAY_LIST_IMPORT);
-        }
+        if (realisation != null)
+            switch (realisation) {
+                case ("ArrayList"):
+                    requiredImports.add(ARRAY_LIST_IMPORT);
+                    break;
+                case ("LinkedList"):
+                    requiredImports.add(LINKED_LIST_IMPORT);
+                    break;
+                case ("LinkedHashMap"):
+                    requiredImports.add(LINKED_HASH_MAP_IMPORT);
+                    break;
+                case ("HashMap"):
+                    requiredImports.add(HASH_MAP_IMPORT);
+                    break;
+            }
     }
 
     public String getMinimum() {
@@ -188,16 +254,8 @@ public class VariableProperties {
         }
     }
 
-    public String getAnnotationParameter() {
-        return annotationParameter;
-    }
-
-    public void setAnnotationParameter(String annotationParameter) {
-        this.annotationParameter = annotationParameter;
-    }
-
     public boolean isPrimitive() {
-        return primitive;
+        return primitive != null && primitive == true;
     }
 
     public void setPrimitive(String primitive) {
@@ -234,10 +292,52 @@ public class VariableProperties {
                     }
                     break;
                 case "int64":
+                case "long":
                     this.type = LONG;
                     if (items != null) {
                         this.items = LONG;
                         this.type = format(LIST_TYPE, LONG);
+                    }
+                    if (digits != null) {
+                        requiredImports.add(DIGITS_IMPORT);
+                        annotationSet.add(format(DIGITS_ANNOTATION, digits));
+                    }
+                    break;
+                case "int32":
+                case "integer":
+                    this.type = INTEGER;
+                    if (items != null) {
+                        this.items = INTEGER;
+                        this.type = format(LIST_TYPE, INTEGER);
+                    }
+                    if (digits != null) {
+                        requiredImports.add(DIGITS_IMPORT);
+                        annotationSet.add(format(DIGITS_ANNOTATION, digits));
+                    }
+                    break;
+                case "byte":
+                    this.type = BYTE;
+                    if (items != null) {
+                        this.items = BYTE;
+                        this.type = format(LIST_TYPE, BYTE);
+                    }
+                    if (digits != null) {
+                        requiredImports.add(DIGITS_IMPORT);
+                        annotationSet.add(format(DIGITS_ANNOTATION, digits));
+                    }
+                    break;
+                case "double":
+                    this.type = DOUBLE;
+                    if (items != null) {
+                        this.items = DOUBLE;
+                        this.type = format(LIST_TYPE, DOUBLE);
+                    }
+                    break;
+                case "float":
+                    this.type = FLOAT;
+                    if (items != null) {
+                        this.items = FLOAT;
+                        this.type = format(LIST_TYPE, FLOAT);
                     }
                     break;
                 case "uuid":
@@ -254,6 +354,18 @@ public class VariableProperties {
                     if (items != null) {
                         this.items = BIG_DECIMAL;
                         this.type = format(LIST_TYPE, BIG_DECIMAL);
+                    }
+                    if (digits != null) {
+                        requiredImports.add(DIGITS_IMPORT);
+                        annotationSet.add(format(DIGITS_ANNOTATION, digits));
+                    }
+                    break;
+                case "bigInteger":
+                    this.type = BIG_INTEGER;
+                    requiredImports.add(BIG_INTEGER_IMPORT);
+                    if (items != null) {
+                        this.items = BIG_INTEGER;
+                        this.type = format(LIST_TYPE, BIG_INTEGER);
                     }
                     if (digits != null) {
                         requiredImports.add(DIGITS_IMPORT);
@@ -327,47 +439,91 @@ public class VariableProperties {
         this.defaultProperty = defaultProperty;
     }
 
+
+    public boolean isValid() {
+        return valid;
+    }
+
+    public void setValid(boolean valid) {
+        this.valid = valid;
+    }
+
     public String toWrite() {
         StringBuilder stringBuilder = new StringBuilder();
         generateJavaDoc(stringBuilder, getDescription(), getExample());
-        getAnnotationSet().forEach(annotation -> {
+        Comparator<String> stringComparator = (a, b) -> Integer.compare(a.length(), b.length());
+        getAnnotationSet().stream().filter(annotation -> !isPrimitive()).sorted().sorted(stringComparator).forEach(annotation -> {
             stringBuilder.append(lineSeparator())
                     .append(TABULATION)
                     .append(annotation);
         });
 
-        if (defaultProperty != null) {
-            if (type.equals(STRING)) {
-                defaultProperty = "\"" + defaultProperty + "\"";
-            }
-            return stringBuilder.append(lineSeparator())
-                    .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), getDefaultProperty())).toString();
-        }
-
         if (primitive != null) {
             switch (type) {
-                case "Boolean":
-                    setType(ST_BOOLEAN);
+                case BOOLEAN:
+                    setType("boolean");
                     break;
-                case "Integer":
+                case BYTE:
+                    setType("byte");
+                    break;
+                case INTEGER:
                     setType("int");
                     break;
-                case "Long":
+                case LONG:
                     setType("long");
                     break;
-                case "Double":
+                case DOUBLE:
                     setType("double");
                     break;
-                case "Float":
+                case FLOAT:
                     setType("float");
                     break;
             }
         }
 
+        if (defaultProperty != null) {
+            switch (type) {
+                case UUID:
+                    defaultProperty = "UUID.fromString(" + "\"" + defaultProperty + "\"" + ")";
+                    break;
+                case STRING:
+                    defaultProperty = defaultProperty.replace("\"", "");
+                    defaultProperty = "\"" + defaultProperty + "\"";
+                    break;
+            }
+            if (isPrimitive()) {
+                stringBuilder.append(lineSeparator())
+                        .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), getDefaultProperty())).toString();
+            } else {
+                stringBuilder.append(lineSeparator())
+                        .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), getDefaultProperty())).toString();
+            }
+            return stringBuilder.toString();
+        }
+
         if (realisation != null) {
             if (type.startsWith("List")) {
-                return stringBuilder.append(lineSeparator())
-                        .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), ARRAY_LIST_REALISATION)).toString();
+                switch (realisation) {
+                    case ("ArrayList"): {
+                        return stringBuilder.append(lineSeparator())
+                                .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), ARRAY_LIST_REALISATION)).toString();
+                    }
+                    case ("LinkedList"): {
+                        return stringBuilder.append(lineSeparator())
+                                .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), LINKED_LIST_REALISATION)).toString();
+                    }
+                }
+            }
+            if (type.startsWith("Map")) {
+                switch (realisation) {
+                    case ("HashMap"):
+                        return stringBuilder.append(lineSeparator())
+                                .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), HASH_MAP_REALISATION)).toString();
+                    case ("LinkedHashMap"):
+                    return stringBuilder.append(lineSeparator())
+                            .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), LINKED_HASH_MAP_REALISATION)).toString();
+
+                }
             }
         }
 

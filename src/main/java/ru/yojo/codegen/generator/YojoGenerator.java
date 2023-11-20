@@ -119,7 +119,7 @@ public class YojoGenerator implements Generator {
         System.out.println();
         System.out.println(ANSI_PURPLE + LOG_DELIMETER);
         System.out.println("Starting Analyze AsyncAPI: " + filePath);
-        Map<String, Object> mapAllOf = new HashMap<>();
+        Map<String, Object> mapAllOf = new LinkedHashMap<>();
         schemasMap.forEach((schemaName, schemaValues) -> {
             System.out.println("ANALYZING OF SCHEMA: " + schemaName);
             System.out.println(schemaValues);

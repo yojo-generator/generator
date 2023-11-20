@@ -1,5 +1,6 @@
 package ru.yojo.codegen.domain;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,7 +53,9 @@ public class FillParameters {
             stringBuilder.append(lineSeparator());
             for (int i = 0; i < variableProperties.size(); i++) {
                 if (JAVA_DEFAULT_TYPES.contains(variableProperties.get(i).getType())) {
-                    variableProperties.get(i).getAnnotationSet().forEach(annotation -> {
+
+                    Comparator<String> stringComparator = (a, b) -> Integer.compare(a.length(), b.length());
+                    variableProperties.get(i).getAnnotationSet().stream().sorted().sorted(stringComparator).forEach(annotation -> {
                         stringBuilder.append(lineSeparator())
                                 .append(TABULATION)
                                 .append(annotation);
