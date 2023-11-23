@@ -53,6 +53,7 @@ public final class Dictionary {
     public static final String FROM_CLASS = "fromClass";
     public static final String FROM_PACKAGE = "fromPackage";
     public static final String FROM_INTERFACE = "fromInterface";
+    public static final String SET = "Set";
 
     /**
      * Schema Types
@@ -145,9 +146,11 @@ public final class Dictionary {
     public static final String LIST_IMPORT = "java.util.List;";
     public static final String ARRAY_LIST_IMPORT = "java.util.ArrayList;";
     public static final String LINKED_LIST_IMPORT = "java.util.LinkedList;";
+    public static final String SET_IMPORT = "java.util.Set;";
+    public static final String HASH_SET_IMPORT = "java.util.HashSet;";
+    public static final String MAP_IMPORT = "java.util.Map;";
     public static final String HASH_MAP_IMPORT = "java.util.HashMap;";
     public static final String LINKED_HASH_MAP_IMPORT = "java.util.LinkedHashMap;";
-    public static final String MAP_IMPORT = "java.util.Map;";
     public static final String DIGITS_IMPORT = "javax.validation.constraints.Digits;";
     public static final String MIN_IMPORT = "javax.validation.constraints.Min;";
     public static final String MAX_IMPORT = "javax.validation.constraints.Max;";
@@ -187,6 +190,7 @@ public final class Dictionary {
      */
     public static final String ARRAY_LIST_REALISATION = "new ArrayList<>()";
     public static final String LINKED_LIST_REALISATION = "new LinkedList<>()";
+    public static final String HASH_SET_REALISATION = "new HashSet<>()";
     public static final String HASH_MAP_REALISATION = "new HashMap<>()";
     public static final String LINKED_HASH_MAP_REALISATION = "new LinkedHashMap<>()";
 
@@ -197,6 +201,7 @@ public final class Dictionary {
     public static final String FIELD_WITH_DEFAULT_VALUE = "    private %s %s = %s;";
     public static final String FIELD_ENUM_WITH_DESCRIPTION = "    private String description;";
     public static final String LIST_TYPE = "List<%s>";
+    public static final String SET_TYPE = "Set<%s>";
     public static final String MAP_TYPE = "Map<String, %s>";
     public static final String ENUM_TYPE = "%s(\"%s\")";
     public static final String DELIMITER = "/";

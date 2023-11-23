@@ -102,6 +102,11 @@ public class VariableProperties {
     private Boolean primitive;
 
     /**
+     *
+     */
+    private String collectionType = "list";
+
+    /**
      * Set of required annotation for variable
      */
     private Set<String> annotationSet = new HashSet<>();
@@ -187,6 +192,14 @@ public class VariableProperties {
         return reference;
     }
 
+    public String getCollectionType() {
+        return collectionType;
+    }
+
+    public void setCollectionType(String collectionType) {
+        this.collectionType = collectionType;
+    }
+
     public void setReference(String reference) {
         this.reference = reference;
     }
@@ -226,6 +239,9 @@ public class VariableProperties {
                     break;
                 case ("HashMap"):
                     requiredImports.add(HASH_MAP_IMPORT);
+                    break;
+                case ("HashSet"):
+                    requiredImports.add(HASH_SET_IMPORT);
                     break;
             }
     }
@@ -271,32 +287,52 @@ public class VariableProperties {
                     this.type = LOCAL_DATE;
                     requiredImports.add(LOCAL_DATE_IMPORT);
                     if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
                         this.items = LOCAL_DATE;
-                        this.type = format(LIST_TYPE, LOCAL_DATE);
+                        this.type = format(collectionPattern, LOCAL_DATE);
+                        this.valid = false;
                     }
                     break;
                 case "date-time":
                     this.type = LOCAL_DATE_TIME;
                     requiredImports.add(LOCAL_DATE_TIME_IMPORT);
                     if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
                         this.items = LOCAL_DATE_TIME;
-                        this.type = format(LIST_TYPE, LOCAL_DATE_TIME);
+                        this.type = format(collectionPattern, LOCAL_DATE_TIME);
+                        this.valid = false;
                     }
                     break;
                 case "offsetDateTime":
                     this.type = OFFSET_DATE_TIME;
                     requiredImports.add(OFFSET_DATE_TIME_IMPORT);
                     if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
                         this.items = OFFSET_DATE_TIME;
-                        this.type = format(LIST_TYPE, OFFSET_DATE_TIME);
+                        this.type = format(collectionPattern, OFFSET_DATE_TIME);
+                        this.valid = false;
                     }
                     break;
                 case "int64":
                 case "long":
                     this.type = LONG;
                     if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
                         this.items = LONG;
-                        this.type = format(LIST_TYPE, LONG);
+                        this.type = format(collectionPattern, LONG);
+                        this.valid = false;
                     }
                     if (digits != null) {
                         requiredImports.add(DIGITS_IMPORT);
@@ -307,8 +343,13 @@ public class VariableProperties {
                 case "integer":
                     this.type = INTEGER;
                     if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
                         this.items = INTEGER;
-                        this.type = format(LIST_TYPE, INTEGER);
+                        this.type = format(collectionPattern, INTEGER);
+                        this.valid = false;
                     }
                     if (digits != null) {
                         requiredImports.add(DIGITS_IMPORT);
@@ -318,8 +359,13 @@ public class VariableProperties {
                 case "byte":
                     this.type = BYTE;
                     if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
                         this.items = BYTE;
-                        this.type = format(LIST_TYPE, BYTE);
+                        this.type = format(collectionPattern, BYTE);
+                        this.valid = false;
                     }
                     if (digits != null) {
                         requiredImports.add(DIGITS_IMPORT);
@@ -329,31 +375,51 @@ public class VariableProperties {
                 case "double":
                     this.type = DOUBLE;
                     if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
                         this.items = DOUBLE;
-                        this.type = format(LIST_TYPE, DOUBLE);
+                        this.type = format(collectionPattern, DOUBLE);
+                        this.valid = false;
                     }
                     break;
                 case "float":
                     this.type = FLOAT;
                     if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
                         this.items = FLOAT;
-                        this.type = format(LIST_TYPE, FLOAT);
+                        this.type = format(collectionPattern, FLOAT);
+                        this.valid = false;
                     }
                     break;
                 case "uuid":
                     this.type = UUID;
                     requiredImports.add(UUID_IMPORT);
                     if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
                         this.items = UUID;
-                        this.type = format(LIST_TYPE, UUID);
+                        this.type = format(collectionPattern, UUID);
+                        this.valid = false;
                     }
                     break;
                 case "bigDecimal":
                     this.type = BIG_DECIMAL;
                     requiredImports.add(BIG_DECIMAL_IMPORT);
                     if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
                         this.items = BIG_DECIMAL;
-                        this.type = format(LIST_TYPE, BIG_DECIMAL);
+                        this.type = format(collectionPattern, BIG_DECIMAL);
+                        this.valid = false;
                     }
                     if (digits != null) {
                         requiredImports.add(DIGITS_IMPORT);
@@ -364,8 +430,13 @@ public class VariableProperties {
                     this.type = BIG_INTEGER;
                     requiredImports.add(BIG_INTEGER_IMPORT);
                     if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
                         this.items = BIG_INTEGER;
-                        this.type = format(LIST_TYPE, BIG_INTEGER);
+                        this.type = format(collectionPattern, BIG_INTEGER);
+                        this.valid = false;
                     }
                     if (digits != null) {
                         requiredImports.add(DIGITS_IMPORT);
@@ -398,8 +469,11 @@ public class VariableProperties {
     }
 
     public void setItems(String items) {
-        if (items != null) {
+        if (items != null && "list".equals(collectionType)) {
             requiredImports.add(LIST_IMPORT);
+        }
+        if (items != null && "set".equals(collectionType)) {
+            requiredImports.add(SET_IMPORT);
         }
         this.items = items;
     }
@@ -511,6 +585,14 @@ public class VariableProperties {
                     case ("LinkedList"): {
                         return stringBuilder.append(lineSeparator())
                                 .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), LINKED_LIST_REALISATION)).toString();
+                    }
+                }
+            }
+            if (type.startsWith("Set")) {
+                switch (realisation) {
+                    case ("HashSet"): {
+                        return stringBuilder.append(lineSeparator())
+                                .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), HASH_SET_REALISATION)).toString();
                     }
                 }
             }

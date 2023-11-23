@@ -45,12 +45,19 @@ public class Message {
         this.commonPackageName = commonPackageName;
     }
 
+    public String getExtendsFrom() {
+        return extendsFrom;
+    }
     public void setExtendsFrom(String extendsFrom) {
         this.extendsFrom = extendsFrom;
     }
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public void enrichFillParameters(FillParameters fillParameters) {
+        this.fillParameters.getVariableProperties().addAll(fillParameters.getVariableProperties());
     }
 
     public void setFillParameters(FillParameters fillParameters) {

@@ -40,13 +40,18 @@ ext {
 }
 
 //Uncomment this if you need to test by YojoCLI
-//sourceSets {
+sourceSets {
 //    main {
 //        java {
 //            srcDir "${buildDir}/generated-sources"
 //        }
 //    }
-//}
+    test {
+        java {
+            srcDir "src/test/resources/"
+        }
+    }
+}
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'

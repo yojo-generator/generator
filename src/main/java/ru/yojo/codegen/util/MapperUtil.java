@@ -245,9 +245,13 @@ public class MapperUtil {
             Map<String, Object> items = castObjectToMap(propertiesMap.get(ITEMS));
             variableProperties.setRealisation(getStringValueIfExistOrElseNull(REALIZATION, items));
             String refValue = getStringValueIfExistOrElseNull(REFERENCE, items);
+            String collectionFormat = getStringValueIfExistOrElseNull(FORMAT, propertiesMap);
+            if (collectionFormat != null) {
+                variableProperties.setCollectionType(collectionFormat);
+            }
             if (refValue != null) {
                 variableProperties.setItems(refReplace(refValue));
-                variableProperties.setType(format(refReplace(LIST_TYPE), variableProperties.getItems()));
+                fillCollectionType(variableProperties);
             } else {
                 if (getStringValueIfExistOrElseNull(FORMAT, items) != null) {
                     //Fill java format atributes array
@@ -256,7 +260,7 @@ public class MapperUtil {
                 } else {
                     fillProperties(variableProperties, currentSchema, schemas, propertyName, items, commonPackage, innerSchemas);
                     variableProperties.setItems(capitalize(propertyName));
-                    variableProperties.setType(format(refReplace(LIST_TYPE), variableProperties.getItems()));
+                    fillCollectionType(variableProperties);
                 }
             }
             if (variableProperties.getItems() != null &&
@@ -319,6 +323,16 @@ public class MapperUtil {
                 variableProperties.setType(format(MAP_TYPE, OBJECT_TYPE));
             }
             System.out.println();
+        }
+    }
+
+    private static void fillCollectionType(VariableProperties variableProperties) {
+        switch (variableProperties.getCollectionType()) {
+            case "list":
+                variableProperties.setType(format(refReplace(LIST_TYPE), variableProperties.getItems()));
+                break;
+            case "set":
+                variableProperties.setType(format(refReplace(SET_TYPE), variableProperties.getItems()));
         }
     }
 

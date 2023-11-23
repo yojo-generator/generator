@@ -7,12 +7,26 @@ channels:
   Request:
     subscribe:
       message:
-        $ref: '#/components/messages/RequestDto'
+        $ref: '#/components/messages/RequestDtoByRef'
 components:
   messages:
-    RequestDto:
+    RequestDtoByRef:
       payload:
         #If you use this way of contract, yojo does not generate referenced object
+        $ref: '#/components/schemas/RequestDtoSchema'
+    RequestDtoByRefAndProperties:
+      payload:
+        $ref: '#/components/schemas/RequestDtoSchema'
+        properties:
+          someString:
+            type: String
+    RequestDtoWithProperties:
+      payload:
+        properties:
+          someString:
+            type: string
+    RequestDtoWithDoubleInheritance:
+      payload:
         $ref: '#/components/schemas/RequestDtoSchema'
         implements:
           fromInterface:
@@ -20,14 +34,24 @@ components:
             - testGenerate.InterfaceForImpl2
         extends:
           fromClass: ClassForExtends
-          fromPackage: testGenerate.siteProcess.common
-        properties:
-          someString:
-            type: string
+          fromPackage: testGenerate.test.common
+    RequestDtoInheritanceFromSchema:
+      payload:
+        $ref: '#/components/schemas/RequestDtoSchema'
+        extends:
+          fromClass: RequestDtoSchema
+          fromPackage: testGenerate.test.common
   schemas:
     RequestDtoSchema:
       type: object
       description: RequestExample
+      implements:
+        fromInterface:
+          - testGenerate.InterfaceForImpl
+          - testGenerate.InterfaceForImpl2
+      extends:
+        fromClass: ClassForExtends
+        fromPackage: testGenerate.test.common
       #Validation Groups was added for backward compatibility. Must be used with required.
       #validationGroups contains name of Class
 #      validationGroups:
@@ -141,7 +165,7 @@ components:
       type: object
       extends:
         fromClass: ClassForExtends
-        fromPackage: testGenerate.siteProcess.common
+        fromPackage: testGenerate.test.common
       properties:
         someInteger:
           type: integer
@@ -167,6 +191,8 @@ components:
       required:
         - listOfPrimitivesRequired
       properties:
+
+        #LIST
         listOfPrimitives:
           type: array
           items:
@@ -180,7 +206,7 @@ components:
           items:
             $ref: '#/components/schemas/Primitives'
             realization: LinkedList
-        listOftDate:
+        listOfDate:
           type: array
           items:
             format: date
@@ -221,6 +247,75 @@ components:
           items:
             format: long
             realization: ArrayList
+
+        #SET
+        setOfPrimitives:
+          type: array
+          format: set
+          items:
+            $ref: '#/components/schemas/Primitives'
+        setOfPrimitivesRequired:
+          type: array
+          format: set
+          items:
+            $ref: '#/components/schemas/Primitives'
+        setOfPrimitivesWithRealization:
+          type: array
+          format: set
+          items:
+            $ref: '#/components/schemas/Primitives'
+            realization: HashSet
+        setOfDate:
+          type: array
+          format: set
+          items:
+            format: date
+        setOftDateTime:
+          type: array
+          format: set
+          items:
+            format: date-time
+        setOfOffsetDateTime:
+          type: array
+          format: set
+          items:
+            format: offsetDateTime
+        setOfInteger:
+          type: array
+          format: set
+          items:
+            format: integer
+        setOfByte:
+          type: array
+          format: set
+          items:
+            format: byte
+        setOfDouble:
+          type: array
+          format: set
+          items:
+            format: double
+        setOfFloat:
+          type: array
+          format: set
+          items:
+            format: float
+        setOfBigInteger:
+          type: array
+          format: set
+          items:
+            format: bigInteger
+        setOfBigDecimal:
+          type: array
+          format: set
+          items:
+            format: bigDecimal
+        setOfLongsWithRealization:
+          type: array
+          format: set
+          items:
+            format: long
+            realization: HashSet
 
     Primitives:
       type: object

@@ -1,9 +1,6 @@
 package ru.yojo.codegen.domain;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static java.lang.System.lineSeparator;
 import static ru.yojo.codegen.constants.Dictionary.*;
@@ -14,7 +11,7 @@ public class FillParameters {
     public FillParameters() {
     }
 
-    private List<VariableProperties> variableProperties;
+    private List<VariableProperties> variableProperties = new LinkedList<>();
 
     private Set<String> validationGroups = new HashSet<>();
     private Set<String> validationGroupsImports = new HashSet<>();
