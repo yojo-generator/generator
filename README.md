@@ -236,16 +236,15 @@ See examples [here](./examples)
   * `@Valid`
 * 📈 Added required imports according to annotations
 * 📈 Filling JavaDoc based on keywords:
-  * `summary`
   * `description`
   * `example`
-  * `enum`
 * 📈 Added getters and setters
 * 📈 Added Lombok
   * If a lombok is selected, the following annotations will be annotated:
     * `@Data` 
     * `@NoArgsConstructor`
   * Added optionally annotations: 
+  * However, you can control Accessor filling
     * `@AllArgsConstructor`
     * `@Accessors(fluent = true, chain = true)`
  * 📈 Added generating messages
@@ -256,13 +255,15 @@ See examples [here](./examples)
   * `extends:`
     * `fromClass: SomeDTO`
     * `fromPackage: ru.example.path`
+  More examples in allSupportedCases.yaml
 * 📈 Added function to add implements of class.
   Example :
   ````
   implements:
     fromInterface:
       - ru.example.path.SomeInterface
-* 📈 Added custom `bigDecimal` format
+More examples in allSupportedCases.yaml
+* 📈 Added custom `bigDecimal` and `bigInteger` format
   * Added annotation `@Digits`
     ````* Example: 
       someCost:
@@ -270,13 +271,13 @@ See examples [here](./examples)
         description: The price of smth.
         format: bigDecimal
         digits: integer = 18, fraction = 2
-* 📈 Updated Accessors annotation: now you can configure it.
 * 📈 Added Logs to Console
 * 📈 Unbound from apache lang dependencies
 * 📈 Added support inner schemas
 * 📈 Optimization code by abstract of variable properties
 * 📈 Added support of generation `Enum` classes
 * 📈 Added support of generation `Map<String, Object>` or other default types
+* 📈 Added support of generation `Set<String>` or other default types
 * 📈 Added support of validation groups. It was added for the specific cases, when you already have groups but want to use generator. Example: 
   * ````Example:
     Request:
