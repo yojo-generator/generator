@@ -12,19 +12,19 @@ public class LogUtils {
 
     public static void printLogo() {
         System.out.println(ANSI_GREEN + "*********************YAML TO POJO GENERATOR**************************");
-        System.out.println(LOG_DELIMETER);
-        System.out.println(LOG_DELIMETER);
-        System.out.println("**   ********   ***            **        **********            ******");
-        System.out.println("***   *****   ****   ********   ***   ************   ********   *****");
-        System.out.println("****   ***   *****   ********   ***   ************   ********   *****");
-        System.out.println("*****   *   ******   ********   ***   ************   ********   *****");
-        System.out.println("*******   ********   ********   ***   ************   ********   *****");
-        System.out.println("*******   ********   ********   ***   ******   ***   ********   *****");
-        System.out.println("*******   ********   ********   ****   ****   ****   ********   *****");
-        System.out.println("*******   *********            *******      *******            ******");
-        System.out.println(LOG_DELIMETER);
-        System.out.println(LOG_DELIMETER);
-        System.out.println(LOG_DELIMETER + ANSI_RESET);
+        System.out.println(ANSI_GREEN + LOG_DELIMETER);
+        System.out.println(ANSI_GREEN + LOG_DELIMETER);
+        System.out.println(ANSI_GREEN + "**   ********   ***            **        **********            ******");
+        System.out.println(ANSI_GREEN + "***   *****   ****   ********   ***   ************   ********   *****");
+        System.out.println(ANSI_GREEN + "****   ***   *****   ********   ***   ************   ********   *****");
+        System.out.println(ANSI_GREEN + "*****   *   ******   ********   ***   ************   ********   *****");
+        System.out.println(ANSI_GREEN + "*******   ********   ********   ***   ************   ********   *****");
+        System.out.println(ANSI_GREEN + "*******   ********   ********   ***   ******   ***   ********   *****");
+        System.out.println(ANSI_GREEN + "*******   ********   ********   ****   ****   ****   ********   *****");
+        System.out.println(ANSI_GREEN + "*******   *********            *******      *******            ******");
+        System.out.println(ANSI_GREEN + LOG_DELIMETER);
+        System.out.println(ANSI_GREEN + LOG_DELIMETER);
+        System.out.println(ANSI_GREEN + LOG_DELIMETER + ANSI_RESET);
     }
 
 }

@@ -22,7 +22,7 @@ public class YojoGeneratorTest {
         yojoGenerator.generate("src/test/resources/test.yaml",
                 "src/test/resources/testGenerate/",
                 "testGenerate",
-                new LombokProperties(false,
+                new LombokProperties(true,
                         true,
                         new LombokProperties.Accessors(true, true, true)));
         Assertions.assertTrue(new File("src/test/resources/testGenerate/test").listFiles().length != 0);

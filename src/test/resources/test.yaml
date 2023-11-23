@@ -190,6 +190,7 @@ components:
       description: Here was located all supported collections
       required:
         - listOfPrimitivesRequired
+        - setOfPrimitivesRequired
       properties:
 
         #LIST
@@ -213,6 +214,7 @@ components:
         listOftDateTime:
           type: array
           items:
+            type: string
             format: date-time
         listOfOffsetDateTime:
           type: array
@@ -274,6 +276,7 @@ components:
           type: array
           format: set
           items:
+            type: string
             format: date-time
         setOfOffsetDateTime:
           type: array
@@ -457,10 +460,10 @@ components:
 
         #DATE-TIME
         dateTimeValue:
-          type: object
+          type: string
           format: date-time
         dateTimeValueWithRequired:
-          type: object
+          type: string
           format: date-time
 
         #OFFSET DATE TIME

@@ -246,11 +246,29 @@ public class MapperUtil {
             variableProperties.setRealisation(getStringValueIfExistOrElseNull(REALIZATION, items));
             String refValue = getStringValueIfExistOrElseNull(REFERENCE, items);
             String collectionFormat = getStringValueIfExistOrElseNull(FORMAT, propertiesMap);
+            boolean javaType = false;
             if (collectionFormat != null) {
                 variableProperties.setCollectionType(collectionFormat);
             }
             if (refValue != null) {
-                variableProperties.setItems(refReplace(refValue));
+                String tryToFound = refValue.replaceAll(".+/", "");
+                Map<String, Object> schemaRef = castObjectToMap(schemas.get(tryToFound));
+                if (getStringValueIfExistOrElseNull(PROPERTIES, schemaRef) == null) {
+                    String typeOfRefObj = getStringValueIfExistOrElseNull(TYPE, schemaRef);
+                    String formatOfRefObj = getStringValueIfExistOrElseNull(FORMAT, schemaRef);
+                    String descOfRefObj = getStringValueIfExistOrElseNull(DESCRIPTION, schemaRef);
+                    if (descOfRefObj != null) {
+                        variableProperties.setDescription(descOfRefObj);
+                    }
+                    if (formatOfRefObj != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(typeOfRefObj)) {
+                        variableProperties.setItems(formatOfRefObj);
+                        variableProperties.setFormat(formatOfRefObj);
+                    } else {
+                        variableProperties.setItems(refReplace(refValue));
+                    }
+                } else {
+                    variableProperties.setItems(refReplace(refValue));
+                }
                 fillCollectionType(variableProperties);
             } else {
                 if (getStringValueIfExistOrElseNull(FORMAT, items) != null) {
@@ -265,20 +283,20 @@ public class MapperUtil {
             }
             if (variableProperties.getItems() != null &&
                     !JAVA_DEFAULT_TYPES.contains(variableProperties.getItems()) &&
-                    !OBJECT_TYPE.equals(variableProperties.getItems())) {
+                    !OBJECT_TYPE.equals(variableProperties.getItems()) && !javaType) {
                 variableProperties.getRequiredImports().add(commonPackage.replace(";", "." + variableProperties.getItems() + ";"));
             }
         } else if (getStringValueIfExistOrElseNull(REFERENCE, propertiesMap) != null && !ARRAY.equals(uncapitalize(variableProperties.getType()))) {
             String referenceObject = propertiesMap.get(REFERENCE).toString();
             Map<String, Object> stringObjectMap = castObjectToMap(schemas.get(referenceObject.replaceAll(".+/", "")));
             String objectType = getStringValueIfExistOrElseNull(TYPE, stringObjectMap);
-//            if (objectType != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(objectType)) {
-//                //Recursive Fill
-//                System.out.println();
-//                System.out.println("Start Recursive fillProperties " + propertyName);
-//                System.out.println();
-//                fillProperties(variableProperties, currentSchema, schemas, propertyName, stringObjectMap, commonPackage, innerSchemas);
-//            }
+            if (objectType != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(objectType)) {
+                //Recursive Fill
+                System.out.println();
+                System.out.println("Start Recursive fillProperties " + propertyName);
+                System.out.println();
+                fillProperties(variableProperties, currentSchema, schemas, propertyName, stringObjectMap, commonPackage, innerSchemas);
+            }
             if (variableProperties.getType() == null || OBJECT_TYPE.equals(variableProperties.getType())) {
                 String refReplace = refReplace(referenceObject);
                 variableProperties.setType(refReplace);

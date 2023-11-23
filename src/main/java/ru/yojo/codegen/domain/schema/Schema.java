@@ -176,7 +176,8 @@ public class Schema {
                         .append(lineSeparator());
             }
 
-            if (lombokProperties.enableLombok() && lombokProperties.allArgsConstructor() && fillParameters.getVariableProperties().stream()
+            if (lombokProperties.enableLombok() &&
+                    fillParameters.getVariableProperties().stream()
                     .anyMatch(variableProperties -> variableProperties.getEnumNames() != null)) {
                 lombokAnnotationBuilder.append(LOMBOK_ALL_ARGS_CONSTRUCTOR_ANNOTATION)
                         .append(lineSeparator());
