@@ -211,6 +211,10 @@ components:
           type: array
           items:
             format: date
+        listOfStandAloneDate:
+          type: array
+          items:
+            $ref: '#/components/schemas/StandaloneDate'
         listOftDateTime:
           type: array
           items:
@@ -627,6 +631,11 @@ components:
              * «SUCCESS» - Ok
              * «DECLINE» - Decline
              * «ERROR» - Error
+
+    StandaloneDate:
+      type: string
+      format: date
+      description: This is standalone date
 
     ClassForExtends:
       type: object
