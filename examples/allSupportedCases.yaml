@@ -1,0 +1,645 @@
+asyncapi: 2.0.0
+info:
+  title: Account Service
+  version: 1.0.0
+  description: "This service is test example of properties, which yojo can understand :rocket:"
+channels:
+  Request:
+    subscribe:
+      message:
+        $ref: '#/components/messages/RequestDtoByRef'
+components:
+  messages:
+    RequestDtoByRef:
+      payload:
+        #If you use this way of contract, yojo does not generate referenced object
+        $ref: '#/components/schemas/RequestDtoSchema'
+    RequestDtoByRefAndProperties:
+      payload:
+        $ref: '#/components/schemas/RequestDtoSchema'
+        properties:
+          someString:
+            type: String
+    RequestDtoWithProperties:
+      payload:
+        properties:
+          someString:
+            type: string
+    RequestDtoWithDoubleInheritance:
+      payload:
+        $ref: '#/components/schemas/RequestDtoSchema'
+        implements:
+          fromInterface:
+            - testGenerate.InterfaceForImpl
+            - testGenerate.InterfaceForImpl2
+        extends:
+          fromClass: ClassForExtends
+          fromPackage: testGenerate.test.common
+    RequestDtoInheritanceFromSchema:
+      payload:
+        $ref: '#/components/schemas/RequestDtoSchema'
+        extends:
+          fromClass: RequestDtoSchema
+          fromPackage: testGenerate.test.common
+  schemas:
+    RequestDtoSchema:
+      type: object
+      description: RequestExample
+      implements:
+        fromInterface:
+          - testGenerate.InterfaceForImpl
+          - testGenerate.InterfaceForImpl2
+      extends:
+        fromClass: ClassForExtends
+        fromPackage: testGenerate.test.common
+      #Validation Groups was added for backward compatibility. Must be used with required.
+      #validationGroups contains name of Class
+#      validationGroups:
+#        - ApplicationValidation.Application.class
+#      #validationGroupsImports contains import of Class
+#      validationGroupsImports:
+#        - ru.yojo.codegen.validation.ApplicationValidation
+#      #validateByGroups contains name of fields, which yojo will mark with annotation NotBlank, NotNull etc.
+#      #with params (groups = {Some.class})
+#      validateByGroups:
+#        - requestType
+#        - isTwoCities
+#        - collectionTypes
+#        - integerValidationField
+#        - uuidValidationList
+      required:
+        - requestType
+        - realEstateCost
+        - isTwoCities
+        - collectionTypes
+        - integerValidationField
+        - uuidValidationList
+      properties:
+        primitives:
+          type: object
+          description: Here was located all supported primitives
+          $ref: '#/components/schemas/Primitives'
+        objectTypes:
+          type: object
+          description: Here was located all supported object types
+          $ref: '#/components/schemas/ObjectTypes'
+        collectionTypes:
+          type: array
+          description: Here was located all supported collections
+          items:
+            $ref: '#/components/schemas/CollectionTypes'
+        integerValidationField:
+          type: integer
+        uuidValidationList:
+          type: array
+          items:
+            format: uuid
+        innerSchema:
+          type: object
+          properties:
+            someString:
+              type: string
+        mapStringInteger:
+          type: object
+          description: Map generation Example
+          additionalProperties:
+            type: integer
+        mapStringObject:
+          type: object
+          description: Map generation Example
+          additionalProperties:
+            type: object
+        mapStringObjectWithHashMap:
+          type: object
+          description: Map generation Example
+          realization: HashMap
+          additionalProperties:
+            type: object
+        mapStringObjectWithLinkedHashMap:
+          type: object
+          description: Map generation Example
+          realization: LinkedHashMap
+          additionalProperties:
+            type: object
+        innerEnumWithDescription:
+          type: object
+          enum:
+            - SUCCESS
+            - DECLINE
+            - ERROR
+          x-enumNames:
+            SUCCESS: Success value
+            DECLINE: Decline value
+            ERROR: Error value
+          description: |
+            Result of request
+                 * <p>
+                 * Supported values:
+                 * «SUCCESS» - Ok
+                 * «DECLINE» - Decline
+                 * «ERROR» - Error
+        innerEnumWithoutDescription:
+          type: object
+          enum:
+            - SUCCESS
+            - DECLINE
+            - ERROR
+          description: |
+            Result of request
+                 * <p>
+                 * Supported values:
+                 * «SUCCESS» - Ok
+                 * «DECLINE» - Decline
+                 * «ERROR» - Error
+        enumResultWithDescription:
+          type: object
+          $ref: '#/components/schemas/EnumResultWithDescription'
+        enumResultWithoutDescription:
+          type: object
+          $ref: '#/components/schemas/EnumResultWithoutDescription'
+        someObject:
+          type: object
+          $ref: '#/components/schemas/SomeObject'
+
+    SomeObject:
+      type: object
+      extends:
+        fromClass: ClassForExtends
+        fromPackage: testGenerate.test.common
+      properties:
+        someInteger:
+          type: integer
+
+    SomeObjectImpl:
+      type: object
+      implements:
+        fromInterface:
+         - testGenerate.InterfaceForImpl
+      properties:
+        someInteger:
+          type: integer
+
+    StandAloneExtendsObject:
+      type: object
+      extends:
+        fromClass: ClassForExtending
+        fromPackage: testGenerate
+
+    CollectionTypes:
+      type: object
+      description: Here was located all supported collections
+      required:
+        - listOfPrimitivesRequired
+        - setOfPrimitivesRequired
+      properties:
+
+        #LIST
+        listOfPrimitives:
+          type: array
+          items:
+            $ref: '#/components/schemas/Primitives'
+        listOfPrimitivesRequired:
+          type: array
+          items:
+            $ref: '#/components/schemas/Primitives'
+        listOfPrimitivesWithRealization:
+          type: array
+          items:
+            $ref: '#/components/schemas/Primitives'
+            realization: LinkedList
+        listOfDate:
+          type: array
+          items:
+            format: date
+        listOfStandAloneDate:
+          type: array
+          items:
+            $ref: '#/components/schemas/StandaloneDate'
+        listOftDateTime:
+          type: array
+          items:
+            type: string
+            format: date-time
+        listOfOffsetDateTime:
+          type: array
+          items:
+            format: offsetDateTime
+        listOfInteger:
+          type: array
+          items:
+            format: integer
+        listOfByte:
+          type: array
+          items:
+            format: byte
+        listOfDouble:
+          type: array
+          items:
+            format: double
+        listOfFloat:
+          type: array
+          items:
+            format: float
+        listOfBigInteger:
+          type: array
+          items:
+            format: bigInteger
+        listOfBigDecimal:
+          type: array
+          items:
+            format: bigDecimal
+        listOfLongsWithRealization:
+          type: array
+          items:
+            format: long
+            realization: ArrayList
+
+        #SET
+        setOfPrimitives:
+          type: array
+          format: set
+          items:
+            $ref: '#/components/schemas/Primitives'
+        setOfPrimitivesRequired:
+          type: array
+          format: set
+          items:
+            $ref: '#/components/schemas/Primitives'
+        setOfPrimitivesWithRealization:
+          type: array
+          format: set
+          items:
+            $ref: '#/components/schemas/Primitives'
+            realization: HashSet
+        setOfDate:
+          type: array
+          format: set
+          items:
+            format: date
+        setOftDateTime:
+          type: array
+          format: set
+          items:
+            type: string
+            format: date-time
+        setOfOffsetDateTime:
+          type: array
+          format: set
+          items:
+            format: offsetDateTime
+        setOfInteger:
+          type: array
+          format: set
+          items:
+            format: integer
+        setOfByte:
+          type: array
+          format: set
+          items:
+            format: byte
+        setOfDouble:
+          type: array
+          format: set
+          items:
+            format: double
+        setOfFloat:
+          type: array
+          format: set
+          items:
+            format: float
+        setOfBigInteger:
+          type: array
+          format: set
+          items:
+            format: bigInteger
+        setOfBigDecimal:
+          type: array
+          format: set
+          items:
+            format: bigDecimal
+        setOfLongsWithRealization:
+          type: array
+          format: set
+          items:
+            format: long
+            realization: HashSet
+
+    Primitives:
+      type: object
+      description: Here was located all supported primitives
+      required:
+        - booleanValueWithRequired
+        - intValueWithRequired
+        - longValueWithRequired
+        - doubleValueWithRequired
+      properties:
+
+        #BOOLEAN
+        booleanWithDefaultValue:
+          type: boolean
+          primitive: true
+          default: true
+        booleanValueWithoutRequired:
+          type: boolean
+          primitive: true
+        booleanValueWithRequired:
+          type: boolean
+          primitive: true
+
+        #BYTE
+        byteWithDefaultValue:
+          type: number
+          format: byte
+          primitive: true
+          default: 5
+        byteValueWithoutRequired:
+          type: number
+          format: byte
+          primitive: true
+        byteValueWithRequired:
+          type: number
+          format: byte
+          primitive: true
+
+        #INTEGER
+        intWithDefaultValue:
+          type: integer
+          format: int32
+          primitive: true
+          default: 123
+        intValueWithoutRequired:
+          type: integer
+          format: int32
+          primitive: true
+        intValueWithRequired:
+          type: integer
+          format: int32
+          primitive: true
+
+        #LONG
+        longWithDefaultValue:
+          type: integer
+          format: int64
+          primitive: true
+          default: 123L
+        longValueWithoutRequired:
+          type: integer
+          format: int64
+          primitive: true
+        longValueWithRequired:
+          type: integer
+          format: int64
+          primitive: true
+
+        #DOUBLE
+        doubleWithDefaultValue:
+          type: number
+          format: double
+          primitive: true
+          default: 123.123
+        doubleValueWithoutRequired:
+          type: number
+          format: double
+          primitive: true
+        doubleValueWithRequired:
+          type: number
+          format: double
+          primitive: true
+
+        #FLOAT
+        floatWithDefaultValue:
+          type: number
+          format: float
+          primitive: true
+          default: 123.123F
+        floatValueWithoutRequired:
+          type: number
+          format: float
+          primitive: true
+        floatValueWithRequired:
+          type: number
+          format: float
+          primitive: true
+
+    ObjectTypes:
+      type: object
+      description: Here was located supported object types
+      required:
+        - StringValues
+        - uuidValueWithRequired
+        - dateValueWithRequired
+        - dateTimeValueWithRequired
+        - offsetDateTimeValueWithRequired
+      properties:
+        #When name starts with UpperCase, it will uncapitalize
+        #Also here we annotate this object with @Valid and @NotNull
+        StringValues:
+          type: object
+          description: Here was located all supported strings values
+          $ref: '#/components/schemas/StringValues'
+        numericsValues:
+          type: object
+          description: Here was located all supported numeric values
+          $ref: '#/components/schemas/NumericsValues'
+
+        #UUID
+        uuidValue:
+          type: object
+          format: uuid
+        uuidWithDefaultValue:
+          type: object
+          format: uuid
+          default: a1256d5f-4ce6-4bb6-9fd1-ae265fe186db
+        uuidValueWithRequired:
+          type: object
+          format: uuid
+
+        #DATE
+        dateValue:
+          type: object
+          format: date
+        dateValueWithRequired:
+          type: object
+          format: date
+
+        #DATE-TIME
+        dateTimeValue:
+          type: string
+          format: date-time
+        dateTimeValueWithRequired:
+          type: string
+          format: date-time
+
+        #OFFSET DATE TIME
+        offsetDateTimeValue:
+          type: object
+          format: offsetDateTime
+        offsetDateTimeValueWithRequired:
+          type: object
+          format: offsetDateTime
+
+    StringValues:
+      type: object
+      description: Here was located all supported strings values
+      required:
+        - stringValueWithRequired
+        - stringValueNotBlankSizeMinLength
+        - stringValueNotBlankSizeMaxLength
+        - stringWithAllAnnotations
+      properties:
+        stringWithDefaultValue:
+          type: string
+          default: "5"
+        stringWithDefaultValueWithoutBrackets:
+          type: string
+          default: 5
+        stringValueWithoutRequired:
+          type: string
+        stringValueWithRequired:
+          type: string
+        stringValueNotBlankSizeMinLength:
+          type: string
+          minLength: 1
+        stringValueNotBlankSizeMaxLength:
+          type: string
+          maxLength: 2
+        stringValueSizeMinMaxLength:
+          type: string
+          minLength: 1
+          maxLength: 2
+        stringWithPattern:
+          type: string
+          pattern: '^d{6}$'
+        stringWithAllAnnotations:
+          type: string
+          minLength: 1
+          maxLength: 2
+          pattern: '^d{6}$'
+
+    NumericsValues:
+      type: object
+      description: Here was located all supported numeric values
+      required:
+        - byteValueWithAnnotations
+        - integerValueWithAnnotations
+        - longValueWithAnnotations
+        - doubleValueWithAnnotations
+        - floatValueWithAnnotations
+        - bigDecimalValueWithAnnotations
+        - bigIntegerValueWithAnnotations
+      properties:
+        byteValue:
+          type: number
+          format: byte
+        integerValue:
+          type: integer
+        integerValueWithFormat:
+          type: integer
+          format: int32
+        longValue:
+          type: integer
+          format: int64
+        #Custom attribute
+        doubleValue:
+          type: number
+          format: double
+        #Custom attribute
+        floatValue:
+          type: number
+          format: float
+        #Custom attribute
+        bigDecimalValue:
+          type: number
+          format: bigDecimal
+        #Custom attribute
+        bigIntegerValue:
+          type: number
+          format: bigInteger
+
+        byteValueWithAnnotations:
+          type: number
+          format: byte
+          digits: integer = 1, fraction = 0
+          minimum: 2
+          maximum: 4
+        integerValueWithAnnotations:
+          type: integer
+          format: int32
+          digits: integer = 2, fraction = 0
+          minimum: 22
+          maximum: 44
+        longValueWithAnnotations:
+          type: integer
+          format: int64
+          digits: integer = 2, fraction = 0
+          minimum: 22
+          maximum: 44
+        #Custom attribute
+        doubleValueWithAnnotations:
+          type: number
+          format: double
+          digits: integer = 2, fraction = 2
+        #Custom attribute
+        floatValueWithAnnotations:
+          type: number
+          format: float
+          digits: integer = 2, fraction = 2
+        #Custom attribute
+        bigDecimalValueWithAnnotations:
+          type: number
+          format: bigDecimal
+          digits: integer = 2, fraction = 2
+          minimum: 22
+          maximum: 44
+        #Custom attribute
+        bigIntegerValueWithAnnotations:
+          type: number
+          format: bigInteger
+          digits: integer = 2, fraction = 2
+          minimum: 22
+          maximum: 44
+
+    EnumResultWithDescription:
+      type: object
+      enum:
+        - SUCCESS
+        - DECLINE
+        - ERROR
+      x-enumNames:
+        SUCCESS: Success value
+        DECLINE: Decline value
+        ERROR: Error value
+      description: |
+        Result of request
+             * <p>
+             * Supported values:
+             * «SUCCESS» - Ok
+             * «DECLINE» - Decline
+             * «ERROR» - Error
+
+
+    EnumResultWithoutDescription:
+      type: object
+      enum:
+        - SUCCESS
+        - DECLINE
+        - ERROR
+      description: |
+        Result of request
+             * <p>
+             * Supported values:
+             * «SUCCESS» - Ok
+             * «DECLINE» - Decline
+             * «ERROR» - Error
+
+    StandaloneDate:
+      type: string
+      format: date
+      description: This is standalone date
+
+    ClassForExtends:
+      type: object
+      description: This Class just fo Example of extends after generate
+      properties:
+        someString:
+          type: string
