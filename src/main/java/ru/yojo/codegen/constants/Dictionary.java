@@ -37,6 +37,7 @@ public final class Dictionary {
     public static final String PAYLOAD = "payload";
     public static final String TAGS = "tags";
     public static final String ADDITIONAL_PROPERTIES = "additionalProperties";
+    public static final String ADDITIONAL_FORMAT = "additionalFormat";
     public static final String DEFAULT = "default";
     public static final String ALL_OF = "allOf";
 

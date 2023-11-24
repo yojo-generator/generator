@@ -121,6 +121,25 @@ components:
           realization: LinkedHashMap
           additionalProperties:
             type: object
+        mapStringCustomObject:
+          type: object
+          description: Map generation Example
+          additionalProperties:
+            $ref: '#/components/schemas/SomeObject'
+        mapStringSetOfCustomObject:
+          type: object
+          description: Map generation Example
+          additionalProperties:
+            type: array
+            format: set
+            $ref: '#/components/schemas/SomeObject'
+        mapStringSetOfStrings:
+          type: object
+          description: Map generation Example
+          additionalProperties:
+            type: array
+            format: set
+            additionalFormat: string
         innerEnumWithDescription:
           type: object
           enum:
