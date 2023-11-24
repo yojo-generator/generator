@@ -347,9 +347,9 @@ public class MapperUtil {
             } else if (OBJECT.equals(type) && referencedObject == null) {
                 variableProperties.setType(format(MAP_TYPE, OBJECT_TYPE));
                 //Fill with custom object
-            } else if (referencedObject != null && schemas.containsKey(refReplace(referencedObject))) {
+            } else if (referencedObject != null && (schemas.containsKey(refReplace(referencedObject)) || currentSchema == schemas)) {
                 String refObjectName = refReplace(referencedObject);
-                System.out.println("FOUND CUSTOM OBJECT!");
+                System.out.println("FOUND CUSTOM OBJECT! " + refObjectName);
                 if (ARRAY.equals(type)) {
                     String collectionType = getStringValueIfExistOrElseNull(FORMAT, castObjectToMap(propertiesMap.get(ADDITIONAL_PROPERTIES)));
                     if (collectionType != null) {

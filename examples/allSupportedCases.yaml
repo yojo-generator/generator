@@ -133,7 +133,6 @@ components:
           additionalProperties:
             type: array
             format: set
-            additionalFormat: string
             $ref: '#/components/schemas/SomeObject'
         mapStringSetOfStrings:
           type: object
