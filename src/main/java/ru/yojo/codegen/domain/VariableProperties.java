@@ -283,6 +283,18 @@ public class VariableProperties {
     public void setFormat(String format) {
         if (format != null) {
             switch (format) {
+                case "string":
+                    this.type = STRING;
+                    if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
+                        this.items = STRING;
+                        this.type = format(collectionPattern, STRING);
+                        this.valid = false;
+                    }
+                    break;
                 case "date":
                     this.type = LOCAL_DATE;
                     requiredImports.add(LOCAL_DATE_IMPORT);

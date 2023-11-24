@@ -271,10 +271,15 @@ public class MapperUtil {
                 }
                 fillCollectionType(variableProperties);
             } else {
-                if (getStringValueIfExistOrElseNull(FORMAT, items) != null) {
+                if (getStringValueIfExistOrElseNull(FORMAT, items) != null || getStringValueIfExistOrElseNull(TYPE, items) != null) {
                     //Fill java format atributes array
-                    variableProperties.setItems(items.get(FORMAT).toString());
-                    variableProperties.setFormat(items.get(FORMAT).toString());
+                    if (getStringValueIfExistOrElseNull(FORMAT, items) != null) {
+                        variableProperties.setItems(items.get(FORMAT).toString());
+                        variableProperties.setFormat(items.get(FORMAT).toString());
+                    } else {
+                        variableProperties.setItems(items.get(TYPE).toString());
+                        variableProperties.setFormat(items.get(TYPE).toString());
+                    }
                 } else {
                     fillProperties(variableProperties, currentSchema, schemas, propertyName, items, commonPackage, innerSchemas);
                     variableProperties.setItems(capitalize(propertyName));
@@ -331,14 +336,20 @@ public class MapperUtil {
             System.out.println();
             System.out.println("ADDITIONAL PROPERTIES");
             String type = getStringValueIfExistOrElseNull(TYPE, castObjectToMap(propertiesMap.get(ADDITIONAL_PROPERTIES)));
+            String referencedObject = getStringValueIfExistOrElseNull(REFERENCE, castObjectToMap(propertiesMap.get(ADDITIONAL_PROPERTIES)));
             variableProperties.getRequiredImports().add(MAP_IMPORT);
             variableProperties.setRealisation(getStringValueIfExistOrElseNull(REALIZATION, propertiesMap));
             variableProperties.setValid(false);
-            if (JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(type)) {
+            if (type != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(type)) {
                 System.out.println("CORRECT TYPE!");
                 variableProperties.setType(format(MAP_TYPE, JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(type)));
             } else if (OBJECT.equals(type)) {
                 variableProperties.setType(format(MAP_TYPE, OBJECT_TYPE));
+            } else if (referencedObject != null && schemas.containsKey(refReplace(referencedObject))) {
+                String refObjectName = refReplace(referencedObject);
+                System.out.println("FOUND CUSTOM OBJECT!");
+                variableProperties.setType(format(MAP_TYPE, refObjectName));
+                variableProperties.getRequiredImports().add(commonPackage.replace(";", "." + refObjectName + ";"));
             }
             System.out.println();
         }
