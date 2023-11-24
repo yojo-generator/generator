@@ -4,11 +4,16 @@ package ru.yojo.codegen.domain;
 public final class LombokProperties {
     private final boolean enableLombok;
     private final boolean allArgsConstructor;
-    private final Accessors accessors;
+
+    private Accessors accessors;
 
     public LombokProperties(boolean enableLombok, boolean allArgsConstructor, Accessors accessors) {
         this.enableLombok = enableLombok;
         this.allArgsConstructor = allArgsConstructor;
+        this.accessors = accessors;
+    }
+
+    public void setAccessors(Accessors accessors) {
         this.accessors = accessors;
     }
 

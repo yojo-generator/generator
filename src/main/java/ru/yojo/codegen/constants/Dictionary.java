@@ -57,6 +57,14 @@ public final class Dictionary {
     public static final String SET = "Set";
 
     /**
+     * lombok manual properties
+     */
+    public static final String LOMBOK = "lombok";
+    public static final String ACCESSORS = "accessors";
+    public static final String FLUENT = "fluent";
+    public static final String CHAIN = "chain";
+
+    /**
      * Schema Types
      */
     public static final String ST_LOCAL_DATE = "date";

@@ -16,6 +16,16 @@ public class FillParameters {
     private Set<String> validationGroups = new HashSet<>();
     private Set<String> validationGroupsImports = new HashSet<>();
 
+    private LombokProperties lombokProperties;
+
+    public LombokProperties getLombokProperties() {
+        return lombokProperties;
+    }
+
+    public void setLombokProperties(LombokProperties lombokProperties) {
+        this.lombokProperties = lombokProperties;
+    }
+
     public Set<String> getValidationGroups() {
         return validationGroups;
     }

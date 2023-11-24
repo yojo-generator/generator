@@ -97,6 +97,11 @@ public class Message {
                         .append(lineSeparator());
                 requiredImports.add(LOMBOK_DATA_IMPORT);
             }
+            if (fillParameters.getLombokProperties() != null) {
+                if (fillParameters.getLombokProperties().getAccessors() != null) {
+                    this.lombokProperties.setAccessors(fillParameters.getLombokProperties().getAccessors());
+                }
+            }
             buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder);
         }
         if (!lombokProperties.enableLombok()) {

@@ -26,6 +26,20 @@ public class SchemaMapper {
             System.out.println("START MAPPING OF SCHEMA: " + schemaName);
             Map<String, Object> schemaMap = castObjectToMap(schemaValues);
             String schemaType = getStringValueIfExistOrElseNull(TYPE, schemaMap);
+            if (schemaMap != null && schemaMap.containsKey(LOMBOK)) {
+                Map<String, Object> lombokProps = castObjectToMap(schemaMap.get(LOMBOK));
+                if (lombokProps.containsKey(ACCESSORS)) {
+                    LombokProperties.Accessors acc = new LombokProperties.Accessors(true, false, false);
+                    Map<String, Object> accessors = castObjectToMap(lombokProps.get(ACCESSORS));
+                    if (accessors.containsKey(FLUENT)) {
+                        acc.setFluent(Boolean.valueOf(accessors.get(FLUENT).toString()));
+                    }
+                    if (accessors.containsKey(CHAIN)) {
+                        acc.setChain(Boolean.valueOf(accessors.get(CHAIN).toString()));
+                    }
+                    lombokProperties.setAccessors(acc);
+                }
+            }
             if (schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
                 Schema schema = new Schema();
                 schema.setSchemaName(capitalize(schemaName));
