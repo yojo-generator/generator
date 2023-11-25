@@ -1,7 +1,6 @@
 package ru.yojo.codegen.domain.lombok;
 
 @SuppressWarnings("all")
-@lombok.experimental.Accessors(chain = true)
 public class LombokProperties {
     private boolean enableLombok;
     private boolean allArgsConstructor;
