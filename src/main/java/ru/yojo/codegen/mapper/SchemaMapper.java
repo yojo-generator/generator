@@ -2,8 +2,10 @@ package ru.yojo.codegen.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.yojo.codegen.domain.FillParameters;
-import ru.yojo.codegen.domain.LombokProperties;
 import ru.yojo.codegen.domain.VariableProperties;
+import ru.yojo.codegen.domain.lombok.Accessors;
+import ru.yojo.codegen.domain.lombok.EqualsAndHashCode;
+import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.schema.Schema;
 import ru.yojo.codegen.exception.SchemaFillException;
 
@@ -23,13 +25,14 @@ public class SchemaMapper {
         List<Schema> schemaList = new ArrayList<>();
         Map<String, Object> innerSchemas = new LinkedHashMap<>();
         schemas.forEach((schemaName, schemaValues) -> {
+            LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(lombokProperties);
             System.out.println("START MAPPING OF SCHEMA: " + schemaName);
             Map<String, Object> schemaMap = castObjectToMap(schemaValues);
             String schemaType = getStringValueIfExistOrElseNull(TYPE, schemaMap);
             if (schemaMap != null && schemaMap.containsKey(LOMBOK)) {
                 Map<String, Object> lombokProps = castObjectToMap(schemaMap.get(LOMBOK));
                 if (lombokProps.containsKey(ACCESSORS)) {
-                    LombokProperties.Accessors acc = new LombokProperties.Accessors(true, false, false);
+                    Accessors acc = new Accessors(true, false, false);
                     Map<String, Object> accessors = castObjectToMap(lombokProps.get(ACCESSORS));
                     if (accessors.containsKey(FLUENT)) {
                         acc.setFluent(Boolean.valueOf(accessors.get(FLUENT).toString()));
@@ -37,14 +40,25 @@ public class SchemaMapper {
                     if (accessors.containsKey(CHAIN)) {
                         acc.setChain(Boolean.valueOf(accessors.get(CHAIN).toString()));
                     }
-                    lombokProperties.setAccessors(acc);
+                    finalLombokProperties.setAccessors(acc);
+                }
+                if (lombokProps.containsKey(EQUALS_AND_HASH_CODE)) {
+                    EqualsAndHashCode equalsAndHashCode = new EqualsAndHashCode();
+                    Map<String, Object> eah = castObjectToMap(lombokProps.get(EQUALS_AND_HASH_CODE));
+                    if (eah != null) {
+                        if (getStringValueIfExistOrElseNull(CALL_SUPER, eah) != null) {
+                            equalsAndHashCode.setCallSuper(Boolean.valueOf(getStringValueIfExistOrElseNull(CALL_SUPER, eah)));
+                        }
+                        equalsAndHashCode.setEnable(true);
+                    }
+                    finalLombokProperties.setEqualsAndHashCode(equalsAndHashCode);
                 }
             }
             if (schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
                 Schema schema = new Schema();
                 schema.setSchemaName(capitalize(schemaName));
                 schema.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap));
-                schema.setLombokProperties(lombokProperties);
+                schema.setLombokProperties(finalLombokProperties);
                 schema.setPackageName(commonPackage);
 
                 // Marker for extending
@@ -100,6 +114,7 @@ public class SchemaMapper {
         });
         if (!innerSchemas.isEmpty()) {
             innerSchemas.forEach((schemaName, schemaValues) -> {
+                LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(lombokProperties);
                 System.out.println("START MAPPING OF INNER SCHEMA: " + schemaName);
                 Map<String, Object> schemaMap = castObjectToMap(schemaValues);
                 String schemaType = getStringValueIfExistOrElseNull(TYPE, schemaMap);
@@ -107,7 +122,7 @@ public class SchemaMapper {
                     Schema schema = new Schema();
                     schema.setSchemaName(capitalize(schemaName));
                     schema.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap));
-                    schema.setLombokProperties(lombokProperties);
+                    schema.setLombokProperties(finalLombokProperties);
                     schema.setPackageName(commonPackage);
                     schema.setFillParameters(
                             getSchemaVariableProperties(

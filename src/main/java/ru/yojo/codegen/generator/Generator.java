@@ -1,6 +1,6 @@
 package ru.yojo.codegen.generator;
 
-import ru.yojo.codegen.domain.LombokProperties;
+import ru.yojo.codegen.domain.lombok.LombokProperties;
 
 /**
  * Generate pojos from Yaml File

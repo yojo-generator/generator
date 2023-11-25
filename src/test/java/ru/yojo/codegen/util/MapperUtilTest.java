@@ -3,7 +3,8 @@ package ru.yojo.codegen.util;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import ru.yojo.codegen.domain.LombokProperties;
+import ru.yojo.codegen.domain.lombok.Accessors;
+import ru.yojo.codegen.domain.lombok.LombokProperties;
 
 import java.util.HashSet;
 
@@ -21,7 +22,7 @@ public class MapperUtilTest {
             "true, false, false, '@Accessors'"
     })
     void buildLombokAnnotationsTest(boolean isAccessorsEnable, boolean isFluent, boolean isChain, String expectedResult) {
-        LombokProperties.Accessors accessors = new LombokProperties.Accessors(isAccessorsEnable, isFluent, isChain);
+        Accessors accessors = new Accessors(isAccessorsEnable, isFluent, isChain);
         LombokProperties lombokProperties = new LombokProperties(true, false, accessors);
 
         StringBuilder actualResultStringBuilder = new StringBuilder();
@@ -38,7 +39,7 @@ public class MapperUtilTest {
 
     @Test
     void buildLombokAnnotationsTestAccessorsDisable() {
-        LombokProperties.Accessors accessors = new LombokProperties.Accessors(false, true, true);
+        Accessors accessors = new Accessors(false, true, true);
         LombokProperties lombokProperties = new LombokProperties(true, false, accessors);
 
         StringBuilder actualResultStringBuilder = new StringBuilder();

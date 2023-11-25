@@ -4,7 +4,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import ru.yojo.codegen.domain.LombokProperties;
+import ru.yojo.codegen.domain.lombok.Accessors;
+import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.mapper.MessageMapper;
 import ru.yojo.codegen.mapper.SchemaMapper;
 
@@ -24,7 +25,7 @@ public class YojoGeneratorTest {
                 "testGenerate",
                 new LombokProperties(true,
                         true,
-                        new LombokProperties.Accessors(true, true, true)));
+                        new Accessors(true, true, true)));
         Assertions.assertTrue(new File("src/test/resources/testGenerate/test").listFiles().length != 0);
     }
 }

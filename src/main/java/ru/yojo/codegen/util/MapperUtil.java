@@ -1,7 +1,7 @@
 package ru.yojo.codegen.util;
 
 import ru.yojo.codegen.domain.FillParameters;
-import ru.yojo.codegen.domain.LombokProperties;
+import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.exception.SchemaFillException;
 
@@ -552,6 +552,21 @@ public class MapperUtil {
             lombokAnnotationBuilder.append(LOMBOK_ALL_ARGS_CONSTRUCTOR_ANNOTATION)
                     .append(lineSeparator());
             requiredImports.add(LOMBOK_ALL_ARGS_CONSTRUCTOR_IMPORT);
+        }
+        if (lombokProperties.getEqualsAndHashCode() != null && lombokProperties.getEqualsAndHashCode().isEnable()) {
+            requiredImports.add(LOMBOK_EQUALS_AND_HASH_CODE_IMPORT);
+            if (lombokProperties.getEqualsAndHashCode().getCallSuper() != null) {
+                if (lombokProperties.getEqualsAndHashCode().getCallSuper()) {
+                    lombokAnnotationBuilder.append(EQUALS_AND_HASH_CODE_CALL_SUPER_TRUE_ANNOTATION)
+                            .append(lineSeparator());
+                } else {
+                    lombokAnnotationBuilder.append(EQUALS_AND_HASH_CODE_CALL_SUPER_FALSE_ANNOTATION)
+                            .append(lineSeparator());
+                }
+            } else {
+                lombokAnnotationBuilder.append(EQUALS_AND_HASH_CODE_ANNOTATION)
+                        .append(lineSeparator());
+            }
         }
     }
 

@@ -2,7 +2,7 @@ package ru.yojo.codegen.generator;
 
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
-import ru.yojo.codegen.domain.LombokProperties;
+import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.message.Message;
 import ru.yojo.codegen.domain.schema.Schema;
 import ru.yojo.codegen.exception.SchemaFillException;

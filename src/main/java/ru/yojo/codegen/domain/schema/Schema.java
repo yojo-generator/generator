@@ -1,7 +1,7 @@
 package ru.yojo.codegen.domain.schema;
 
 import ru.yojo.codegen.domain.FillParameters;
-import ru.yojo.codegen.domain.LombokProperties;
+import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.VariableProperties;
 
 import java.util.HashSet;

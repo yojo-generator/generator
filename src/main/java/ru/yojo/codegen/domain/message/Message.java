@@ -1,7 +1,7 @@
 package ru.yojo.codegen.domain.message;
 
 import ru.yojo.codegen.domain.FillParameters;
-import ru.yojo.codegen.domain.LombokProperties;
+import ru.yojo.codegen.domain.lombok.LombokProperties;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -27,6 +27,10 @@ public class Message {
 
     public void setLombokProperties(LombokProperties lombokProperties) {
         this.lombokProperties = lombokProperties;
+    }
+
+    public LombokProperties getLombokProperties() {
+        return lombokProperties;
     }
 
     public String getMessageName() {

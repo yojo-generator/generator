@@ -25,11 +25,19 @@ components:
         lombok:
           accessors:
             chain: true
+          equalsAndHashCode:
+            enable: true
         properties:
           someString:
             type: string
     RequestDtoWithDoubleInheritance:
       payload:
+        lombok:
+          accessors:
+            chain: true
+          equalsAndHashCode:
+            enable: true
+            callSuper: true
         $ref: '#/components/schemas/RequestDtoSchema'
         implements:
           fromInterface:
@@ -50,6 +58,8 @@ components:
       lombok:
         accessors:
           chain: true
+      equalsAndHashCode:
+        enable: true
       description: RequestExample
       implements:
         fromInterface:
@@ -188,6 +198,12 @@ components:
 
     SomeObject:
       type: object
+      lombok:
+        accessors:
+          chain: true
+        equalsAndHashCode:
+          enable: true
+          callSuper: false
       extends:
         fromClass: ClassForExtends
         fromPackage: testGenerate.test.common
@@ -668,6 +684,9 @@ components:
     ClassForExtends:
       type: object
       description: This Class just fo Example of extends after generate
+      lombok:
+        accessors:
+          chain: true
       properties:
         someString:
           type: string

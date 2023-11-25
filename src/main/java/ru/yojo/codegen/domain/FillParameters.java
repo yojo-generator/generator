@@ -1,5 +1,7 @@
 package ru.yojo.codegen.domain;
 
+import ru.yojo.codegen.domain.lombok.LombokProperties;
+
 import java.util.*;
 
 import static java.lang.System.lineSeparator;

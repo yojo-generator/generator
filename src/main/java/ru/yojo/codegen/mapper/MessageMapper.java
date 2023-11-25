@@ -2,8 +2,10 @@ package ru.yojo.codegen.mapper;
 
 import org.springframework.stereotype.Component;
 import ru.yojo.codegen.domain.FillParameters;
-import ru.yojo.codegen.domain.LombokProperties;
 import ru.yojo.codegen.domain.VariableProperties;
+import ru.yojo.codegen.domain.lombok.Accessors;
+import ru.yojo.codegen.domain.lombok.EqualsAndHashCode;
+import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.message.Message;
 
 import java.util.*;
@@ -29,7 +31,7 @@ public class MessageMapper {
             Map<String, Object> messageMap = castObjectToMap(messageValues);
             Message message = new Message();
             message.setMessageName(capitalize(messageName));
-            message.setLombokProperties(lombokProperties);
+            message.setLombokProperties(LombokProperties.newLombokProperties(lombokProperties));
 
             Map<String, Object> payloadMap = castObjectToMap(messageMap.get(PAYLOAD));
             String refObject = getStringValueIfExistOrElseNull(REFERENCE, payloadMap);
@@ -68,7 +70,7 @@ public class MessageMapper {
                                 schemasMap,
                                 removeSchemas,
                                 excludeRemoveSchemas,
-                                lombokProperties
+                                message.getLombokProperties()
                         )
                 );
                 if (refObject != null) {
@@ -80,7 +82,7 @@ public class MessageMapper {
                                     schemasMap,
                                     removeSchemas,
                                     excludeRemoveSchemas,
-                                    lombokProperties));
+                                    message.getLombokProperties()));
                 }
                 //Check from schema
                 if (message.getImplementsFrom().isEmpty() && isBlank(message.getExtendsFrom())) {
@@ -135,7 +137,7 @@ public class MessageMapper {
         if (payload.containsKey(LOMBOK)) {
             Map<String, Object> lombokProps = castObjectToMap(payload.get(LOMBOK));
             if (lombokProps.containsKey(ACCESSORS)) {
-                LombokProperties.Accessors acc = new LombokProperties.Accessors(true, false, false);
+                Accessors acc = new Accessors(true, false, false);
                 Map<String, Object> accessors = castObjectToMap(lombokProps.get(ACCESSORS));
                 if (accessors.containsKey(FLUENT)) {
                     acc.setFluent(Boolean.valueOf(accessors.get(FLUENT).toString()));
@@ -144,6 +146,17 @@ public class MessageMapper {
                     acc.setChain(Boolean.valueOf(accessors.get(CHAIN).toString()));
                 }
                 lombokProperties.setAccessors(acc);
+            }
+            if (lombokProps.containsKey(EQUALS_AND_HASH_CODE)) {
+                EqualsAndHashCode equalsAndHashCode = new EqualsAndHashCode();
+                Map<String, Object> eah = castObjectToMap(lombokProps.get(EQUALS_AND_HASH_CODE));
+                if (eah != null) {
+                    if (getStringValueIfExistOrElseNull(CALL_SUPER, eah) != null) {
+                        equalsAndHashCode.setCallSuper(Boolean.valueOf(getStringValueIfExistOrElseNull(CALL_SUPER, eah)));
+                    }
+                    equalsAndHashCode.setEnable(true);
+                }
+                lombokProperties.setEqualsAndHashCode(equalsAndHashCode);
             }
         }
         if (getStringValueIfExistOrElseNull(PROPERTIES, payload) != null) {

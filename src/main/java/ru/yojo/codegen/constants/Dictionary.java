@@ -60,9 +60,13 @@ public final class Dictionary {
      * lombok manual properties
      */
     public static final String LOMBOK = "lombok";
+
     public static final String ACCESSORS = "accessors";
     public static final String FLUENT = "fluent";
     public static final String CHAIN = "chain";
+
+    public static final String EQUALS_AND_HASH_CODE = "equalsAndHashCode";
+    public static final String CALL_SUPER = "callSuper";
 
     /**
      * Schema Types
@@ -109,6 +113,9 @@ public final class Dictionary {
     public static final String LOMBOK_ACCESSORS_EMPTY_ANNOTATION = "@Accessors";
     public static final String LOMBOK_ACCESSORS_FLUENT_ANNOTATION = "@Accessors(fluent = true)";
     public static final String LOMBOK_ACCESSORS_CHAIN_ANNOTATION = "@Accessors(chain = true)";
+    public static final String EQUALS_AND_HASH_CODE_ANNOTATION = "@EqualsAndHashCode";
+    public static final String EQUALS_AND_HASH_CODE_CALL_SUPER_FALSE_ANNOTATION = "@EqualsAndHashCode(callSuper = false)";
+    public static final String EQUALS_AND_HASH_CODE_CALL_SUPER_TRUE_ANNOTATION = "@EqualsAndHashCode(callSuper = true)";
 
     /**
      * Lombok Imports
@@ -118,6 +125,7 @@ public final class Dictionary {
     public static final String LOMBOK_DATA_IMPORT = "lombok.Data;";
     public static final String LOMBOK_GETTER_IMPORT = "lombok.Getter;";
     public static final String LOMBOK_ACCESSORS_IMPORT = "lombok.experimental.Accessors;";
+    public static final String LOMBOK_EQUALS_AND_HASH_CODE_IMPORT = "lombok.EqualsAndHashCode;";
 
     /**
      * Java Types
