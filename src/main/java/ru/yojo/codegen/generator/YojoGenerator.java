@@ -11,8 +11,18 @@ import ru.yojo.codegen.mapper.SchemaMapper;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import static java.lang.System.lineSeparator;
 import static ru.yojo.codegen.constants.Dictionary.*;
 import static ru.yojo.codegen.util.LogUtils.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
@@ -39,6 +49,36 @@ public class YojoGenerator implements Generator {
     }
 
     /**
+     * Method for generating from all files in directory
+     *
+     * @param directory        - which directory use for search contracts
+     * @param outputDirectory  - directory to output generated classes
+     * @param packageLocation  - package, which will write in each generated class
+     * @param lombokProperties - properies of lombok
+     * @throws IOException
+     */
+    @Override
+    public void generateAll(String directory, String outputDirectory, String packageLocation, LombokProperties lombokProperties) throws IOException {
+        Files.walk(Paths.get(directory))
+                .filter(Files::isRegularFile)
+                .map(Path::toFile)
+                .forEach(file -> {
+                            String content;
+                            try {
+                                content = new String(Files.readAllBytes(Paths.get(file.getPath())));
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                            content = getContent(file, content);
+                            if (content.startsWith("asyncapi")) {
+                                Map<String, Object> obj = new Yaml().load(content);
+                                process(file.getPath(), outputDirectory, packageLocation, lombokProperties, obj);
+                            }
+                        }
+                );
+    }
+
+    /**
      * Main method for generate POJO
      */
     @Override
@@ -48,9 +88,12 @@ public class YojoGenerator implements Generator {
             obj = new Yaml().load(fileInputStream);
             fileInputStream.close();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage());
         }
+        process(filePath, outputDirectory, packageLocation, lombokProperties, obj);
+    }
 
+    private void process(String filePath, String outputDirectory, String packageLocation, LombokProperties lombokProperties, Map<String, Object> obj) {
         String outputDirectoryName = new File(filePath).getName().replaceAll("\\..*", "");
         if (!outputDirectory.endsWith("/")) {
             outputDirectory = outputDirectory + DELIMITER;
@@ -140,7 +183,6 @@ public class YojoGenerator implements Generator {
                                 getStringValueIfExistOrElseNull(REFERENCE, propertyValueMap) == null) {
                             incorrectFilledProperties.add("Schema: " + schemaName + " TYPE not found: " + propName);
                         }
-
                     });
                 } else {
                     if (schemaType == null) {
@@ -158,6 +200,46 @@ public class YojoGenerator implements Generator {
         System.out.println("ANALYZE FINISH SUCCESSFULLY!");
         System.out.println(LOG_DELIMETER + ANSI_RESET);
         System.out.println();
+    }
+
+
+    /**
+     * Method checks and return connected yaml
+     *
+     * @param file    Yaml file
+     * @param content Content from Yaml file
+     * @return content
+     */
+    private static String getContent(File file, String content) {
+        if (content.contains("./")) {
+            System.out.println("FOUND SEPARATED CONTRACT! " + file.getName());
+            List<String> contentByLines = content.lines().collect(Collectors.toList());
+
+            AtomicInteger lineNumber = new AtomicInteger();
+            content.lines()
+                    //key - number of line, value - line with content
+                    .collect(Collectors.toMap(line -> lineNumber.incrementAndGet(), Function.identity()))
+                    .entrySet().stream()
+                    //try to find reference to other contract
+                    .filter(entry -> entry.getValue().contains("./"))
+                    .forEach(entry -> {
+                        String contentFromSeparatedFile;
+                        try {
+                            String line = entry.getValue();
+                            contentFromSeparatedFile = new String(Files.readAllBytes(Paths.get(
+                                    new File(file.getParent() + line.substring(line.indexOf(".") + 1, line.indexOf("#"))).getPath())));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        contentByLines.remove(entry.getKey() - 1);
+                        contentByLines.remove(entry.getKey() - 2);
+                        contentByLines.addAll(entry.getKey() - 2, contentFromSeparatedFile.lines()
+                                .map(l -> TABULATION + l)
+                                .collect(Collectors.toList()));
+                    });
+            content = String.join(lineSeparator(), contentByLines);
+        }
+        return content;
     }
 
     /**
@@ -195,6 +277,7 @@ public class YojoGenerator implements Generator {
             System.out.println(ex.getMessage());
         }
     }
+
     private void throwException(List<String> messages) {
         throw new SchemaFillException(messages.toString());
     }
