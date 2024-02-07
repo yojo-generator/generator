@@ -145,6 +145,9 @@ public class MessageMapper {
                 if (accessors.containsKey(CHAIN)) {
                     acc.setChain(Boolean.valueOf(accessors.get(CHAIN).toString()));
                 }
+                if (accessors.containsKey(ENABLE)) {
+                    acc.setEnable(Boolean.valueOf(accessors.get(ENABLE).toString()));
+                }
                 lombokProperties.setAccessors(acc);
             }
             if (lombokProps.containsKey(EQUALS_AND_HASH_CODE)) {

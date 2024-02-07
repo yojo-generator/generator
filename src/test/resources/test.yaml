@@ -215,7 +215,7 @@ components:
       type: object
       implements:
         fromInterface:
-         - testGenerate.InterfaceForImpl
+          - testGenerate.InterfaceForImpl
       properties:
         someInteger:
           type: integer
@@ -472,7 +472,8 @@ components:
         - StringValues
         - uuidValueWithRequired
         - dateValueWithRequired
-        - dateTimeValueWithRequired
+        - localDateValueWithRequired
+        - localDateTimeValueWithRequired
         - offsetDateTimeValueWithRequired
       properties:
         #When name starts with UpperCase, it will uncapitalize
@@ -501,16 +502,25 @@ components:
         #DATE
         dateValue:
           type: object
-          format: date
+          format: simple-date
         dateValueWithRequired:
+          type: object
+          format: simple-date
+          default: new
+
+        #LOCAL-DATE
+        localDateValue:
+          type: object
+          format: date
+        localDateValueWithRequired:
           type: object
           format: date
 
-        #DATE-TIME
-        dateTimeValue:
+        #LOCAL-DATE-TIME
+        localDateTimeValue:
           type: string
           format: date-time
-        dateTimeValueWithRequired:
+        localDateTimeValueWithRequired:
           type: string
           format: date-time
 

@@ -40,6 +40,9 @@ public class SchemaMapper {
                     if (accessors.containsKey(CHAIN)) {
                         acc.setChain(Boolean.valueOf(accessors.get(CHAIN).toString()));
                     }
+                    if (accessors.containsKey(ENABLE)) {
+                        acc.setEnable(Boolean.valueOf(accessors.get(ENABLE).toString()));
+                    }
                     finalLombokProperties.setAccessors(acc);
                 }
                 if (lombokProps.containsKey(EQUALS_AND_HASH_CODE)) {

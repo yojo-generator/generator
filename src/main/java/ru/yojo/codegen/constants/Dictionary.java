@@ -60,6 +60,7 @@ public final class Dictionary {
      * lombok manual properties
      */
     public static final String LOMBOK = "lombok";
+    public static final String ENABLE = "enable";
 
     public static final String ACCESSORS = "accessors";
     public static final String FLUENT = "fluent";
@@ -71,6 +72,7 @@ public final class Dictionary {
     /**
      * Schema Types
      */
+    public static final String ST_SIMPLE_DATE = "simple-date";
     public static final String ST_LOCAL_DATE = "date";
     public static final String ST_LOCAL_DATE_TIME = "date-time";
     public static final String ST_LONG = "long";
@@ -130,6 +132,7 @@ public final class Dictionary {
     /**
      * Java Types
      */
+    public static final String SIMPLE_DATE = "Date";
     public static final String LOCAL_DATE = "LocalDate";
     public static final String LOCAL_DATE_TIME = "LocalDateTime";
     public static final String OFFSET_DATE_TIME = "OffsetDateTime";
@@ -152,6 +155,7 @@ public final class Dictionary {
     public static final String BIG_INTEGER_IMPORT = "java.math.BigInteger;";
     public static final String LOCAL_DATE_IMPORT = "java.time.LocalDate;";
     public static final String LOCAL_DATE_TIME_IMPORT = "java.time.LocalDateTime;";
+    public static final String SIMPLE_DATE_IMPORT = "java.util.Date;";
     public static final String OFFSET_DATE_TIME_IMPORT = "java.time.OffsetDateTime;";
     public static final String UUID_IMPORT = "java.util.UUID;";
     public static final String NOT_BLANK_IMPORT = "javax.validation.constraints.NotBlank;";
@@ -241,6 +245,7 @@ public final class Dictionary {
             entry(BOOLEAN, NOT_NULL_ANNOTATION),
             entry(LOCAL_DATE, NOT_NULL_ANNOTATION),
             entry(LOCAL_DATE_TIME, NOT_NULL_ANNOTATION),
+            entry(SIMPLE_DATE, NOT_NULL_ANNOTATION),
             entry(BIG_DECIMAL, NOT_NULL_ANNOTATION),
             entry(BIG_INTEGER, NOT_NULL_ANNOTATION),
             entry(UUID, NOT_NULL_ANNOTATION),
@@ -266,6 +271,7 @@ public final class Dictionary {
             BOOLEAN,
             BIG_DECIMAL,
             BIG_INTEGER,
+            SIMPLE_DATE,
             LOCAL_DATE,
             LOCAL_DATE_TIME,
             OFFSET_DATE_TIME,
@@ -284,6 +290,7 @@ public final class Dictionary {
             entry(ST_BIG_INTEGER, BIG_INTEGER),
             entry(ST_LOCAL_DATE, LOCAL_DATE),
             entry(ST_LOCAL_DATE_TIME, LOCAL_DATE_TIME),
+            entry(ST_SIMPLE_DATE, SIMPLE_DATE),
             entry(ST_UUID, UUID)
     );
 
@@ -299,6 +306,7 @@ public final class Dictionary {
             entry(BIG_INTEGER, ST_BIG_INTEGER),
             entry(LOCAL_DATE, ST_LOCAL_DATE),
             entry(LOCAL_DATE_TIME, ST_LOCAL_DATE_TIME),
+            entry(SIMPLE_DATE, SIMPLE_DATE),
             entry(UUID, ST_UUID)
     );
 }

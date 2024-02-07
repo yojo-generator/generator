@@ -16,6 +16,10 @@ public class Accessors {
         return enable;
     }
 
+    public void setEnable(boolean enable) {
+        this.enable = enable;
+    }
+
     public boolean isFluent() {
         return fluent;
     }

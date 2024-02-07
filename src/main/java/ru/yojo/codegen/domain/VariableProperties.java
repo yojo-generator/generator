@@ -321,6 +321,19 @@ public class VariableProperties {
                         this.valid = false;
                     }
                     break;
+                case "simple-date":
+                    this.type = SIMPLE_DATE;
+                    requiredImports.add(SIMPLE_DATE_IMPORT);
+                    if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
+                        this.items = SIMPLE_DATE;
+                        this.type = format(collectionPattern, SIMPLE_DATE);
+                        this.valid = false;
+                    }
+                    break;
                 case "offsetDateTime":
                     this.type = OFFSET_DATE_TIME;
                     requiredImports.add(OFFSET_DATE_TIME_IMPORT);
@@ -568,22 +581,28 @@ public class VariableProperties {
         }
 
         if (defaultProperty != null) {
-            switch (type) {
-                case UUID:
-                    defaultProperty = "UUID.fromString(" + "\"" + defaultProperty + "\"" + ")";
-                    break;
-                case STRING:
-                    defaultProperty = defaultProperty.replace("\"", "");
-                    defaultProperty = "\"" + defaultProperty + "\"";
-                    break;
-            }
-            if (isPrimitive()) {
-                stringBuilder.append(lineSeparator())
-                        .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), getDefaultProperty())).toString();
+            if (defaultProperty.equals("new")) {
+                switch (type) {
+                    case SIMPLE_DATE:
+                        defaultProperty = "new Date()";
+                        break;
+                    case STRING:
+                        defaultProperty = "new String()";
+                        break;
+                }
             } else {
-                stringBuilder.append(lineSeparator())
-                        .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), getDefaultProperty())).toString();
+                switch (type) {
+                    case UUID:
+                        defaultProperty = "UUID.fromString(" + "\"" + defaultProperty + "\"" + ")";
+                        break;
+                    case STRING:
+                        defaultProperty = defaultProperty.replace("\"", "");
+                        defaultProperty = "\"" + defaultProperty + "\"";
+                        break;
+                }
             }
+            stringBuilder.append(lineSeparator())
+                    .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), getDefaultProperty())).toString();
             return stringBuilder.toString();
         }
 
@@ -614,8 +633,8 @@ public class VariableProperties {
                         return stringBuilder.append(lineSeparator())
                                 .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), HASH_MAP_REALISATION)).toString();
                     case ("LinkedHashMap"):
-                    return stringBuilder.append(lineSeparator())
-                            .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), LINKED_HASH_MAP_REALISATION)).toString();
+                        return stringBuilder.append(lineSeparator())
+                                .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), LINKED_HASH_MAP_REALISATION)).toString();
 
                 }
             }
