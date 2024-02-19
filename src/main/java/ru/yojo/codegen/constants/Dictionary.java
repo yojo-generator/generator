@@ -32,14 +32,21 @@ public final class Dictionary {
     public static final String ARRAY = "array";
     public static final String OBJECT = "object";
     public static final String NAME = "name";
+    public static final String CHANNELS = "channels";
+    public static final String PUBLISH = "publish";
+    public static final String SUBSCRIBE = "subscribe";
     public static final String TITLE = "title";
     public static final String SUMMARY = "summary";
     public static final String PAYLOAD = "payload";
+    public static final String HEADERS = "headers";
     public static final String TAGS = "tags";
     public static final String ADDITIONAL_PROPERTIES = "additionalProperties";
     public static final String ADDITIONAL_FORMAT = "additionalFormat";
     public static final String DEFAULT = "default";
     public static final String ALL_OF = "allOf";
+    public static final String ONE_OF = "oneOf";
+    public static final String ANY_OF = "anyOf";
+    public static final List<String> POLYMORPHS = List.of(ALL_OF, ONE_OF, ANY_OF);
 
     /**
      * Custom YAML attributes

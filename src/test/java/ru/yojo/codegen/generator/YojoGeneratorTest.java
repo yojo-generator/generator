@@ -42,6 +42,6 @@ public class YojoGeneratorTest {
         File file = new File("src/test/resources/testGenerate/test");
         Assertions.assertTrue(file.exists());
         //cleanUp
-//        Assertions.assertTrue(FileSystemUtils.deleteRecursively(file));
+        Assertions.assertTrue(FileSystemUtils.deleteRecursively(file));
     }
 }

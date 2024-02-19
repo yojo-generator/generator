@@ -1,8 +1,8 @@
 package ru.yojo.codegen.util;
 
 import ru.yojo.codegen.domain.FillParameters;
-import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.VariableProperties;
+import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.exception.SchemaFillException;
 
 import java.lang.reflect.Array;
@@ -48,6 +48,13 @@ public class MapperUtil {
             return new ArrayList<>();
         }
         return (ArrayList<String>) list;
+    }
+
+    public static ArrayList<Object> castObjectToListObjects(Object list) {
+        if (list == null) {
+            return new ArrayList<>();
+        }
+        return (ArrayList<Object>) list;
     }
 
     public static String refReplace(String ref) {
@@ -322,7 +329,7 @@ public class MapperUtil {
             variableProperties.setType(capitalize(propertyName));
             variableProperties.getRequiredImports().add(commonPackage.replace(";", "." + capitalize(propertyName) + ";"));
             innerSchemas.put(propertyName, propertiesMap);
-        } else if (OBJECT_TYPE.equals(variableProperties.getType()) &&
+        } else if ((OBJECT_TYPE.equals(variableProperties.getType()) || STRING.equals(variableProperties.getType())) &&
                 getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap) != null) {
             System.out.println("ENUMERATION FOUND");
             fillEnumSchema(propertyName, propertiesMap, innerSchemas);
@@ -381,6 +388,120 @@ public class MapperUtil {
             }
             System.out.println();
         }
+    }
+
+    public static void fillMessage(Map<String, Object> allContent, Map<String, Object> messagesMap, Set<String> excludeSchemas, Map<String, Object> mapToMessage, String channelName, String channelType) {
+        mapToMessage.entrySet().stream()
+                .flatMap(e -> castObjectToMap(e.getValue()).entrySet().stream())
+                .filter(e -> e.getKey().equals("message"))
+                .flatMap(e -> castObjectToMap(e.getValue()).entrySet().stream())
+                .filter(e -> e.getKey().equals(PAYLOAD))
+                .forEach(e -> {
+                    Map<String, Object> messageValues = castObjectToMap(e.getValue());
+                    if (messageValues.containsKey(REFERENCE)) {
+                        String messageName = refReplace(messageValues.get(REFERENCE).toString());
+                        messagesMap.put(messageName, Map.of(PAYLOAD, messageValues));
+                    }
+                    if (messageValues.containsKey(ONE_OF) || messageValues.containsKey(ALL_OF) || messageValues.containsKey(ANY_OF)) {
+                        String messageName = capitalize(channelName)
+                                .concat(capitalize(channelType))
+                                .concat("Message");
+                        System.out.println(messageName);
+
+                        List<Object> polymorphList = POLYMORPHS.stream()
+                                .map(p -> messageValues.get(p))
+                                .map(MapperUtil::castObjectToListObjects)
+                                .flatMap(objects -> objects.stream())
+                                .collect(Collectors.toList());
+
+                        if (!polymorphList.stream()
+                                .flatMap(refPair -> castObjectToMap(refPair).entrySet().stream())
+                                .map(en -> refReplace(en.getValue().toString()))
+                                .map(ref -> getSchemaByName(allContent, ref))
+                                .flatMap(map -> map.entrySet().stream())
+                                .filter(en -> POLYMORPHS.contains(en.getKey()))
+                                .collect(Collectors.toList()).isEmpty()) {
+                            System.out.println("FOUND POLYMORPHISM INSIDE SCHEMA!");
+
+                            List<Object> filteredReferences = polymorphList.stream()
+                                    .flatMap(refPair -> castObjectToMap(refPair).entrySet().stream())
+                                    .map(en -> {
+                                        String schemaName = refReplace(en.getValue().toString());
+                                        excludeSchemas.add(schemaName);
+                                        return schemaName;
+                                    })
+                                    .map(ref -> getSchemaByName(allContent, ref))
+                                    .map(MapperUtil::castObjectToMap)
+                                    .flatMap(refObj -> refObj.entrySet().stream()
+                                            .filter(en -> POLYMORPHS.contains(en.getKey()))
+                                            .map(all -> castObjectToListObjects(all.getValue()).stream()
+                                                    .filter(o -> o.toString().startsWith("{" + REFERENCE))
+                                                    .collect(Collectors.toList())
+                                            ))
+                                    .collect(Collectors.toList());
+
+                            //Here create propertiesMap from all referenced objects properties
+                            Map<String, Object> propertiesMap = polymorphList.stream()
+                                    .flatMap(refPair -> castObjectToMap(refPair).entrySet().stream())
+                                    .map(en -> refReplace(en.getValue().toString()))
+                                    .map(ref -> getSchemaByName(allContent, ref))
+                                    .map(MapperUtil::castObjectToMap)
+                                    .flatMap(map -> map.entrySet().stream())
+                                    .filter(en -> POLYMORPHS.contains(en.getKey()))
+                                    .flatMap(all -> castObjectToListObjects(all.getValue()).stream())
+                                    .map(all -> castObjectToMap(all))
+                                    .flatMap(map -> map.entrySet().stream())
+                                    .filter(en -> en.getKey().equals(PROPERTIES))
+                                    .map(pr -> castObjectToMap(pr.getValue()))
+                                    .flatMap(map -> map.entrySet().stream())
+                                    .distinct()
+                                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                                            (existing, replacement) -> existing));
+
+                            //Here put in the properties all from referenced schemas
+                            filteredReferences.stream()
+                                    .flatMap(en -> castObjectToListObjects(en).stream())
+                                    .distinct()
+                                    .map(MapperUtil::castObjectToMap)
+                                    .flatMap(ey -> ey.entrySet().stream())
+                                    .map(en -> refReplace(en.getValue().toString()))
+                                    .map(ref -> getSchemaByName(allContent, ref))
+                                    .map(MapperUtil::castObjectToMap)
+                                    .map(o -> castObjectToMap(o).get(PROPERTIES))
+                                    .map(MapperUtil::castObjectToMap)
+                                    .flatMap(ey -> ey.entrySet().stream())
+                                    .forEach(el -> propertiesMap.put(el.getKey(), el.getValue()));
+
+                            //Here fill message map by structure:
+                            // MessageName:
+                            //      payload:
+                            //          type: object
+                            //          properties:
+                            //              content here
+                            messagesMap.put(messageName, Map.of(PAYLOAD, Map.of(TYPE, OBJECT, PROPERTIES, propertiesMap)));
+                        } else {
+
+                            //Here prepare map with merged properties
+                            Map<String, Object> schemaMap = polymorphList.stream()
+                                    .flatMap(refPair -> castObjectToMap(refPair).entrySet().stream())
+                                    .map(en -> {
+                                        String schemaName = refReplace(en.getValue().toString());
+                                        excludeSchemas.add(schemaName);
+                                        return schemaName;
+                                    })
+                                    .map(ref -> getSchemaByName(allContent, ref))
+                                    .map(MapperUtil::castObjectToMap)
+                                    .flatMap(map -> map.entrySet().stream())
+                                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (existing, replacement) -> existing));
+
+                            //Here fill message map by structure:
+                            // MessageName:
+                            //      payload:
+                            //          content here
+                            messagesMap.put(messageName, Map.of(PAYLOAD, schemaMap));
+                        }
+                    }
+                });
     }
 
     private static void fillCollectionType(VariableProperties variableProperties) {
@@ -735,5 +856,11 @@ public class MapperUtil {
 
     public static boolean isTrue(final Boolean bool) {
         return Boolean.TRUE.equals(bool);
+    }
+
+    public static Map<String, Object> getSchemaByName(Map<String, Object> content, String schemaName) {
+        return castObjectToMap(
+                castObjectToMap(
+                        castObjectToMap(content.get("components")).get("schemas")).get(schemaName));
     }
 }

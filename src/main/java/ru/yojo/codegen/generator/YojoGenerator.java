@@ -14,10 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -83,17 +80,17 @@ public class YojoGenerator implements Generator {
      */
     @Override
     public void generate(String filePath, String outputDirectory, String packageLocation, LombokProperties lombokProperties) {
-        Map<String, Object> obj;
+        Map<String, Object> allContent;
         try (InputStream fileInputStream = new FileInputStream(filePath)) {
-            obj = new Yaml().load(fileInputStream);
+            allContent = new Yaml().load(fileInputStream);
             fileInputStream.close();
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
-        process(filePath, outputDirectory, packageLocation, lombokProperties, obj);
+        process(filePath, outputDirectory, packageLocation, lombokProperties, allContent);
     }
 
-    private void process(String filePath, String outputDirectory, String packageLocation, LombokProperties lombokProperties, Map<String, Object> obj) {
+    private void process(String filePath, String outputDirectory, String packageLocation, LombokProperties lombokProperties, Map<String, Object> allContent) {
         String outputDirectoryName = new File(filePath).getName().replaceAll("\\..*", "");
         if (!outputDirectory.endsWith("/")) {
             outputDirectory = outputDirectory + DELIMITER;
@@ -107,18 +104,50 @@ public class YojoGenerator implements Generator {
         Map<String, Object> messagesMap =
                 castObjectToMap(
                         castObjectToMap(
-                                castObjectToMap(obj.get("components"))).get("messages"));
+                                castObjectToMap(allContent.get("components"))).get("messages"));
+
         Map<String, Object> schemasMap =
                 castObjectToMap(
                         castObjectToMap(
-                                castObjectToMap(obj.get("components"))).get("schemas"));
+                                castObjectToMap(allContent.get("components"))).get("schemas"));
 
+        Set<String> excludeSchemas = new HashSet<>();
+        if (messagesMap.isEmpty()) {
+            fillMessagesByChannel(allContent, messagesMap, excludeSchemas);
+        }
+        excludeSchemas.forEach(sc -> schemasMap.remove(sc));
         analyzeSchemas(filePath, schemasMap);
 
         processMessages(lombokProperties, outputDirectoryName, output, messagePackage, commonPackage, messagesMap, schemasMap);
         processSchemas(lombokProperties, outputDirectoryName, output, commonPackage, schemasMap);
 
         System.out.println(LOG_FINISH);
+    }
+
+    private void fillMessagesByChannel(Map<String, Object> allContent, Map<String, Object> messagesMap, Set<String> excludeSchemas) {
+        Map<String, Object> channelsMap = castObjectToMap(allContent.get(CHANNELS));
+        channelsMap.entrySet().forEach(
+                entry -> {
+                    String channelName = entry.getKey();
+
+                    Map<String, Object> filteredSubscribeMap = castObjectToMap(entry.getValue()).entrySet().stream()
+                            .filter(e -> e.getKey().equals(SUBSCRIBE))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+                    Map<String, Object> filteredPublishMap = castObjectToMap(entry.getValue()).entrySet().stream()
+                            .filter(e -> e.getKey().equals(PUBLISH))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+                    if (!filteredSubscribeMap.isEmpty()) {
+                        fillMessage(allContent, messagesMap, excludeSchemas, filteredSubscribeMap, channelName, SUBSCRIBE);
+                    }
+                    if (!filteredPublishMap.isEmpty()) {
+                        fillMessage(allContent, messagesMap, excludeSchemas, filteredPublishMap, channelName, PUBLISH);
+                    }
+
+                    System.out.println("MESSAGES MAP AFTER MAPPING - " + messagesMap);
+                }
+        );
     }
 
     private void processSchemas(LombokProperties lombokProperties, String outputDirectoryName, String output, String commonPackage, Map<String, Object> schemasMap) {
@@ -276,6 +305,27 @@ public class YojoGenerator implements Generator {
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
         }
+    }
+
+    private boolean equalsPropertiesContent(List<Map<String, Object>> checkContent) {
+        boolean isEqualsContent = false;
+        for (int i = 0; checkContent.size() > i; i++) {
+            if (i != 0 && isEqualsContent == false) {
+                break;
+            }
+            for (int j = 1; checkContent.size() > j; j++) {
+                boolean equals = checkContent.get(i).values().toString().equals(checkContent.get(j).values().toString());
+                if (equals) {
+                    isEqualsContent = equals;
+                } else {
+                    isEqualsContent = equals;
+                    break;
+                }
+            }
+        }
+
+        System.out.println("CONTENT IS EQUALS: " + isEqualsContent);
+        return isEqualsContent;
     }
 
     private void throwException(List<String> messages) {
