@@ -12,7 +12,7 @@ import static java.lang.System.lineSeparator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static ru.yojo.codegen.constants.Dictionary.LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION;
 
-public class MapperUtilTest {
+class MapperUtilTest {
 
     @ParameterizedTest
     @CsvSource({

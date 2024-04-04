@@ -215,7 +215,14 @@ public class MapperUtil {
      * @param commonPackage      commonPackage
      * @param innerSchemas       innerSchemas
      */
-    public static void fillProperties(VariableProperties variableProperties, Map<String, Object> currentSchema, Map<String, Object> schemas, String propertyName, Map<String, Object> propertiesMap, String commonPackage, Map<String, Object> innerSchemas) {
+    public static void fillProperties(String schemaName,
+                                      VariableProperties variableProperties,
+                                      Map<String, Object> currentSchema,
+                                      Map<String, Object> schemas,
+                                      String propertyName,
+                                      Map<String, Object> propertiesMap,
+                                      String commonPackage,
+                                      Map<String, Object> innerSchemas) {
         variableProperties.setName(uncapitalize(propertyName));
         variableProperties.setDefaultProperty(getStringValueIfExistOrElseNull(DEFAULT, propertiesMap));
         variableProperties.setType(capitalize(getStringValueIfExistOrElseNull(TYPE, propertiesMap)));
@@ -231,13 +238,15 @@ public class MapperUtil {
         variableProperties.setMaximum(getStringValueIfExistOrElseNull(MAXIMUM, propertiesMap));
         variableProperties.setEnumeration(getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap));
         variableProperties.setEnumNames(getStringValueIfExistOrElseNull(X_ENUM_NAMES, propertiesMap));
+        variableProperties.setPackageOfExisingObject(getStringValueIfExistOrElseNull(PACKAGE, propertiesMap));
+        variableProperties.setNameOfExisingObject(getStringValueIfExistOrElseNull(NAME, propertiesMap));
 
-        recursivelyFillProperties(variableProperties, currentSchema, schemas, propertyName, propertiesMap, commonPackage, innerSchemas);
+        fillVariableProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, commonPackage, innerSchemas);
         fillRequiredAnnotationsAndImports(variableProperties, currentSchema, propertyName);
     }
 
     /**
-     * Recursive Filling from $ref Objects
+     * filling from $ref Objects
      *
      * @param variableProperties variableProperties
      * @param currentSchema      currentSchema
@@ -247,7 +256,14 @@ public class MapperUtil {
      * @param commonPackage      commonPackage
      * @param innerSchemas       innerSchemas
      */
-    public static void recursivelyFillProperties(VariableProperties variableProperties, Map<String, Object> currentSchema, Map<String, Object> schemas, String propertyName, Map<String, Object> propertiesMap, String commonPackage, Map<String, Object> innerSchemas) {
+    public static void fillVariableProperties(String schemaName,
+                                              VariableProperties variableProperties,
+                                              Map<String, Object> currentSchema,
+                                              Map<String, Object> schemas,
+                                              String propertyName,
+                                              Map<String, Object> propertiesMap,
+                                              String commonPackage,
+                                              Map<String, Object> innerSchemas) {
         if (ARRAY.equals(uncapitalize(variableProperties.getType()))) {
             Map<String, Object> items = castObjectToMap(propertiesMap.get(ITEMS));
             variableProperties.setRealisation(getStringValueIfExistOrElseNull(REALIZATION, items));
@@ -284,11 +300,22 @@ public class MapperUtil {
                         variableProperties.setItems(items.get(FORMAT).toString());
                         variableProperties.setFormat(items.get(FORMAT).toString());
                     } else {
-                        variableProperties.setItems(items.get(TYPE).toString());
-                        variableProperties.setFormat(items.get(TYPE).toString());
+                        if (getStringValueIfExistOrElseNull(PROPERTIES, items) != null) {
+                            String propName;
+                            if (schemas.containsKey(propertyName) || schemas.containsKey(capitalize(propertyName)) ||
+                                    innerSchemas.containsKey(propertyName) || innerSchemas.containsKey(capitalize(propertyName))) {
+                                propName = capitalize(schemaName).concat(capitalize(propertyName));
+                            } else {
+                                propName = propertyName;
+                            }
+                            fillInnerSchema(variableProperties, propName, items, commonPackage, innerSchemas);
+                        } else {
+                            variableProperties.setItems(items.get(TYPE).toString());
+                            variableProperties.setFormat(items.get(TYPE).toString());
+                        }
                     }
                 } else {
-                    fillProperties(variableProperties, currentSchema, schemas, propertyName, items, commonPackage, innerSchemas);
+                    fillProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, items, commonPackage, innerSchemas);
                     variableProperties.setItems(capitalize(propertyName));
                     fillCollectionType(variableProperties);
                 }
@@ -307,7 +334,7 @@ public class MapperUtil {
                 System.out.println();
                 System.out.println("Start Recursive fillProperties " + propertyName);
                 System.out.println();
-                fillProperties(variableProperties, currentSchema, schemas, propertyName, stringObjectMap, commonPackage, innerSchemas);
+                fillProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, stringObjectMap, commonPackage, innerSchemas);
             }
             if (variableProperties.getType() == null || OBJECT_TYPE.equals(variableProperties.getType())) {
                 String refReplace = refReplace(referenceObject);
@@ -325,10 +352,14 @@ public class MapperUtil {
             }
         } else if (OBJECT_TYPE.equals(variableProperties.getType()) &&
                 getStringValueIfExistOrElseNull(PROPERTIES, propertiesMap) != null) {
-            System.out.println("FOUND INNER SCHEMA!!! " + propertyName);
-            variableProperties.setType(capitalize(propertyName));
-            variableProperties.getRequiredImports().add(commonPackage.replace(";", "." + capitalize(propertyName) + ";"));
-            innerSchemas.put(propertyName, propertiesMap);
+            String propName;
+            if (schemas.containsKey(propertyName) || schemas.containsKey(capitalize(propertyName)) ||
+                    innerSchemas.containsKey(propertyName) || innerSchemas.containsKey(capitalize(propertyName))) {
+                propName = capitalize(schemaName).concat(capitalize(propertyName));
+            } else {
+                propName = propertyName;
+            }
+            fillInnerSchema(variableProperties, propName, propertiesMap, commonPackage, innerSchemas);
         } else if ((OBJECT_TYPE.equals(variableProperties.getType()) || STRING.equals(variableProperties.getType())) &&
                 getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap) != null) {
             System.out.println("ENUMERATION FOUND");
@@ -339,6 +370,14 @@ public class MapperUtil {
             variableProperties.setEnumeration(null);
             variableProperties.setEnum(true);
             variableProperties.getRequiredImports().add(commonPackage.replace(";", "." + capitalize(propertyName) + ";"));
+        } else if (OBJECT_TYPE.equals(variableProperties.getType()) &&
+                variableProperties.getPackageOfExisingObject() != null &&
+                variableProperties.getNameOfExisingObject() != null) {
+            variableProperties.setType(capitalize(variableProperties.getNameOfExisingObject()));
+            variableProperties.getRequiredImports().add(variableProperties.getPackageOfExisingObject()
+                    .concat(".")
+                    .concat(capitalize(variableProperties.getNameOfExisingObject()))
+                    .concat(";"));
         } else if (getStringValueIfExistOrElseNull(ADDITIONAL_PROPERTIES, propertiesMap) != null) {
             System.out.println();
             System.out.println("ADDITIONAL PROPERTIES");
@@ -388,6 +427,17 @@ public class MapperUtil {
             }
             System.out.println();
         }
+    }
+
+    private static void fillInnerSchema(VariableProperties variableProperties,
+                                        String propertyName,
+                                        Map<String, Object> propertiesMap,
+                                        String commonPackage,
+                                        Map<String, Object> innerSchemas) {
+        System.out.println("FOUND INNER SCHEMA!!! " + propertyName);
+        variableProperties.setType(capitalize(propertyName));
+        variableProperties.getRequiredImports().add(commonPackage.replace(";", "." + capitalize(propertyName) + ";"));
+        innerSchemas.put(propertyName, propertiesMap);
     }
 
     public static void fillMessage(Map<String, Object> allContent, Map<String, Object> messagesMap, Set<String> excludeSchemas, Map<String, Object> mapToMessage, String channelName, String channelType) {
@@ -637,14 +687,14 @@ public class MapperUtil {
                     }
                 }
             }
-            if (variableProperties.isEnum() == false &&
-                    variableProperties.getType() != null &&
-                    !JAVA_DEFAULT_TYPES.contains(variableProperties.getType()) &&
-                    variableProperties.isValid()) {
-                importSet.add(JAVA_TYPES_REQUIRED_IMPORTS.get(VALID_ANNOTATION));
-                annotationSet.add(VALID_ANNOTATION);
-            }
+            validAnnotationCheck(variableProperties, annotationSet, importSet);
         });
+        validAnnotationCheck(variableProperties, annotationSet, importSet);
+        variableProperties.getRequiredImports().addAll(importSet);
+        variableProperties.getAnnotationSet().addAll(annotationSet);
+    }
+
+    private static void validAnnotationCheck(VariableProperties variableProperties, Set<String> annotationSet, Set<String> importSet) {
         if (variableProperties.isEnum() == false &&
                 variableProperties.getType() != null &&
                 !JAVA_DEFAULT_TYPES.contains(variableProperties.getType()) &&
@@ -652,8 +702,6 @@ public class MapperUtil {
             importSet.add(JAVA_TYPES_REQUIRED_IMPORTS.get(VALID_ANNOTATION));
             annotationSet.add(VALID_ANNOTATION);
         }
-        variableProperties.getRequiredImports().addAll(importSet);
-        variableProperties.getAnnotationSet().addAll(annotationSet);
     }
 
     public static void buildLombokAnnotations(LombokProperties lombokProperties, Set<String> requiredImports, StringBuilder lombokAnnotationBuilder) {

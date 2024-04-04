@@ -14,14 +14,14 @@ import java.io.File;
 import java.io.IOException;
 
 @SpringBootTest(classes = {YojoGenerator.class, SchemaMapper.class, MessageMapper.class})
-public class YojoGeneratorTest {
+class YojoGeneratorTest {
 
     @Autowired
     private YojoGenerator yojoGenerator;
 
     @Test
     @SuppressWarnings("all")
-    public void generateTest() {
+    void generateTest() {
         yojoGenerator.generate("src/test/resources/test.yaml",
                 "src/test/resources/testGenerate/",
                 "testGenerate",
@@ -35,7 +35,7 @@ public class YojoGeneratorTest {
     }
 
     @Test
-    public void generateAll() throws IOException {
+    void generateAll() throws IOException {
         yojoGenerator.generateAll("src/test/resources/", "src/test/resources/testGenerate/", "testGenerate", new LombokProperties(false,
                 true,
                 new Accessors(true, true, true)));

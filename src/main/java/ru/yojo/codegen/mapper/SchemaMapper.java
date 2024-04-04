@@ -3,8 +3,6 @@ package ru.yojo.codegen.mapper;
 import org.springframework.stereotype.Component;
 import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.VariableProperties;
-import ru.yojo.codegen.domain.lombok.Accessors;
-import ru.yojo.codegen.domain.lombok.EqualsAndHashCode;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.schema.Schema;
 import ru.yojo.codegen.exception.SchemaFillException;
@@ -13,6 +11,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static ru.yojo.codegen.constants.Dictionary.*;
+import static ru.yojo.codegen.util.LombokUtils.fillLombokAccessors;
+import static ru.yojo.codegen.util.LombokUtils.fillLombokEqualsAndHashCode;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 @SuppressWarnings("all")
@@ -31,31 +31,8 @@ public class SchemaMapper {
             String schemaType = getStringValueIfExistOrElseNull(TYPE, schemaMap);
             if (schemaMap != null && schemaMap.containsKey(LOMBOK)) {
                 Map<String, Object> lombokProps = castObjectToMap(schemaMap.get(LOMBOK));
-                if (lombokProps.containsKey(ACCESSORS)) {
-                    Accessors acc = new Accessors(true, false, false);
-                    Map<String, Object> accessors = castObjectToMap(lombokProps.get(ACCESSORS));
-                    if (accessors.containsKey(FLUENT)) {
-                        acc.setFluent(Boolean.valueOf(accessors.get(FLUENT).toString()));
-                    }
-                    if (accessors.containsKey(CHAIN)) {
-                        acc.setChain(Boolean.valueOf(accessors.get(CHAIN).toString()));
-                    }
-                    if (accessors.containsKey(ENABLE)) {
-                        acc.setEnable(Boolean.valueOf(accessors.get(ENABLE).toString()));
-                    }
-                    finalLombokProperties.setAccessors(acc);
-                }
-                if (lombokProps.containsKey(EQUALS_AND_HASH_CODE)) {
-                    EqualsAndHashCode equalsAndHashCode = new EqualsAndHashCode();
-                    Map<String, Object> eah = castObjectToMap(lombokProps.get(EQUALS_AND_HASH_CODE));
-                    if (eah != null) {
-                        if (getStringValueIfExistOrElseNull(CALL_SUPER, eah) != null) {
-                            equalsAndHashCode.setCallSuper(Boolean.valueOf(getStringValueIfExistOrElseNull(CALL_SUPER, eah)));
-                        }
-                        equalsAndHashCode.setEnable(true);
-                    }
-                    finalLombokProperties.setEqualsAndHashCode(equalsAndHashCode);
-                }
+                fillLombokAccessors(lombokProperties, lombokProps);
+                fillLombokEqualsAndHashCode(lombokProperties, lombokProps);
             }
             if (schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
                 Schema schema = new Schema();
@@ -157,6 +134,7 @@ public class SchemaMapper {
             properties.forEach((propertyName, propertyValue) -> {
                 VariableProperties vp = new VariableProperties();
                 fillProperties(
+                        schemaName,
                         vp,
                         currentSchema,
                         schemas,
@@ -171,7 +149,7 @@ public class SchemaMapper {
             VariableProperties vp = new VariableProperties();
             vp.setValid(false);
             vp.setEnum(true);
-            fillProperties(vp, currentSchema, schemas, schemaName, currentSchema, commonPackage, innerSchemas);
+            fillProperties(schemaName, vp, currentSchema, schemas, schemaName, currentSchema, commonPackage, innerSchemas);
             variableProperties.add(vp);
         }
         return new FillParameters(variableProperties);

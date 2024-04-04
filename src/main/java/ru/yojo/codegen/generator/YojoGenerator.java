@@ -90,6 +90,13 @@ public class YojoGenerator implements Generator {
         process(filePath, outputDirectory, packageLocation, lombokProperties, allContent);
     }
 
+    /**
+     * @param filePath Path to file
+     * @param outputDirectory Output Directory
+     * @param packageLocation specify package like: com.example.myproject
+     * @param lombokProperties properties for lombok {@link LombokProperties}
+     * @param allContent All content from YAML-file
+     */
     private void process(String filePath, String outputDirectory, String packageLocation, LombokProperties lombokProperties, Map<String, Object> allContent) {
         String outputDirectoryName = new File(filePath).getName().replaceAll("\\..*", "");
         if (!outputDirectory.endsWith("/")) {
@@ -124,6 +131,12 @@ public class YojoGenerator implements Generator {
         System.out.println(LOG_FINISH);
     }
 
+    /**
+     * Method will be called if the messages block in the components block is empty
+     * @param allContent All content from YAML-file
+     * @param messagesMap map of content messages
+     * @param excludeSchemas set of schemas, which willn't be generated
+     */
     private void fillMessagesByChannel(Map<String, Object> allContent, Map<String, Object> messagesMap, Set<String> excludeSchemas) {
         Map<String, Object> channelsMap = castObjectToMap(allContent.get(CHANNELS));
         channelsMap.entrySet().forEach(
@@ -150,6 +163,14 @@ public class YojoGenerator implements Generator {
         );
     }
 
+    /**
+     * Main method for preparing shemas
+     * @param lombokProperties properties for lombok {@link LombokProperties}
+     * @param outputDirectoryName prepared output directory name
+     * @param output full path to write
+     * @param commonPackage directory named common for generate schemas
+     * @param schemasMap map of schemas from components block
+     */
     private void processSchemas(LombokProperties lombokProperties, String outputDirectoryName, String output, String commonPackage, Map<String, Object> schemasMap) {
         System.out.println(LOG_DELIMETER);
         List<Schema> schemaList =
@@ -168,6 +189,16 @@ public class YojoGenerator implements Generator {
         }
     }
 
+    /**
+     * Main method for preparing messages
+     * @param lombokProperties properties for lombok {@link LombokProperties}
+     * @param outputDirectoryName prepared output directory name
+     * @param output full path to write
+     * @param messagePackage directory named messages for generate messages
+     * @param commonPackage directory named common for generate schemas(here used for schema-like mapping)
+     * @param messagesMap map of messages from components block
+     * @param schemasMap map of schemas from components block
+     */
     private void processMessages(LombokProperties lombokProperties, String outputDirectoryName, String output, String messagePackage, String commonPackage, Map<String, Object> messagesMap, Map<String, Object> schemasMap) {
         System.out.println(ANSI_CYAN + LOG_DELIMETER);
         List<Message> messageList =
@@ -186,6 +217,11 @@ public class YojoGenerator implements Generator {
         System.out.println();
     }
 
+    /**
+     * Preliminary analysis of the schemas
+     * @param filePath path to file (used for logging only)
+     * @param schemasMap map of schemas from components block
+     */
     private void analyzeSchemas(String filePath, Map<String, Object> schemasMap) {
         List<String> incorrectFilledProperties = new ArrayList<>();
         System.out.println();
@@ -307,6 +343,14 @@ public class YojoGenerator implements Generator {
         }
     }
 
+    /**
+     * Method unused. Maybe in the next features will be used.
+     * The method checks the equality of filling schemes.
+     * It was originally conceived for polymorphism.
+     *
+     * @param checkContent content for check
+     * @return result of equals
+     */
     private boolean equalsPropertiesContent(List<Map<String, Object>> checkContent) {
         boolean isEqualsContent = false;
         for (int i = 0; checkContent.size() > i; i++) {
@@ -328,6 +372,9 @@ public class YojoGenerator implements Generator {
         return isEqualsContent;
     }
 
+    /**
+     * @param messages list of message names
+     */
     private void throwException(List<String> messages) {
         throw new SchemaFillException(messages.toString());
     }

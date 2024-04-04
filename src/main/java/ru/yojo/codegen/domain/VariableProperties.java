@@ -102,9 +102,19 @@ public class VariableProperties {
     private Boolean primitive;
 
     /**
-     *
+     * Type of collection default = list
      */
     private String collectionType = "list";
+
+    /**
+     * Name of Existing Object
+     */
+    private String nameOfExisingObject;
+
+    /**
+     * Package of Existing Object
+     */
+    private String packageOfExisingObject;
 
     /**
      * Set of required annotation for variable
@@ -218,6 +228,22 @@ public class VariableProperties {
 
     public void setDigits(String digits) {
         this.digits = digits;
+    }
+
+    public String getPackageOfExisingObject() {
+        return packageOfExisingObject;
+    }
+
+    public void setPackageOfExisingObject(String packageOfExisingObject) {
+        this.packageOfExisingObject = packageOfExisingObject;
+    }
+
+    public String getNameOfExisingObject() {
+        return nameOfExisingObject;
+    }
+
+    public void setNameOfExisingObject(String nameOfExisingObject) {
+        this.nameOfExisingObject = nameOfExisingObject;
     }
 
     public String getRealisation() {

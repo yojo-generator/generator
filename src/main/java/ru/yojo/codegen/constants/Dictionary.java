@@ -62,6 +62,8 @@ public final class Dictionary {
     public static final String FROM_PACKAGE = "fromPackage";
     public static final String FROM_INTERFACE = "fromInterface";
     public static final String SET = "Set";
+    public static final String PACKAGE = "package";
+    public static final String EXISTING = "existing";
 
     /**
      * lombok manual properties

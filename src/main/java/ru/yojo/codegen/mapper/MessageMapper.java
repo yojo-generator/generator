@@ -3,8 +3,6 @@ package ru.yojo.codegen.mapper;
 import org.springframework.stereotype.Component;
 import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.VariableProperties;
-import ru.yojo.codegen.domain.lombok.Accessors;
-import ru.yojo.codegen.domain.lombok.EqualsAndHashCode;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.message.Message;
 
@@ -12,6 +10,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static ru.yojo.codegen.constants.Dictionary.*;
+import static ru.yojo.codegen.util.LombokUtils.fillLombokAccessors;
+import static ru.yojo.codegen.util.LombokUtils.fillLombokEqualsAndHashCode;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 @SuppressWarnings("all")
@@ -20,12 +20,25 @@ public class MessageMapper {
 
     private boolean filledByRef = false;
 
-    public List<Message> mapMessagesToObjects(Map<String, Object> messages, Map<String, Object> schemasMap, LombokProperties lombokProperties, String messagePackage, String commonPackage) {
+    /**
+     * @param messages         map of messages from components block
+     * @param schemasMap       map of schemas from components block
+     * @param lombokProperties properties for lombok {@link LombokProperties}
+     * @param messagePackage   directory named messages for generate messages
+     * @param commonPackage    directory named common for generate schemas(here used for schema-like mapping)
+     * @return list of prepared messages
+     */
+    public List<Message> mapMessagesToObjects(Map<String, Object> messages,
+                                              Map<String, Object> schemasMap,
+                                              LombokProperties lombokProperties,
+                                              String messagePackage,
+                                              String commonPackage) {
         List<Message> messageList = new ArrayList<>();
         Set<String> removeSchemas = new HashSet<>();
         Set<String> excludeRemoveSchemas = new HashSet<>();
         Set<String> excludeInheritanceSchemas = new HashSet<>();
         messages.forEach((messageName, messageValues) -> {
+            //flag will true if message was filled by schemas propeties
             filledByRef = false;
             System.out.println("START MAPPING OF MESSAGE: " + messageName);
             Map<String, Object> messageMap = castObjectToMap(messageValues);
@@ -35,36 +48,16 @@ public class MessageMapper {
 
             Map<String, Object> payloadMap = castObjectToMap(messageMap.get(PAYLOAD));
             String refObject = getStringValueIfExistOrElseNull(REFERENCE, payloadMap);
+
+            //see extendsAndImplFilling method
             AtomicBoolean needToFill = new AtomicBoolean(true);
-            payloadMap.forEach((mk, mv) -> {
-                if (mk.equals(EXTENDS)) {
-                    Map<String, Object> extendsMap = castObjectToMap(mv);
-                    String fromClass = getStringValueIfExistOrElseNull(FROM_CLASS, extendsMap);
-                    String fromPackage = getStringValueIfExistOrElseNull(FROM_PACKAGE, extendsMap);
-                    System.out.println("SHOULD EXTENDS FROM: " + fromClass);
-                    message.setExtendsFrom(fromClass);
-                    message.getImportSet().add(fromPackage + "." + fromClass + ";");
-                    if (refObject != null && refReplace(refObject).equals(fromClass)) {
-                        needToFill.set(false);
-                        excludeInheritanceSchemas.add(refReplace(refObject));
-                    }
-                }
-                if (mk.equals(IMPLEMENTS)) {
-                    Map<String, Object> implementsMap = castObjectToMap(mv);
-                    List<String> fromInterfaceList = castObjectToList(implementsMap.get(FROM_INTERFACE));
-                    System.out.println("SHOULD IMPLEMENTS FROM: " + fromInterfaceList);
-                    fromInterfaceList.forEach(ifc -> {
-                        String[] split = ifc.split("[.]");
-                        message.getImplementsFrom().add(split[split.length - 1]);
-                        message.getImportSet().add(ifc + ";");
-                    });
-                }
-            });
+            extendsAndImplFilling(excludeInheritanceSchemas, message, payloadMap, refObject, needToFill);
 
             if (needToFill.get()) {
                 filledByRef = false;
                 message.setFillParameters(
                         getFillParameters(
+                                messageName,
                                 payloadMap,
                                 commonPackage,
                                 schemasMap,
@@ -77,6 +70,7 @@ public class MessageMapper {
                     payloadMap.remove(PROPERTIES);
                     message.enrichFillParameters(
                             getFillParameters(
+                                    messageName,
                                     payloadMap,
                                     commonPackage,
                                     schemasMap,
@@ -84,31 +78,21 @@ public class MessageMapper {
                                     excludeRemoveSchemas,
                                     message.getLombokProperties()));
                 }
-                //Check from schema
+                //Check inhiritance from schema
                 if (message.getImplementsFrom().isEmpty() && isBlank(message.getExtendsFrom())) {
                     if (refObject != null) {
                         Map<String, Object> refMap = castObjectToMap(schemasMap.get(refReplace(refObject)));
                         refMap.forEach((mk, mv) -> {
                             if (mk.equals(EXTENDS)) {
-                                Map<String, Object> extendsMap = castObjectToMap(mv);
-                                String fromClass = getStringValueIfExistOrElseNull(FROM_CLASS, extendsMap);
-                                String fromPackage = getStringValueIfExistOrElseNull(FROM_PACKAGE, extendsMap);
-                                System.out.println("SHOULD EXTENDS FROM: " + fromClass);
-                                message.setExtendsFrom(fromClass);
-                                message.getImportSet().add(fromPackage + "." + fromClass + ";");
+                                String fromClass = prepareExtendsMessage(message, mv);
+                                //If the object reference is equal to the fromClass field,
+                                //the message will not be filled with data from the schema and the extends keyword will be inserted.
                                 if (refObject != null && refReplace(refObject).equals(fromClass)) {
                                     needToFill.set(false);
                                 }
                             }
                             if (mk.equals(IMPLEMENTS)) {
-                                Map<String, Object> implementsMap = castObjectToMap(mv);
-                                List<String> fromInterfaceList = castObjectToList(implementsMap.get(FROM_INTERFACE));
-                                System.out.println("SHOULD IMPLEMENTS FROM: " + fromInterfaceList);
-                                fromInterfaceList.forEach(ifc -> {
-                                    String[] split = ifc.split("[.]");
-                                    message.getImplementsFrom().add(split[split.length - 1]);
-                                    message.getImportSet().add(ifc + ";");
-                                });
+                                prepareImplementsMessage(message, mv);
                             }
                         });
                     }
@@ -132,35 +116,76 @@ public class MessageMapper {
         return messageList;
     }
 
-    private FillParameters getFillParameters(Map<String, Object> payload, String commonPackage, Map<String, Object> schemasMap, Set<String> removeSchemas, Set<String> excludeRemoveSchemas, LombokProperties lombokProperties) {
+    private static void prepareImplementsMessage(Message message, Object mv) {
+        Map<String, Object> implementsMap = castObjectToMap(mv);
+        List<String> fromInterfaceList = castObjectToList(implementsMap.get(FROM_INTERFACE));
+        System.out.println("SHOULD IMPLEMENTS FROM: " + fromInterfaceList);
+        fromInterfaceList.forEach(ifc -> {
+            String[] split = ifc.split("[.]");
+            message.getImplementsFrom().add(split[split.length - 1]);
+            message.getImportSet().add(ifc + ";");
+        });
+    }
+
+    private static String prepareExtendsMessage(Message message, Object mv) {
+        Map<String, Object> extendsMap = castObjectToMap(mv);
+        String fromClass = getStringValueIfExistOrElseNull(FROM_CLASS, extendsMap);
+        String fromPackage = getStringValueIfExistOrElseNull(FROM_PACKAGE, extendsMap);
+        System.out.println("SHOULD EXTENDS FROM: " + fromClass);
+        message.setExtendsFrom(fromClass);
+        message.getImportSet().add(fromPackage + "." + fromClass + ";");
+        return fromClass;
+    }
+
+    /**
+     * @param excludeInheritanceSchemas set of schemas which willn't remove
+     * @param message                   message
+     * @param payloadMap                payload of message
+     * @param refObject                 reference to schema, may be null
+     * @param needToFill                here sets flag to determine whether a message needs to be filled with data from the schema
+     */
+    private static void extendsAndImplFilling(Set<String> excludeInheritanceSchemas,
+                                              Message message,
+                                              Map<String, Object> payloadMap,
+                                              String refObject,
+                                              AtomicBoolean needToFill) {
+        payloadMap.forEach((mk, mv) -> {
+            if (mk.equals(EXTENDS)) {
+                String fromClass = prepareExtendsMessage(message, mv);
+                //If the object reference is equal to the fromClass field,
+                //the message will not be filled with data from the schema and the extends keyword will be inserted.
+                if (refObject != null && refReplace(refObject).equals(fromClass)) {
+                    needToFill.set(false);
+                    excludeInheritanceSchemas.add(refReplace(refObject));
+                }
+            }
+            if (mk.equals(IMPLEMENTS)) {
+                prepareImplementsMessage(message, mv);
+            }
+        });
+    }
+
+    /**
+     * @param payload              payload from message
+     * @param commonPackage        directory named common for generate schemas(here used for schema-like mapping)
+     * @param schemasMap           map of schemas
+     * @param removeSchemas        schemas for remove
+     * @param excludeRemoveSchemas exclude schemas for remove
+     * @param lombokProperties     lombokProperties properties for lombok {@link LombokProperties}
+     * @return mapped parameters of message
+     */
+    private FillParameters getFillParameters(String messageName,
+                                             Map<String, Object> payload,
+                                             String commonPackage,
+                                             Map<String, Object> schemasMap,
+                                             Set<String> removeSchemas,
+                                             Set<String> excludeRemoveSchemas,
+                                             LombokProperties lombokProperties) {
         FillParameters parameters = new FillParameters();
         if (payload.containsKey(LOMBOK)) {
             Map<String, Object> lombokProps = castObjectToMap(payload.get(LOMBOK));
-            if (lombokProps.containsKey(ACCESSORS)) {
-                Accessors acc = new Accessors(true, false, false);
-                Map<String, Object> accessors = castObjectToMap(lombokProps.get(ACCESSORS));
-                if (accessors.containsKey(FLUENT)) {
-                    acc.setFluent(Boolean.valueOf(accessors.get(FLUENT).toString()));
-                }
-                if (accessors.containsKey(CHAIN)) {
-                    acc.setChain(Boolean.valueOf(accessors.get(CHAIN).toString()));
-                }
-                if (accessors.containsKey(ENABLE)) {
-                    acc.setEnable(Boolean.valueOf(accessors.get(ENABLE).toString()));
-                }
-                lombokProperties.setAccessors(acc);
-            }
-            if (lombokProps.containsKey(EQUALS_AND_HASH_CODE)) {
-                EqualsAndHashCode equalsAndHashCode = new EqualsAndHashCode();
-                Map<String, Object> eah = castObjectToMap(lombokProps.get(EQUALS_AND_HASH_CODE));
-                if (eah != null) {
-                    if (getStringValueIfExistOrElseNull(CALL_SUPER, eah) != null) {
-                        equalsAndHashCode.setCallSuper(Boolean.valueOf(getStringValueIfExistOrElseNull(CALL_SUPER, eah)));
-                    }
-                    equalsAndHashCode.setEnable(true);
-                }
-                lombokProperties.setEqualsAndHashCode(equalsAndHashCode);
-            }
+            fillLombokAccessors(lombokProperties, lombokProps);
+            fillLombokEqualsAndHashCode(lombokProperties, lombokProps);
         }
         if (getStringValueIfExistOrElseNull(PROPERTIES, payload) != null) {
             System.out.println("Properties Mapping from message");
@@ -172,7 +197,7 @@ public class MessageMapper {
                 VariableProperties mvp = new VariableProperties();
                 Map<String, Object> innerSchemas = new LinkedHashMap<>();
 
-                fillProperties(mvp, payload, payload, propertyName, castObjectToMap(propertyValue), commonPackage, innerSchemas);
+                fillProperties(messageName, mvp, payload, payload, propertyName, castObjectToMap(propertyValue), commonPackage, innerSchemas);
 
                 if (mvp.getItems() != null && !JAVA_DEFAULT_TYPES.contains(mvp.getItems())) {
                     excludeRemoveSchemas.add(mvp.getItems());

@@ -1,5 +1,5 @@
 package ru.yojo.codegen.util;
-
+@SuppressWarnings("all")
 public class LogUtils {
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_PURPLE = "\u001B[35m";
