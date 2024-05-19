@@ -117,6 +117,11 @@ public class VariableProperties {
     private String packageOfExisingObject;
 
     /**
+     * Indicates, if variable is polymorph
+     */
+    private boolean polymorph = false;
+
+    /**
      * Set of required annotation for variable
      */
     private Set<String> annotationSet = new HashSet<>();
@@ -248,6 +253,14 @@ public class VariableProperties {
 
     public String getRealisation() {
         return realisation;
+    }
+
+    public void setPolymorph(boolean polymorph) {
+        this.polymorph = polymorph;
+    }
+
+    public boolean isPolymorph() {
+        return polymorph;
     }
 
     public void setRealisation(String realisation) {
@@ -546,6 +559,12 @@ public class VariableProperties {
 
     public Set<String> getRequiredImports() {
         return requiredImports;
+    }
+
+    public void addRequiredImports(String preparedImport) {
+        if (preparedImport != null) {
+            requiredImports.add(preparedImport);
+        }
     }
 
     public String getTitle() {

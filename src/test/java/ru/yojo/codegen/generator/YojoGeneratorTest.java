@@ -7,13 +7,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.FileSystemUtils;
 import ru.yojo.codegen.domain.lombok.Accessors;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
+import ru.yojo.codegen.mapper.Helper;
 import ru.yojo.codegen.mapper.MessageMapper;
 import ru.yojo.codegen.mapper.SchemaMapper;
 
 import java.io.File;
 import java.io.IOException;
 
-@SpringBootTest(classes = {YojoGenerator.class, SchemaMapper.class, MessageMapper.class})
+@SpringBootTest(classes = {YojoGenerator.class, SchemaMapper.class, MessageMapper.class, Helper.class})
 class YojoGeneratorTest {
 
     @Autowired

@@ -66,67 +66,67 @@ components:
           fromClass: RequestDtoSchema
           fromPackage: testGenerate.test.common
   schemas:
-#    PolymorphExampleOne:
-#      type: object
-#      properties:
-#        status:
-#          type: string
-#    PolymorphExampleTwo:
-#      type: object
-#      properties:
-#        status:
-#          type: string
-#        someField:
-#          type: integer
-#    PolymorphExampleThree:
-#      allOf:
-#        - $ref: '#/components/schemas/ExampleOne'
-#        - $ref: '#/components/schemas/ExampleTwo'
-#    PolymorphExampleFour:
-#      allOf:
-#        - $ref: '#/components/schemas/ExampleOne'
-#        - $ref: '#/components/schemas/ExampleTwo'
-#        - type: object
-#          properties:
-#            oneMoreField:
-#              type: boolean
-#    ExampleOne:
-#      type: object
-#      properties:
-#        status:
-#          type: string
-#    ExampleTwo:
-#      type: object
-#      properties:
-#        status:
-#          type: string
-#        someField:
-#          type: integer
-#    ExampleThree:
-#      allOf:
-#        - $ref: '#/components/schemas/ExampleOne'
-#        - $ref: '#/components/schemas/ExampleTwo'
-#        - $ref: '#/components/schemas/ExampleFour'
-#        - type: object
-#          properties:
-#            oneMoreField:
-#              type: boolean
-#    ExampleFour:
-#      allOf:
-#        - $ref: '#/components/schemas/ExampleFive'
-#        - type: object
-#          properties:
-#            fromFour:
-#              type: boolean
-#    ExampleFive:
-#      allOf:
-#        - $ref: '#/components/schemas/RequestDtoSchema'
-#        - type: object
-#          properties:
-#            oneMoreField:
-#              type: boolean
-#            fromFive:
-#              type: string
+    PolymorphExampleOne:
+      type: object
+      properties:
+        status:
+          type: string
+    PolymorphExampleTwo:
+      type: object
+      properties:
+        status:
+          type: string
+        someField:
+          type: integer
+    PolymorphExampleThree:
+      allOf:
+        - $ref: '#/components/schemas/ExampleOne'
+        - $ref: '#/components/schemas/ExampleTwo'
+    PolymorphExampleFour:
+      allOf:
+        - $ref: '#/components/schemas/ExampleOne'
+        - $ref: '#/components/schemas/ExampleTwo'
+        - type: object
+      properties:
+        oneMoreField:
+          type: boolean
+    ExampleOne:
+      type: object
+      properties:
+        status:
+          type: string
+    ExampleTwo:
+      type: object
+      properties:
+        status:
+          type: string
+        someField:
+          type: integer
+    ExampleThree:
+      allOf:
+        - $ref: '#/components/schemas/ExampleOne'
+        - $ref: '#/components/schemas/ExampleTwo'
+        - $ref: '#/components/schemas/ExampleFour'
+      type: object
+      properties:
+        oneMoreField:
+          type: boolean
+    ExampleFour:
+      allOf:
+        - $ref: '#/components/schemas/ExampleFive'
+      type: object
+      properties:
+        fromFour:
+          type: boolean
+    ExampleFive:
+      allOf:
+        - $ref: '#/components/schemas/RequestDtoSchema'
+      type: object
+      properties:
+        oneMoreField:
+          type: boolean
+        fromFive:
+          type: string
     RequestDtoSchema:
       type: object
       lombok:
@@ -165,6 +165,13 @@ components:
         - integerValidationField
         - uuidValidationList
       properties:
+        polymorph:
+          oneOf:
+            - $ref: '#/components/schemas/PolymorphExampleOne'
+            - $ref: '#/components/schemas/PolymorphExampleTwo'
+        polymorphWithInsidePolymorph:
+          type: object
+          $ref: '#/components/schemas/PolymorphExampleThree'
         primitives:
           type: object
           description: Here was located all supported primitives

@@ -9,6 +9,7 @@ import ru.yojo.codegen.exception.SchemaFillException;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import static ru.yojo.codegen.constants.Dictionary.*;
 import static ru.yojo.codegen.util.LombokUtils.fillLombokAccessors;
@@ -17,11 +18,19 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 
 @SuppressWarnings("all")
 @Component
-public class SchemaMapper {
+public class SchemaMapper extends AbstractMapper {
+
+    public SchemaMapper(Helper helper) {
+        super(helper);
+        this.helper = helper;
+    }
+
+    private final Helper helper;
 
     public List<Schema> mapSchemasToObjects(Map<String, Object> schemas,
                                             LombokProperties lombokProperties,
                                             String commonPackage) {
+        helper.setIsMappedFromSchemas(true);
         List<Schema> schemaList = new ArrayList<>();
         Map<String, Object> innerSchemas = new LinkedHashMap<>();
         schemas.forEach((schemaName, schemaValues) -> {
@@ -34,7 +43,7 @@ public class SchemaMapper {
                 fillLombokAccessors(lombokProperties, lombokProps);
                 fillLombokEqualsAndHashCode(lombokProperties, lombokProps);
             }
-            if (schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
+            if ((schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) || POLYMORPHS.stream().anyMatch(p -> schemaMap.containsKey(p))) {
                 Schema schema = new Schema();
                 schema.setSchemaName(capitalize(schemaName));
                 schema.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap));
@@ -144,6 +153,34 @@ public class SchemaMapper {
                         innerSchemas);
                 variableProperties.add(vp);
             });
+        }
+        if (POLYMORPHS.stream().anyMatch(p -> currentSchema.containsKey(p))) {
+            System.out.println("POLYMORPH: " + schemaName);
+            System.out.println("POLYMORPH: " + currentSchema);
+            //Found a polymorph schema names here
+            List<String> polymorphSchemasNames = getPolymorphSchemasNames(currentSchema, schemas);
+
+            System.out.println(polymorphSchemasNames);
+
+            //Getting merged polymorph properties
+            Map<String, Object> mergedProperties = mergeProperties(polymorphSchemasNames, currentSchema, schemas);
+
+            //Prepare VariableProperties
+            mergedProperties.forEach((propertyName, propertyValue) -> {
+                if (variableProperties.stream().noneMatch(vp -> vp.getName().equals(propertyName))) {
+                    VariableProperties vp = new VariableProperties();
+                    fillProperties(
+                            schemaName,
+                            vp,
+                            currentSchema,
+                            schemas,
+                            propertyName,
+                            castObjectToMap(propertyValue),
+                            commonPackage,
+                            innerSchemas);
+                    variableProperties.add(vp);
+                }
+            });
         } else if (getStringValueIfExistOrElseNull(ENUMERATION, currentSchema) != null) {
             currentSchema.get(ENUMERATION);
             VariableProperties vp = new VariableProperties();
@@ -153,5 +190,55 @@ public class SchemaMapper {
             variableProperties.add(vp);
         }
         return new FillParameters(variableProperties);
+    }
+
+    /**
+     * Method for getting polymorph schemas names with recursion
+     *
+     * @param currentSchema
+     * @param schemas
+     * @return
+     */
+    private static List<String> getPolymorphSchemasNames(Map<String, Object> currentSchema, Map<String, Object> schemas) {
+        return POLYMORPHS.stream()
+                .filter(p -> currentSchema.containsKey(p))
+                .flatMap(p -> castObjectToListObjects(currentSchema.get(p)).stream())
+                .map(p -> castObjectToMap(p))
+                .map(p -> p.get(REFERENCE))
+                .filter(Objects::nonNull)
+                .map(p -> refReplace(p.toString()))
+                .flatMap(ref -> {
+                    //recursievly get polymorph schemas names here
+                    if (castObjectToMap(schemas.get(ref)).containsKey(ALL_OF) || castObjectToMap(schemas.get(ref)).containsKey(ANY_OF) || castObjectToMap(schemas.get(ref)).containsKey(ONE_OF)) {
+                        List<String> polymorphSchemasNames = getPolymorphSchemasNames(castObjectToMap(schemas.get(ref)), schemas);
+                        polymorphSchemasNames.add(ref);
+                        return polymorphSchemasNames.stream();
+                    }
+                    return List.of(ref).stream();
+                })
+                .collect(Collectors.toList());
+    }
+
+    private Map<String, Object> mergeProperties(List<String> polymorphSchemasNames, Map<String, Object> currentSchema, Map<String, Object> schemas) {
+        return polymorphSchemasNames.stream()
+                .flatMap(name -> {
+                    Map<String, Object> schema = castObjectToMap(schemas.get(name));
+                    if (schema.containsKey(ALL_OF) || schema.containsKey(ANY_OF) || schema.containsKey(ONE_OF)) {
+                        Map<String, Object> propertyMap = schema.entrySet().stream()
+                                .filter(en -> en.getKey().equals(PROPERTIES))
+                                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (existing, replacement) -> existing));
+                        propertyMap.putAll(castObjectToMap(schemas.get(name)));
+                        return propertyMap.entrySet().stream();
+                    }
+                    return castObjectToMap(schemas.get(name)).entrySet().stream();
+                })
+                .filter(en -> en.getKey().equals(PROPERTIES))
+//                .flatMap(en -> getMap(schemas, currentSchema, en).stream())
+                .distinct()
+                .map(pr -> castObjectToMap(pr.getValue()))
+                .flatMap(map -> map.entrySet().stream())
+                .distinct()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (existing, replacement) -> existing));
     }
 }

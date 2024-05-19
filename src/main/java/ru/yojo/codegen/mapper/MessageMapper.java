@@ -16,9 +16,17 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 
 @SuppressWarnings("all")
 @Component
-public class MessageMapper {
+public class MessageMapper extends AbstractMapper {
 
+    private final Helper helper;
+    private final SchemaMapper schemaMapper;
     private boolean filledByRef = false;
+
+    public MessageMapper(Helper helper, SchemaMapper schemaMapper) {
+        super(helper);
+        this.helper = helper;
+        this.schemaMapper = schemaMapper;
+    }
 
     /**
      * @param messages         map of messages from components block
@@ -182,6 +190,7 @@ public class MessageMapper {
                                              Set<String> excludeRemoveSchemas,
                                              LombokProperties lombokProperties) {
         FillParameters parameters = new FillParameters();
+        helper.setIsMappedFromMessages(true);
         if (payload.containsKey(LOMBOK)) {
             Map<String, Object> lombokProps = castObjectToMap(payload.get(LOMBOK));
             fillLombokAccessors(lombokProperties, lombokProps);
@@ -214,7 +223,7 @@ public class MessageMapper {
                 Map<String, Object> schema = castObjectToMap(schemasMap.get(schemaName));
                 System.out.println("SCHEMA: " + schemaName);
 
-                SchemaMapper schemaMapper = new SchemaMapper();
+                SchemaMapper schemaMapper = new SchemaMapper(helper);
 
                 Set<String> requiredPropertiesSet = getSetValueIfExistsOrElseEmptySet(REQUIRED, schema);
                 Map<String, Object> innerSchemas = new LinkedHashMap<>();

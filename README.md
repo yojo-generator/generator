@@ -46,9 +46,9 @@ As such, any keyword available for those vocabularies is by definition available
 27. [x] `items`
 28. [ ] `propertyNames`
 29. [ ] `contains`
-30. [ ] `allOf`
-31. [ ] `oneOf`
-32. [ ] `anyOf`
+30. [x] `allOf`
+31. [x] `oneOf`
+32. [x] `anyOf`
 33. [ ] `not`
 
 The following properties are taken from the JSON Schema definition but their definitions were adjusted to the AsyncAPI Specification.
@@ -62,143 +62,7 @@ The following properties are taken from the JSON Schema definition but their def
 Available are marked with a checkbox.**
 
 ## Examples
-#### Let's see the following example of a product store:
-```
-components:
-  messages:
-    Request:
-      payload:
-        $ref: '#/components/schemas/SaveGoodsRequest'
-    Response:
-      payload:
-        $ref: '#/components/schemas/SaveGoodsResponse'
-  schemas:
-    SaveGoodsRequest:
-      type: object
-      required:
-        - messageId
-        - goods
-      properties:
-        messageId:
-          type: string
-          minLength: 1
-          maxLength: 36
-          description: "message id"
-          example: "d88646bd-36c8-45b6-866a-17009e88736a"
-        goods:
-          type: array
-          items:
-            $ref: '#/components/schemas/Good'
-    Good:
-      type: object
-      required:
-        - isNewGood
-        - name
-      properties:
-        isNewGood:
-          type: boolean
-          example: "FALSE"
-          description: "Sign of a new product"
-        name:
-          type: string
-          minLength: 1
-          maxLength: 60
-          example: "T-shirt"
-          description: "Good name"
-        manufactureDate:
-          type: string
-          format: date
-          example: "2023-01-02"
-          description: "Date of manufacture"
-    SaveGoodsResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          example: "success"
-          description: "Item save status"
-        data:
-          $ref: '#/components/schemas/Data'
-        error:
-          $ref: '#/components/schemas/Error'
-    Data:
-      type: string
-      description: "Номер товара"
-      example: "2143512341234"
-    Error:
-      type: object
-      required:
-        - code
-        - message
-      properties:
-        code:
-          type: integer
-          enum:
-            - 0
-            - 1
-            - 2
-            - 3
-        message:
-          type: string
-          enum:
-            - Good creation error!
-            - Internal error!
-            - Incorrect request!
-          example: Incorrect request!
-```
 
-Based on this example, we are silencing several files with the extension `.java`:
-* SaveGoodsRequest.java
-* SaveGoodsResponse.java
-* Good.java
-* Error.java
-
-Examples of the main generated files:
-* SaveGoodsRequest.java
-```
-import javax.validation.constraints.Size
-import javax.validation.constraints.NotBlank
-import javax.validation.Valid
-import java.util.List
-
-public class SaveGoodsRequest {
-
-    /**
-     * message Id
-     * Example: d88646bd-36c8-45b6-866a-17009e88736a
-     */
-    @NotBlank
-    @Size(min = 1, max = 36)
-    private String messageId;
-
-    @Valid
-    private List<Good> parameters;
-
-}
-```
-* SaveGoodsResponse.java
-```
-import javax.validation.Valid
-
-public class SaveGoodsResponse {
-
-    /**
-     * Item save status
-     * Example: success
-     */
-    private String status;
-
-    /**
-     * Number
-     * Example: 2143512341234
-     */
-    private String data;
-
-    @Valid
-    private Error error;
-
-}
-```
 See examples [here](./examples)
 
 ## Releases
@@ -291,6 +155,11 @@ More examples in allSupportedCases.yaml
         - fieldForValidation
         - fieldForValidation
         - fieldForValidation
+
+* 📈 Added support of polymorphism for schemas
+* 📈 Added support of polymorphism for messages from channels
+
+See also to [here](./examples) to find more cases.
 
 ## Developers
 * 😎 Vladimir Morozkin

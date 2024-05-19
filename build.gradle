@@ -8,6 +8,8 @@ plugins {
 java {
     withJavadocJar()
     withSourcesJar()
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 group 'ru.yojo'
@@ -76,13 +78,13 @@ jar {
 }
 
 dependencies {
-    implementation 'org.springframework:spring-context:5.3.25'
+    implementation 'org.springframework:spring-context:6.1.7'
     implementation 'org.yaml:snakeyaml:2.0'
     implementation 'javax.validation:validation-api:2.0.1.Final'
     compileOnly 'org.projectlombok:lombok:1.18.26'
     testCompileOnly 'org.projectlombok:lombok:1.18.26'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:2.7.10'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.5'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
 }
 

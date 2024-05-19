@@ -8,6 +8,19 @@ channels:
     subscribe:
       message:
         $ref: '#/components/messages/RequestDtoByRef'
+#  PolymorphMessage:
+#    subscribe:
+#      message:
+#        payload:
+#          oneOf:
+#            - $ref: '#/components/schemas/PolymorphExampleOne'
+#            - $ref: '#/components/schemas/PolymorphExampleTwo'
+#    publish:
+#      message:
+#        payload:
+#          oneOf:
+#            - $ref: '#/components/schemas/PolymorphExampleThree'
+#            - $ref: '#/components/schemas/PolymorphExampleFour'
 components:
   messages:
     RequestDtoByRef:
@@ -22,11 +35,22 @@ components:
             type: String
     RequestDtoWithProperties:
       payload:
+        lombok:
+          accessors:
+            chain: true
+          equalsAndHashCode:
+            enable: true
         properties:
           someString:
             type: string
     RequestDtoWithDoubleInheritance:
       payload:
+        lombok:
+          accessors:
+            chain: true
+          equalsAndHashCode:
+            enable: true
+            callSuper: true
         $ref: '#/components/schemas/RequestDtoSchema'
         implements:
           fromInterface:
@@ -42,8 +66,74 @@ components:
           fromClass: RequestDtoSchema
           fromPackage: testGenerate.test.common
   schemas:
+    PolymorphExampleOne:
+      type: object
+      properties:
+        status:
+          type: string
+    PolymorphExampleTwo:
+      type: object
+      properties:
+        status:
+          type: string
+        someField:
+          type: integer
+    PolymorphExampleThree:
+      allOf:
+        - $ref: '#/components/schemas/ExampleOne'
+        - $ref: '#/components/schemas/ExampleTwo'
+    PolymorphExampleFour:
+      allOf:
+        - $ref: '#/components/schemas/ExampleOne'
+        - $ref: '#/components/schemas/ExampleTwo'
+        - type: object
+      properties:
+        oneMoreField:
+          type: boolean
+    ExampleOne:
+      type: object
+      properties:
+        status:
+          type: string
+    ExampleTwo:
+      type: object
+      properties:
+        status:
+          type: string
+        someField:
+          type: integer
+    ExampleThree:
+      allOf:
+        - $ref: '#/components/schemas/ExampleOne'
+        - $ref: '#/components/schemas/ExampleTwo'
+        - $ref: '#/components/schemas/ExampleFour'
+      type: object
+      properties:
+        oneMoreField:
+          type: boolean
+    ExampleFour:
+      allOf:
+        - $ref: '#/components/schemas/ExampleFive'
+      type: object
+      properties:
+        fromFour:
+          type: boolean
+    ExampleFive:
+      allOf:
+        - $ref: '#/components/schemas/RequestDtoSchema'
+      type: object
+      properties:
+        oneMoreField:
+          type: boolean
+        fromFive:
+          type: string
     RequestDtoSchema:
       type: object
+      lombok:
+        accessors:
+          enable: false
+      equalsAndHashCode:
+        enable: true
       description: RequestExample
       implements:
         fromInterface:
@@ -75,6 +165,13 @@ components:
         - integerValidationField
         - uuidValidationList
       properties:
+        polymorph:
+          oneOf:
+            - $ref: '#/components/schemas/PolymorphExampleOne'
+            - $ref: '#/components/schemas/PolymorphExampleTwo'
+        polymorphWithInsidePolymorph:
+          type: object
+          $ref: '#/components/schemas/PolymorphExampleThree'
         primitives:
           type: object
           description: Here was located all supported primitives
@@ -125,7 +222,6 @@ components:
           type: object
           description: Map generation Example
           additionalProperties:
-            type: object
             $ref: '#/components/schemas/SomeObject'
         mapStringSetOfCustomObject:
           type: object
@@ -183,18 +279,34 @@ components:
 
     SomeObject:
       type: object
+      lombok:
+        accessors:
+          chain: true
+        equalsAndHashCode:
+          enable: true
+          callSuper: false
       extends:
         fromClass: ClassForExtends
         fromPackage: testGenerate.test.common
       properties:
         someInteger:
           type: integer
+        #same name of existing class
+        innerSchema:
+          type: object
+          properties:
+            someString:
+              type: string
+            someExistingObject:
+              type: object
+              name: ClassForExtending
+              package: testGenerate
 
     SomeObjectImpl:
       type: object
       implements:
         fromInterface:
-         - testGenerate.InterfaceForImpl
+          - testGenerate.InterfaceForImpl
       properties:
         someInteger:
           type: integer
@@ -207,6 +319,9 @@ components:
 
     CollectionTypes:
       type: object
+      lombok:
+        accessors:
+          fluent: true
       description: Here was located all supported collections
       required:
         - listOfPrimitivesRequired
@@ -273,6 +388,31 @@ components:
           items:
             format: long
             realization: ArrayList
+        listWithInnerSchemaAndExistingObject:
+          type: array
+          items:
+            type: object
+            properties:
+              someString:
+                type: string
+              someExistingObject:
+                type: object
+                format: existing
+                name: ClassForExtending
+                package: testGenerate
+        #same name of existing class
+        innerSchema:
+          type: array
+          items:
+            type: object
+            properties:
+              someString:
+                type: string
+              someExistingObject:
+                type: object
+                format: existing
+                name: ClassForExtending
+                package: testGenerate
 
         #SET
         setOfPrimitives:
@@ -448,7 +588,8 @@ components:
         - StringValues
         - uuidValueWithRequired
         - dateValueWithRequired
-        - dateTimeValueWithRequired
+        - localDateValueWithRequired
+        - localDateTimeValueWithRequired
         - offsetDateTimeValueWithRequired
       properties:
         #When name starts with UpperCase, it will uncapitalize
@@ -477,16 +618,25 @@ components:
         #DATE
         dateValue:
           type: object
-          format: date
+          format: simple-date
         dateValueWithRequired:
+          type: object
+          format: simple-date
+          default: new
+
+        #LOCAL-DATE
+        localDateValue:
+          type: object
+          format: date
+        localDateValueWithRequired:
           type: object
           format: date
 
-        #DATE-TIME
-        dateTimeValue:
+        #LOCAL-DATE-TIME
+        localDateTimeValue:
           type: string
           format: date-time
-        dateTimeValueWithRequired:
+        localDateTimeValueWithRequired:
           type: string
           format: date-time
 
@@ -660,6 +810,9 @@ components:
     ClassForExtends:
       type: object
       description: This Class just fo Example of extends after generate
+      lombok:
+        accessors:
+          chain: true
       properties:
         someString:
           type: string
