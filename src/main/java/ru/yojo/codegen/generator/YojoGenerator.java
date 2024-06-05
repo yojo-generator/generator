@@ -2,6 +2,8 @@ package ru.yojo.codegen.generator;
 
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
+import ru.yojo.codegen.context.ProcessContext;
+import ru.yojo.codegen.context.YojoContext;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.message.Message;
 import ru.yojo.codegen.domain.schema.Schema;
@@ -47,6 +49,37 @@ public class YojoGenerator implements Generator {
     }
 
     /**
+     * Method for generating from all files in directory with spring boot version
+     *
+     *
+     * @param yojoContext Context with all properties
+     */
+    public void generateAll(YojoContext yojoContext) throws IOException {
+        Files.walk(Paths.get(yojoContext.getDirectory()))
+                .filter(Files::isRegularFile)
+                .map(Path::toFile)
+                .forEach(file -> {
+                            String content;
+                            try {
+                                content = new String(Files.readAllBytes(Paths.get(file.getPath())));
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                            content = getContent(file, content);
+                            if (content.startsWith("asyncapi")) {
+                                ProcessContext processContext = new ProcessContext(new Yaml().load(content));
+                                processContext.setFilePath(file.getPath());
+                                processContext.setOutputDirectory(yojoContext.getOutputDirectory());
+                                processContext.setPackageLocation(yojoContext.getPackageLocation());
+                                processContext.setLombokProperties(yojoContext.getLombokProperties());
+                                processContext.setSpringBootVersion(yojoContext.getSpringBootVersion());
+                                process(processContext);
+                            }
+                        }
+                );
+    }
+
+    /**
      * Method for generating from all files in directory
      *
      * @param directory        - which directory use for search contracts
@@ -56,7 +89,10 @@ public class YojoGenerator implements Generator {
      * @throws IOException
      */
     @Override
-    public void generateAll(String directory, String outputDirectory, String packageLocation, LombokProperties lombokProperties) throws IOException {
+    public void generateAll(String directory,
+                            String outputDirectory,
+                            String packageLocation,
+                            LombokProperties lombokProperties) throws IOException {
         Files.walk(Paths.get(directory))
                 .filter(Files::isRegularFile)
                 .map(Path::toFile)
@@ -69,8 +105,14 @@ public class YojoGenerator implements Generator {
                             }
                             content = getContent(file, content);
                             if (content.startsWith("asyncapi")) {
-                                Map<String, Object> obj = new Yaml().load(content);
-                                process(file.getPath(), outputDirectory, packageLocation, lombokProperties, obj);
+                                ProcessContext processContext = new ProcessContext(new Yaml().load(content));
+                                processContext.setFilePath(file.getPath());
+                                processContext.setOutputDirectory(outputDirectory);
+                                processContext.setPackageLocation(packageLocation);
+                                processContext.setLombokProperties(lombokProperties);
+                                processContext.setSpringBootVersion("2");
+
+                                process(processContext);
                             }
                         }
                 );
@@ -81,53 +123,58 @@ public class YojoGenerator implements Generator {
      */
     @Override
     public void generate(String filePath, String outputDirectory, String packageLocation, LombokProperties lombokProperties) {
-        Map<String, Object> allContent;
+        ProcessContext processContext;
         try (InputStream fileInputStream = new FileInputStream(filePath)) {
-            allContent = new Yaml().load(fileInputStream);
+            processContext = new ProcessContext(new Yaml().load(fileInputStream));
             fileInputStream.close();
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
-        process(filePath, outputDirectory, packageLocation, lombokProperties, allContent);
+
+        processContext.setFilePath(filePath);
+        processContext.setOutputDirectory(outputDirectory);
+        processContext.setPackageLocation(packageLocation);
+        processContext.setLombokProperties(lombokProperties);
+        processContext.setSpringBootVersion("2");
+
+        process(processContext);
     }
 
     /**
-     * @param filePath         Path to file
-     * @param outputDirectory  Output Directory
-     * @param packageLocation  specify package like: com.example.myproject
-     * @param lombokProperties properties for lombok {@link LombokProperties}
-     * @param allContent       All content from YAML-file
+     *
+     * @param processContext Context with all properties
      */
-    private void process(String filePath, String outputDirectory, String packageLocation, LombokProperties lombokProperties, Map<String, Object> allContent) {
-        String outputDirectoryName = new File(filePath).getName().replaceAll("\\..*", "");
-        if (!outputDirectory.endsWith("/")) {
-            outputDirectory = outputDirectory + DELIMITER;
+    private void process(ProcessContext processContext) {
+        String outputDirectoryName = new File(processContext.getFilePath()).getName().replaceAll("\\..*", "");
+        if (!processContext.getOutputDirectory().endsWith("/"))  {
+            processContext.setOutputDirectory(processContext.getOutputDirectory() + DELIMITER);
         }
-        String output = outputDirectory + outputDirectoryName;
-        new File(output).mkdirs();
-
-        String messagePackage = getPackage(packageLocation, outputDirectoryName, MESSAGE_PACKAGE_IMPORT);
-        String commonPackage = getPackage(packageLocation, outputDirectoryName, COMMON_PACKAGE_IMPORT);
+        processContext.setOutputDirectoryName(outputDirectoryName);
+        processContext.setPathToWrite(processContext.getOutputDirectory() + outputDirectoryName);
+        processContext.preparePackages();
 
         Map<String, Object> messagesMap =
                 castObjectToMap(
                         castObjectToMap(
-                                castObjectToMap(allContent.get("components"))).get("messages"));
+                                castObjectToMap(processContext.getContent().get("components"))).get("messages"));
 
         Map<String, Object> schemasMap =
                 castObjectToMap(
                         castObjectToMap(
-                                castObjectToMap(allContent.get("components"))).get("schemas"));
+                                castObjectToMap(processContext.getContent().get("components"))).get("schemas"));
 
         Set<String> excludeSchemas = new HashSet<>();
         if (messagesMap.isEmpty()) {
-            fillMessagesByChannel(allContent, messagesMap, excludeSchemas);
+            fillMessagesByChannel(processContext.getContent(), messagesMap, excludeSchemas);
         }
         excludeSchemas.forEach(sc -> schemasMap.remove(sc));
         //analyzeSchemas(filePath, schemasMap);
 
-        processMessages(lombokProperties, outputDirectoryName, output, messagePackage, commonPackage, messagesMap, schemasMap);
-        processSchemas(lombokProperties, outputDirectoryName, output, commonPackage, schemasMap);
+        processContext.setMessagesMap(messagesMap);
+        processContext.setSchemasMap(schemasMap);
+
+        processMessages(processContext);
+        processSchemas(processContext);
 
         System.out.println(LOG_FINISH);
     }
@@ -168,25 +215,18 @@ public class YojoGenerator implements Generator {
     /**
      * Main method for preparing shemas
      *
-     * @param lombokProperties    properties for lombok {@link LombokProperties}
-     * @param outputDirectoryName prepared output directory name
-     * @param output              full path to write
-     * @param commonPackage       directory named common for generate schemas
-     * @param schemasMap          map of schemas from components block
+     * @param processContext Context with all properties
      */
-    private void processSchemas(LombokProperties lombokProperties, String outputDirectoryName, String output, String commonPackage, Map<String, Object> schemasMap) {
+    private void processSchemas(ProcessContext processContext)   {
         System.out.println(LOG_DELIMETER);
         List<Schema> schemaList =
-                schemaMapper.mapSchemasToObjects(
-                        schemasMap,
-                        lombokProperties,
-                        commonPackage);
+                schemaMapper.mapSchemasToObjects(processContext);
         if (!schemaList.isEmpty()) {
             System.out.println();
             System.out.println("START WRITING JAVA CLASS FROM SCHEMAS:");
             schemaList.forEach(schema -> System.out.println(schema.getSchemaName()));
             System.out.println();
-            writeSchemas(output, outputDirectoryName, schemaList);
+            writeSchemas(processContext.getPathToWrite(), processContext.getOutputDirectoryName(), schemaList);
             System.out.println(LOG_DELIMETER + ANSI_RESET);
             System.out.println();
         }
@@ -195,28 +235,17 @@ public class YojoGenerator implements Generator {
     /**
      * Main method for preparing messages
      *
-     * @param lombokProperties    properties for lombok {@link LombokProperties}
-     * @param outputDirectoryName prepared output directory name
-     * @param output              full path to write
-     * @param messagePackage      directory named messages for generate messages
-     * @param commonPackage       directory named common for generate schemas(here used for schema-like mapping)
-     * @param messagesMap         map of messages from components block
-     * @param schemasMap          map of schemas from components block
+     * @param processContext Context with all properties
      */
-    private void processMessages(LombokProperties lombokProperties, String outputDirectoryName, String output, String messagePackage, String commonPackage, Map<String, Object> messagesMap, Map<String, Object> schemasMap) {
+    private void processMessages(ProcessContext processContext)  {
         System.out.println(ANSI_CYAN + LOG_DELIMETER);
         List<Message> messageList =
-                messageMapper.mapMessagesToObjects(
-                        messagesMap,
-                        schemasMap,
-                        lombokProperties,
-                        messagePackage,
-                        commonPackage);
+                messageMapper.mapMessagesToObjects(processContext);
         System.out.println();
         System.out.println("START WRITING JAVA CLASS FROM MESSAGES:");
         messageList.forEach(message -> System.out.println(message.getMessageName()));
         System.out.println();
-        writeMessages(output, outputDirectoryName, messageList);
+        writeMessages(processContext.getPathToWrite(), processContext.getOutputDirectoryName(), messageList);
         System.out.println(LOG_DELIMETER);
         System.out.println();
     }

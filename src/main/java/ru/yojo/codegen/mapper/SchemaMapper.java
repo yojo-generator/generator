@@ -1,6 +1,7 @@
 package ru.yojo.codegen.mapper;
 
 import org.springframework.stereotype.Component;
+import ru.yojo.codegen.context.ProcessContext;
 import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
@@ -27,28 +28,26 @@ public class SchemaMapper extends AbstractMapper {
 
     private final Helper helper;
 
-    public List<Schema> mapSchemasToObjects(Map<String, Object> schemas,
-                                            LombokProperties lombokProperties,
-                                            String commonPackage) {
+    public List<Schema> mapSchemasToObjects(ProcessContext processContext) {
         helper.setIsMappedFromSchemas(true);
         List<Schema> schemaList = new ArrayList<>();
         Map<String, Object> innerSchemas = new LinkedHashMap<>();
-        schemas.forEach((schemaName, schemaValues) -> {
-            LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(lombokProperties);
+        processContext.getSchemasMap().forEach((schemaName, schemaValues) -> {
+            LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(processContext.getLombokProperties());
             System.out.println("START MAPPING OF SCHEMA: " + schemaName);
             Map<String, Object> schemaMap = castObjectToMap(schemaValues);
             String schemaType = getStringValueIfExistOrElseNull(TYPE, schemaMap);
             if (schemaMap != null && schemaMap.containsKey(LOMBOK)) {
                 Map<String, Object> lombokProps = castObjectToMap(schemaMap.get(LOMBOK));
-                fillLombokAccessors(lombokProperties, lombokProps);
-                fillLombokEqualsAndHashCode(lombokProperties, lombokProps);
+                fillLombokAccessors(finalLombokProperties, lombokProps);
+                fillLombokEqualsAndHashCode(finalLombokProperties, lombokProps);
             }
             if ((schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) || POLYMORPHS.stream().anyMatch(p -> schemaMap.containsKey(p))) {
                 Schema schema = new Schema();
                 schema.setSchemaName(capitalize(schemaName));
                 schema.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap));
                 schema.setLombokProperties(finalLombokProperties);
-                schema.setPackageName(commonPackage);
+                schema.setPackageName(processContext.getCommonPackage());
 
                 // Marker for extending
                 // Check, if there are no attributes other than inheritance,
@@ -85,9 +84,9 @@ public class SchemaMapper extends AbstractMapper {
                             getSchemaVariableProperties(
                                     schemaName,
                                     schemaMap,
-                                    schemas,
+                                    processContext.getSchemasMap(),
                                     castObjectToMap(schemaMap.get(PROPERTIES)),
-                                    commonPackage,
+                                    processContext,
                                     innerSchemas
                             )
                     );
@@ -103,7 +102,7 @@ public class SchemaMapper extends AbstractMapper {
         });
         if (!innerSchemas.isEmpty()) {
             innerSchemas.forEach((schemaName, schemaValues) -> {
-                LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(lombokProperties);
+                LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(processContext.getLombokProperties());
                 System.out.println("START MAPPING OF INNER SCHEMA: " + schemaName);
                 Map<String, Object> schemaMap = castObjectToMap(schemaValues);
                 String schemaType = getStringValueIfExistOrElseNull(TYPE, schemaMap);
@@ -112,14 +111,14 @@ public class SchemaMapper extends AbstractMapper {
                     schema.setSchemaName(capitalize(schemaName));
                     schema.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap));
                     schema.setLombokProperties(finalLombokProperties);
-                    schema.setPackageName(commonPackage);
+                    schema.setPackageName(processContext.getCommonPackage());
                     schema.setFillParameters(
                             getSchemaVariableProperties(
                                     schemaName,
                                     schemaMap,
                                     innerSchemas,
                                     castObjectToMap(schemaMap.get(PROPERTIES)),
-                                    commonPackage,
+                                    processContext,
                                     innerSchemas
                             )
                     );
@@ -136,7 +135,7 @@ public class SchemaMapper extends AbstractMapper {
                                                       Map<String, Object> currentSchema,
                                                       Map<String, Object> schemas,
                                                       Map<String, Object> properties,
-                                                      String commonPackage,
+                                                      ProcessContext processContext,
                                                       Map<String, Object> innerSchemas) {
         List<VariableProperties> variableProperties = new LinkedList<>();
         if (!properties.isEmpty()) {
@@ -149,7 +148,7 @@ public class SchemaMapper extends AbstractMapper {
                         schemas,
                         propertyName,
                         castObjectToMap(propertyValue),
-                        commonPackage,
+                        processContext,
                         innerSchemas);
                 variableProperties.add(vp);
             });
@@ -176,7 +175,7 @@ public class SchemaMapper extends AbstractMapper {
                             schemas,
                             propertyName,
                             castObjectToMap(propertyValue),
-                            commonPackage,
+                            processContext,
                             innerSchemas);
                     variableProperties.add(vp);
                 }
@@ -186,7 +185,7 @@ public class SchemaMapper extends AbstractMapper {
             VariableProperties vp = new VariableProperties();
             vp.setValid(false);
             vp.setEnum(true);
-            fillProperties(schemaName, vp, currentSchema, schemas, schemaName, currentSchema, commonPackage, innerSchemas);
+            fillProperties(schemaName, vp, currentSchema, schemas, schemaName, currentSchema, processContext, innerSchemas);
             variableProperties.add(vp);
         }
         return new FillParameters(variableProperties);

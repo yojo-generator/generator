@@ -156,7 +156,8 @@ public class Schema {
 
         } else {
             stringBuilder = getEnumClassBuilder(schemaName);
-            fillParameters.getVariableProperties().forEach(vp -> vp.getRequiredImports().remove(VALID_IMPORT));
+            fillParameters.getVariableProperties().forEach(vp -> vp.getRequiredImports().remove(JAVAX_VALID_IMPORT));
+            fillParameters.getVariableProperties().forEach(vp -> vp.getRequiredImports().remove(JAKARTA_VALID_IMPORT));
             //ENUM WITH DESCRIPTION
             if (fillParameters.getVariableProperties().stream()
                     .anyMatch(variableProperties -> variableProperties.getEnumNames() != null)) {

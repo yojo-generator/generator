@@ -1,6 +1,7 @@
 package ru.yojo.codegen.mapper;
 
 import org.springframework.stereotype.Component;
+import ru.yojo.codegen.context.ProcessContext;
 import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
@@ -36,23 +37,19 @@ public class MessageMapper extends AbstractMapper {
      * @param commonPackage    directory named common for generate schemas(here used for schema-like mapping)
      * @return list of prepared messages
      */
-    public List<Message> mapMessagesToObjects(Map<String, Object> messages,
-                                              Map<String, Object> schemasMap,
-                                              LombokProperties lombokProperties,
-                                              String messagePackage,
-                                              String commonPackage) {
+    public List<Message> mapMessagesToObjects(ProcessContext processContext) {
         List<Message> messageList = new ArrayList<>();
         Set<String> removeSchemas = new HashSet<>();
         Set<String> excludeRemoveSchemas = new HashSet<>();
         Set<String> excludeInheritanceSchemas = new HashSet<>();
-        messages.forEach((messageName, messageValues) -> {
+        processContext.getMessagesMap().forEach((messageName, messageValues) -> {
             //flag will true if message was filled by schemas propeties
             filledByRef = false;
             System.out.println("START MAPPING OF MESSAGE: " + messageName);
             Map<String, Object> messageMap = castObjectToMap(messageValues);
             Message message = new Message();
             message.setMessageName(capitalize(messageName));
-            message.setLombokProperties(LombokProperties.newLombokProperties(lombokProperties));
+            message.setLombokProperties(LombokProperties.newLombokProperties(processContext.getLombokProperties()));
 
             Map<String, Object> payloadMap = castObjectToMap(messageMap.get(PAYLOAD));
             String refObject = getStringValueIfExistOrElseNull(REFERENCE, payloadMap);
@@ -67,8 +64,7 @@ public class MessageMapper extends AbstractMapper {
                         getFillParameters(
                                 messageName,
                                 payloadMap,
-                                commonPackage,
-                                schemasMap,
+                                processContext,
                                 removeSchemas,
                                 excludeRemoveSchemas,
                                 message.getLombokProperties()
@@ -80,8 +76,7 @@ public class MessageMapper extends AbstractMapper {
                             getFillParameters(
                                     messageName,
                                     payloadMap,
-                                    commonPackage,
-                                    schemasMap,
+                                    processContext,
                                     removeSchemas,
                                     excludeRemoveSchemas,
                                     message.getLombokProperties()));
@@ -89,7 +84,7 @@ public class MessageMapper extends AbstractMapper {
                 //Check inhiritance from schema
                 if (message.getImplementsFrom().isEmpty() && isBlank(message.getExtendsFrom())) {
                     if (refObject != null) {
-                        Map<String, Object> refMap = castObjectToMap(schemasMap.get(refReplace(refObject)));
+                        Map<String, Object> refMap = castObjectToMap(processContext.getSchemasMap().get(refReplace(refObject)));
                         refMap.forEach((mk, mv) -> {
                             if (mk.equals(EXTENDS)) {
                                 String fromClass = prepareExtendsMessage(message, mv);
@@ -110,8 +105,8 @@ public class MessageMapper extends AbstractMapper {
             }
 
             message.setSummary(getStringValueIfExistOrElseNull(SUMMARY, messageMap));
-            message.setMessagePackageName(messagePackage);
-            message.setCommonPackageName(commonPackage);
+            message.setMessagePackageName(processContext.getMessagePackage());
+            message.setCommonPackageName(processContext.getCommonPackage());
             messageList.add(message);
         });
         excludeRemoveSchemas.addAll(excludeInheritanceSchemas);
@@ -120,7 +115,7 @@ public class MessageMapper extends AbstractMapper {
         }
 
         System.out.println("FINISH MAPPING OF MESSAGES! CLEAN UP SCHEMAS: " + removeSchemas);
-        removeSchemas.forEach(schemasMap::remove);
+        removeSchemas.forEach(processContext.getSchemasMap()::remove);
         return messageList;
     }
 
@@ -184,8 +179,7 @@ public class MessageMapper extends AbstractMapper {
      */
     private FillParameters getFillParameters(String messageName,
                                              Map<String, Object> payload,
-                                             String commonPackage,
-                                             Map<String, Object> schemasMap,
+                                             ProcessContext processContext,
                                              Set<String> removeSchemas,
                                              Set<String> excludeRemoveSchemas,
                                              LombokProperties lombokProperties) {
@@ -206,7 +200,7 @@ public class MessageMapper extends AbstractMapper {
                 VariableProperties mvp = new VariableProperties();
                 Map<String, Object> innerSchemas = new LinkedHashMap<>();
 
-                fillProperties(messageName, mvp, payload, payload, propertyName, castObjectToMap(propertyValue), commonPackage, innerSchemas);
+                fillProperties(messageName, mvp, payload, payload, propertyName, castObjectToMap(propertyValue), processContext, innerSchemas);
 
                 if (mvp.getItems() != null && !JAVA_DEFAULT_TYPES.contains(mvp.getItems())) {
                     excludeRemoveSchemas.add(mvp.getItems());
@@ -218,20 +212,23 @@ public class MessageMapper extends AbstractMapper {
             //Here we go only if payload filled by one field $ref
             if (getStringValueIfExistOrElseNull(REFERENCE, payload) != null && !filledByRef) {
                 filledByRef = true;
+                helper.setIsMappedFromMessages(true);
+                helper.setIsMappedFromSchemas(false);
                 System.out.println("Starting schema-like mapping");
                 String schemaName = getStringValueIfExistOrElseNull(REFERENCE, payload).replaceAll(".+/", "");
-                Map<String, Object> schema = castObjectToMap(schemasMap.get(schemaName));
+                Map<String, Object> schema = castObjectToMap(processContext.getSchemasMap().get(schemaName));
                 System.out.println("SCHEMA: " + schemaName);
 
                 SchemaMapper schemaMapper = new SchemaMapper(helper);
 
                 Set<String> requiredPropertiesSet = getSetValueIfExistsOrElseEmptySet(REQUIRED, schema);
                 Map<String, Object> innerSchemas = new LinkedHashMap<>();
-                parameters = schemaMapper.getSchemaVariableProperties(schemaName, schema, schemasMap, castObjectToMap(schema.get(PROPERTIES)), commonPackage, innerSchemas);
+                parameters = schemaMapper.getSchemaVariableProperties(schemaName,
+                        schema, processContext.getSchemasMap(), castObjectToMap(schema.get(PROPERTIES)), processContext, innerSchemas);
                 removeSchemas.add(schemaName);
                 if (!innerSchemas.isEmpty()) {
                     innerSchemas.forEach((pk, pv) -> excludeRemoveSchemas.add(pk));
-                    schemasMap.putAll(innerSchemas);
+                    processContext.getSchemasMap().putAll(innerSchemas);
                 }
                 return parameters;
             } else if (filledByRef) {

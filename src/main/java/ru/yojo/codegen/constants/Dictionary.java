@@ -167,12 +167,36 @@ public final class Dictionary {
     public static final String SIMPLE_DATE_IMPORT = "java.util.Date;";
     public static final String OFFSET_DATE_TIME_IMPORT = "java.time.OffsetDateTime;";
     public static final String UUID_IMPORT = "java.util.UUID;";
-    public static final String NOT_BLANK_IMPORT = "javax.validation.constraints.NotBlank;";
-    public static final String NOT_EMPTY_IMPORT = "javax.validation.constraints.NotEmpty;";
-    public static final String NOT_NULL_IMPORT = "javax.validation.constraints.NotNull;";
-    public static final String SIZE_IMPORT = "javax.validation.constraints.Size;";
-    public static final String PATTERN_IMPORT = "javax.validation.constraints.Pattern;";
-    public static final String VALID_IMPORT = "javax.validation.Valid;";
+
+
+    /**
+     * JAVAX
+     */
+    public static final String JAVAX_NOT_BLANK_IMPORT = "javax.validation.constraints.NotBlank;";
+    public static final String JAVAX_NOT_EMPTY_IMPORT = "javax.validation.constraints.NotEmpty;";
+    public static final String JAVAX_NOT_NULL_IMPORT = "javax.validation.constraints.NotNull;";
+    public static final String JAVAX_SIZE_IMPORT = "javax.validation.constraints.Size;";
+    public static final String JAVAX_PATTERN_IMPORT = "javax.validation.constraints.Pattern;";
+    public static final String JAVAX_VALID_IMPORT = "javax.validation.Valid;";
+    public static final String JAVAX_DIGITS_IMPORT = "javax.validation.constraints.Digits;";
+    public static final String JAVAX_MIN_IMPORT = "javax.validation.constraints.Min;";
+    public static final String JAVAX_MAX_IMPORT = "javax.validation.constraints.Max;";
+
+    /**
+     * JAKARTA
+     */
+    public static final String JAKARTA_NOT_BLANK_IMPORT = "jakarta.validation.constraints.NotBlank;";
+    public static final String JAKARTA_NOT_EMPTY_IMPORT = "jakarta.validation.constraints.NotEmpty;";
+    public static final String JAKARTA_NOT_NULL_IMPORT = "jakarta.validation.constraints.NotNull;";
+    public static final String JAKARTA_SIZE_IMPORT = "jakarta.validation.constraints.Size;";
+    public static final String JAKARTA_PATTERN_IMPORT = "jakarta.validation.constraints.Pattern;";
+    public static final String JAKARTA_VALID_IMPORT = "jakarta.validation.Valid;";
+    public static final String JAKARTA_DIGITS_IMPORT = "jakarta.validation.constraints.Digits;";
+    public static final String JAKARTA_MIN_IMPORT = "jakarta.validation.constraints.Min;";
+    public static final String JAKARTA_MAX_IMPORT = "jakarta.validation.constraints.Max;";
+
+
+
     public static final String LIST_IMPORT = "java.util.List;";
     public static final String ARRAY_LIST_IMPORT = "java.util.ArrayList;";
     public static final String LINKED_LIST_IMPORT = "java.util.LinkedList;";
@@ -181,9 +205,6 @@ public final class Dictionary {
     public static final String MAP_IMPORT = "java.util.Map;";
     public static final String HASH_MAP_IMPORT = "java.util.HashMap;";
     public static final String LINKED_HASH_MAP_IMPORT = "java.util.LinkedHashMap;";
-    public static final String DIGITS_IMPORT = "javax.validation.constraints.Digits;";
-    public static final String MIN_IMPORT = "javax.validation.constraints.Min;";
-    public static final String MAX_IMPORT = "javax.validation.constraints.Max;";
 
     /**
      * Java Doc
@@ -261,13 +282,22 @@ public final class Dictionary {
             entry(OBJECT_TYPE, NOT_NULL_ANNOTATION)
     );
 
-    public static final Map<String, String> JAVA_TYPES_REQUIRED_IMPORTS = ofEntries(
-            entry(NOT_BLANK_ANNOTATION, NOT_BLANK_IMPORT),
-            entry(NOT_EMPTY_ANNOTATION, NOT_EMPTY_IMPORT),
-            entry(NOT_NULL_ANNOTATION, NOT_NULL_IMPORT),
-            entry(SIZE_ANNOTATION, SIZE_IMPORT),
-            entry(PATTERN_ANNOTATION_WITHOUT_REGEXP, PATTERN_IMPORT),
-            entry(VALID_ANNOTATION, VALID_IMPORT)
+    public static final Map<String, String> JAVAX_JAVA_TYPES_REQUIRED_IMPORTS = ofEntries(
+            entry(NOT_BLANK_ANNOTATION, JAVAX_NOT_BLANK_IMPORT),
+            entry(NOT_EMPTY_ANNOTATION, JAVAX_NOT_EMPTY_IMPORT),
+            entry(NOT_NULL_ANNOTATION, JAVAX_NOT_NULL_IMPORT),
+            entry(SIZE_ANNOTATION, JAVAX_SIZE_IMPORT),
+            entry(PATTERN_ANNOTATION_WITHOUT_REGEXP, JAVAX_PATTERN_IMPORT),
+            entry(VALID_ANNOTATION, JAVAX_VALID_IMPORT)
+    );
+
+    public static final Map<String, String> JAKARTA_JAVA_TYPES_REQUIRED_IMPORTS = ofEntries(
+            entry(NOT_BLANK_ANNOTATION, JAKARTA_NOT_BLANK_IMPORT),
+            entry(NOT_EMPTY_ANNOTATION, JAKARTA_NOT_EMPTY_IMPORT),
+            entry(NOT_NULL_ANNOTATION, JAKARTA_NOT_NULL_IMPORT),
+            entry(SIZE_ANNOTATION, JAKARTA_SIZE_IMPORT),
+            entry(PATTERN_ANNOTATION_WITHOUT_REGEXP, JAKARTA_PATTERN_IMPORT),
+            entry(VALID_ANNOTATION, JAKARTA_VALID_IMPORT)
     );
 
     public static final List<String> JAVA_DEFAULT_TYPES = List.of(

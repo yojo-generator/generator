@@ -1,5 +1,6 @@
 package ru.yojo.codegen.mapper;
 
+import ru.yojo.codegen.context.ProcessContext;
 import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.exception.SchemaFillException;
 import ru.yojo.codegen.util.MapperUtil;
@@ -38,34 +39,35 @@ public class AbstractMapper {
                                Map<String, Object> schemas,
                                String propertyName,
                                Map<String, Object> propertiesMap,
-                               String commonPackage,
+                               ProcessContext processContext,
                                Map<String, Object> innerSchemas) {
-            variableProperties.setName(uncapitalize(propertyName));
-            variableProperties.setDefaultProperty(getStringValueIfExistOrElseNull(DEFAULT, propertiesMap));
-            variableProperties.setType(capitalize(getStringValueIfExistOrElseNull(TYPE, propertiesMap)));
-            variableProperties.setPrimitive(getStringValueIfExistOrElseNull(PRIMITIVE, propertiesMap));
-            variableProperties.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, propertiesMap));
-            variableProperties.setExample(getStringValueIfExistOrElseNull(EXAMPLE, propertiesMap));
-            variableProperties.setTitle(getStringValueIfExistOrElseNull(TITLE, propertiesMap));
-            variableProperties.setDigits(getStringValueIfExistOrElseNull(DIGITS, propertiesMap));
-            variableProperties.setFormat(getStringValueIfExistOrElseNull(FORMAT, propertiesMap));
-            variableProperties.setPattern(getStringValueIfExistOrElseNull(PATTERN, propertiesMap));
-            variableProperties.setMinMaxLength(getStringValueIfExistOrElseNull(MIN_LENGTH, propertiesMap), getStringValueIfExistOrElseNull(MAX_LENGTH, propertiesMap));
-            variableProperties.setMinimum(getStringValueIfExistOrElseNull(MINIMUM, propertiesMap));
-            variableProperties.setMaximum(getStringValueIfExistOrElseNull(MAXIMUM, propertiesMap));
-            variableProperties.setEnumeration(getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap));
-            variableProperties.setEnumNames(getStringValueIfExistOrElseNull(X_ENUM_NAMES, propertiesMap));
-            variableProperties.setPackageOfExisingObject(getStringValueIfExistOrElseNull(PACKAGE, propertiesMap));
-            variableProperties.setNameOfExisingObject(getStringValueIfExistOrElseNull(NAME, propertiesMap));
-            variableProperties.setPolymorph(
-                    !POLYMORPHS.stream()
-                            .map(p -> propertiesMap.get(p))
-                            .map(MapperUtil::castObjectToListObjects)
-                            .flatMap(objects -> objects.stream())
-                            .collect(Collectors.toList()).isEmpty());
+        variableProperties.setSpringBootVersion(processContext.getSpringBootVersion());
+        variableProperties.setName(uncapitalize(propertyName));
+        variableProperties.setDefaultProperty(getStringValueIfExistOrElseNull(DEFAULT, propertiesMap));
+        variableProperties.setType(capitalize(getStringValueIfExistOrElseNull(TYPE, propertiesMap)));
+        variableProperties.setPrimitive(getStringValueIfExistOrElseNull(PRIMITIVE, propertiesMap));
+        variableProperties.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, propertiesMap));
+        variableProperties.setExample(getStringValueIfExistOrElseNull(EXAMPLE, propertiesMap));
+        variableProperties.setTitle(getStringValueIfExistOrElseNull(TITLE, propertiesMap));
+        variableProperties.setDigits(getStringValueIfExistOrElseNull(DIGITS, propertiesMap));
+        variableProperties.setFormat(getStringValueIfExistOrElseNull(FORMAT, propertiesMap));
+        variableProperties.setPattern(getStringValueIfExistOrElseNull(PATTERN, propertiesMap));
+        variableProperties.setMinMaxLength(getStringValueIfExistOrElseNull(MIN_LENGTH, propertiesMap), getStringValueIfExistOrElseNull(MAX_LENGTH, propertiesMap));
+        variableProperties.setMinimum(getStringValueIfExistOrElseNull(MINIMUM, propertiesMap));
+        variableProperties.setMaximum(getStringValueIfExistOrElseNull(MAXIMUM, propertiesMap));
+        variableProperties.setEnumeration(getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap));
+        variableProperties.setEnumNames(getStringValueIfExistOrElseNull(X_ENUM_NAMES, propertiesMap));
+        variableProperties.setPackageOfExisingObject(getStringValueIfExistOrElseNull(PACKAGE, propertiesMap));
+        variableProperties.setNameOfExisingObject(getStringValueIfExistOrElseNull(NAME, propertiesMap));
+        variableProperties.setPolymorph(
+                !POLYMORPHS.stream()
+                        .map(p -> propertiesMap.get(p))
+                        .map(MapperUtil::castObjectToListObjects)
+                        .flatMap(objects -> objects.stream())
+                        .collect(Collectors.toList()).isEmpty());
 
-            fillVariableProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, commonPackage, innerSchemas);
-            fillRequiredAnnotationsAndImports(variableProperties, currentSchema, propertyName);
+        fillVariableProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, processContext, innerSchemas);
+        fillRequiredAnnotationsAndImports(variableProperties, currentSchema, propertyName);
     }
 
     /**
@@ -85,12 +87,13 @@ public class AbstractMapper {
                                        Map<String, Object> schemas,
                                        String propertyName,
                                        Map<String, Object> propertiesMap,
-                                       String commonPackage,
+                                       ProcessContext processContext,
                                        Map<String, Object> innerSchemas) {
+        String commonPackage = processContext.getCommonPackage();
         if (ARRAY.equals(uncapitalize(variableProperties.getType()))) {
-            fillArrayProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, commonPackage, innerSchemas);
+            fillArrayProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, processContext, innerSchemas);
         } else if (getStringValueIfExistOrElseNull(REFERENCE, propertiesMap) != null && !ARRAY.equals(uncapitalize(variableProperties.getType()))) {
-            fillReferenceProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, commonPackage, innerSchemas);
+            fillReferenceProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, processContext, innerSchemas);
         } else if (OBJECT_TYPE.equals(variableProperties.getType()) &&
                 getStringValueIfExistOrElseNull(PROPERTIES, propertiesMap) != null) {
             fillObjectProperties(schemaName, variableProperties, schemas, propertyName, propertiesMap, commonPackage, innerSchemas);
@@ -229,7 +232,7 @@ public class AbstractMapper {
         fillInnerSchema(variableProperties, propName, propertiesMap, commonPackage, innerSchemas);
     }
 
-    private void fillReferenceProperties(String schemaName, VariableProperties variableProperties, Map<String, Object> currentSchema, Map<String, Object> schemas, String propertyName, Map<String, Object> propertiesMap, String commonPackage, Map<String, Object> innerSchemas) {
+    private void fillReferenceProperties(String schemaName, VariableProperties variableProperties, Map<String, Object> currentSchema, Map<String, Object> schemas, String propertyName, Map<String, Object> propertiesMap, ProcessContext processContext, Map<String, Object> innerSchemas) {
         String referenceObject = propertiesMap.get(REFERENCE).toString();
         Map<String, Object> stringObjectMap = castObjectToMap(schemas.get(referenceObject.replaceAll(".+/", "")));
         String objectType = getStringValueIfExistOrElseNull(TYPE, stringObjectMap);
@@ -238,7 +241,7 @@ public class AbstractMapper {
             System.out.println();
             System.out.println("Start Recursive fillProperties " + propertyName);
             System.out.println();
-            fillProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, stringObjectMap, commonPackage, innerSchemas);
+            fillProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, stringObjectMap, processContext, innerSchemas);
         }
         if (variableProperties.getType() == null || OBJECT_TYPE.equals(variableProperties.getType())) {
             String refReplace = refReplace(referenceObject);
@@ -247,7 +250,7 @@ public class AbstractMapper {
                     .anyMatch(p -> POLYMORPHS.contains(p.getKey()))) {
                 System.out.println("SKIP INHIRITANCE POLYMORPH INSIDE SCHEMA! " + refReplace);
                 variableProperties.setType(refReplace);
-                variableProperties.addRequiredImports(prepareImport(commonPackage, refReplace));
+                variableProperties.addRequiredImports(prepareImport(processContext.getCommonPackage(), refReplace));
             } else {
                 variableProperties.setType(refReplace);
                 String possibleReferencedEnum = getStringValueIfExistOrElseNull(refReplace, schemas);
@@ -258,13 +261,13 @@ public class AbstractMapper {
                     }
                 }
                 if (Character.isUpperCase(refReplace.charAt(0))) {
-                    variableProperties.addRequiredImports(prepareImport(commonPackage, refReplace));
+                    variableProperties.addRequiredImports(prepareImport(processContext.getCommonPackage(), refReplace));
                 }
             }
         }
     }
 
-    private void fillArrayProperties(String schemaName, VariableProperties variableProperties, Map<String, Object> currentSchema, Map<String, Object> schemas, String propertyName, Map<String, Object> propertiesMap, String commonPackage, Map<String, Object> innerSchemas) {
+    private void fillArrayProperties(String schemaName, VariableProperties variableProperties, Map<String, Object> currentSchema, Map<String, Object> schemas, String propertyName, Map<String, Object> propertiesMap, ProcessContext processContext, Map<String, Object> innerSchemas) {
         Map<String, Object> items = castObjectToMap(propertiesMap.get(ITEMS));
         variableProperties.setRealisation(getStringValueIfExistOrElseNull(REALIZATION, items));
         String refValue = getStringValueIfExistOrElseNull(REFERENCE, items);
@@ -301,14 +304,14 @@ public class AbstractMapper {
                     variableProperties.setFormat(items.get(FORMAT).toString());
                 } else {
                     if (getStringValueIfExistOrElseNull(PROPERTIES, items) != null) {
-                        fillObjectProperties(schemaName, variableProperties, schemas, propertyName, items, commonPackage, innerSchemas);
+                        fillObjectProperties(schemaName, variableProperties, schemas, propertyName, items, processContext.getCommonPackage(), innerSchemas);
                     } else {
                         variableProperties.setItems(items.get(TYPE).toString());
                         variableProperties.setFormat(items.get(TYPE).toString());
                     }
                 }
             } else {
-                fillProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, items, commonPackage, innerSchemas);
+                fillProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, items, processContext, innerSchemas);
                 variableProperties.setItems(capitalize(propertyName));
                 fillCollectionType(variableProperties);
             }
@@ -316,7 +319,7 @@ public class AbstractMapper {
         if (variableProperties.getItems() != null &&
                 !JAVA_DEFAULT_TYPES.contains(variableProperties.getItems()) &&
                 !OBJECT_TYPE.equals(variableProperties.getItems()) && !javaType) {
-            variableProperties.addRequiredImports(prepareImport(commonPackage, variableProperties.getItems()));
+            variableProperties.addRequiredImports(prepareImport(processContext.getCommonPackage(), variableProperties.getItems()));
         }
     }
 
@@ -540,7 +543,11 @@ public class AbstractMapper {
         requiredAttributes.forEach(requiredAttribute -> {
             if (requiredAttribute.equals(propertyName)) {
                 if (variableProperties.getItems() != null) {
-                    importSet.add(JAVA_TYPES_REQUIRED_IMPORTS.get(NOT_EMPTY_ANNOTATION));
+                    if (variableProperties.getSpringBootVersion() != null && variableProperties.getSpringBootVersion().startsWith("3")) {
+                        importSet.add(JAKARTA_JAVA_TYPES_REQUIRED_IMPORTS.get(NOT_EMPTY_ANNOTATION));
+                    } else {
+                        importSet.add(JAVAX_JAVA_TYPES_REQUIRED_IMPORTS.get(NOT_EMPTY_ANNOTATION));
+                    }
                     if (validationFields.contains(propertyName) && finalGroups != null) {
                         String annotationWithGroups = NOT_EMPTY_ANNOTATION + finalGroups;
                         annotationSet.add(annotationWithGroups);
@@ -561,12 +568,20 @@ public class AbstractMapper {
 
                     //VALIDATION GROUPS FOR JAVA OBJECTS
                     if (validationFields.contains(propertyName) && finalGroups != null) {
-                        importSet.add(JAVA_TYPES_REQUIRED_IMPORTS.get(annotation));
+                        if (variableProperties.getSpringBootVersion() != null && variableProperties.getSpringBootVersion().startsWith("3")) {
+                            importSet.add(JAKARTA_JAVA_TYPES_REQUIRED_IMPORTS.get(annotation));
+                        } else {
+                            importSet.add(JAVAX_JAVA_TYPES_REQUIRED_IMPORTS.get(annotation));
+                        }
                         annotation = annotation + finalGroups;
                         annotationSet.add(annotation);
                         importSet.addAll(validationGroupsImports.stream().map(vi -> vi.concat(";")).collect(Collectors.toSet()));
                     } else {
-                        importSet.add(JAVA_TYPES_REQUIRED_IMPORTS.get(annotation));
+                        if (variableProperties.getSpringBootVersion() != null && variableProperties.getSpringBootVersion().startsWith("3")) {
+                            importSet.add(JAKARTA_JAVA_TYPES_REQUIRED_IMPORTS.get(annotation));
+                        } else {
+                            importSet.add(JAVAX_JAVA_TYPES_REQUIRED_IMPORTS.get(annotation));
+                        }
                         annotationSet.add(annotation);
                     }
                 }
@@ -583,7 +598,11 @@ public class AbstractMapper {
                 variableProperties.getType() != null &&
                 !JAVA_DEFAULT_TYPES.contains(variableProperties.getType()) &&
                 variableProperties.isValid()) {
-            importSet.add(JAVA_TYPES_REQUIRED_IMPORTS.get(VALID_ANNOTATION));
+            if (variableProperties.getSpringBootVersion() != null && variableProperties.getSpringBootVersion().startsWith("3")) {
+                importSet.add(JAKARTA_JAVA_TYPES_REQUIRED_IMPORTS.get(VALID_ANNOTATION));
+            } else {
+                importSet.add(JAVAX_JAVA_TYPES_REQUIRED_IMPORTS.get(VALID_ANNOTATION));
+            }
             annotationSet.add(VALID_ANNOTATION);
         }
     }

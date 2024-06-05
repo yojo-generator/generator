@@ -13,6 +13,12 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 public class VariableProperties {
 
     /**
+     * springBootVersion
+     */
+    private String springBootVersion;
+
+
+    /**
      * Property name
      */
     private String name;
@@ -293,7 +299,11 @@ public class VariableProperties {
         this.minimum = minimum;
         if (isNotBlank(minimum)) {
             annotationSet.add(generateMinAnnotation(minimum));
-            requiredImports.add(MIN_IMPORT);
+            if (springBootVersion!= null && springBootVersion.startsWith("3")) {
+                requiredImports.add(JAKARTA_MIN_IMPORT);
+            } else {
+                requiredImports.add(JAVAX_MIN_IMPORT);
+            }
         }
     }
 
@@ -305,7 +315,11 @@ public class VariableProperties {
         this.maximum = maximum;
         if (isNotBlank(maximum)) {
             annotationSet.add(generateMaxAnnotation(maximum));
-            requiredImports.add(MAX_IMPORT);
+            if (springBootVersion!= null && springBootVersion.startsWith("3")) {
+                requiredImports.add(JAKARTA_MAX_IMPORT);
+            } else {
+                requiredImports.add(JAVAX_MAX_IMPORT);
+            }
         }
     }
 
@@ -399,7 +413,11 @@ public class VariableProperties {
                         this.valid = false;
                     }
                     if (digits != null) {
-                        requiredImports.add(DIGITS_IMPORT);
+                        if (springBootVersion != null && springBootVersion.startsWith("3")) {
+                            requiredImports.add(JAKARTA_DIGITS_IMPORT);
+                        } else {
+                            requiredImports.add(JAVAX_DIGITS_IMPORT);
+                        }
                         annotationSet.add(format(DIGITS_ANNOTATION, digits));
                     }
                     break;
@@ -416,7 +434,11 @@ public class VariableProperties {
                         this.valid = false;
                     }
                     if (digits != null) {
-                        requiredImports.add(DIGITS_IMPORT);
+                        if (springBootVersion != null && springBootVersion.startsWith("3")) {
+                            requiredImports.add(JAKARTA_DIGITS_IMPORT);
+                        } else {
+                            requiredImports.add(JAVAX_DIGITS_IMPORT);
+                        }
                         annotationSet.add(format(DIGITS_ANNOTATION, digits));
                     }
                     break;
@@ -432,7 +454,11 @@ public class VariableProperties {
                         this.valid = false;
                     }
                     if (digits != null) {
-                        requiredImports.add(DIGITS_IMPORT);
+                        if (springBootVersion != null && springBootVersion.startsWith("3")) {
+                            requiredImports.add(JAKARTA_DIGITS_IMPORT);
+                        } else {
+                            requiredImports.add(JAVAX_DIGITS_IMPORT);
+                        }
                         annotationSet.add(format(DIGITS_ANNOTATION, digits));
                     }
                     break;
@@ -486,7 +512,11 @@ public class VariableProperties {
                         this.valid = false;
                     }
                     if (digits != null) {
-                        requiredImports.add(DIGITS_IMPORT);
+                        if (springBootVersion != null && springBootVersion.startsWith("3")) {
+                            requiredImports.add(JAKARTA_DIGITS_IMPORT);
+                        } else {
+                            requiredImports.add(JAVAX_DIGITS_IMPORT);
+                        }
                         annotationSet.add(format(DIGITS_ANNOTATION, digits));
                     }
                     break;
@@ -503,7 +533,11 @@ public class VariableProperties {
                         this.valid = false;
                     }
                     if (digits != null) {
-                        requiredImports.add(DIGITS_IMPORT);
+                        if (springBootVersion != null && springBootVersion.startsWith("3")) {
+                            requiredImports.add(JAKARTA_DIGITS_IMPORT);
+                        } else {
+                            requiredImports.add(JAVAX_DIGITS_IMPORT);
+                        }
                         annotationSet.add(format(DIGITS_ANNOTATION, digits));
                     }
                     break;
@@ -515,7 +549,11 @@ public class VariableProperties {
     public void setPattern(String pattern) {
         if (pattern != null) {
             annotationSet.add(format(PATTERN_ANNOTATION, pattern));
-            requiredImports.add(JAVA_TYPES_REQUIRED_IMPORTS.get(substringBefore(PATTERN_ANNOTATION, "(")));
+            if (springBootVersion != null && springBootVersion.startsWith("3")) {
+                requiredImports.add(JAKARTA_JAVA_TYPES_REQUIRED_IMPORTS.get(substringBefore(PATTERN_ANNOTATION, "(")));
+            } else {
+                requiredImports.add(JAVAX_JAVA_TYPES_REQUIRED_IMPORTS.get(substringBefore(PATTERN_ANNOTATION, "(")));
+            }
         }
         this.pattern = pattern;
     }
@@ -545,9 +583,15 @@ public class VariableProperties {
     public void setMinMaxLength(String min, String max) {
         if (isNoneEmpty(min) || isNoneEmpty(max)) {
             annotationSet.add(generateSizeAnnotation(min, max));
-            requiredImports.add(
-                    JAVA_TYPES_REQUIRED_IMPORTS.get(substringBefore(
-                            SIZE_MIN_MAX_ANNOTATION, "(")));
+            if (springBootVersion != null && springBootVersion.startsWith("3")) {
+                requiredImports.add(
+                        JAKARTA_JAVA_TYPES_REQUIRED_IMPORTS.get(substringBefore(
+                                SIZE_MIN_MAX_ANNOTATION, "(")));
+            } else {
+                requiredImports.add(
+                        JAVAX_JAVA_TYPES_REQUIRED_IMPORTS.get(substringBefore(
+                                SIZE_MIN_MAX_ANNOTATION, "(")));
+            }
         }
         this.minLength = min;
         this.maxLength = max;
@@ -687,5 +731,13 @@ public class VariableProperties {
 
         return stringBuilder.append(lineSeparator())
                 .append(format(FIELD, getType(), getName())).toString();
+    }
+
+    public String getSpringBootVersion() {
+        return springBootVersion;
+    }
+
+    public void setSpringBootVersion(String springBootVersion) {
+        this.springBootVersion = springBootVersion;
     }
 }

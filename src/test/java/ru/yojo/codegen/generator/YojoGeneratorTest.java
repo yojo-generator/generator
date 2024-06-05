@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.FileSystemUtils;
+import ru.yojo.codegen.context.YojoContext;
 import ru.yojo.codegen.domain.lombok.Accessors;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.mapper.Helper;
@@ -31,6 +32,25 @@ class YojoGeneratorTest {
                         new Accessors(true, true, true)));
         File file = new File("src/test/resources/testGenerate/test");
         Assertions.assertTrue(file.listFiles().length != 0);
+        //cleanUp
+        Assertions.assertTrue(FileSystemUtils.deleteRecursively(file));
+    }
+
+    @Test
+    void generateAllWithSpringBootVersion() throws IOException {
+        YojoContext yojoContext = new YojoContext();
+        yojoContext.setSpringBootVersion("3.0.0");
+        yojoContext.setDirectory("src/test/resources/");
+        yojoContext.setOutputDirectory("src/test/resources/testGenerate/");
+        yojoContext.setPackageLocation("testGenerate");
+        yojoContext.setLombokProperties(new LombokProperties(false,
+                true,
+                new Accessors(true, true, true)));
+
+        yojoGenerator.generateAll(yojoContext);
+
+        File file = new File("src/test/resources/testGenerate/test");
+        Assertions.assertTrue(file.exists());
         //cleanUp
         Assertions.assertTrue(FileSystemUtils.deleteRecursively(file));
     }
