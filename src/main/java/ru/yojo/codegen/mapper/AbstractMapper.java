@@ -30,7 +30,7 @@ public class AbstractMapper {
      * @param schemas            schemas
      * @param propertyName       propertyName
      * @param propertiesMap      propertiesMap
-     * @param commonPackage      commonPackage
+     * @param processContext     processContext
      * @param innerSchemas       innerSchemas
      */
     public void fillProperties(String schemaName,
@@ -78,7 +78,7 @@ public class AbstractMapper {
      * @param schemas            schemas
      * @param propertyName       propertyName
      * @param propertiesMap      propertiesMap
-     * @param commonPackage      commonPackage
+     * @param processContext     processContext
      * @param innerSchemas       innerSchemas
      */
     public void fillVariableProperties(String schemaName,

@@ -30,11 +30,7 @@ public class MessageMapper extends AbstractMapper {
     }
 
     /**
-     * @param messages         map of messages from components block
-     * @param schemasMap       map of schemas from components block
-     * @param lombokProperties properties for lombok {@link LombokProperties}
-     * @param messagePackage   directory named messages for generate messages
-     * @param commonPackage    directory named common for generate schemas(here used for schema-like mapping)
+     * @param processContext     processContext
      * @return list of prepared messages
      */
     public List<Message> mapMessagesToObjects(ProcessContext processContext) {

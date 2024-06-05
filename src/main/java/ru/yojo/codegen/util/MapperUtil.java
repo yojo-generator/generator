@@ -203,13 +203,7 @@ public class MapperUtil {
 
     /**
      * Method filling required annotations and imports
-     *
-     * @param variableProperties variableProperties
-     * @param currentSchema      currentSchema
-     * @param propertyName       propertyName
      */
-
-
     public static void buildLombokAnnotations(LombokProperties lombokProperties, Set<String> requiredImports, StringBuilder lombokAnnotationBuilder) {
         lombokAnnotationBuilder
                 .append(LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION)
