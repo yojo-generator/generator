@@ -223,6 +223,14 @@ components:
           description: Map generation Example
           additionalProperties:
             $ref: '#/components/schemas/SomeObject'
+        mapStringExistingObject:
+          type: string
+          description: Map generation Example
+          additionalProperties:
+            type: object
+            format: existing
+            name: ClassForExtending
+            package: testGenerate
         mapStringSetOfCustomObject:
           type: object
           description: Map generation Example
@@ -237,6 +245,14 @@ components:
             type: array
             format: set
             additionalFormat: string
+        mapStringSetOfExistingObject:
+          type: object
+          description: Map generation Example
+          additionalProperties:
+            type: array
+            format: set
+            name: ClassForExtending
+            package: testGenerate
         innerEnumWithDescription:
           type: object
           enum:

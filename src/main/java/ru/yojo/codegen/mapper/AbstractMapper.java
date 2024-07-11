@@ -155,8 +155,9 @@ public class AbstractMapper {
     private void fillMapProperties(VariableProperties variableProperties, Map<String, Object> currentSchema, Map<String, Object> schemas, Map<String, Object> propertiesMap, String commonPackage) {
         System.out.println();
         System.out.println("ADDITIONAL PROPERTIES");
-        String type = getStringValueIfExistOrElseNull(TYPE, castObjectToMap(propertiesMap.get(ADDITIONAL_PROPERTIES)));
-        String referencedObject = getStringValueIfExistOrElseNull(REFERENCE, castObjectToMap(propertiesMap.get(ADDITIONAL_PROPERTIES)));
+        Map<String, Object> additionalPropertiesMap = castObjectToMap(propertiesMap.get(ADDITIONAL_PROPERTIES));
+        String type = getStringValueIfExistOrElseNull(TYPE, additionalPropertiesMap);
+        String referencedObject = getStringValueIfExistOrElseNull(REFERENCE, additionalPropertiesMap);
         variableProperties.addRequiredImports(MAP_IMPORT);
         variableProperties.setRealisation(getStringValueIfExistOrElseNull(REALIZATION, propertiesMap));
         variableProperties.setValid(false);
@@ -165,17 +166,26 @@ public class AbstractMapper {
             System.out.println("CORRECT TYPE!");
             variableProperties.setType(format(MAP_TYPE, JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(type)));
         } else if (OBJECT.equals(type) && referencedObject == null) {
-            variableProperties.setType(format(MAP_TYPE, OBJECT_TYPE));
+            //Fill from Existing Object
+           if (getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap) != null) {
+               variableProperties.setType(format(MAP_TYPE, capitalize(getStringValueIfExistOrElseNull(NAME, additionalPropertiesMap))));
+               variableProperties.addRequiredImports(getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap)
+                       .concat(".")
+                       .concat(capitalize(getStringValueIfExistOrElseNull(NAME, additionalPropertiesMap)))
+                       .concat(";"));
+           } else {
+               variableProperties.setType(format(MAP_TYPE, OBJECT_TYPE));
+           }
             //Fill with custom object
         } else if (referencedObject != null && (schemas.containsKey(refReplace(referencedObject)) || currentSchema == schemas)) {
             String refObjectName = refReplace(referencedObject);
             System.out.println("FOUND CUSTOM OBJECT! " + refObjectName);
             if (ARRAY.equals(type)) {
-                String collectionType = getStringValueIfExistOrElseNull(FORMAT, castObjectToMap(propertiesMap.get(ADDITIONAL_PROPERTIES)));
+                String collectionType = getStringValueIfExistOrElseNull(FORMAT, additionalPropertiesMap);
                 if (collectionType != null) {
                     variableProperties.setCollectionType(collectionType);
                 }
-                String javaType = getStringValueIfExistOrElseNull(ADDITIONAL_FORMAT, castObjectToMap(propertiesMap.get(ADDITIONAL_PROPERTIES)));
+                String javaType = getStringValueIfExistOrElseNull(ADDITIONAL_FORMAT, additionalPropertiesMap);
                 if (javaType != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(javaType)) {
                     variableProperties.setItems(JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(javaType).toString());
                     fillCollectionType(variableProperties);
@@ -190,13 +200,20 @@ public class AbstractMapper {
                 variableProperties.setType(format(MAP_TYPE, refObjectName));
                 variableProperties.addRequiredImports(prepareImport(commonPackage, refObjectName));
             }
-        } else if (ARRAY.equals(type) && getStringValueIfExistOrElseNull(ADDITIONAL_FORMAT, castObjectToMap(propertiesMap.get(ADDITIONAL_PROPERTIES))) != null) {
-            String collectionType = getStringValueIfExistOrElseNull(FORMAT, castObjectToMap(propertiesMap.get(ADDITIONAL_PROPERTIES)));
+        } else if (ARRAY.equals(type) && getStringValueIfExistOrElseNull(ADDITIONAL_FORMAT, additionalPropertiesMap) != null) {
+            String collectionType = getStringValueIfExistOrElseNull(FORMAT, additionalPropertiesMap);
             if (collectionType != null) {
                 variableProperties.setCollectionType(collectionType);
             }
-            variableProperties.setItems(JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(getStringValueIfExistOrElseNull(ADDITIONAL_FORMAT, castObjectToMap(propertiesMap.get(ADDITIONAL_PROPERTIES)))).toString());
+            variableProperties.setItems(JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(getStringValueIfExistOrElseNull(ADDITIONAL_FORMAT, additionalPropertiesMap)).toString());
             fillCollectionType(variableProperties);
+            variableProperties.setType(format(MAP_TYPE, format(variableProperties.getType())));
+        } else if (ARRAY.equals(type) && getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap) != null) {
+            String collectionType = getStringValueIfExistOrElseNull(FORMAT, additionalPropertiesMap);
+            if (collectionType != null) {
+                variableProperties.setCollectionType(collectionType);
+            }
+            fillCollectionWithExistingObject(variableProperties, additionalPropertiesMap);
             variableProperties.setType(format(MAP_TYPE, format(variableProperties.getType())));
         }
         System.out.println();
