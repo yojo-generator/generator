@@ -298,16 +298,25 @@ public class AbstractMapper {
             fillCollectionType(variableProperties);
         } else {
             if (getStringValueIfExistOrElseNull(FORMAT, items) != null || getStringValueIfExistOrElseNull(TYPE, items) != null) {
-                //Fill java format atributes array
                 if (getStringValueIfExistOrElseNull(FORMAT, items) != null) {
-                    variableProperties.setItems(items.get(FORMAT).toString());
-                    variableProperties.setFormat(items.get(FORMAT).toString());
+                    if (getStringValueIfExistOrElseNull(FORMAT, items).equals(EXISTING)) {
+                        fillCollectionWithExistingObject(variableProperties, items);
+                    } else {
+                        //Fill java format atributes array
+                        variableProperties.setItems(items.get(FORMAT).toString());
+                        variableProperties.setFormat(items.get(FORMAT).toString());
+                    }
                 } else {
                     if (getStringValueIfExistOrElseNull(PROPERTIES, items) != null) {
                         fillObjectProperties(schemaName, variableProperties, schemas, propertyName, items, processContext.getCommonPackage(), innerSchemas);
+                        variableProperties.setType(format(LIST_TYPE, variableProperties.getType()));
                     } else {
-                        variableProperties.setItems(items.get(TYPE).toString());
-                        variableProperties.setFormat(items.get(TYPE).toString());
+                        if (getStringValueIfExistOrElseNull(PACKAGE, items) != null) {
+                            fillCollectionWithExistingObject(variableProperties, items);
+                        } else {
+                            variableProperties.setItems(items.get(TYPE).toString());
+                            variableProperties.setFormat(items.get(TYPE).toString());
+                        }
                     }
                 }
             } else {
@@ -321,6 +330,17 @@ public class AbstractMapper {
                 !OBJECT_TYPE.equals(variableProperties.getItems()) && !javaType) {
             variableProperties.addRequiredImports(prepareImport(processContext.getCommonPackage(), variableProperties.getItems()));
         }
+    }
+
+    private static void fillCollectionWithExistingObject(VariableProperties variableProperties, Map<String, Object> items) {
+        variableProperties.setItems(getStringValueIfExistOrElseNull(NAME, items));
+        variableProperties.setPackageOfExisingObject(getStringValueIfExistOrElseNull(PACKAGE, items));
+        variableProperties.setNameOfExisingObject(getStringValueIfExistOrElseNull(NAME, items));
+        variableProperties.addRequiredImports(variableProperties.getPackageOfExisingObject()
+                .concat(".")
+                .concat(capitalize(variableProperties.getNameOfExisingObject()))
+                .concat(";"));
+        fillCollectionType(variableProperties);
     }
 
     private void fillInnerSchema(VariableProperties variableProperties,

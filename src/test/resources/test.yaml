@@ -400,6 +400,20 @@ components:
                 format: existing
                 name: ClassForExtending
                 package: testGenerate
+        listOfExistingObject:
+          type: array
+          items:
+            type: object
+            name: ClassForExtending
+            package: testGenerate
+        setOfExistingObject:
+          type: array
+          format: set
+          items:
+            type: object
+            format: existing
+            name: ClassForExtending
+            package: testGenerate
         #same name of existing class
         innerSchema:
           type: array
