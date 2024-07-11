@@ -344,7 +344,9 @@ public class AbstractMapper {
         }
         if (variableProperties.getItems() != null &&
                 !JAVA_DEFAULT_TYPES.contains(variableProperties.getItems()) &&
-                !OBJECT_TYPE.equals(variableProperties.getItems()) && !javaType) {
+                !OBJECT_TYPE.equals(variableProperties.getItems()) && !javaType &&
+                getStringValueIfExistOrElseNull(PACKAGE, items) == null
+        ) {
             variableProperties.addRequiredImports(prepareImport(processContext.getCommonPackage(), variableProperties.getItems()));
         }
     }
