@@ -59,6 +59,7 @@ public class AbstractMapper {
         variableProperties.setEnumNames(getStringValueIfExistOrElseNull(X_ENUM_NAMES, propertiesMap));
         variableProperties.setPackageOfExisingObject(getStringValueIfExistOrElseNull(PACKAGE, propertiesMap));
         variableProperties.setNameOfExisingObject(getStringValueIfExistOrElseNull(NAME, propertiesMap));
+        variableProperties.setOriginalEnumName(propertyName);
         variableProperties.setPolymorph(
                 !POLYMORPHS.stream()
                         .map(p -> propertiesMap.get(p))

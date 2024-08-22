@@ -9,6 +9,7 @@ import ru.yojo.codegen.domain.schema.Schema;
 import ru.yojo.codegen.exception.SchemaFillException;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class SchemaMapper extends AbstractMapper {
     public List<Schema> mapSchemasToObjects(ProcessContext processContext) {
         helper.setIsMappedFromSchemas(true);
         List<Schema> schemaList = new ArrayList<>();
-        Map<String, Object> innerSchemas = new LinkedHashMap<>();
+        Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
         processContext.getSchemasMap().forEach((schemaName, schemaValues) -> {
             LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(processContext.getLombokProperties());
             System.out.println("START MAPPING OF SCHEMA: " + schemaName);

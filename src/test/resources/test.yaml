@@ -283,6 +283,20 @@ components:
                  * «SUCCESS» - Ok
                  * «DECLINE» - Decline
                  * «ERROR» - Error
+
+        innerEnumWithoutDescriptionSmall:
+          type: object
+          enum:
+            - success
+            - decline
+            - error
+          description: |
+            Result of request
+                 * <p>
+                 * Supported values:
+                 * «success» - Ok
+                 * «decline» - Decline
+                 * «error» - Error
         enumResultWithDescription:
           type: object
           $ref: '#/components/schemas/EnumResultWithDescription'
@@ -831,6 +845,20 @@ components:
              * «SUCCESS» - Ok
              * «DECLINE» - Decline
              * «ERROR» - Error
+
+    EnumResultWithoutDescriptionSmall:
+      type: object
+      enum:
+        - success
+        - decline
+        - error
+      description: |
+        Result of request
+             * <p>
+             * Supported values:
+             * «success» - Ok
+             * «decline» - Decline
+             * «error» - Error
 
     StandaloneDate:
       type: string

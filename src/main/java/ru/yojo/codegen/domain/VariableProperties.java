@@ -101,6 +101,11 @@ public class VariableProperties {
 
     private boolean isEnum = false;
 
+    /**
+     * When in contract starts from small character - will generate small enum
+     */
+    private String originalEnumName;
+
     private boolean valid = true;
     /**
      * Property used to generate simple variable
@@ -191,6 +196,14 @@ public class VariableProperties {
 
     public void setEnum(boolean anEnum) {
         isEnum = anEnum;
+    }
+
+    public String getOriginalEnumName() {
+        return originalEnumName;
+    }
+
+    public void setOriginalEnumName(String name) {
+        originalEnumName = name;
     }
 
     public void setEnumeration(String enumeration) {

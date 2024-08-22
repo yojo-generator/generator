@@ -8,6 +8,7 @@ import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.message.Message;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static ru.yojo.codegen.constants.Dictionary.*;
@@ -30,7 +31,7 @@ public class MessageMapper extends AbstractMapper {
     }
 
     /**
-     * @param processContext     processContext
+     * @param processContext processContext
      * @return list of prepared messages
      */
     public List<Message> mapMessagesToObjects(ProcessContext processContext) {
@@ -194,7 +195,7 @@ public class MessageMapper extends AbstractMapper {
             propertiesMap.forEach((propertyName, propertyValue) -> {
 
                 VariableProperties mvp = new VariableProperties();
-                Map<String, Object> innerSchemas = new LinkedHashMap<>();
+                Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
 
                 fillProperties(messageName, mvp, payload, payload, propertyName, castObjectToMap(propertyValue), processContext, innerSchemas);
 
@@ -218,7 +219,7 @@ public class MessageMapper extends AbstractMapper {
                 SchemaMapper schemaMapper = new SchemaMapper(helper);
 
                 Set<String> requiredPropertiesSet = getSetValueIfExistsOrElseEmptySet(REQUIRED, schema);
-                Map<String, Object> innerSchemas = new LinkedHashMap<>();
+                Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
                 parameters = schemaMapper.getSchemaVariableProperties(schemaName,
                         schema, processContext.getSchemasMap(), castObjectToMap(schema.get(PROPERTIES)), processContext, innerSchemas);
                 removeSchemas.add(schemaName);

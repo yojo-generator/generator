@@ -81,7 +81,10 @@ public class FillParameters {
                 } else {
                     stringBuilder.append(lineSeparator())
                             .append(TABULATION)
-                            .append(variableProperties.get(i).getType())
+                            .append(variableProperties.get(i).getEnumeration() != null
+                                    && Character.isLowerCase(variableProperties.get(i).getOriginalEnumName().charAt(0)) ?
+                                    variableProperties.get(i).getOriginalEnumName() :
+                                    variableProperties.get(i).getType())
                             .append(i == variableProperties.size() - 1 ? ";" : ",")
                             .toString();
                 }
