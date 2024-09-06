@@ -25,6 +25,8 @@ public class Message {
     private Set<String> implementsFrom = new HashSet<>();
     private Set<String> importSet = new HashSet<>();
 
+    private String pathForGenerateMessage;
+
     public void setLombokProperties(LombokProperties lombokProperties) {
         this.lombokProperties = lombokProperties;
     }
@@ -52,6 +54,7 @@ public class Message {
     public String getExtendsFrom() {
         return extendsFrom;
     }
+
     public void setExtendsFrom(String extendsFrom) {
         this.extendsFrom = extendsFrom;
     }
@@ -74,6 +77,14 @@ public class Message {
 
     public Set<String> getImportSet() {
         return importSet;
+    }
+
+    public String getPathForGenerateMessage() {
+        return pathForGenerateMessage;
+    }
+
+    public void setPathForGenerateMessage(String pathForGenerateMessage) {
+        this.pathForGenerateMessage = pathForGenerateMessage;
     }
 
     public String toWrite() {

@@ -50,6 +50,7 @@ public class MessageMapper extends AbstractMapper {
 
             Map<String, Object> payloadMap = castObjectToMap(messageMap.get(PAYLOAD));
             String refObject = getStringValueIfExistOrElseNull(REFERENCE, payloadMap);
+            message.setPathForGenerateMessage(getStringValueIfExistOrElseNull("pathForGenerateMessage", payloadMap));
 
             //see extendsAndImplFilling method
             AtomicBoolean needToFill = new AtomicBoolean(true);

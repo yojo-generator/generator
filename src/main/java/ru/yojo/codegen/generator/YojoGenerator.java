@@ -25,7 +25,9 @@ import static java.lang.System.lineSeparator;
 import static ru.yojo.codegen.constants.Dictionary.*;
 import static ru.yojo.codegen.mapper.AbstractMapper.fillMessageFromChannel;
 import static ru.yojo.codegen.util.LogUtils.*;
-import static ru.yojo.codegen.util.MapperUtil.*;
+import static ru.yojo.codegen.util.MapperUtil.castObjectToMap;
+import static ru.yojo.codegen.util.MapperUtil.getStringValueIfExistOrElseNull;
+import static ru.yojo.codegen.util.RefParser.getParsedReference;
 
 /**
  * POJO Generator
@@ -50,7 +52,6 @@ public class YojoGenerator implements Generator {
 
     /**
      * Method for generating from all files in directory with spring boot version
-     *
      *
      * @param yojoContext Context with all properties
      */
@@ -141,12 +142,11 @@ public class YojoGenerator implements Generator {
     }
 
     /**
-     *
      * @param processContext Context with all properties
      */
     private void process(ProcessContext processContext) {
         String outputDirectoryName = new File(processContext.getFilePath()).getName().replaceAll("\\..*", "");
-        if (!processContext.getOutputDirectory().endsWith("/"))  {
+        if (!processContext.getOutputDirectory().endsWith("/")) {
             processContext.setOutputDirectory(processContext.getOutputDirectory() + DELIMITER);
         }
         processContext.setOutputDirectoryName(outputDirectoryName);
@@ -217,7 +217,7 @@ public class YojoGenerator implements Generator {
      *
      * @param processContext Context with all properties
      */
-    private void processSchemas(ProcessContext processContext)   {
+    private void processSchemas(ProcessContext processContext) {
         System.out.println(LOG_DELIMETER);
         List<Schema> schemaList =
                 schemaMapper.mapSchemasToObjects(processContext);
@@ -237,7 +237,7 @@ public class YojoGenerator implements Generator {
      *
      * @param processContext Context with all properties
      */
-    private void processMessages(ProcessContext processContext)  {
+    private void processMessages(ProcessContext processContext) {
         System.out.println(ANSI_CYAN + LOG_DELIMETER);
         List<Message> messageList =
                 messageMapper.mapMessagesToObjects(processContext);
@@ -325,8 +325,11 @@ public class YojoGenerator implements Generator {
                         String contentFromSeparatedFile;
                         try {
                             String line = entry.getValue();
+                            String path = line.replace("$ref:", "").trim()
+                                    .replace("'", "").replace("\"", "");
+                            List<String> parsedReference = getParsedReference(path);
                             contentFromSeparatedFile = new String(Files.readAllBytes(Paths.get(
-                                    new File(file.getParent() + line.substring(line.indexOf(".") + 1, line.indexOf("#"))).getPath())));
+                                    new File(file.getParent() + parsedReference.get(0)).getPath())));
                         } catch (IOException e) {
                             throw new RuntimeException(e);
                         }
@@ -347,8 +350,15 @@ public class YojoGenerator implements Generator {
      */
     private void writeMessages(String outputDirectory, String outputDirectoryName, List<Message> messageList) {
         messageList.forEach(message -> {
-            //Create a file by the name of a specific message and write then
-            String messagesPath = String.join(DELIMITER, outputDirectory, "messages") + DELIMITER;
+            String messagesPath;
+            if (message.getPathForGenerateMessage() != null) {
+                String preparePath = message.getPathForGenerateMessage().replaceAll("\\.", DELIMITER);
+                messagesPath = String.join(DELIMITER, preparePath) + DELIMITER;
+                message.setMessagePackageName(message.getPathForGenerateMessage().concat(";"));
+            } else {
+                //Create a file by the name of a specific message and write then
+                messagesPath = String.join(DELIMITER, outputDirectory, "messages") + DELIMITER;
+            }
             writeFile(messagesPath, message.getMessageName(), message.toWrite());
         });
     }
