@@ -1,0 +1,408 @@
+asyncapi: 2.0.0
+info:
+  title: Account Service
+  version: 1.0.0
+  description: "This service is test example of properties, which yojo can understand :rocket:"
+channels:
+  Request:
+    subscribe:
+      message:
+        $ref: '#/components/messages/RequestDtoByRef'
+#  PolymorphMessage:
+#    subscribe:
+#      message:
+#        payload:
+#          oneOf:
+#            - $ref: '#/components/schemas/PolymorphExampleOne'
+#            - $ref: '#/components/schemas/PolymorphExampleTwo'
+#    publish:
+#      message:
+#        payload:
+#          oneOf:
+#            - $ref: '#/components/schemas/PolymorphExampleThree'
+#            - $ref: '#/components/schemas/PolymorphExampleFour'
+components:
+  messages:
+    RequestDtoByRef:
+      payload:
+        pathForGenerateMessage: 'ru.gpb.rkk2.integrations.dto.myservice.request'
+        #If you use this way of contract, yojo does not generate referenced object
+        $ref: '#/components/schemas/RequestDtoSchema'
+    RequestDtoByRefAndProperties:
+      payload:
+        $ref: '#/components/schemas/RequestDtoSchema'
+        properties:
+          someString:
+            type: String
+    RequestDtoWithProperties:
+      payload:
+        lombok:
+          accessors:
+            chain: true
+          equalsAndHashCode:
+            enable: true
+        properties:
+          someString:
+            type: string
+    RequestDtoWithDoubleInheritance:
+      payload:
+        lombok:
+          accessors:
+            chain: true
+          equalsAndHashCode:
+            enable: true
+            callSuper: true
+        $ref: '#/components/schemas/RequestDtoSchema'
+        implements:
+          fromInterface:
+            - testGenerate.InterfaceForImpl
+            - testGenerate.InterfaceForImpl2
+        extends:
+          fromClass: ClassForExtends
+          fromPackage: testGenerate.test.common
+    RequestDtoInheritanceFromSchema:
+      payload:
+        $ref: '#/components/schemas/RequestDtoSchema'
+        extends:
+          fromClass: RequestDtoSchema
+          fromPackage: testGenerate.test.common
+  schemas:
+    PolymorphExampleOne:
+      type: object
+      properties:
+        status:
+          type: string
+    PolymorphExampleTwo:
+      type: object
+      properties:
+        status:
+          type: string
+        someField:
+          type: integer
+    PolymorphExampleThree:
+      allOf:
+        - $ref: '#/components/schemas/ExampleOne'
+        - $ref: '#/components/schemas/ExampleTwo'
+    PolymorphExampleFour:
+      allOf:
+        - $ref: '#/components/schemas/ExampleOne'
+        - $ref: '#/components/schemas/ExampleTwo'
+        - type: object
+      properties:
+        oneMoreField:
+          type: boolean
+    ExampleOne:
+      type: object
+      properties:
+        status:
+          type: string
+    ExampleTwo:
+      type: object
+      properties:
+        status:
+          type: string
+        someField:
+          type: integer
+    ExampleThree:
+      allOf:
+        - $ref: '#/components/schemas/ExampleOne'
+        - $ref: '#/components/schemas/ExampleTwo'
+        - $ref: '#/components/schemas/ExampleFour'
+      type: object
+      properties:
+        oneMoreField:
+          type: boolean
+    ExampleFour:
+      allOf:
+        - $ref: '#/components/schemas/ExampleFive'
+      type: object
+      properties:
+        fromFour:
+          type: boolean
+    ExampleFive:
+      allOf:
+        - $ref: '#/components/schemas/RequestDtoSchema'
+      type: object
+      properties:
+        oneMoreField:
+          type: boolean
+        fromFive:
+          type: string
+    RequestDtoSchema:
+      type: object
+      lombok:
+        accessors:
+          enable: false
+      equalsAndHashCode:
+        enable: true
+      description: RequestExample
+      implements:
+        fromInterface:
+          - testGenerate.InterfaceForImpl
+          - testGenerate.InterfaceForImpl2
+      extends:
+        fromClass: ClassForExtends
+        fromPackage: testGenerate.test.common
+      #Validation Groups was added for backward compatibility. Must be used with required.
+      #validationGroups contains name of Class
+#      validationGroups:
+#        - ApplicationValidation.Application.class
+#      #validationGroupsImports contains import of Class
+#      validationGroupsImports:
+#        - ru.yojo.codegen.validation.ApplicationValidation
+#      #validateByGroups contains name of fields, which yojo will mark with annotation NotBlank, NotNull etc.
+#      #with params (groups = {Some.class})
+#      validateByGroups:
+#        - requestType
+#        - isTwoCities
+#        - collectionTypes
+#        - integerValidationField
+#        - uuidValidationList
+      required:
+        - requestType
+        - realEstateCost
+        - isTwoCities
+        - collectionTypes
+        - integerValidationField
+        - uuidValidationList
+      properties:
+        polymorph:
+          oneOf:
+            - $ref: '#/components/schemas/PolymorphExampleOne'
+            - $ref: '#/components/schemas/PolymorphExampleTwo'
+        polymorphWithInsidePolymorph:
+          type: object
+          $ref: '#/components/schemas/PolymorphExampleThree'
+        primitives:
+          type: object
+          description: Here was located all supported primitives
+          $ref: './primitives.yaml#/components/schemas/Primitives'
+        objectTypes:
+          type: object
+          description: Here was located all supported object types
+          $ref: './objectTypes.yaml#/components/schemas/ObjectTypes'
+        collectionTypes:
+          type: array
+          description: Here was located all supported collections
+          items:
+            #Attribute Type object is required attribute if you use separated contract
+            type: object
+            $ref: './collectionTypes.yaml#/components/schemas/CollectionTypes'
+        integerValidationField:
+          type: integer
+        uuidValidationList:
+          type: array
+          items:
+            format: uuid
+        innerSchema:
+          type: object
+          properties:
+            someString:
+              type: string
+        mapStringInteger:
+          type: object
+          description: Map generation Example
+          additionalProperties:
+            type: integer
+        mapStringObject:
+          type: object
+          description: Map generation Example
+          additionalProperties:
+            type: object
+        mapStringObjectWithHashMap:
+          type: object
+          description: Map generation Example
+          realization: HashMap
+          additionalProperties:
+            type: object
+        mapStringObjectWithLinkedHashMap:
+          type: object
+          description: Map generation Example
+          realization: LinkedHashMap
+          additionalProperties:
+            type: object
+        mapStringCustomObject:
+          type: object
+          description: Map generation Example
+          additionalProperties:
+            $ref: '#/components/schemas/SomeObject'
+        mapStringExistingObject:
+          type: string
+          description: Map generation Example
+          additionalProperties:
+            type: object
+            format: existing
+            name: ClassForExtending
+            package: testGenerate
+        mapStringSetOfCustomObject:
+          type: object
+          description: Map generation Example
+          additionalProperties:
+            type: array
+            format: set
+            $ref: '#/components/schemas/SomeObject'
+        mapStringSetOfStrings:
+          type: object
+          description: Map generation Example
+          additionalProperties:
+            type: array
+            format: set
+            additionalFormat: string
+        mapStringSetOfExistingObject:
+          type: object
+          description: Map generation Example
+          additionalProperties:
+            type: array
+            format: set
+            name: ClassForExtending
+            package: testGenerate
+        innerEnumWithDescription:
+          type: object
+          enum:
+            - SUCCESS
+            - DECLINE
+            - ERROR
+          x-enumNames:
+            SUCCESS: Success value
+            DECLINE: Decline value
+            ERROR: Error value
+          description: |
+            Result of request
+                 * <p>
+                 * Supported values:
+                 * «SUCCESS» - Ok
+                 * «DECLINE» - Decline
+                 * «ERROR» - Error
+        innerEnumWithoutDescription:
+          type: object
+          enum:
+            - SUCCESS
+            - DECLINE
+            - ERROR
+          description: |
+            Result of request
+                 * <p>
+                 * Supported values:
+                 * «SUCCESS» - Ok
+                 * «DECLINE» - Decline
+                 * «ERROR» - Error
+
+        innerEnumWithoutDescriptionSmall:
+          type: object
+          enum:
+            - success
+            - decline
+            - error
+          description: |
+            Result of request
+                 * <p>
+                 * Supported values:
+                 * «success» - Ok
+                 * «decline» - Decline
+                 * «error» - Error
+        enumResultWithDescription:
+          type: object
+          $ref: '#/components/schemas/EnumResultWithDescription'
+        enumResultWithoutDescription:
+          type: object
+          $ref: '#/components/schemas/EnumResultWithoutDescription'
+        someObject:
+          type: object
+          $ref: '#/components/schemas/SomeObject'
+
+    SomeObject:
+      type: object
+      lombok:
+        accessors:
+          chain: true
+        equalsAndHashCode:
+          enable: true
+          callSuper: false
+      extends:
+        fromClass: ClassForExtends
+        fromPackage: testGenerate.test.common
+      properties:
+        someInteger:
+          type: integer
+        #same name of existing class
+        innerSchema:
+          type: object
+          properties:
+            someString:
+              type: string
+            someExistingObject:
+              type: object
+              name: ClassForExtending
+              package: testGenerate
+
+    SomeObjectImpl:
+      type: object
+      implements:
+        fromInterface:
+          - testGenerate.InterfaceForImpl
+      properties:
+        someInteger:
+          type: integer
+
+    StandAloneExtendsObject:
+      type: object
+      extends:
+        fromClass: ClassForExtending
+        fromPackage: testGenerate
+
+    EnumResultWithDescription:
+      type: object
+      enum:
+        - SUCCESS
+        - DECLINE
+        - ERROR
+      x-enumNames:
+        SUCCESS: Success value
+        DECLINE: Decline value
+        ERROR: Error value
+      description: |
+        Result of request
+             * <p>
+             * Supported values:
+             * «SUCCESS» - Ok
+             * «DECLINE» - Decline
+             * «ERROR» - Error
+
+
+    EnumResultWithoutDescription:
+      type: object
+      enum:
+        - SUCCESS
+        - DECLINE
+        - ERROR
+      description: |
+        Result of request
+             * <p>
+             * Supported values:
+             * «SUCCESS» - Ok
+             * «DECLINE» - Decline
+             * «ERROR» - Error
+
+    EnumResultWithoutDescriptionSmall:
+      type: object
+      enum:
+        - success
+        - decline
+        - error
+      description: |
+        Result of request
+             * <p>
+             * Supported values:
+             * «success» - Ok
+             * «decline» - Decline
+             * «error» - Error
+
+    ClassForExtends:
+      type: object
+      description: This Class just fo Example of extends after generate
+      lombok:
+        accessors:
+          chain: true
+      properties:
+        someString:
+          type: string

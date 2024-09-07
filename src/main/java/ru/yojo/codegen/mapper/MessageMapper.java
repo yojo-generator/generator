@@ -183,6 +183,7 @@ public class MessageMapper extends AbstractMapper {
                                              LombokProperties lombokProperties) {
         FillParameters parameters = new FillParameters();
         helper.setIsMappedFromMessages(true);
+        helper.setIsMappedFromSchemas(false);
         if (payload.containsKey(LOMBOK)) {
             Map<String, Object> lombokProps = castObjectToMap(payload.get(LOMBOK));
             fillLombokAccessors(lombokProperties, lombokProps);

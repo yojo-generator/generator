@@ -119,6 +119,7 @@ public class Message {
             }
             buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder);
         }
+
         if (!lombokProperties.enableLombok()) {
             fillParameters.getVariableProperties().forEach(vp -> {
                 String reference = vp.getReference();
