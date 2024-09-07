@@ -17,17 +17,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static java.lang.System.lineSeparator;
 import static ru.yojo.codegen.constants.Dictionary.*;
 import static ru.yojo.codegen.mapper.AbstractMapper.fillMessageFromChannel;
 import static ru.yojo.codegen.util.LogUtils.*;
 import static ru.yojo.codegen.util.MapperUtil.castObjectToMap;
 import static ru.yojo.codegen.util.MapperUtil.getStringValueIfExistOrElseNull;
-import static ru.yojo.codegen.util.RefParser.getParsedReference;
 
 /**
  * POJO Generator
@@ -66,12 +64,33 @@ public class YojoGenerator implements Generator {
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
-                            content = getContent(file, content);
+                            String pathByDirectory = yojoContext.getDirectory().replaceAll("/", "\\\\");
+                            String substring = file.getPath().substring(pathByDirectory.length());
+                            // Find the index of the last occurrence of the backslash
+                            int lastIndex = substring.lastIndexOf('\\');
+                            String modifiedString = "";
+                            if (lastIndex != -1) {
+                                // Extract the substring up to the last backslash
+                                modifiedString = substring.substring(0, lastIndex);
+
+                                // Replace backslashes with forward slashes
+                                modifiedString = modifiedString.replace('\\', '/');
+
+                                // Remove the leading slash if it exists
+                                if (modifiedString.startsWith("/")) {
+                                    modifiedString = modifiedString.substring(1);
+                                }
+                            }
+                            String packageLocation = modifiedString.isBlank() ?
+                                    yojoContext.getPackageLocation() :
+                                    String.join(".", yojoContext.getPackageLocation(), modifiedString.replace("/", "."));
+                            content = getContent(content, packageLocation);
+
                             if (content.startsWith("asyncapi")) {
                                 ProcessContext processContext = new ProcessContext(new Yaml().load(content));
                                 processContext.setFilePath(file.getPath());
-                                processContext.setOutputDirectory(yojoContext.getOutputDirectory());
-                                processContext.setPackageLocation(yojoContext.getPackageLocation());
+                                processContext.setOutputDirectory(yojoContext.getOutputDirectory() + modifiedString.replace('\\', '/'));
+                                processContext.setPackageLocation(packageLocation);
                                 processContext.setLombokProperties(yojoContext.getLombokProperties());
                                 processContext.setSpringBootVersion(yojoContext.getSpringBootVersion());
                                 process(processContext);
@@ -104,12 +123,32 @@ public class YojoGenerator implements Generator {
                             } catch (IOException e) {
                                 throw new RuntimeException(e);
                             }
-                            content = getContent(file, content);
+                            String pathByDirectory = directory.replaceAll("/", "\\\\");
+                            String substring = file.getPath().substring(pathByDirectory.length());
+                            // Find the index of the last occurrence of the backslash
+                            int lastIndex = substring.lastIndexOf('\\');
+                            String modifiedString = "";
+                            if (lastIndex != -1) {
+                                // Extract the substring up to the last backslash
+                                modifiedString = substring.substring(0, lastIndex);
+
+                                // Replace backslashes with forward slashes
+                                modifiedString = modifiedString.replace('\\', '/');
+
+                                // Remove the leading slash if it exists
+                                if (modifiedString.startsWith("/")) {
+                                    modifiedString = modifiedString.substring(1);
+                                }
+                            }
+                            String packageLoc = modifiedString.isBlank() ?
+                                    packageLocation :
+                                    String.join(".", packageLocation, modifiedString.replace("/", "."));
+                            content = getContent(content, packageLocation);
                             if (content.startsWith("asyncapi")) {
                                 ProcessContext processContext = new ProcessContext(new Yaml().load(content));
                                 processContext.setFilePath(file.getPath());
-                                processContext.setOutputDirectory(outputDirectory);
-                                processContext.setPackageLocation(packageLocation);
+                                processContext.setOutputDirectory(outputDirectory + modifiedString.replace('\\', '/'));
+                                processContext.setPackageLocation(packageLoc);
                                 processContext.setLombokProperties(lombokProperties);
                                 processContext.setSpringBootVersion("2");
 
@@ -301,7 +340,6 @@ public class YojoGenerator implements Generator {
         System.out.println();
     }
 
-
     /**
      * Method checks and return connected yaml
      *
@@ -309,40 +347,58 @@ public class YojoGenerator implements Generator {
      * @param content Content from Yaml file
      * @return content
      */
-    private static String getContent(File file, String content) {
-        if (content.contains("./")) {
-            System.out.println("FOUND SEPARATED CONTRACT! " + file.getName());
-            List<String> contentByLines = content.lines().collect(Collectors.toList());
+    private static String getContent(String content, String packageLocation) {
+        // Regular expression to find the line with $ref, including indentation
+        String regex = "\\s*\\$ref:\\s*['\"](\\./[^'\"]*\\.yaml)(?:#/(.*))?['\"]";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(content);
 
-            AtomicInteger lineNumber = new AtomicInteger();
-            content.lines()
-                    //key - number of line, value - line with content
-                    .collect(Collectors.toMap(line -> lineNumber.incrementAndGet(), Function.identity()))
-                    .entrySet().stream()
-                    //try to find reference to other contract
-                    .filter(entry -> entry.getValue().contains("./"))
-                    .forEach(entry -> {
-                        String contentFromSeparatedFile;
-                        try {
-                            String line = entry.getValue();
-                            String path = line.replace("$ref:", "").trim()
-                                    .replace("'", "").replace("\"", "");
-                            List<String> parsedReference = getParsedReference(path);
-                            contentFromSeparatedFile = new String(Files.readAllBytes(Paths.get(
-                                    new File(file.getParent() + parsedReference.get(0)).getPath())));
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                        contentByLines.remove(entry.getKey() - 1);
-                        contentByLines.remove(entry.getKey() - 2);
-                        contentByLines.addAll(entry.getKey() - 2, contentFromSeparatedFile.lines()
-                                .map(l -> TABULATION + l)
-                                .collect(Collectors.toList()));
-                    });
-            content = String.join(lineSeparator(), contentByLines);
+        StringBuilder modifiedContent = new StringBuilder();
+        int lastEnd = 0;
+
+        // Check if a match is found
+        while (matcher.find()) {
+            // Add the part of the string before the match
+            modifiedContent.append(content, lastEnd, matcher.start());
+
+            // Extract the class name from the fragment
+            String className = matcher.group(2); // Get the fragment if it exists
+            if (className != null) {
+                className = className.substring(className.lastIndexOf('/') + 1);
+            }
+            String pathName = matcher.group(1).replace("./", "").replace(".yaml", ""); // If there is no fragment, use the file name
+
+
+            // Determine the indentation from the original line
+            String originalLine = matcher.group(0); // Includes indentation
+            String indentation = originalLine.substring(0, originalLine.indexOf("$ref:")); // Get the indentation
+
+            // Form the new line with the correct indentation
+            String replaceName = String.format("%sname: %s", indentation, className);
+            String replacePackage = String.format("%spackage: %s", indentation,
+                    packageLocation.isBlank() ? pathName : packageLocation + "." + toLowerCaseFirstChar(pathName) + "." + "common");
+
+            // Add the new line to the result
+            modifiedContent.append(replaceName).append("\n").append(replacePackage).append("\n");
+
+            // Update the end of the last match
+            lastEnd = matcher.end();
         }
-        return content;
+
+        // Add the remaining part of the string after the last match
+        modifiedContent.append(content.substring(lastEnd));
+
+        return modifiedContent.toString();
     }
+
+    public static String toLowerCaseFirstChar(String input) {
+        if (input == null || input.isEmpty()) {
+            return input; // return null or Empty String
+        }
+        // Convert the first character to lowercase and concatenate it with the rest of the string
+        return input.substring(0, 1).toLowerCase() + input.substring(1);
+    }
+
 
     /**
      * @param outputDirectory output directory for pojos

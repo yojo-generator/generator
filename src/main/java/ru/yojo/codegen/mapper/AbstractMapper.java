@@ -150,6 +150,7 @@ public class AbstractMapper {
             return commonPackage.replace(";", "." + className + ";");
         } else {
             return null;
+//            return commonPackage.replace(";", ".*;");
         }
     }
 
@@ -168,15 +169,15 @@ public class AbstractMapper {
             variableProperties.setType(format(MAP_TYPE, JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(type)));
         } else if (OBJECT.equals(type) && referencedObject == null) {
             //Fill from Existing Object
-           if (getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap) != null) {
-               variableProperties.setType(format(MAP_TYPE, capitalize(getStringValueIfExistOrElseNull(NAME, additionalPropertiesMap))));
-               variableProperties.addRequiredImports(getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap)
-                       .concat(".")
-                       .concat(capitalize(getStringValueIfExistOrElseNull(NAME, additionalPropertiesMap)))
-                       .concat(";"));
-           } else {
-               variableProperties.setType(format(MAP_TYPE, OBJECT_TYPE));
-           }
+            if (getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap) != null) {
+                variableProperties.setType(format(MAP_TYPE, capitalize(getStringValueIfExistOrElseNull(NAME, additionalPropertiesMap))));
+                variableProperties.addRequiredImports(getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap)
+                        .concat(".")
+                        .concat(capitalize(getStringValueIfExistOrElseNull(NAME, additionalPropertiesMap)))
+                        .concat(";"));
+            } else {
+                variableProperties.setType(format(MAP_TYPE, OBJECT_TYPE));
+            }
             //Fill with custom object
         } else if (referencedObject != null && (schemas.containsKey(refReplace(referencedObject)) || currentSchema == schemas)) {
             String refObjectName = refReplace(referencedObject);

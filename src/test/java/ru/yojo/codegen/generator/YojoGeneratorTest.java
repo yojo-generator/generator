@@ -24,13 +24,13 @@ class YojoGeneratorTest {
     @Test
     @SuppressWarnings("all")
     void generateTest() {
-        yojoGenerator.generate("src/test/resources/test.yaml",
-                "src/test/resources/testGenerate/",
+        yojoGenerator.generate("src/test/resources/example/test.yaml",
+                "src/test/resources/example/testGenerate/",
                 "testGenerate",
                 new LombokProperties(false,
                         true,
                         new Accessors(true, true, true)));
-        File file = new File("src/test/resources/testGenerate/test");
+        File file = new File("src/test/resources/example/testGenerate/test");
         Assertions.assertTrue(file.listFiles().length != 0);
         //cleanUp
         Assertions.assertTrue(FileSystemUtils.deleteRecursively(file));
@@ -39,9 +39,9 @@ class YojoGeneratorTest {
     @Test
     void generateAllWithSpringBootVersion() throws IOException {
         YojoContext yojoContext = new YojoContext();
-        yojoContext.setSpringBootVersion("3.0.0");
-        yojoContext.setDirectory("src/test/resources/");
-        yojoContext.setOutputDirectory("src/test/resources/testGenerate/");
+        yojoContext.setSpringBootVersion("2.0.0");
+        yojoContext.setDirectory("src/test/resources/example");
+        yojoContext.setOutputDirectory("src/test/resources/example/testGenerate/");
         yojoContext.setPackageLocation("testGenerate");
         yojoContext.setLombokProperties(new LombokProperties(false,
                 true,
@@ -49,7 +49,7 @@ class YojoGeneratorTest {
 
         yojoGenerator.generateAll(yojoContext);
 
-        File file = new File("src/test/resources/testGenerate/test");
+        File file = new File("src/test/resources/example/testGenerate/");
         Assertions.assertTrue(file.exists());
         //cleanUp
         Assertions.assertTrue(FileSystemUtils.deleteRecursively(file));
@@ -57,10 +57,10 @@ class YojoGeneratorTest {
 
     @Test
     void generateAll() throws IOException {
-        yojoGenerator.generateAll("src/test/resources/", "src/test/resources/testGenerate/", "testGenerate", new LombokProperties(false,
+        yojoGenerator.generateAll("src/test/resources/example/", "src/test/resources/example/testGenerate", "testGenerate", new LombokProperties(false,
                 true,
                 new Accessors(true, true, true)));
-        File file = new File("src/test/resources/testGenerate/test");
+        File file = new File("src/test/resources/example/testGenerate");
         Assertions.assertTrue(file.exists());
         //cleanUp
         Assertions.assertTrue(FileSystemUtils.deleteRecursively(file));
