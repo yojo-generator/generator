@@ -28,31 +28,9 @@ components:
         accessors:
           fluent: true
       description: Here was located all supported collections
-      required:
-        - listOfPrimitivesRequired
-        - setOfPrimitivesRequired
       properties:
 
         #LIST
-        listOfPrimitives:
-          type: array
-          items:
-            #Attribute Type object is required attribute if you use separated contract
-            type: object
-            $ref: './primitives.yaml#/components/schemas/Primitives'
-        listOfPrimitivesRequired:
-          type: array
-          items:
-            #Attribute Type object is required attribute if you use separated contract
-            type: object
-            $ref: './primitives.yaml#/components/schemas/Primitives'
-        listOfPrimitivesWithRealization:
-          type: array
-          items:
-            #Attribute Type object is required attribute if you use separated contract
-            type: object
-            $ref: './primitives.yaml#/components/schemas/Primitives'
-            realization: LinkedList
         listOfDate:
           type: array
           items:
@@ -140,28 +118,6 @@ components:
                 package: testGenerate
 
         #SET
-        setOfPrimitives:
-          type: array
-          format: set
-          items:
-            #Attribute Type object is required attribute if you use separated contract
-            type: object
-            $ref: './primitives.yaml#/components/schemas/Primitives'
-        setOfPrimitivesRequired:
-          type: array
-          format: set
-          items:
-            #Attribute Type object is required attribute if you use separated contract
-            type: object
-            $ref: './primitives.yaml#/components/schemas/Primitives'
-        setOfPrimitivesWithRealization:
-          type: array
-          format: set
-          items:
-            #Attribute Type object is required attribute if you use separated contract
-            type: object
-            $ref: './primitives.yaml#/components/schemas/Primitives'
-            realization: HashSet
         setOfDate:
           type: array
           format: set

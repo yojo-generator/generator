@@ -70,6 +70,16 @@ public class MapperUtil {
         return format(ENUM_CONSTRUCTOR, enumClassName, capitalize(type), variableName);
     }
 
+    public static StringBuilder getInterfaceBuilder(String schemaName) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder
+                .append(PUBLIC_INTERFACE)
+                .append(schemaName)
+                .append(" {")
+                .append(lineSeparator());
+        return stringBuilder;
+    }
+
     public static StringBuilder getClassBuilder(String schemaName) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder
