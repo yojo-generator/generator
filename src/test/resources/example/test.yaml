@@ -25,7 +25,7 @@ components:
   messages:
     RequestDtoByRef:
       payload:
-        pathForGenerateMessage: 'ru.gpb.rkk2.integrations.dto.myservice.request'
+        pathForGenerateMessage: 'example.testGenerate.request'
         #If you use this way of contract, yojo does not generate referenced object
         $ref: '#/components/schemas/RequestDtoSchema'
     RequestDtoByRefAndProperties:
