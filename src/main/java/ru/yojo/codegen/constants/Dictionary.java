@@ -64,6 +64,8 @@ public final class Dictionary {
     public static final String SET = "Set";
     public static final String PACKAGE = "package";
     public static final String EXISTING = "existing";
+    public static final String INTERFACE = "interface";
+    public static final String DEFINITION = "definition";
 
     /**
      * lombok manual properties
@@ -196,7 +198,6 @@ public final class Dictionary {
     public static final String JAKARTA_MAX_IMPORT = "jakarta.validation.constraints.Max;";
 
 
-
     public static final String LIST_IMPORT = "java.util.List;";
     public static final String ARRAY_LIST_IMPORT = "java.util.ArrayList;";
     public static final String LINKED_LIST_IMPORT = "java.util.LinkedList;";
@@ -234,7 +235,7 @@ public final class Dictionary {
      */
     public static final String ENUM_CONSTRUCTOR = "    %s(%s %s) {" +
             lineSeparator() +
-             "    }";
+            "    }";
 
     /**
      * Realizations
@@ -264,6 +265,9 @@ public final class Dictionary {
     public static final String SPACE = " ";
     public static final String PUBLIC_CLASS = "public class ";
     public static final String PUBLIC_ENUM = "public enum ";
+    public static final String PUBLIC_INTERFACE = "public interface ";
+    public static final String METHODS = "methods";
+    public static final String IMPORTS = "imports";
 
     public static final Map<String, String> JAVA_TYPES_REQUIRED_ANNOTATIONS = ofEntries(
             entry(STRING, NOT_BLANK_ANNOTATION),
@@ -337,7 +341,7 @@ public final class Dictionary {
             entry(STRING, ST_STRING),
             entry(BYTE, ST_BYTE),
             entry(INTEGER, ST_INTEGER),
-            entry(LONG,ST_LONG),
+            entry(LONG, ST_LONG),
             entry(DOUBLE, ST_DOUBLE),
             entry(FLOAT, ST_FLOAT),
             entry(BOOLEAN, ST_BOOLEAN),

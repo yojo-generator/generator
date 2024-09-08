@@ -26,23 +26,12 @@ components:
       type: object
       description: Here was located supported object types
       required:
-        - StringValues
         - uuidValueWithRequired
         - dateValueWithRequired
         - localDateValueWithRequired
         - localDateTimeValueWithRequired
         - offsetDateTimeValueWithRequired
       properties:
-        #When name starts with UpperCase, it will uncapitalize
-        #Also here we annotate this object with @Valid and @NotNull
-        StringValues:
-          type: object
-          description: Here was located all supported strings values
-          $ref: './stringValues.yaml#/components/schemas/StringValues'
-        numericsValues:
-          type: object
-          description: Here was located all supported numeric values
-          $ref: './numericValues.yaml#/components/schemas/NumericsValues'
 
         #UUID
         uuidValue:

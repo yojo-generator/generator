@@ -38,6 +38,20 @@ public class SchemaMapper extends AbstractMapper {
             System.out.println("START MAPPING OF SCHEMA: " + schemaName);
             Map<String, Object> schemaMap = castObjectToMap(schemaValues);
             String schemaType = getStringValueIfExistOrElseNull(TYPE, schemaMap);
+            String format = getStringValueIfExistOrElseNull(FORMAT, schemaMap);
+            //Added support of use interfaces like marker, or with some methods and imports
+            if (format != null && format.equals(INTERFACE)) {
+                Schema schema = new Schema();
+                schema.setSchemaName(capitalize(schemaName));
+                schema.setPackageName(processContext.getCommonPackage());
+                schema.setFillParameters(new FillParameters(new ArrayList<>()));
+                schema.setInterface(true);
+                schema.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap));
+                schema.setMethods(castObjectToMap(schemaMap.get(METHODS)));
+                schema.setImports(getSetValueIfExistsOrElseEmptySet(IMPORTS, schemaMap));
+                schemaList.add(schema);
+                return;
+            }
             if (schemaMap != null && schemaMap.containsKey(LOMBOK)) {
                 Map<String, Object> lombokProps = castObjectToMap(schemaMap.get(LOMBOK));
                 fillLombokAccessors(finalLombokProperties, lombokProps);

@@ -59,13 +59,13 @@ components:
             - testGenerate.InterfaceForImpl2
         extends:
           fromClass: ClassForExtends
-          fromPackage: testGenerate.test.common
+          fromPackage: example.testGenerate.test.common
     RequestDtoInheritanceFromSchema:
       payload:
         $ref: '#/components/schemas/RequestDtoSchema'
         extends:
           fromClass: RequestDtoSchema
-          fromPackage: testGenerate.test.common
+          fromPackage: example.testGenerate.test.common
   schemas:
     PolymorphExampleOne:
       type: object
@@ -142,7 +142,7 @@ components:
           - testGenerate.InterfaceForImpl2
       extends:
         fromClass: ClassForExtends
-        fromPackage: testGenerate.test.common
+        fromPackage: example.testGenerate.test.common
       #Validation Groups was added for backward compatibility. Must be used with required.
       #validationGroups contains name of Class
 #      validationGroups:
@@ -160,11 +160,13 @@ components:
 #        - uuidValidationList
       required:
         - requestType
-        - realEstateCost
         - isTwoCities
         - collectionTypes
         - integerValidationField
         - uuidValidationList
+        - listOfPrimitivesRequired
+        - setOfPrimitivesRequired
+        - StringValues
       properties:
         polymorph:
           oneOf:
@@ -173,14 +175,30 @@ components:
         polymorphWithInsidePolymorph:
           type: object
           $ref: '#/components/schemas/PolymorphExampleThree'
+
+        #If you want to use plugin AsynApi - all references must be in main contract
+
         primitives:
           type: object
           description: Here was located all supported primitives
           $ref: './primitives.yaml#/components/schemas/Primitives'
+
         objectTypes:
           type: object
           description: Here was located all supported object types
           $ref: './objectTypes.yaml#/components/schemas/ObjectTypes'
+
+        #When name starts with UpperCase, it will uncapitalize
+        #Also here we annotate this object with @Valid and @NotNull
+        StringValues:
+          type: object
+          description: Here was located all supported strings values
+          $ref: './stringValues.yaml#/components/schemas/StringValues'
+        numericsValues:
+          type: object
+          description: Here was located all supported numeric values
+          $ref: './numericValues.yaml#/components/schemas/NumericsValues'
+
         collectionTypes:
           type: array
           description: Here was located all supported collections
@@ -188,11 +206,54 @@ components:
             #Attribute Type object is required attribute if you use separated contract
             type: object
             $ref: './collectionTypes.yaml#/components/schemas/CollectionTypes'
+        listOfPrimitives:
+          type: array
+          items:
+            #Attribute Type object is required attribute if you use separated contract
+            type: object
+            $ref: './primitives.yaml#/components/schemas/Primitives'
+        listOfPrimitivesRequired:
+          type: array
+          items:
+            #Attribute Type object is required attribute if you use separated contract
+            type: object
+            $ref: './primitives.yaml#/components/schemas/Primitives'
+        listOfPrimitivesWithRealization:
+          type: array
+          items:
+            #Attribute Type object is required attribute if you use separated contract
+            type: object
+            $ref: './primitives.yaml#/components/schemas/Primitives'
+            realization: LinkedList
+        setOfPrimitives:
+          type: array
+          format: set
+          items:
+            #Attribute Type object is required attribute if you use separated contract
+            type: object
+            $ref: './primitives.yaml#/components/schemas/Primitives'
+        setOfPrimitivesRequired:
+          type: array
+          format: set
+          items:
+            #Attribute Type object is required attribute if you use separated contract
+            type: object
+            $ref: './primitives.yaml#/components/schemas/Primitives'
+        setOfPrimitivesWithRealization:
+          type: array
+          format: set
+          items:
+            #Attribute Type object is required attribute if you use separated contract
+            type: object
+            $ref: './primitives.yaml#/components/schemas/Primitives'
+            realization: HashSet
+
         integerValidationField:
           type: integer
         uuidValidationList:
           type: array
           items:
+            type: object
             format: uuid
         innerSchema:
           type: object
@@ -320,7 +381,7 @@ components:
           callSuper: false
       extends:
         fromClass: ClassForExtends
-        fromPackage: testGenerate.test.common
+        fromPackage: example.testGenerate.test.common
       properties:
         someInteger:
           type: integer
@@ -368,7 +429,6 @@ components:
              * «DECLINE» - Decline
              * «ERROR» - Error
 
-
     EnumResultWithoutDescription:
       type: object
       enum:
@@ -406,3 +466,33 @@ components:
       properties:
         someString:
           type: string
+
+    MarkerInterface:
+      type: object
+      format: interface
+      description: It is marker Interface
+
+    InterfaceWithMethods:
+      type: object
+      format: interface
+      description: It is interface with Methods
+      imports:
+        - example.testGenerate.test.common.InnerSchema
+      methods:
+        methodOne:
+          description: This is void method
+          definition: void someOne(String someString, InnerSchema schema)
+        methodTwo:
+          description: This is method with return statement
+          definition: InnerSchema anotherOne(String someString, InnerSchema schema)
+
+    InterfaceWithMethodsWithoutDescription:
+      type: object
+      format: interface
+      imports:
+        - example.testGenerate.test.common.InnerSchema
+      methods:
+        methodOne:
+          definition: void someOne(String someString, InnerSchema schema)
+        methodTwo:
+          definition: InnerSchema anotherOne(String someString, InnerSchema schema)

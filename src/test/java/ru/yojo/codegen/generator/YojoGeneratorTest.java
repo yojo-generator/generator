@@ -42,7 +42,7 @@ class YojoGeneratorTest {
         yojoContext.setSpringBootVersion("2.0.0");
         yojoContext.setDirectory("src/test/resources/example");
         yojoContext.setOutputDirectory("src/test/resources/example/testGenerate/");
-        yojoContext.setPackageLocation("testGenerate");
+        yojoContext.setPackageLocation("example.testGenerate");
         yojoContext.setLombokProperties(new LombokProperties(false,
                 true,
                 new Accessors(true, true, true)));
