@@ -25,7 +25,7 @@ components:
   messages:
     RequestDtoByRef:
       payload:
-        pathForGenerateMessage: 'example.testGenerate.request'
+        pathForGenerateMessage: 'io.github.somepath'
         #If you use this way of contract, yojo does not generate referenced object
         $ref: '#/components/schemas/RequestDtoSchema'
     RequestDtoByRefAndProperties:
@@ -260,6 +260,8 @@ components:
           properties:
             someString:
               type: string
+
+        #MAP String key
         mapStringInteger:
           type: object
           description: Map generation Example
@@ -317,6 +319,76 @@ components:
             format: set
             name: ClassForExtending
             package: testGenerate
+
+        #MAP UUID key
+
+        mapUUIDInteger:
+          type: object
+          format: uuid
+          description: Map generation Example
+          additionalProperties:
+            type: integer
+        mapUUIDObject:
+          type: object
+          format: uuid
+          description: Map generation Example
+          additionalProperties:
+            type: object
+        mapUUIDObjectWithHashMap:
+          type: object
+          format: uuid
+          description: Map generation Example
+          realization: HashMap
+          additionalProperties:
+            type: object
+        mapUUIDObjectWithLinkedHashMap:
+          type: object
+          format: uuid
+          description: Map generation Example
+          realization: LinkedHashMap
+          additionalProperties:
+            type: object
+        mapUUIDCustomObject:
+          type: object
+          format: uuid
+          description: Map generation Example
+          additionalProperties:
+            $ref: '#/components/schemas/SomeObject'
+        mapUUIDExistingObject:
+          type: object
+          format: uuid
+          description: Map generation Example
+          additionalProperties:
+            type: object
+            format: existing
+            name: ClassForExtending
+            package: testGenerate
+        mapUUIDSetOfCustomObject:
+          type: object
+          format: uuid
+          description: Map generation Example
+          additionalProperties:
+            type: array
+            format: set
+            $ref: '#/components/schemas/SomeObject'
+        mapUUIDSetOfStrings:
+          type: object
+          format: uuid
+          description: Map generation Example
+          additionalProperties:
+            type: array
+            format: set
+            additionalFormat: string
+        mapUUIDSetOfExistingObject:
+          type: object
+          format: uuid
+          description: Map generation Example
+          additionalProperties:
+            type: array
+            format: set
+            name: ClassForExtending
+            package: testGenerate
+
         innerEnumWithDescription:
           type: object
           enum:

@@ -255,6 +255,7 @@ public final class Dictionary {
     public static final String LIST_TYPE = "List<%s>";
     public static final String SET_TYPE = "Set<%s>";
     public static final String MAP_TYPE = "Map<String, %s>";
+    public static final String MAP_CUSTOM_TYPE = "Map<%s, %s>";
     public static final String ENUM_TYPE = "%s(\"%s\")";
     public static final String DELIMITER = "/";
     public static final String TABULATION = "    ";

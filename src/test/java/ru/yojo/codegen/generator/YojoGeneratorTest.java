@@ -24,9 +24,9 @@ class YojoGeneratorTest {
     @Test
     @SuppressWarnings("all")
     void generateTest() {
-        yojoGenerator.generate("src/test/resources/example/test.yaml",
+        yojoGenerator.generate("src/test/resources/example/contract/test.yaml",
                 "src/test/resources/example/testGenerate/",
-                "testGenerate",
+                "example.testGenerate",
                 new LombokProperties(false,
                         true,
                         new Accessors(true, true, true)));
@@ -57,7 +57,10 @@ class YojoGeneratorTest {
 
     @Test
     void generateAll() throws IOException {
-        yojoGenerator.generateAll("src/test/resources/example/", "src/test/resources/example/testGenerate", "testGenerate", new LombokProperties(false,
+        yojoGenerator.generateAll("src/test/resources/example",
+                "src/test/resources/example/testGenerate/",
+                "example.testGenerate",
+                new LombokProperties(false,
                 true,
                 new Accessors(true, true, true)));
         File file = new File("src/test/resources/example/testGenerate");

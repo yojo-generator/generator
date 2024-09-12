@@ -284,7 +284,7 @@ public class YojoGenerator implements Generator {
         System.out.println("START WRITING JAVA CLASS FROM MESSAGES:");
         messageList.forEach(message -> System.out.println(message.getMessageName()));
         System.out.println();
-        writeMessages(processContext.getPathToWrite(), processContext.getOutputDirectoryName(), messageList);
+        writeMessages(processContext.getPathToWrite(), processContext.getOutputDirectoryName(), processContext.getPackageLocation(), messageList);
         System.out.println(LOG_DELIMETER);
         System.out.println();
     }
@@ -404,13 +404,15 @@ public class YojoGenerator implements Generator {
      * @param outputDirectory output directory for pojos
      * @param messageList     Mapped messages to pojo view
      */
-    private void writeMessages(String outputDirectory, String outputDirectoryName, List<Message> messageList) {
+    private void writeMessages(String outputDirectory, String outputDirectoryName, String packageLocation, List<Message> messageList) {
         messageList.forEach(message -> {
             String messagesPath;
             if (message.getPathForGenerateMessage() != null) {
-                String preparePath = message.getPathForGenerateMessage().replaceAll("\\.", DELIMITER);
+                String preparePath = String.join(DELIMITER, outputDirectory,
+                        message.getPathForGenerateMessage().replaceAll("\\.", DELIMITER));
                 messagesPath = String.join(DELIMITER, preparePath) + DELIMITER;
-                message.setMessagePackageName(message.getPathForGenerateMessage().concat(";"));
+                message.setMessagePackageName(String.join(DELIMITER, packageLocation, outputDirectoryName,
+                        message.getPathForGenerateMessage()).replaceAll("/", ".").concat(";"));
             } else {
                 //Create a file by the name of a specific message and write then
                 messagesPath = String.join(DELIMITER, outputDirectory, "messages") + DELIMITER;

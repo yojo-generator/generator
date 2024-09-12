@@ -25,6 +25,7 @@ public class AbstractMapper {
     /**
      * Fill properties
      *
+     * @param schemaName         schemaName
      * @param variableProperties variableProperties
      * @param currentSchema      currentSchema
      * @param schemas            schemas
@@ -74,6 +75,7 @@ public class AbstractMapper {
     /**
      * filling from $ref Objects
      *
+     * @param schemaName         schemaName
      * @param variableProperties variableProperties
      * @param currentSchema      currentSchema
      * @param schemas            schemas
@@ -159,6 +161,7 @@ public class AbstractMapper {
         System.out.println("ADDITIONAL PROPERTIES");
         Map<String, Object> additionalPropertiesMap = castObjectToMap(propertiesMap.get(ADDITIONAL_PROPERTIES));
         String type = getStringValueIfExistOrElseNull(TYPE, additionalPropertiesMap);
+        String format = variableProperties.getFormat();
         String referencedObject = getStringValueIfExistOrElseNull(REFERENCE, additionalPropertiesMap);
         variableProperties.addRequiredImports(MAP_IMPORT);
         variableProperties.setRealisation(getStringValueIfExistOrElseNull(REALIZATION, propertiesMap));
@@ -166,17 +169,39 @@ public class AbstractMapper {
         //Fill with javaTypes
         if (type != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(type)) {
             System.out.println("CORRECT TYPE!");
-            variableProperties.setType(format(MAP_TYPE, JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(type)));
+            if (format != null) {
+                variableProperties.setType(format(MAP_CUSTOM_TYPE,
+                        JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(format),
+                        JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(type)));
+            } else {
+                variableProperties.setType(format(MAP_TYPE, JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(type)));
+            }
         } else if (OBJECT.equals(type) && referencedObject == null) {
             //Fill from Existing Object
             if (getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap) != null) {
-                variableProperties.setType(format(MAP_TYPE, capitalize(getStringValueIfExistOrElseNull(NAME, additionalPropertiesMap))));
-                variableProperties.addRequiredImports(getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap)
-                        .concat(".")
-                        .concat(capitalize(getStringValueIfExistOrElseNull(NAME, additionalPropertiesMap)))
-                        .concat(";"));
+                if (format != null) {
+                    variableProperties.setType(format(MAP_CUSTOM_TYPE,
+                            JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(variableProperties.getFormat()),
+                            capitalize(getStringValueIfExistOrElseNull(NAME, additionalPropertiesMap))));
+                    variableProperties.addRequiredImports(getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap)
+                            .concat(".")
+                            .concat(capitalize(getStringValueIfExistOrElseNull(NAME, additionalPropertiesMap)))
+                            .concat(";"));
+                } else {
+                    variableProperties.setType(format(MAP_TYPE, capitalize(getStringValueIfExistOrElseNull(NAME, additionalPropertiesMap))));
+                    variableProperties.addRequiredImports(getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap)
+                            .concat(".")
+                            .concat(capitalize(getStringValueIfExistOrElseNull(NAME, additionalPropertiesMap)))
+                            .concat(";"));
+                }
             } else {
-                variableProperties.setType(format(MAP_TYPE, OBJECT_TYPE));
+                if (format != null) {
+                    variableProperties.setType(format(MAP_CUSTOM_TYPE,
+                            JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(variableProperties.getFormat()),
+                            OBJECT_TYPE));
+                } else {
+                    variableProperties.setType(format(MAP_TYPE, OBJECT_TYPE));
+                }
             }
             //Fill with custom object
         } else if (referencedObject != null && (schemas.containsKey(refReplace(referencedObject)) || currentSchema == schemas)) {
@@ -189,17 +214,41 @@ public class AbstractMapper {
                 }
                 String javaType = getStringValueIfExistOrElseNull(ADDITIONAL_FORMAT, additionalPropertiesMap);
                 if (javaType != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(javaType)) {
-                    variableProperties.setItems(JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(javaType).toString());
-                    fillCollectionType(variableProperties);
-                    variableProperties.setType(format(MAP_TYPE, format(variableProperties.getType())));
+                    if (format != null) {
+                        variableProperties.setItems(JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(javaType).toString());
+                        fillCollectionType(variableProperties);
+                        variableProperties.setType(format(MAP_CUSTOM_TYPE,
+                                JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(variableProperties.getFormat()),
+                                variableProperties.getType()));
+                    } else {
+                        variableProperties.setItems(JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(javaType).toString());
+                        fillCollectionType(variableProperties);
+                        variableProperties.setType(format(MAP_TYPE, format(variableProperties.getType())));
+                    }
                 } else {
-                    variableProperties.setItems(refObjectName);
-                    fillCollectionType(variableProperties);
-                    variableProperties.setType(format(MAP_TYPE, format(variableProperties.getType())));
-                    variableProperties.addRequiredImports(prepareImport(commonPackage, refObjectName));
+                    if (format != null) {
+                        variableProperties.setItems(refObjectName);
+                        fillCollectionType(variableProperties);
+                        variableProperties.setType(format(MAP_CUSTOM_TYPE,
+                                JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(variableProperties.getFormat()),
+                                variableProperties.getType()));
+                        variableProperties.addRequiredImports(prepareImport(commonPackage, refObjectName));
+                    } else {
+                        variableProperties.setItems(refObjectName);
+                        fillCollectionType(variableProperties);
+                        variableProperties.setType(format(MAP_TYPE, format(variableProperties.getType())));
+                        variableProperties.addRequiredImports(prepareImport(commonPackage, refObjectName));
+                    }
                 }
             } else {
-                variableProperties.setType(format(MAP_TYPE, refObjectName));
+                if (format != null) {
+                    variableProperties.setType(format(MAP_CUSTOM_TYPE,
+                            JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(variableProperties.getFormat()),
+                            refObjectName));
+                    variableProperties.addRequiredImports(prepareImport(commonPackage, refObjectName));
+                } else {
+                    variableProperties.setType(format(MAP_TYPE, refObjectName));
+                }
                 variableProperties.addRequiredImports(prepareImport(commonPackage, refObjectName));
             }
         } else if (ARRAY.equals(type) && getStringValueIfExistOrElseNull(ADDITIONAL_FORMAT, additionalPropertiesMap) != null) {
@@ -209,14 +258,26 @@ public class AbstractMapper {
             }
             variableProperties.setItems(JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(getStringValueIfExistOrElseNull(ADDITIONAL_FORMAT, additionalPropertiesMap)).toString());
             fillCollectionType(variableProperties);
-            variableProperties.setType(format(MAP_TYPE, format(variableProperties.getType())));
+            if (format != null) {
+                variableProperties.setType(format(MAP_CUSTOM_TYPE,
+                        JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(variableProperties.getFormat()),
+                        variableProperties.getType()));
+            } else {
+                variableProperties.setType(format(MAP_TYPE, format(variableProperties.getType())));
+            }
         } else if (ARRAY.equals(type) && getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap) != null) {
             String collectionType = getStringValueIfExistOrElseNull(FORMAT, additionalPropertiesMap);
             if (collectionType != null) {
                 variableProperties.setCollectionType(collectionType);
             }
             fillCollectionWithExistingObject(variableProperties, additionalPropertiesMap);
-            variableProperties.setType(format(MAP_TYPE, format(variableProperties.getType())));
+            if (format != null) {
+                variableProperties.setType(format(MAP_CUSTOM_TYPE,
+                        JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(variableProperties.getFormat()),
+                        variableProperties.getType()));
+            } else {
+                variableProperties.setType(format(MAP_TYPE, format(variableProperties.getType())));
+            }
         }
         System.out.println();
     }
