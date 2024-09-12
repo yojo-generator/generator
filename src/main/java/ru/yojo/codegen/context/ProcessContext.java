@@ -101,6 +101,10 @@ public class ProcessContext {
         this.packageLocation = packageLocation;
     }
 
+    public String getPackageLocation() {
+        return packageLocation;
+    }
+
     public LombokProperties getLombokProperties() {
         return lombokProperties;
     }

@@ -25,6 +25,7 @@ public class AbstractMapper {
     /**
      * Fill properties
      *
+     * @param schemaName         schemaName
      * @param variableProperties variableProperties
      * @param currentSchema      currentSchema
      * @param schemas            schemas
@@ -74,6 +75,7 @@ public class AbstractMapper {
     /**
      * filling from $ref Objects
      *
+     * @param schemaName         schemaName
      * @param variableProperties variableProperties
      * @param currentSchema      currentSchema
      * @param schemas            schemas
