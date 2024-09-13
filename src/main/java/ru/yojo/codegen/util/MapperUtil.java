@@ -215,7 +215,7 @@ public class MapperUtil {
      * Method filling required annotations and imports
      */
     public static void buildLombokAnnotations(LombokProperties lombokProperties, Set<String> requiredImports, StringBuilder lombokAnnotationBuilder) {
-        if (lombokProperties.allArgsConstructor()) {
+        if (lombokProperties.noArgsConstructor()) {
             lombokAnnotationBuilder
                     .append(LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION)
                     .append(lineSeparator());
