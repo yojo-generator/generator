@@ -66,6 +66,7 @@ public final class Dictionary {
     public static final String EXISTING = "existing";
     public static final String INTERFACE = "interface";
     public static final String DEFINITION = "definition";
+    public static final String REMOVE_SCHEMA = "removeSchema";
 
     /**
      * lombok manual properties
@@ -79,6 +80,9 @@ public final class Dictionary {
 
     public static final String EQUALS_AND_HASH_CODE = "equalsAndHashCode";
     public static final String CALL_SUPER = "callSuper";
+
+    public static final String ALL_ARGS = "allArgsConstructor";
+    public static final String NO_ARGS = "noArgsConstructor";
 
     /**
      * Schema Types

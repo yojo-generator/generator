@@ -12,8 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static ru.yojo.codegen.constants.Dictionary.*;
-import static ru.yojo.codegen.util.LombokUtils.fillLombokAccessors;
-import static ru.yojo.codegen.util.LombokUtils.fillLombokEqualsAndHashCode;
+import static ru.yojo.codegen.util.LombokUtils.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 @SuppressWarnings("all")
@@ -186,8 +185,14 @@ public class MessageMapper extends AbstractMapper {
         helper.setIsMappedFromSchemas(false);
         if (payload.containsKey(LOMBOK)) {
             Map<String, Object> lombokProps = castObjectToMap(payload.get(LOMBOK));
-            fillLombokAccessors(lombokProperties, lombokProps);
-            fillLombokEqualsAndHashCode(lombokProperties, lombokProps);
+            if (lombokProps.containsKey(ENABLE) &&
+                    "false".equals(getStringValueIfExistOrElseNull(ENABLE, lombokProps))) {
+                lombokProperties.setEnableLombok(Boolean.valueOf(getStringValueIfExistOrElseNull(ENABLE, lombokProps)));
+            } else {
+                fillLombokAccessors(lombokProperties, lombokProps);
+                fillLombokEqualsAndHashCode(lombokProperties, lombokProps);
+                fillLombokConstructors(lombokProperties, lombokProps);
+            }
         }
         if (getStringValueIfExistOrElseNull(PROPERTIES, payload) != null) {
             System.out.println("Properties Mapping from message");
@@ -224,7 +229,10 @@ public class MessageMapper extends AbstractMapper {
                 Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
                 parameters = schemaMapper.getSchemaVariableProperties(schemaName,
                         schema, processContext.getSchemasMap(), castObjectToMap(schema.get(PROPERTIES)), processContext, innerSchemas);
-                removeSchemas.add(schemaName);
+                if (getStringValueIfExistOrElseNull(REMOVE_SCHEMA, payload) != null &&
+                        getStringValueIfExistOrElseNull(REMOVE_SCHEMA, payload).equals("true")) {
+                    removeSchemas.add(schemaName);
+                }
                 if (!innerSchemas.isEmpty()) {
                     innerSchemas.forEach((pk, pv) -> excludeRemoveSchemas.add(pk));
                     processContext.getSchemasMap().putAll(innerSchemas);

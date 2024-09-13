@@ -43,4 +43,17 @@ public class LombokUtils {
             lombokProperties.setEqualsAndHashCode(equalsAndHashCode);
         }
     }
+
+    public static void fillLombokConstructors(LombokProperties lombokProperties, Map<String, Object> lombokProps) {
+        if (lombokProps.containsKey(ALL_ARGS) || lombokProps.containsKey(NO_ARGS)) {
+            String allArgs = getStringValueIfExistOrElseNull(ALL_ARGS, lombokProps);
+            String noArgs = getStringValueIfExistOrElseNull(NO_ARGS, lombokProps);
+            if (allArgs != null) {
+                lombokProperties.setAllArgsConstructor(Boolean.valueOf(allArgs));
+            }
+            if (noArgs != null) {
+                lombokProperties.setNoArgsConstructor(Boolean.valueOf(noArgs));
+            }
+        }
+    }
 }

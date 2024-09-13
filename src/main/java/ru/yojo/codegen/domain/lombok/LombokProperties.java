@@ -4,6 +4,7 @@ package ru.yojo.codegen.domain.lombok;
 public class LombokProperties {
     private boolean enableLombok;
     private boolean allArgsConstructor;
+    private boolean noArgsConstructor;
 
     private Accessors accessors;
     private EqualsAndHashCode equalsAndHashCode;
@@ -41,7 +42,23 @@ public class LombokProperties {
         return enableLombok;
     }
 
+    public void setEnableLombok(boolean enableLombok) {
+        this.enableLombok = enableLombok;
+    }
+
     public boolean allArgsConstructor() {
         return allArgsConstructor;
+    }
+
+    public void setAllArgsConstructor(boolean allArgsConstructor) {
+        this.allArgsConstructor = allArgsConstructor;
+    }
+
+    public boolean noArgsConstructor() {
+        return noArgsConstructor;
+    }
+
+    public void setNoArgsConstructor(boolean noArgsConstructor) {
+        this.noArgsConstructor = noArgsConstructor;
     }
 }
