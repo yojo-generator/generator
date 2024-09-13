@@ -215,11 +215,12 @@ public class MapperUtil {
      * Method filling required annotations and imports
      */
     public static void buildLombokAnnotations(LombokProperties lombokProperties, Set<String> requiredImports, StringBuilder lombokAnnotationBuilder) {
-        lombokAnnotationBuilder
-                .append(LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION)
-                .append(lineSeparator());
-        requiredImports.add(LOMBOK_NO_ARGS_CONSTRUCTOR_IMPORT);
-
+        if (lombokProperties.allArgsConstructor()) {
+            lombokAnnotationBuilder
+                    .append(LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION)
+                    .append(lineSeparator());
+            requiredImports.add(LOMBOK_NO_ARGS_CONSTRUCTOR_IMPORT);
+        }
         if (lombokProperties.getAccessors().isEnable()) {
             String accessors = fetchAccessors(lombokProperties);
 

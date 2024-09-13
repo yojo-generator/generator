@@ -14,8 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static ru.yojo.codegen.constants.Dictionary.*;
-import static ru.yojo.codegen.util.LombokUtils.fillLombokAccessors;
-import static ru.yojo.codegen.util.LombokUtils.fillLombokEqualsAndHashCode;
+import static ru.yojo.codegen.util.LombokUtils.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 @SuppressWarnings("all")
@@ -54,8 +53,14 @@ public class SchemaMapper extends AbstractMapper {
             }
             if (schemaMap != null && schemaMap.containsKey(LOMBOK)) {
                 Map<String, Object> lombokProps = castObjectToMap(schemaMap.get(LOMBOK));
-                fillLombokAccessors(finalLombokProperties, lombokProps);
-                fillLombokEqualsAndHashCode(finalLombokProperties, lombokProps);
+                if (lombokProps.containsKey(ENABLE) &&
+                        "false".equals(getStringValueIfExistOrElseNull(ENABLE, lombokProps))) {
+                    finalLombokProperties.setEnableLombok(Boolean.valueOf(getStringValueIfExistOrElseNull(ENABLE, lombokProps)));
+                } else {
+                    fillLombokAccessors(finalLombokProperties, lombokProps);
+                    fillLombokEqualsAndHashCode(finalLombokProperties, lombokProps);
+                    fillLombokConstructors(finalLombokProperties, lombokProps);
+                }
             }
             if ((schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) || POLYMORPHS.stream().anyMatch(p -> schemaMap.containsKey(p))) {
                 Schema schema = new Schema();
