@@ -1,0 +1,79 @@
+asyncapi: 2.0.0
+info:
+  title: Account Service
+  version: 1.0.0
+  description: "This service is in charge of processing user signups :rocket:"
+channels:
+  user/signedup:
+    subscribe:
+      message:
+        $ref: '#/components/messages/UserSignedUp'
+components:
+  messages:
+    UserSignedUp:
+      payload:
+        type: object
+        properties:
+          displayName:
+            type: string
+            description: Name of the user
+          email:
+            type: string
+            format: email
+            description: Email of the user
+  schemas:
+    ObjectTypes:
+      type: object
+      description: Here was located supported object types
+      required:
+        - uuidValueWithRequired
+        - dateValueWithRequired
+        - localDateValueWithRequired
+        - localDateTimeValueWithRequired
+        - offsetDateTimeValueWithRequired
+      properties:
+
+        #UUID
+        uuidValue:
+          type: object
+          format: uuid
+        uuidWithDefaultValue:
+          type: object
+          format: uuid
+          default: a1256d5f-4ce6-4bb6-9fd1-ae265fe186db
+        uuidValueWithRequired:
+          type: object
+          format: uuid
+
+        #DATE
+        dateValue:
+          type: object
+          format: simple-date
+        dateValueWithRequired:
+          type: object
+          format: simple-date
+          default: new
+
+        #LOCAL-DATE
+        localDateValue:
+          type: object
+          format: date
+        localDateValueWithRequired:
+          type: object
+          format: date
+
+        #LOCAL-DATE-TIME
+        localDateTimeValue:
+          type: string
+          format: date-time
+        localDateTimeValueWithRequired:
+          type: string
+          format: date-time
+
+        #OFFSET DATE TIME
+        offsetDateTimeValue:
+          type: object
+          format: offsetDateTime
+        offsetDateTimeValueWithRequired:
+          type: object
+          format: offsetDateTime

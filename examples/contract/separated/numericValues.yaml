@@ -1,0 +1,106 @@
+asyncapi: 2.0.0
+info:
+  title: Account Service
+  version: 1.0.0
+  description: "This service is in charge of processing user signups :rocket:"
+channels:
+  user/signedup:
+    subscribe:
+      message:
+        $ref: '#/components/messages/UserSignedUp'
+components:
+  messages:
+    UserSignedUp:
+      payload:
+        type: object
+        properties:
+          displayName:
+            type: string
+            description: Name of the user
+          email:
+            type: string
+            format: email
+            description: Email of the user
+  schemas:
+    NumericsValues:
+      type: object
+      description: Here was located all supported numeric values
+      required:
+        - byteValueWithAnnotations
+        - integerValueWithAnnotations
+        - longValueWithAnnotations
+        - doubleValueWithAnnotations
+        - floatValueWithAnnotations
+        - bigDecimalValueWithAnnotations
+        - bigIntegerValueWithAnnotations
+      properties:
+        byteValue:
+          type: number
+          format: byte
+        integerValue:
+          type: integer
+        integerValueWithFormat:
+          type: integer
+          format: int32
+        longValue:
+          type: integer
+          format: int64
+        #Custom attribute
+        doubleValue:
+          type: number
+          format: double
+        #Custom attribute
+        floatValue:
+          type: number
+          format: float
+        #Custom attribute
+        bigDecimalValue:
+          type: number
+          format: bigDecimal
+        #Custom attribute
+        bigIntegerValue:
+          type: number
+          format: bigInteger
+
+        byteValueWithAnnotations:
+          type: number
+          format: byte
+          digits: integer = 1, fraction = 0
+          minimum: 2
+          maximum: 4
+        integerValueWithAnnotations:
+          type: integer
+          format: int32
+          digits: integer = 2, fraction = 0
+          minimum: 22
+          maximum: 44
+        longValueWithAnnotations:
+          type: integer
+          format: int64
+          digits: integer = 2, fraction = 0
+          minimum: 22
+          maximum: 44
+        #Custom attribute
+        doubleValueWithAnnotations:
+          type: number
+          format: double
+          digits: integer = 2, fraction = 2
+        #Custom attribute
+        floatValueWithAnnotations:
+          type: number
+          format: float
+          digits: integer = 2, fraction = 2
+        #Custom attribute
+        bigDecimalValueWithAnnotations:
+          type: number
+          format: bigDecimal
+          digits: integer = 2, fraction = 2
+          minimum: 22
+          maximum: 44
+        #Custom attribute
+        bigIntegerValueWithAnnotations:
+          type: number
+          format: bigInteger
+          digits: integer = 2, fraction = 2
+          minimum: 22
+          maximum: 44

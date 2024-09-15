@@ -26,7 +26,6 @@ public final class Dictionary {
     public static final String PATTERN = "pattern";
     public static final String ENUMERATION = "enum";
     public static final String X_ENUM_NAMES = "x-enumNames";
-    public static final String DIGITS = "digits";
     public static final String MINIMUM = "minimum";
     public static final String MAXIMUM = "maximum";
     public static final String ARRAY = "array";
@@ -61,12 +60,13 @@ public final class Dictionary {
     public static final String FROM_CLASS = "fromClass";
     public static final String FROM_PACKAGE = "fromPackage";
     public static final String FROM_INTERFACE = "fromInterface";
-    public static final String SET = "Set";
     public static final String PACKAGE = "package";
     public static final String EXISTING = "existing";
     public static final String INTERFACE = "interface";
     public static final String DEFINITION = "definition";
     public static final String REMOVE_SCHEMA = "removeSchema";
+    public static final String DIGITS = "digits";
+
 
     /**
      * lombok manual properties

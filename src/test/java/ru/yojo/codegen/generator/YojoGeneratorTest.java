@@ -43,7 +43,7 @@ class YojoGeneratorTest {
         yojoContext.setDirectory("src/test/resources/example");
         yojoContext.setOutputDirectory("src/test/resources/example/testGenerate/");
         yojoContext.setPackageLocation("example.testGenerate");
-        yojoContext.setLombokProperties(new LombokProperties(false,
+        yojoContext.setLombokProperties(new LombokProperties(true,
                 true,
                 new Accessors(true, true, true)));
 

@@ -1,0 +1,115 @@
+asyncapi: 2.0.0
+info:
+  title: Primitive Types
+  version: 1.0.0
+  description: "Primitive types are described here"
+channels:
+  Primitives:
+    subscribe:
+      message:
+        $ref: '#/components/messages/SomeMessage'
+components:
+  messages:
+    SomeMessage:
+      payload:
+        type: object
+        properties:
+          primitives:
+            $ref: '#/components/schemas/Primitives'
+  schemas:
+    Primitives:
+      type: object
+      description: Here was located all supported primitives
+      required:
+        - booleanValueWithRequired
+        - intValueWithRequired
+        - longValueWithRequired
+        - doubleValueWithRequired
+      properties:
+
+        #BOOLEAN
+        booleanWithDefaultValue:
+          type: boolean
+          primitive: true
+          default: true
+        booleanValueWithoutRequired:
+          type: boolean
+          primitive: true
+        booleanValueWithRequired:
+          type: boolean
+          primitive: true
+
+        #BYTE
+        byteWithDefaultValue:
+          type: number
+          format: byte
+          primitive: true
+          default: 5
+        byteValueWithoutRequired:
+          type: number
+          format: byte
+          primitive: true
+        byteValueWithRequired:
+          type: number
+          format: byte
+          primitive: true
+
+        #INTEGER
+        intWithDefaultValue:
+          type: integer
+          format: int32
+          primitive: true
+          default: 123
+        intValueWithoutRequired:
+          type: integer
+          format: int32
+          primitive: true
+        intValueWithRequired:
+          type: integer
+          format: int32
+          primitive: true
+
+        #LONG
+        longWithDefaultValue:
+          type: integer
+          format: int64
+          primitive: true
+          default: 123L
+        longValueWithoutRequired:
+          type: integer
+          format: int64
+          primitive: true
+        longValueWithRequired:
+          type: integer
+          format: int64
+          primitive: true
+
+        #DOUBLE
+        doubleWithDefaultValue:
+          type: number
+          format: double
+          primitive: true
+          default: 123.123
+        doubleValueWithoutRequired:
+          type: number
+          format: double
+          primitive: true
+        doubleValueWithRequired:
+          type: number
+          format: double
+          primitive: true
+
+        #FLOAT
+        floatWithDefaultValue:
+          type: number
+          format: float
+          primitive: true
+          default: 123.123F
+        floatValueWithoutRequired:
+          type: number
+          format: float
+          primitive: true
+        floatValueWithRequired:
+          type: number
+          format: float
+          primitive: true
