@@ -376,7 +376,9 @@ public class YojoGenerator implements Generator {
             // Form the new line with the correct indentation
             String replaceName = String.format("%sname: %s", indentation, className);
             String replacePackage = String.format("%spackage: %s", indentation,
-                    packageLocation.isBlank() ? pathName : packageLocation + "." + toLowerCaseFirstChar(pathName) + "." + "common");
+                    packageLocation.isBlank() ?
+                            pathName :
+                            packageLocation + "." + toLowerCaseFirstChar(pathName) + "." + "common").replaceAll("/", ".");
 
             // Add the new line to the result
             modifiedContent.append(replaceName).append("\n").append(replacePackage).append("\n");

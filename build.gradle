@@ -3,6 +3,8 @@ plugins {
     id 'application'
     id 'maven-publish'
     id 'java-library'
+    id 'signing'
+    id 'org.jreleaser' version '1.14.0'
 }
 
 java {
@@ -12,23 +14,99 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
-group 'ru.yojo'
-version '1.0.0'
+group 'io.github.yojo-generator'
+//archivesBaseName = "generator"
+version '1.0.1'
 
 publishing {
     repositories {
+//        maven {
+//            name = "GitHubPackages"
+//            url = uri("https://maven.pkg.github.com/yojo-generator/generator")
+//            credentials {
+//                username = project.findProperty("user") ?: System.getenv("USERNAME")
+//                password = project.findProperty("token") ?: System.getenv("TOKEN")
+//            }
+//        }
+
         maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/yojo-generator/generator")
-            credentials {
-                username = project.findProperty("user") ?: System.getenv("USERNAME")
-                password = project.findProperty("token") ?: System.getenv("TOKEN")
+            url = layout.buildDirectory.dir('staging-deploy')
+        }
+    }
+
+    publications {
+//        gpr(MavenPublication) {
+//            from(components.java)
+//        }
+        mavenJava(MavenPublication) {
+            groupId = 'io.github.yojo-generator'
+            artifactId = 'generator'
+
+            from components.java
+            pom {
+                name = 'YOJO Generator'
+                description = "This spring-based project is a core-library for generate POJO's from asyncApi yaml contract."
+                url = 'https://github.com/yojo-generator/generator'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        name = 'Vladimir Morozkin'
+                        email = 'jvmorozkin@gmail.com'
+                        organization = 'YOJO-generator'
+                        organizationUrl = 'https://github.com/yojo-generator'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/yojo-generator/generator.git'
+                    developerConnection = 'scm:git:ssh://github.com:yojo-generator/generator.git'
+                    url = 'https://github.com/yojo-generator/generator/tree/master'
+                }
             }
         }
     }
-    publications {
-        gpr(MavenPublication) {
-            from(components.java)
+}
+
+jreleaser {
+    project {
+        inceptionYear = "2024"
+        author("@vmorozkin")
+    }
+    signing {
+        active = 'ALWAYS'
+        armored = true
+        verify = true
+    }
+    environment {
+        variables 'config.toml'
+    }
+    release {
+        github {
+            skipRelease = true
+            skipTag = true
+        }
+    }
+    deploy {
+        maven {
+            mavenCentral {
+                sonatype {
+                    active = 'ALWAYS'
+                    url = 'https://central.sonatype.com/api/v1/publisher'
+                    sign = true
+                    setAuthorization("Basic")
+                    checksums = true
+                    sourceJar = true
+                    javadocJar = true
+                    verifyPom = true
+                    retryDelay = 60
+                    applyMavenCentralRules = false
+                    stagingRepository('build/staging-deploy')
+                }
+            }
         }
     }
 }
@@ -42,18 +120,18 @@ ext {
 }
 
 //Uncomment this if you need to test by YojoCLI
-sourceSets {
-//    main {
+//sourceSets {
+////    main {
+////        java {
+////            srcDir "${buildDir}/generated-sources"
+////        }
+////    }
+//    test {
 //        java {
-//            srcDir "${buildDir}/generated-sources"
+//            srcDir "src/test/resources/"
 //        }
 //    }
-    test {
-        java {
-            srcDir "src/test/resources/"
-        }
-    }
-}
+//}
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -80,7 +158,7 @@ jar {
 dependencies {
     implementation 'org.springframework:spring-context:6.1.7'
     implementation 'org.yaml:snakeyaml:2.0'
-    implementation 'javax.validation:validation-api:2.0.1.Final'
+//    implementation 'javax.validation:validation-api:2.0.1.Final'
     compileOnly 'org.projectlombok:lombok:1.18.26'
     testCompileOnly 'org.projectlombok:lombok:1.18.26'
 
