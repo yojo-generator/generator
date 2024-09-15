@@ -81,9 +81,9 @@ jreleaser {
         armored = true
         verify = true
     }
-    environment {
-        variables 'config.toml'
-    }
+    // environment {
+    //     variables 'config.toml'
+    // }
     release {
         github {
             skipRelease = true
