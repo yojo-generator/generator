@@ -5,10 +5,18 @@
 
 Developed according to 📗 [Official documentation](https://www.asyncapi.com/docs/reference/specification/v2.6.0)
 
-- 👉 [Description](#Description)
-- 🎓 [Examples](#Examples)
-- 🔥 [Releases](#Releases)
-- 💻 [Developers](#Developers)
+<!-- TOC -->
+    * [YOJO](#yojo)
+      * [YAML to POJO generator](#yaml-to-pojo-generator-)
+  * 👉 [Description](#description)
+  * 🎓 [Examples](#examples)
+  * 🎓 [How to fill AsyncApi contract](#how-to-fill-asyncapi-contract)
+    * [Message Object](#message-object)
+    * [Schema Object](#schema-object)
+    * [Аttributes](#аttributes)
+    * [Custom YAML attributes](#custom-yaml-attributes)
+  * 💻 [Developers](#developers)
+<!-- TOC -->
 
 ## Description
 The generator works with schema objects described in `components:`
@@ -17,7 +25,7 @@ An excerpt from the 📜 AsyncApi documentation:
 
 The AsyncAPI Schema Object is a JSON Schema vocabulary which extends JSON Schema Core and Validation vocabularies. 
 As such, any keyword available for those vocabularies is by definition available in AsyncAPI, and will work the exact same way, including but not limited to:
-1. [ ] `title`
+1. [x] `title`
 2. [x] `type`
 3. [x] `required`
 4. [ ] `multipleOf`
@@ -63,103 +71,152 @@ Available are marked with a checkbox.**
 
 ## Examples
 
-See examples [here](./examples)
+Find examples [here](./examples) for more cases
 
-## Releases
-### 💥 Release 0.0.x:
-##### Currently implemented the following 📈 features:
-* 📈 Support for the following keywords:
-  * `type`
-  * `format`
-  * `example`
-  * `description`
-  * `$ref`
-  * `required`
-  * `maxLength`
-  * `minLength`
-  * `maximum`
-  * `minimum`
-  * `digits`
-  * `pattern`
-  * `name`
-  * `title`
-  * `summary`
-  * `enum`
-  * `x-enumNames`
-  * `examples`
-  * `properties`
-  * `items`
-  * `default`
-  * `additionalProperties`
-* 📈 Added the following annotations based on keywords:
-  * `@NotNull`
-  * `@NotEmpty`
-  * `@NotBlank`
-  * `@Size`
-  * `@Pattern`
-  * `@Valid`
-* 📈 Added required imports according to annotations
-* 📈 Filling JavaDoc based on keywords:
-  * `description`
-  * `example`
-* 📈 Added getters and setters
-* 📈 Added Lombok
-  * If a lombok is selected, the following annotations will be annotated:
-    * `@Data` 
-    * `@NoArgsConstructor`
-  * Added optionally annotations: 
-  * However, you can control Accessor filling
-    * `@AllArgsConstructor`
-    * `@Accessors(fluent = true, chain = true)`
- * 📈 Added generating messages
-    * Schema generates to "common" directory
-    * Message generates to "messages" directory
-* 📈 Added function to add extends of class.
-  Example : 
-  * `extends:`
-    * `fromClass: SomeDTO`
-    * `fromPackage: ru.example.path`
-  More examples in allSupportedCases.yaml
-* 📈 Added function to add implements of class.
-  Example :
-  ````
-  implements:
-    fromInterface:
-      - ru.example.path.SomeInterface
-More examples in allSupportedCases.yaml
-* 📈 Added custom `bigDecimal` and `bigInteger` format
-  * Added annotation `@Digits`
-    ````* Example: 
-      someCost:
-        type: number
-        description: The price of smth.
-        format: bigDecimal
-        digits: integer = 18, fraction = 2
-* 📈 Added Logs to Console
-* 📈 Unbound from apache lang dependencies
-* 📈 Added support inner schemas
-* 📈 Optimization code by abstract of variable properties
-* 📈 Added support of generation `Enum` classes
-* 📈 Added support of generation `Map<String, Object>` or other default types
-* 📈 Added support of generation `Set<String>` or other default types
-* 📈 Added support of validation groups. It was added for the specific cases, when you already have groups but want to use generator. Example: 
-  * ````Example:
-    Request:
+## How to fill AsyncApi contract
+
+At the moment, yojo is actively being refined and supplemented with various custom attributes for convenient code generation in Java. 
+The features available today are:
+
+Please **note** that it is always **necessary** to fill in the `type` attribute!
+
+### Message Object
+
+You can fill message like this:
+
+    RequestDtoByRef:
+      payload:
+        #This attribute will help you generate the message in the package you need.
+        pathForGenerateMessage: 'io.github.somepath'
+        $ref: '#/components/schemas/RequestDtoSchema'
+
+And you will get message like:
+
+    package example.testGenerate.contract.test.io.github.somepath;
+    
+    public class RequestDtoByRef {
+    
+    }
+
+Also you can make generate messages with propeties like:
+
+    RequestDtoByRefAndProperties:
+      payload:
+        $ref: '#/components/schemas/RequestDtoSchema'
+        properties:
+          someString:
+            type: String
+
+And you will getting this one:
+    
+    package example.testGenerate.contract.test.messages;
+
+    public class RequestDtoByRefAndProperties {
+        private String someString;
+    }
+
+This is what the option looks like with all possible attributes:
+
+    RequestDtoWithDoubleInheritance:
+      payload:
+        #You can use enable true/false on lombok
+        lombok:
+          accessors:
+            chain: true
+            fluent: false
+          equalsAndHashCode:
+            enable: true
+            callSuper: true
+          allArgsConstructor: true
+          noArgsConstructor: false
+        #removeSchema - schema in the reference will not be deleted.
+        removeSchema: false
+        $ref: '#/components/schemas/RequestDtoSchema'
+        implements:
+          fromInterface:
+            - testGenerate.InterfaceForImpl
+            - testGenerate.InterfaceForImpl2
+        extends:
+          fromClass: ClassForExtends
+          fromPackage: example.testGenerate.contract.test.common
+
+In the end, you will easily obtain such a class:
+
+    @Data
+    @Accessors(chain = true)
+    @AllArgsConstructor
+    @EqualsAndHashCode(callSuper = true)
+    public class RequestDtoWithDoubleInheritance extends ClassForExtends implements InterfaceForImpl,InterfaceForImpl2 {
+    }
+
+**See more in** [here](./examples)
+
+### Schema Object
+
+This is what the option looks like with all possible attributes:
+
+    RequestDtoSchema:
       type: object
-      description: SomeRequest
-      validationGroups:
-        - ApplicationValidation.Application.class
-      validationGroupsImports:
-        - ru.example.path.validation.ApplicationValidation
-      validateByGroups:
-        - fieldForValidation
-        - fieldForValidation
-        - fieldForValidation
+      lombok:
+        accessors:
+          enable: false
+      implements:
+        fromInterface:
+          - testGenerate.InterfaceForImpl
+          - testGenerate.InterfaceForImpl2
+      extends:
+        fromClass: ClassForExtends
+        fromPackage: example.testGenerate.contract.test.common
 
-* 📈 Added support of polymorphism for schemas
-* 📈 Added support of polymorphism for messages from channels
+In the end, you will easily obtain such a class:
 
-See also to [here](./examples) to find more cases.
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class RequestDtoSchema extends ClassForExtends implements InterfaceForImpl,InterfaceForImpl2 {
+    }
+
+
+### Аttributes
+| Common <br/>name | type    | format         | Result         |
+|------------------|---------|----------------|----------------|
+| integer          | integer | int32          | Integer        |
+| long             | integer | int64          | Long           |
+| float            | number  | float          | Float          |
+| double           | number  | double         | Double         |
+| byte             | string  | byte           | Byte           |
+| bigInteger       | number  | bigInteger     | BigInteger     |
+| bigDecimal       | number  | bigDecimal     | BigDecimal     |
+| boolean          | boolean | -              | Boolean        |
+| string           | string  | -              | String         |
+| uuid             | string  | uuid           | UUID           |
+| date             | object  | simple-date    | Date           |
+| date             | string  | date           | LocalDate      |
+| dateTime         | string  | date-time      | LocalDateTime  |
+| offsetDateTime   | string  | offsetDateTime | OffsetDateTime |
+
+The list is constantly being updated; for more details, see the examples.
+
+### Custom YAML attributes
+
+| Attribute                                                              | Description                                                     | Example                                                           |
+|------------------------------------------------------------------------|-----------------------------------------------------------------|-------------------------------------------------------------------|
+| realization                                                            | Use this attribute to specify the type of collection being used | Accepts realization by name. = new ArrayList/HashSet/HashMap etc. |
+| primitive                                                              | Use for generating primitive types.                             | Accepts a boolean. long, int, byte, boolean etc.                  |
+| existing<br/>package                                                   | Use for generating with using existing object.                  |                                                                   |
+| digits                                                                 | Use for generating @Digits annotation                           |                                                                   |
+| removeSchema                                                           | Used in messages. See examples                                  |                                                                   |
+| interface<br/>definition                                               | Use for generating interfaces.                                  |                                                                   |
+| extends<br/>implements<br/>fromClass<br/>fromPackage<br/>fromInterface | Attributes for extending or implementing objects                |                                                                   |
+
+The list is constantly being updated; for more details, see the examples.
+
+Also the generator is capable of generating collections(Map,List,Set) and enums.
+
+
+Please contact me if you need assistance; I will definitely help you. 
+This instruction only covers a small part of what can be generated. 
+Use the examples, or download the open source code and run the test cases, commenting out the file deletion in them beforehand.
 
 ## Developers
 * 😎 Vladimir Morozkin

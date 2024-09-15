@@ -1,0 +1,177 @@
+asyncapi: 2.0.0
+info:
+  title: Account Service
+  version: 1.0.0
+  description: "This service is in charge of processing user signups :rocket:"
+channels:
+  user/signedup:
+    subscribe:
+      message:
+        $ref: '#/components/messages/UserSignedUp'
+components:
+  messages:
+    UserSignedUp:
+      payload:
+        type: object
+        properties:
+          displayName:
+            type: string
+            description: Name of the user
+          email:
+            type: string
+            format: email
+            description: Email of the user
+  schemas:
+    CollectionTypes:
+      type: object
+      lombok:
+        accessors:
+          fluent: true
+      description: Here was located all supported collections
+      properties:
+
+        #LIST
+        listOfDate:
+          type: array
+          items:
+            format: date
+        listOfStandAloneDate:
+          type: array
+          items:
+            $ref: '#/components/schemas/StandaloneDate'
+        listOftDateTime:
+          type: array
+          items:
+            type: string
+            format: date-time
+        listOfOffsetDateTime:
+          type: array
+          items:
+            format: offsetDateTime
+        listOfInteger:
+          type: array
+          items:
+            format: integer
+        listOfByte:
+          type: array
+          items:
+            format: byte
+        listOfDouble:
+          type: array
+          items:
+            format: double
+        listOfFloat:
+          type: array
+          items:
+            format: float
+        listOfBigInteger:
+          type: array
+          items:
+            format: bigInteger
+        listOfBigDecimal:
+          type: array
+          items:
+            format: bigDecimal
+        listOfLongsWithRealization:
+          type: array
+          items:
+            format: long
+            realization: ArrayList
+        listWithInnerSchemaAndExistingObject:
+          type: array
+          items:
+            type: object
+            properties:
+              someString:
+                type: string
+              someExistingObject:
+                type: object
+                format: existing
+                name: ClassForExtending
+                package: testGenerate
+        listOfExistingObject:
+          type: array
+          items:
+            type: object
+            name: ClassForExtending
+            package: testGenerate
+        setOfExistingObject:
+          type: array
+          format: set
+          items:
+            type: object
+            format: existing
+            name: ClassForExtending
+            package: testGenerate
+        #same name of existing class
+        innerSchema:
+          type: array
+          items:
+            type: object
+            properties:
+              someString:
+                type: string
+              someExistingObject:
+                type: object
+                format: existing
+                name: ClassForExtending
+                package: testGenerate
+
+        #SET
+        setOfDate:
+          type: array
+          format: set
+          items:
+            format: date
+        setOftDateTime:
+          type: array
+          format: set
+          items:
+            type: string
+            format: date-time
+        setOfOffsetDateTime:
+          type: array
+          format: set
+          items:
+            format: offsetDateTime
+        setOfInteger:
+          type: array
+          format: set
+          items:
+            format: integer
+        setOfByte:
+          type: array
+          format: set
+          items:
+            format: byte
+        setOfDouble:
+          type: array
+          format: set
+          items:
+            format: double
+        setOfFloat:
+          type: array
+          format: set
+          items:
+            format: float
+        setOfBigInteger:
+          type: array
+          format: set
+          items:
+            format: bigInteger
+        setOfBigDecimal:
+          type: array
+          format: set
+          items:
+            format: bigDecimal
+        setOfLongsWithRealization:
+          type: array
+          format: set
+          items:
+            format: long
+            realization: HashSet
+
+    StandaloneDate:
+      type: string
+      format: date
+      description: This is standalone date

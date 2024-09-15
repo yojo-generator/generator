@@ -30,6 +30,7 @@ components:
         $ref: '#/components/schemas/RequestDtoSchema'
     RequestDtoByRefAndProperties:
       payload:
+        pathForGenerateMessage: 'io.github.someotherpath'
         $ref: '#/components/schemas/RequestDtoSchema'
         properties:
           someString:
