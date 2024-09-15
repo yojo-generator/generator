@@ -30,6 +30,7 @@ components:
         $ref: '#/components/schemas/RequestDtoSchema'
     RequestDtoByRefAndProperties:
       payload:
+        pathForGenerateMessage: 'io.github.someotherpath'
         $ref: '#/components/schemas/RequestDtoSchema'
         properties:
           someString:
@@ -59,7 +60,7 @@ components:
             - testGenerate.InterfaceForImpl2
         extends:
           fromClass: ClassForExtends
-          fromPackage: example.testGenerate.test.common
+          fromPackage: example.testGenerate.contract.test.common
     RequestDtoInheritanceFromSchema:
       payload:
         $ref: '#/components/schemas/RequestDtoSchema'
@@ -142,7 +143,7 @@ components:
           - testGenerate.InterfaceForImpl2
       extends:
         fromClass: ClassForExtends
-        fromPackage: example.testGenerate.test.common
+        fromPackage: example.testGenerate.contract.test.common
       #Validation Groups was added for backward compatibility. Must be used with required.
       #validationGroups contains name of Class
 #      validationGroups:
@@ -181,23 +182,23 @@ components:
         primitives:
           type: object
           description: Here was located all supported primitives
-          $ref: './primitives.yaml#/components/schemas/Primitives'
+          $ref: './separated/primitives.yaml#/components/schemas/Primitives'
 
         objectTypes:
           type: object
           description: Here was located all supported object types
-          $ref: './objectTypes.yaml#/components/schemas/ObjectTypes'
+          $ref: './separated/objectTypes.yaml#/components/schemas/ObjectTypes'
 
         #When name starts with UpperCase, it will uncapitalize
         #Also here we annotate this object with @Valid and @NotNull
         StringValues:
           type: object
           description: Here was located all supported strings values
-          $ref: './stringValues.yaml#/components/schemas/StringValues'
+          $ref: './separated/stringValues.yaml#/components/schemas/StringValues'
         numericsValues:
           type: object
           description: Here was located all supported numeric values
-          $ref: './numericValues.yaml#/components/schemas/NumericsValues'
+          $ref: './separated/numericValues.yaml#/components/schemas/NumericsValues'
 
         collectionTypes:
           type: array
@@ -205,25 +206,25 @@ components:
           items:
             #Attribute Type object is required attribute if you use separated contract
             type: object
-            $ref: './collectionTypes.yaml#/components/schemas/CollectionTypes'
+            $ref: './separated/collectionTypes.yaml#/components/schemas/CollectionTypes'
         listOfPrimitives:
           type: array
           items:
             #Attribute Type object is required attribute if you use separated contract
             type: object
-            $ref: './primitives.yaml#/components/schemas/Primitives'
+            $ref: './separated/primitives.yaml#/components/schemas/Primitives'
         listOfPrimitivesRequired:
           type: array
           items:
             #Attribute Type object is required attribute if you use separated contract
             type: object
-            $ref: './primitives.yaml#/components/schemas/Primitives'
+            $ref: './separated/primitives.yaml#/components/schemas/Primitives'
         listOfPrimitivesWithRealization:
           type: array
           items:
             #Attribute Type object is required attribute if you use separated contract
             type: object
-            $ref: './primitives.yaml#/components/schemas/Primitives'
+            $ref: './separated/primitives.yaml#/components/schemas/Primitives'
             realization: LinkedList
         setOfPrimitives:
           type: array
@@ -231,21 +232,21 @@ components:
           items:
             #Attribute Type object is required attribute if you use separated contract
             type: object
-            $ref: './primitives.yaml#/components/schemas/Primitives'
+            $ref: './separated/primitives.yaml#/components/schemas/Primitives'
         setOfPrimitivesRequired:
           type: array
           format: set
           items:
             #Attribute Type object is required attribute if you use separated contract
             type: object
-            $ref: './primitives.yaml#/components/schemas/Primitives'
+            $ref: './separated/primitives.yaml#/components/schemas/Primitives'
         setOfPrimitivesWithRealization:
           type: array
           format: set
           items:
             #Attribute Type object is required attribute if you use separated contract
             type: object
-            $ref: './primitives.yaml#/components/schemas/Primitives'
+            $ref: './separated/primitives.yaml#/components/schemas/Primitives'
             realization: HashSet
 
         integerValidationField:
@@ -295,7 +296,7 @@ components:
           additionalProperties:
             type: object
             format: existing
-            name: ClassForExtending
+            name: ExistingClass
             package: testGenerate
         mapStringSetOfCustomObject:
           type: object
@@ -317,7 +318,7 @@ components:
           additionalProperties:
             type: array
             format: set
-            name: ClassForExtending
+            name: ExistingClass
             package: testGenerate
 
         #MAP UUID key
@@ -361,7 +362,7 @@ components:
           additionalProperties:
             type: object
             format: existing
-            name: ClassForExtending
+            name: ExistingClass
             package: testGenerate
         mapUUIDSetOfCustomObject:
           type: object
@@ -386,7 +387,7 @@ components:
           additionalProperties:
             type: array
             format: set
-            name: ClassForExtending
+            name: ExistingClass
             package: testGenerate
 
         innerEnumWithDescription:
@@ -453,7 +454,7 @@ components:
           callSuper: false
       extends:
         fromClass: ClassForExtends
-        fromPackage: example.testGenerate.test.common
+        fromPackage: example.testGenerate.contract.test.common
       properties:
         someInteger:
           type: integer
@@ -465,7 +466,7 @@ components:
               type: string
             someExistingObject:
               type: object
-              name: ClassForExtending
+              name: ExistingClass
               package: testGenerate
 
     SomeObjectImpl:
