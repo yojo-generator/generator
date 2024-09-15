@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '17'
-          distribution: 'Axiom'
+          distribution: 'temurin'
       - name: Build and publish with Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
