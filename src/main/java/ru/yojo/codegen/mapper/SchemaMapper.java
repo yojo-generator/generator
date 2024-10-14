@@ -31,7 +31,6 @@ public class SchemaMapper extends AbstractMapper {
     public List<Schema> mapSchemasToObjects(ProcessContext processContext) {
         helper.setIsMappedFromSchemas(true);
         List<Schema> schemaList = new ArrayList<>();
-        Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
         processContext.getSchemasMap().forEach((schemaName, schemaValues) -> {
             LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(processContext.getLombokProperties());
             System.out.println("START MAPPING OF SCHEMA: " + schemaName);
@@ -107,7 +106,7 @@ public class SchemaMapper extends AbstractMapper {
                                     processContext.getSchemasMap(),
                                     castObjectToMap(schemaMap.get(PROPERTIES)),
                                     processContext,
-                                    innerSchemas
+                                    helper.getInnerSchemas()
                             )
                     );
                 } else {
@@ -120,8 +119,8 @@ public class SchemaMapper extends AbstractMapper {
                 throw new SchemaFillException("NOT DEFINED TYPE OF SCHEMA! Schema: " + schemaName);
             }
         });
-        if (!innerSchemas.isEmpty()) {
-            innerSchemas.forEach((schemaName, schemaValues) -> {
+        if (!helper.getInnerSchemas().isEmpty()) {
+            helper.getInnerSchemas().forEach((schemaName, schemaValues) -> {
                 LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(processContext.getLombokProperties());
                 System.out.println("START MAPPING OF INNER SCHEMA: " + schemaName);
                 Map<String, Object> schemaMap = castObjectToMap(schemaValues);
@@ -136,10 +135,10 @@ public class SchemaMapper extends AbstractMapper {
                             getSchemaVariableProperties(
                                     schemaName,
                                     schemaMap,
-                                    innerSchemas,
+                                    helper.getInnerSchemas(),
                                     castObjectToMap(schemaMap.get(PROPERTIES)),
                                     processContext,
-                                    innerSchemas
+                                    helper.getInnerSchemas()
                             )
                     );
                     schemaList.add(schema);
@@ -169,7 +168,7 @@ public class SchemaMapper extends AbstractMapper {
                         propertyName,
                         castObjectToMap(propertyValue),
                         processContext,
-                        innerSchemas);
+                        helper.getInnerSchemas());
                 variableProperties.add(vp);
             });
         }
@@ -196,7 +195,7 @@ public class SchemaMapper extends AbstractMapper {
                             propertyName,
                             castObjectToMap(propertyValue),
                             processContext,
-                            innerSchemas);
+                            helper.getInnerSchemas());
                     variableProperties.add(vp);
                 }
             });
@@ -205,7 +204,7 @@ public class SchemaMapper extends AbstractMapper {
             VariableProperties vp = new VariableProperties();
             vp.setValid(false);
             vp.setEnum(true);
-            fillProperties(schemaName, vp, currentSchema, schemas, schemaName, currentSchema, processContext, innerSchemas);
+            fillProperties(schemaName, vp, currentSchema, schemas, schemaName, currentSchema, processContext, helper.getInnerSchemas());
             variableProperties.add(vp);
         }
         return new FillParameters(variableProperties);

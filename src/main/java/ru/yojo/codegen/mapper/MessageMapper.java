@@ -35,9 +35,6 @@ public class MessageMapper extends AbstractMapper {
      */
     public List<Message> mapMessagesToObjects(ProcessContext processContext) {
         List<Message> messageList = new ArrayList<>();
-        Set<String> removeSchemas = new HashSet<>();
-        Set<String> excludeRemoveSchemas = new HashSet<>();
-        Set<String> excludeInheritanceSchemas = new HashSet<>();
         processContext.getMessagesMap().forEach((messageName, messageValues) -> {
             //flag will true if message was filled by schemas propeties
             filledByRef = false;
@@ -53,7 +50,7 @@ public class MessageMapper extends AbstractMapper {
 
             //see extendsAndImplFilling method
             AtomicBoolean needToFill = new AtomicBoolean(true);
-            extendsAndImplFilling(excludeInheritanceSchemas, message, payloadMap, refObject, needToFill);
+            extendsAndImplFilling(helper.getExcludeInheritanceSchemas(), message, payloadMap, refObject, needToFill);
 
             if (needToFill.get()) {
                 filledByRef = false;
@@ -62,8 +59,8 @@ public class MessageMapper extends AbstractMapper {
                                 messageName,
                                 payloadMap,
                                 processContext,
-                                removeSchemas,
-                                excludeRemoveSchemas,
+                                helper.getRemoveSchemas(),
+                                helper.getExcludeRemoveSchemas(),
                                 message.getLombokProperties()
                         )
                 );
@@ -74,8 +71,8 @@ public class MessageMapper extends AbstractMapper {
                                     messageName,
                                     payloadMap,
                                     processContext,
-                                    removeSchemas,
-                                    excludeRemoveSchemas,
+                                    helper.getRemoveSchemas(),
+                                    helper.getExcludeRemoveSchemas(),
                                     message.getLombokProperties()));
                 }
                 //Check inhiritance from schema
@@ -106,13 +103,13 @@ public class MessageMapper extends AbstractMapper {
             message.setCommonPackageName(processContext.getCommonPackage());
             messageList.add(message);
         });
-        excludeRemoveSchemas.addAll(excludeInheritanceSchemas);
-        if (!excludeRemoveSchemas.isEmpty()) {
-            excludeRemoveSchemas.forEach(removeSchemas::remove);
+        helper.getExcludeRemoveSchemas().addAll(helper.getExcludeInheritanceSchemas());
+        if (!helper.getExcludeRemoveSchemas().isEmpty()) {
+            helper.getExcludeRemoveSchemas().forEach(helper.getRemoveSchemas()::remove);
         }
 
-        System.out.println("FINISH MAPPING OF MESSAGES! CLEAN UP SCHEMAS: " + removeSchemas);
-        removeSchemas.forEach(processContext.getSchemasMap()::remove);
+        System.out.println("FINISH MAPPING OF MESSAGES! CLEAN UP SCHEMAS: " + helper.getRemoveSchemas());
+        helper.getRemoveSchemas().forEach(processContext.getSchemasMap()::remove);
         return messageList;
     }
 
@@ -202,9 +199,8 @@ public class MessageMapper extends AbstractMapper {
             propertiesMap.forEach((propertyName, propertyValue) -> {
 
                 VariableProperties mvp = new VariableProperties();
-                Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
 
-                fillProperties(messageName, mvp, payload, payload, propertyName, castObjectToMap(propertyValue), processContext, innerSchemas);
+                fillProperties(messageName, mvp, payload, payload, propertyName, castObjectToMap(propertyValue), processContext, helper.getInnerSchemas());
 
                 if (mvp.getItems() != null && !JAVA_DEFAULT_TYPES.contains(mvp.getItems())) {
                     excludeRemoveSchemas.add(mvp.getItems());
