@@ -56,7 +56,7 @@ components:
         #Custom attribute
         bigDecimalValue:
           type: number
-          format: bigDecimal
+          multipleOf: 10.01
         #Custom attribute
         bigIntegerValue:
           type: number

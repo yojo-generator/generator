@@ -93,6 +93,7 @@ public class YojoGenerator implements Generator {
                                 processContext.setPackageLocation(packageLocation);
                                 processContext.setLombokProperties(yojoContext.getLombokProperties());
                                 processContext.setSpringBootVersion(yojoContext.getSpringBootVersion());
+                                processContext.setJsonPropertyDescription(yojoContext.isJsonPropertyDescription());
                                 process(processContext);
                             }
                         }
@@ -144,7 +145,7 @@ public class YojoGenerator implements Generator {
                                     packageLocation :
                                     String.join(".", packageLocation, modifiedString.replace("/", "."));
                             content = getContent(content, packageLocation);
-                            if (content.startsWith("asyncapi")) {
+                            if (content.startsWith("asyncapi") || content.startsWith("openapi")) {
                                 ProcessContext processContext = new ProcessContext(new Yaml().load(content));
                                 processContext.setFilePath(file.getPath());
                                 processContext.setOutputDirectory(outputDirectory + modifiedString.replace('\\', '/'));

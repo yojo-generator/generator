@@ -12,6 +12,7 @@ public class YojoContext {
     private String packageLocation;
     private LombokProperties lombokProperties;
     private String springBootVersion;
+    private boolean jsonPropertyDescription;
 
     public String getDirectory() {
         return directory;
@@ -53,4 +54,11 @@ public class YojoContext {
         this.springBootVersion = springBootVersion;
     }
 
+    public boolean isJsonPropertyDescription() {
+        return jsonPropertyDescription;
+    }
+
+    public void setJsonPropertyDescription(boolean jsonPropertyDescription) {
+        this.jsonPropertyDescription = jsonPropertyDescription;
+    }
 }

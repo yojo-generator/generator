@@ -59,6 +59,8 @@ public class ProcessContext {
      */
     private String commonPackage;
 
+    private boolean jsonPropertyDescription;
+
     /**
      * Prepared messages map, from components.messages
      */
@@ -157,5 +159,13 @@ public class ProcessContext {
 
     public void setSchemasMap(Map<String, Object> schemasMap) {
         this.schemasMap = schemasMap;
+    }
+
+    public void setJsonPropertyDescription(boolean jsonPropertyDescription) {
+        jsonPropertyDescription = jsonPropertyDescription;
+    }
+
+    public boolean isJsonPropertyDescription() {
+        return jsonPropertyDescription;
     }
 }

@@ -45,6 +45,7 @@ public final class Dictionary {
     public static final String ALL_OF = "allOf";
     public static final String ONE_OF = "oneOf";
     public static final String ANY_OF = "anyOf";
+    public static final String NUMBER = "number";
     public static final List<String> POLYMORPHS = List.of(ALL_OF, ONE_OF, ANY_OF);
 
     /**
@@ -66,6 +67,7 @@ public final class Dictionary {
     public static final String DEFINITION = "definition";
     public static final String REMOVE_SCHEMA = "removeSchema";
     public static final String DIGITS = "digits";
+    public static final String MULTIPLE_OF = "multipleOf";
 
 
     /**
@@ -116,8 +118,11 @@ public final class Dictionary {
     public static final String PATTERN_ANNOTATION_WITHOUT_REGEXP = "@Pattern";
     public static final String VALID_ANNOTATION = "@Valid";
     public static final String DIGITS_ANNOTATION = "@Digits(%s)";
+    public static final String DECIMAL_MIN_ANNOTATION = "@Digits(%s)";
+    public static final String DECIMAL_MAX_ANNOTATION = "@Digits(%s)";
     public static final String MINIMUM_ANNOTATION = "@Min(%s)";
     public static final String MAXIMUM_ANNOTATION = "@Max(%s)";
+    public static final String JSON_PROPERTY_DESCRIPTION_ANNOTATION = "@JsonPropertyDescription()";
 
     /**
      * Lombok annotations
@@ -185,6 +190,8 @@ public final class Dictionary {
     public static final String JAVAX_PATTERN_IMPORT = "javax.validation.constraints.Pattern;";
     public static final String JAVAX_VALID_IMPORT = "javax.validation.Valid;";
     public static final String JAVAX_DIGITS_IMPORT = "javax.validation.constraints.Digits;";
+    public static final String JAVAX_DECIMAL_MIN_IMPORT = "javax.validation.constraints.DecimalMin;";
+    public static final String JAVAX_DECIMAL_MAX_IMPORT = "javax.validation.constraints.DecimalMax;";
     public static final String JAVAX_MIN_IMPORT = "javax.validation.constraints.Min;";
     public static final String JAVAX_MAX_IMPORT = "javax.validation.constraints.Max;";
 
@@ -198,6 +205,8 @@ public final class Dictionary {
     public static final String JAKARTA_PATTERN_IMPORT = "jakarta.validation.constraints.Pattern;";
     public static final String JAKARTA_VALID_IMPORT = "jakarta.validation.Valid;";
     public static final String JAKARTA_DIGITS_IMPORT = "jakarta.validation.constraints.Digits;";
+    public static final String JAKARTA_DECIMAL_MIN_IMPORT = "javax.validation.constraints.DecimalMin;";
+    public static final String JAKARTA_DECIMAL_MAX_IMPORT = "javax.validation.constraints.DecimalMax;";
     public static final String JAKARTA_MIN_IMPORT = "jakarta.validation.constraints.Min;";
     public static final String JAKARTA_MAX_IMPORT = "jakarta.validation.constraints.Max;";
 
@@ -210,6 +219,7 @@ public final class Dictionary {
     public static final String MAP_IMPORT = "java.util.Map;";
     public static final String HASH_MAP_IMPORT = "java.util.HashMap;";
     public static final String LINKED_HASH_MAP_IMPORT = "java.util.LinkedHashMap;";
+    public static final String JSON_PROPERTY_DESCRIPTION_IMPORT = "com.fasterxml.jackson.annotation.JsonPropertyDescription;";
 
     /**
      * Java Doc

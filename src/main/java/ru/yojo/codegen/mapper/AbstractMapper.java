@@ -51,11 +51,12 @@ public class AbstractMapper {
         variableProperties.setExample(getStringValueIfExistOrElseNull(EXAMPLE, propertiesMap));
         variableProperties.setTitle(getStringValueIfExistOrElseNull(TITLE, propertiesMap));
         variableProperties.setDigits(getStringValueIfExistOrElseNull(DIGITS, propertiesMap));
-        variableProperties.setFormat(getStringValueIfExistOrElseNull(FORMAT, propertiesMap));
-        variableProperties.setPattern(getStringValueIfExistOrElseNull(PATTERN, propertiesMap));
-        variableProperties.setMinMaxLength(getStringValueIfExistOrElseNull(MIN_LENGTH, propertiesMap), getStringValueIfExistOrElseNull(MAX_LENGTH, propertiesMap));
+        variableProperties.setMultipleOf(getStringValueIfExistOrElseNull(MULTIPLE_OF, propertiesMap));
         variableProperties.setMinimum(getStringValueIfExistOrElseNull(MINIMUM, propertiesMap));
         variableProperties.setMaximum(getStringValueIfExistOrElseNull(MAXIMUM, propertiesMap));
+        variableProperties.setMinMaxLength(getStringValueIfExistOrElseNull(MIN_LENGTH, propertiesMap), getStringValueIfExistOrElseNull(MAX_LENGTH, propertiesMap));
+        variableProperties.setFormat(getStringValueIfExistOrElseNull(FORMAT, propertiesMap));
+        variableProperties.setPattern(getStringValueIfExistOrElseNull(PATTERN, propertiesMap));
         variableProperties.setEnumeration(getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap));
         variableProperties.setEnumNames(getStringValueIfExistOrElseNull(X_ENUM_NAMES, propertiesMap));
         variableProperties.setPackageOfExisingObject(getStringValueIfExistOrElseNull(PACKAGE, propertiesMap));

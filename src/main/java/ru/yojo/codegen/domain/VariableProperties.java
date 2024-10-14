@@ -78,6 +78,11 @@ public class VariableProperties {
     private String digits;
 
     /**
+     * One more used in annotation @Digits for BigDecimal. same digits, but will seems like 200.01
+     */
+    private String multipleOf;
+
+    /**
      * Property used in annotation @Min for Integers
      */
     private String minimum;
@@ -141,6 +146,7 @@ public class VariableProperties {
      * Set of required imports for variable
      */
     private Set<String> requiredImports = new HashSet<>();
+
 
     public String getName() {
         return name;
@@ -310,9 +316,9 @@ public class VariableProperties {
 
     public void setMinimum(String minimum) {
         this.minimum = minimum;
-        if (isNotBlank(minimum)) {
+        if (isNotBlank(minimum) && multipleOf == null) {
             annotationSet.add(generateMinAnnotation(minimum));
-            if (springBootVersion!= null && springBootVersion.startsWith("3")) {
+            if (springBootVersion != null && springBootVersion.startsWith("3")) {
                 requiredImports.add(JAKARTA_MIN_IMPORT);
             } else {
                 requiredImports.add(JAVAX_MIN_IMPORT);
@@ -326,9 +332,9 @@ public class VariableProperties {
 
     public void setMaximum(String maximum) {
         this.maximum = maximum;
-        if (isNotBlank(maximum)) {
+        if (isNotBlank(maximum) && multipleOf == null) {
             annotationSet.add(generateMaxAnnotation(maximum));
-            if (springBootVersion!= null && springBootVersion.startsWith("3")) {
+            if (springBootVersion != null && springBootVersion.startsWith("3")) {
                 requiredImports.add(JAKARTA_MAX_IMPORT);
             } else {
                 requiredImports.add(JAVAX_MAX_IMPORT);
@@ -347,6 +353,24 @@ public class VariableProperties {
     }
 
     public void setFormat(String format) {
+        if (format == null) {
+            //if only number used will generating BigDecimal
+            if (NUMBER.equalsIgnoreCase(type)) {
+                this.type = BIG_DECIMAL;
+                this.format = BIG_DECIMAL;
+                format = "bigDecimal";
+                if (multipleOf != null) {
+                    Integer fraction = multipleOf
+                            .substring(multipleOf.indexOf('.'), multipleOf.length())
+                            .replace(".", "")
+                            .length();
+                    Integer integer = multipleOf
+                            .replace(".", "")
+                            .length();
+                    digits = "integer = " + integer + ", " + "fraction = " + fraction;
+                }
+            }
+        }
         if (format != null) {
             switch (format) {
                 case "string":
@@ -647,6 +671,14 @@ public class VariableProperties {
 
     public void setValid(boolean valid) {
         this.valid = valid;
+    }
+
+    public void setMultipleOf(String multipleOf) {
+        this.multipleOf = multipleOf;
+    }
+
+    public String getMultipleOf() {
+        return multipleOf;
     }
 
     public String toWrite() {
