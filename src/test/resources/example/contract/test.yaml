@@ -36,14 +36,31 @@ components:
             type: String
     RequestDtoWithProperties:
       payload:
-        lombok:
-          accessors:
-            chain: true
-          equalsAndHashCode:
-            enable: true
         properties:
           someString:
             type: string
+          someOneObject:
+            type: object
+            description: Inheritance object
+            properties:
+              someField:
+                type: string
+                description: someField description
+          aComplexProperty:
+            type: object
+            properties:
+              prop1:
+                type: object
+                additionalProperties:
+                  anyOf:
+                    - type: boolean
+                    - type: string
+                    - type: integer
+                description: "A dynamic object where each key is a feature, and the value"
+                example:
+                  prop1: 100
+                  prop2: "foo"
+                  prop3: true
     RequestDtoWithDoubleInheritance:
       payload:
         lombok:
