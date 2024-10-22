@@ -75,6 +75,7 @@ jreleaser {
     project {
         inceptionYear = "2024"
         author("@vmorozkin")
+        tags = ['yaml', 'yaml-parser', 'asyncapi', 'pojo-builder', 'asyncapi-tools', 'asyncapi-generator', 'yaml-pojo', 'yojo', 'yaml-to-dto', 'yaml-to-pojo', 'yaml-to-java', 'yaml-to-java-dto', 'yaml-dto']
     }
     signing {
         active = 'ALWAYS'
