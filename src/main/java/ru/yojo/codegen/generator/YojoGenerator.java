@@ -1,6 +1,5 @@
 package ru.yojo.codegen.generator;
 
-import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 import ru.yojo.codegen.context.ProcessContext;
 import ru.yojo.codegen.context.YojoContext;
@@ -36,7 +35,6 @@ import static ru.yojo.codegen.util.MapperUtil.getStringValueIfExistOrElseNull;
  * March 2023
  */
 @SuppressWarnings("all")
-@Component
 public class YojoGenerator implements Generator {
 
     private final SchemaMapper schemaMapper;

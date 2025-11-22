@@ -1,14 +1,11 @@
 package ru.yojo.codegen.mapper;
 
-import org.springframework.stereotype.Component;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-@Component
 public class Helper {
 
     private Boolean isMappedFromMessages = false;

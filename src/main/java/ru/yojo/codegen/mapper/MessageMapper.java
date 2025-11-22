@@ -1,6 +1,6 @@
 package ru.yojo.codegen.mapper;
 
-import org.springframework.stereotype.Component;
+
 import ru.yojo.codegen.context.ProcessContext;
 import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.VariableProperties;
@@ -16,7 +16,6 @@ import static ru.yojo.codegen.util.LombokUtils.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 @SuppressWarnings("all")
-@Component
 public class MessageMapper extends AbstractMapper {
 
     private final Helper helper;
