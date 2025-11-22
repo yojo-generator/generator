@@ -139,11 +139,11 @@ tasks.withType(JavaCompile) {
 }
 
 application {
-    mainModule = 'ru.yojo.codegen'
-    mainClass = 'ru.yojo.codegen.YojoCLI'
+    mainModule = 'ru.croc.yojo'
+    mainClass = 'ru.croc.yojo.YojoGenerator'
 }
 
-mainClassName = "ru.yojo.codegen.YojoCLI"
+mainClassName = "ru.croc.yojo.YojoGenerator"
 
 jar {
     manifest {
@@ -157,14 +157,8 @@ jar {
 }
 
 dependencies {
-    implementation 'org.springframework:spring-context:6.1.7'
     implementation 'org.yaml:snakeyaml:2.0'
-//    implementation 'javax.validation:validation-api:2.0.1.Final'
-    compileOnly 'org.projectlombok:lombok:1.18.26'
-    testCompileOnly 'org.projectlombok:lombok:1.18.26'
-
-    testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.5'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.5.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
 }
 
 test {
