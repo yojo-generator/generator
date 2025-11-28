@@ -563,7 +563,7 @@ components:
       type: object
       format: interface
       imports:
-        - example.testGenerate.test.common.InnerSchema
+        - example.testGenerate.contract.test.common.InnerSchema
       methods:
         methodOne:
           definition: void someOne(String someString, InnerSchema schema)

@@ -82,7 +82,7 @@ components:
         $ref: '#/components/schemas/RequestDtoSchema'
         extends:
           fromClass: RequestDtoSchema
-          fromPackage: example.testGenerate.test.common
+          fromPackage: example.testGenerate.contract.test.common
   schemas:
     PolymorphExampleOne:
       type: object
@@ -566,7 +566,7 @@ components:
       format: interface
       description: It is interface with Methods
       imports:
-        - example.testGenerate.test.common.InnerSchema
+        - example.testGenerate.contract.test.common.InnerSchema
       methods:
         methodOne:
           description: This is void method
@@ -579,7 +579,7 @@ components:
       type: object
       format: interface
       imports:
-        - example.testGenerate.test.common.InnerSchema
+        - example.testGenerate.contract.test.common.InnerSchema
       methods:
         methodOne:
           definition: void someOne(String someString, InnerSchema schema)
