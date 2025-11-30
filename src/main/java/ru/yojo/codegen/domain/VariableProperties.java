@@ -73,12 +73,12 @@ public class VariableProperties {
     private String title;
 
     /**
-     * Property used in annotation @Digits for BigDecimal
+     * Property used in annotation @Digits for big-decimal
      */
     private String digits;
 
     /**
-     * One more used in annotation @Digits for BigDecimal. same digits, but will seems like 200.01
+     * One more used in annotation @Digits for big-decimal. same digits, but will seems like 200.01
      */
     private String multipleOf;
 
@@ -354,11 +354,11 @@ public class VariableProperties {
 
     public void setFormat(String format) {
         if (format == null) {
-            //if only number used will generating BigDecimal
+            //if only number used will generating big-decimal
             if (NUMBER.equalsIgnoreCase(type)) {
                 this.type = BIG_DECIMAL;
                 this.format = BIG_DECIMAL;
-                format = "bigDecimal";
+                format = "big-decimal";
                 if (multipleOf != null) {
                     Integer fraction = multipleOf
                             .substring(multipleOf.indexOf('.'), multipleOf.length())
@@ -399,6 +399,20 @@ public class VariableProperties {
                     }
                     break;
                 case "date-time":
+                    this.type = OFFSET_DATE_TIME;
+                    requiredImports.add(OFFSET_DATE_TIME_IMPORT);
+                    if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
+                        this.items = OFFSET_DATE_TIME;
+                        this.type = format(collectionPattern, OFFSET_DATE_TIME);
+                        this.valid = false;
+                    }
+                    break;
+
+                case "local-date-time":
                     this.type = LOCAL_DATE_TIME;
                     requiredImports.add(LOCAL_DATE_TIME_IMPORT);
                     if (items != null) {
@@ -421,19 +435,6 @@ public class VariableProperties {
                         }
                         this.items = SIMPLE_DATE;
                         this.type = format(collectionPattern, SIMPLE_DATE);
-                        this.valid = false;
-                    }
-                    break;
-                case "offsetDateTime":
-                    this.type = OFFSET_DATE_TIME;
-                    requiredImports.add(OFFSET_DATE_TIME_IMPORT);
-                    if (items != null) {
-                        String collectionPattern = LIST_TYPE;
-                        if ("set".equalsIgnoreCase(collectionType)) {
-                            collectionPattern = SET_TYPE;
-                        }
-                        this.items = OFFSET_DATE_TIME;
-                        this.type = format(collectionPattern, OFFSET_DATE_TIME);
                         this.valid = false;
                     }
                     break;
@@ -536,7 +537,20 @@ public class VariableProperties {
                         this.valid = false;
                     }
                     break;
-                case "bigDecimal":
+                case "uri":
+                    this.type = URI;
+                    requiredImports.add(URI_IMPORT);
+                    if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
+                        this.items = URI;
+                        this.type = format(collectionPattern, URI);
+                        this.valid = false;
+                    }
+                    break;
+                case "big-decimal":
                     this.type = BIG_DECIMAL;
                     requiredImports.add(BIG_DECIMAL_IMPORT);
                     if (items != null) {
@@ -557,7 +571,7 @@ public class VariableProperties {
                         annotationSet.add(format(DIGITS_ANNOTATION, digits));
                     }
                     break;
-                case "bigInteger":
+                case "big-integer":
                     this.type = BIG_INTEGER;
                     requiredImports.add(BIG_INTEGER_IMPORT);
                     if (items != null) {

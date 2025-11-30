@@ -65,15 +65,15 @@ components:
         #LOCAL-DATE-TIME
         localDateTimeValue:
           type: string
-          format: date-time
+          format: local-date-time
         localDateTimeValueWithRequired:
           type: string
-          format: date-time
+          format: local-date-time
 
         #OFFSET DATE TIME
         offsetDateTimeValue:
           type: object
-          format: offsetDateTime
+          format: date-time
         offsetDateTimeValueWithRequired:
           type: object
-          format: offsetDateTime
+          format: date-time

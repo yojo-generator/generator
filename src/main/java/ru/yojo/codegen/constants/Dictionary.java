@@ -2,6 +2,7 @@ package ru.yojo.codegen.constants;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static java.lang.System.lineSeparator;
 import static java.util.Map.entry;
@@ -91,7 +92,8 @@ public final class Dictionary {
      */
     public static final String ST_SIMPLE_DATE = "simple-date";
     public static final String ST_LOCAL_DATE = "date";
-    public static final String ST_LOCAL_DATE_TIME = "date-time";
+    public static final String ST_LOCAL_DATE_TIME = "local-date-time";
+    public static final String ST_DATE_TIME = "date-time";
     public static final String ST_LONG = "long";
     public static final String ST_INTEGER = "integer";
     public static final String ST_BYTE = "byte";
@@ -101,8 +103,9 @@ public final class Dictionary {
     public static final String ST_BOOLEAN = "boolean";
     public static final String ST_STRING = "string";
     public static final String ST_OBJECT_TYPE = "object";
-    public static final String ST_BIG_DECIMAL = "bigDecimal";
-    public static final String ST_BIG_INTEGER = "bigInteger";
+    public static final String ST_BIG_DECIMAL = "big-decimal";
+    public static final String ST_BIG_INTEGER = "big-integer";
+    public static final String ST_URI = "uri";
 
     /**
      * Annotations
@@ -167,6 +170,7 @@ public final class Dictionary {
     public static final String OBJECT_TYPE = "Object";
     public static final String BIG_DECIMAL = "BigDecimal";
     public static final String BIG_INTEGER = "BigInteger";
+    public static final String URI = "URI";
 
     /**
      * Packages
@@ -205,8 +209,8 @@ public final class Dictionary {
     public static final String JAKARTA_PATTERN_IMPORT = "jakarta.validation.constraints.Pattern;";
     public static final String JAKARTA_VALID_IMPORT = "jakarta.validation.Valid;";
     public static final String JAKARTA_DIGITS_IMPORT = "jakarta.validation.constraints.Digits;";
-    public static final String JAKARTA_DECIMAL_MIN_IMPORT = "javax.validation.constraints.DecimalMin;";
-    public static final String JAKARTA_DECIMAL_MAX_IMPORT = "javax.validation.constraints.DecimalMax;";
+    public static final String JAKARTA_DECIMAL_MIN_IMPORT = "jakarta.validation.constraints.DecimalMin;";
+    public static final String JAKARTA_DECIMAL_MAX_IMPORT = "jakarta.validation.constraints.DecimalMax;";
     public static final String JAKARTA_MIN_IMPORT = "jakarta.validation.constraints.Min;";
     public static final String JAKARTA_MAX_IMPORT = "jakarta.validation.constraints.Max;";
 
@@ -220,6 +224,7 @@ public final class Dictionary {
     public static final String HASH_MAP_IMPORT = "java.util.HashMap;";
     public static final String LINKED_HASH_MAP_IMPORT = "java.util.LinkedHashMap;";
     public static final String JSON_PROPERTY_DESCRIPTION_IMPORT = "com.fasterxml.jackson.annotation.JsonPropertyDescription;";
+    public static final String URI_IMPORT = "java.net.URI;";
 
     /**
      * Java Doc
@@ -284,6 +289,26 @@ public final class Dictionary {
     public static final String METHODS = "methods";
     public static final String IMPORTS = "imports";
 
+    /**
+     * Java keywords
+     */
+    private static final Set<String> JAVA_KEYWORDS = Set.of(
+            "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char",
+            "class", "const", "continue", "default", "do", "double", "else", "enum",
+            "extends", "final", "finally", "float", "for", "goto", "if", "implements",
+            "import", "instanceof", "int", "interface", "long", "native", "new",
+            "package", "private", "protected", "public", "return", "short", "static",
+            "strictfp", "super", "switch", "synchronized", "this", "throw", "throws",
+            "transient", "try", "void", "volatile", "while"
+    );
+
+    public static String safeFieldName(String name) {
+        if (JAVA_KEYWORDS.contains(name)) {
+            return name + "Field";
+        }
+        return name;
+    }
+
     public static final Map<String, String> JAVA_TYPES_REQUIRED_ANNOTATIONS = ofEntries(
             entry(STRING, NOT_BLANK_ANNOTATION),
             entry(BYTE, NOT_NULL_ANNOTATION),
@@ -333,7 +358,8 @@ public final class Dictionary {
             LOCAL_DATE,
             LOCAL_DATE_TIME,
             OFFSET_DATE_TIME,
-            UUID
+            UUID,
+            URI
     );
 
     public static final Map<String, Object> JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER = ofEntries(
@@ -348,8 +374,10 @@ public final class Dictionary {
             entry(ST_BIG_INTEGER, BIG_INTEGER),
             entry(ST_LOCAL_DATE, LOCAL_DATE),
             entry(ST_LOCAL_DATE_TIME, LOCAL_DATE_TIME),
+            entry(ST_DATE_TIME, OFFSET_DATE_TIME),
             entry(ST_SIMPLE_DATE, SIMPLE_DATE),
-            entry(ST_UUID, UUID)
+            entry(ST_UUID, UUID),
+            entry(ST_URI, URI)
     );
 
     public static final Map<String, Object> JAVA_UPPER_CASE_TYPES_CHECK_CONVERTER = ofEntries(
@@ -365,6 +393,7 @@ public final class Dictionary {
             entry(LOCAL_DATE, ST_LOCAL_DATE),
             entry(LOCAL_DATE_TIME, ST_LOCAL_DATE_TIME),
             entry(SIMPLE_DATE, SIMPLE_DATE),
-            entry(UUID, ST_UUID)
+            entry(UUID, ST_UUID),
+            entry(URI, ST_URI)
     );
 }

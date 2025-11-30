@@ -62,8 +62,10 @@ public class Schema {
      * Interfaces
      */
     private boolean isInterface;
-    private Map<String, Object> methods = new LinkedHashMap();
-    private Set<String> imports = new HashSet<>();
+    private Map<String, Object> methods = new LinkedHashMap<>();
+    private Set<String> interfaceImports = new HashSet<>();
+
+    // ——— Getters & Setters ——— //
 
     public String getSchemaName() {
         return schemaName;
@@ -113,12 +115,12 @@ public class Schema {
         isInterface = anInterface;
     }
 
-    public Set<String> getImports() {
-        return imports;
+    public Set<String> getInterfaceImports() {
+        return interfaceImports;
     }
 
-    public void setImports(Set<String> imports) {
-        this.imports = imports;
+    public void setInterfaceImports(Set<String> interfaceImports) {
+        this.interfaceImports = interfaceImports;
     }
 
     public Map<String, Object> getMethods() {
@@ -129,53 +131,33 @@ public class Schema {
         this.methods = methods;
     }
 
+    // ——— CORE: toWrite() ——— //
+
     public String toWrite() {
         StringBuilder stringBuilder;
         Set<String> requiredImports = new HashSet<>();
         StringBuilder lombokAnnotationBuilder = new StringBuilder();
-        if (isInterface) {
-            stringBuilder = getInterfaceBuilder(schemaName);
-            generateClassJavaDoc(stringBuilder, description);
-            if (!methods.isEmpty()) {
-                methods.values().forEach(method -> {
-                    Map<String, Object> currentMethod = castObjectToMap(method);
-                    String methodDescription = getStringValueIfExistOrElseNull(DESCRIPTION, currentMethod);
-                    String methodDefinition = getStringValueIfExistOrElseNull(DEFINITION, currentMethod);
-                    if (methodDescription != null) {
-                        generateJavaDoc(stringBuilder, methodDescription, null);
-                    }
-                    methodDefinition = TABULATION.concat(methodDefinition.endsWith(";") ? methodDefinition : methodDefinition + ";");
-                    stringBuilder
-                            .append(lineSeparator())
-                            .append(methodDefinition)
-                            .append(lineSeparator());
-                });
-            }
-            if (!imports.isEmpty()) {
-                stringBuilder
-                        .insert(0, lineSeparator());
-                imports.forEach(i -> {
-                    i = IMPORT.concat(i.endsWith(";") ? i : i + ";");
-                    stringBuilder
-                            .insert(0, i + lineSeparator());
-                });
-            }
-        } else {
-            if (fillParameters.getVariableProperties().stream().anyMatch(variableProperties -> variableProperties.getEnumeration() == null) ||
-                    extendsFrom != null) {
 
-                stringBuilder =
-                        prepareStringBuilder(
-                                requiredImports,
-                                implementsFrom,
-                                extendsFrom,
-                                schemaName,
-                                importSet,
-                                fillParameters
-                        );
+        if (isInterface) {
+            stringBuilder = generateInterface();
+        } else {
+            boolean hasNonEnumProperties = fillParameters.getVariableProperties().stream()
+                    .anyMatch(vp -> vp.getEnumeration() == null);
+
+            if (hasNonEnumProperties) {
+                // Regular class
+                stringBuilder = prepareStringBuilder(
+                        requiredImports,
+                        implementsFrom,
+                        extendsFrom,
+                        schemaName,
+                        importSet,
+                        fillParameters
+                );
 
                 if (lombokProperties.enableLombok()) {
-                    if (schemaName.equals("Data") || fillParameters.getVariableProperties().stream().anyMatch(prop -> "Data".equals(prop.getType()))) {
+                    if (schemaName.equals("Data") ||
+                        fillParameters.getVariableProperties().stream().anyMatch(prop -> "Data".equals(prop.getType()))) {
                         lombokAnnotationBuilder
                                 .append(LOMBOK_DATA_ANNOTATION.replace("@", "@lombok."))
                                 .append(lineSeparator());
@@ -187,6 +169,7 @@ public class Schema {
                     }
                     buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder);
                 }
+
                 StringBuilder finalStringBuilder = stringBuilder;
                 fillParameters.getVariableProperties().stream()
                         .flatMap(variableProperties -> {
@@ -214,59 +197,138 @@ public class Schema {
                             return i.stream();
                         })
                         .forEach(requiredImports::add);
-
             } else {
+                // ENUM
                 stringBuilder = getEnumClassBuilder(schemaName);
-                fillParameters.getVariableProperties().forEach(vp -> vp.getRequiredImports().remove(JAVAX_VALID_IMPORT));
-                fillParameters.getVariableProperties().forEach(vp -> vp.getRequiredImports().remove(JAKARTA_VALID_IMPORT));
-                //ENUM WITH DESCRIPTION
-                if (fillParameters.getVariableProperties().stream()
-                        .anyMatch(variableProperties -> variableProperties.getEnumNames() != null)) {
-                    VariableProperties value = new VariableProperties();
-                    value.setType(STRING);
-                    value.setName("value");
-                    value.setEnum(true);
-                    if (lombokProperties.enableLombok()) {
-                        value.getRequiredImports().add(LOMBOK_GETTER_IMPORT);
-                        value.getAnnotationSet().add(LOMBOK_GETTER_ANNOTATION);
+
+                // Remove @Valid from enums
+                fillParameters.getVariableProperties().forEach(vp -> {
+                    vp.getRequiredImports().remove(JAVAX_VALID_IMPORT);
+                    vp.getRequiredImports().remove(JAKARTA_VALID_IMPORT);
+                });
+
+                boolean hasEnumWithDescription = fillParameters.getVariableProperties().stream()
+                        .anyMatch(vp -> vp.getEnumNames() != null);
+
+                if (hasEnumWithDescription) {
+                    // 1️⃣ Генерация констант (SUCCESS("..."), ...)
+                    StringBuilder constantsBuilder = new StringBuilder();
+                    for (int i = 0; i < fillParameters.getVariableProperties().size(); i++) {
+                        VariableProperties vp = fillParameters.getVariableProperties().get(i);
+                        if (vp.getEnumeration() != null) {
+                            String name = vp.getEnumeration();
+                            String desc = vp.getEnumNames() != null ? esc(vp.getEnumNames()) : "";
+                            constantsBuilder
+                                    .append(TABULATION)
+                                    .append(name)
+                                    .append("(\"")
+                                    .append(desc)
+                                    .append("\")");
+                            if (i < fillParameters.getVariableProperties().size() - 1) {
+                                constantsBuilder.append(",");
+                            }
+                            constantsBuilder.append(lineSeparator());
+                        }
                     }
-                    fillParameters.getVariableProperties().add(value);
-                    stringBuilder.append(fillParameters.toWrite())
+
+                    // Убираем последний перевод строки и добавляем ';' в той же строке
+                    String constants = constantsBuilder.toString();
+                    if (constants.endsWith(lineSeparator())) {
+                        constants = constants.substring(0, constants.length() - lineSeparator().length());
+                    }
+                    constants += ";";
+
+                    // 2️⃣ Формируем enum
+                    stringBuilder
+                            .append(lineSeparator())
+                            .append(constants)
+                            .append(lineSeparator())
+                            .append(lineSeparator())
+                            .append("    private final String value;")
+                            .append(lineSeparator())
+                            .append(lineSeparator())
+                            .append("    ")
+                            .append(schemaName)
+                            .append("(String value) {")
+                            .append(lineSeparator())
+                            .append("        this.value = value;")
+                            .append(lineSeparator())
+                            .append("    }")
                             .append(lineSeparator());
+
+                    // 3️⃣ @Getter на уровне класса
+                    if (lombokProperties.enableLombok()) {
+                        lombokAnnotationBuilder.append("@Getter").append(lineSeparator());
+                        requiredImports.add(LOMBOK_GETTER_IMPORT);
+                    } else {
+                        stringBuilder
+                                .append(lineSeparator())
+                                .append("    public String getValue() {")
+                                .append(lineSeparator())
+                                .append("        return value;")
+                                .append(lineSeparator())
+                                .append("    }")
+                                .append(lineSeparator());
+                    }
+
                 } else {
-                    stringBuilder.append(fillParameters.toWrite())
-                            .append(lineSeparator());
+                    // обычный enum (без описания)
+                    stringBuilder.append(fillParameters.toWrite()).append(lineSeparator());
                 }
 
-                if (lombokProperties.enableLombok() &&
-                        fillParameters.getVariableProperties().stream()
-                                .anyMatch(variableProperties -> variableProperties.getEnumNames() != null)) {
-                    lombokAnnotationBuilder.append(LOMBOK_ALL_ARGS_CONSTRUCTOR_ANNOTATION)
-                            .append(lineSeparator());
-                    requiredImports.add(LOMBOK_ALL_ARGS_CONSTRUCTOR_IMPORT);
+                // 4️⃣ Lombok (без @NoArgsConstructor для enum с конструктором)
+                if (lombokProperties.enableLombok()) {
+                    LombokProperties effectiveLombok = LombokProperties.newLombokProperties(lombokProperties);
+                    if (hasEnumWithDescription) {
+                        effectiveLombok.setNoArgsConstructor(false);
+                    }
+                    buildLombokAnnotations(effectiveLombok, requiredImports, lombokAnnotationBuilder);
                 }
-                StringBuilder finalStringBuilder = stringBuilder;
-                fillParameters.getVariableProperties().stream()
-                        .flatMap(variableProperties -> {
-                            Set<String> i = variableProperties.getRequiredImports();
-                            if (!lombokProperties.enableLombok() && variableProperties.getEnumeration() == null && variableProperties.isEnum()) {
-                                finalStringBuilder
-                                        .append(lineSeparator())
-                                        .append(generateEnumConstructor(schemaName, variableProperties.getType(), variableProperties.getName()));
-                            }
-                            if (!lombokProperties.enableLombok() && variableProperties.getEnumeration() == null) {
-                                finalStringBuilder
-                                        .append(lineSeparator())
-                                        .append(generateGetter(variableProperties.getType(), variableProperties.getName()));
-                            }
-                            return i.stream();
-                        }).forEach(requiredImports::add);
             }
         }
+
         stringBuilder.insert(0, lombokAnnotationBuilder);
+
         if (!isInterface) {
             generateClassJavaDoc(stringBuilder, description);
         }
+
         return finishBuild(stringBuilder, requiredImports, packageName);
+    }
+
+    // ——— Вспомогательные методы ——— //
+
+    private StringBuilder generateInterface() {
+        StringBuilder stringBuilder = getInterfaceBuilder(schemaName);
+        generateClassJavaDoc(stringBuilder, description);
+        if (!methods.isEmpty()) {
+            methods.values().forEach(method -> {
+                Map<String, Object> currentMethod = castObjectToMap(method);
+                String methodDescription = getStringValueIfExistOrElseNull(DESCRIPTION, currentMethod);
+                String methodDefinition = getStringValueIfExistOrElseNull(DEFINITION, currentMethod);
+                if (methodDescription != null) {
+                    generateJavaDoc(stringBuilder, methodDescription, null);
+                }
+                methodDefinition = TABULATION.concat(methodDefinition.endsWith(";") ? methodDefinition : methodDefinition + ";");
+                stringBuilder
+                        .append(lineSeparator())
+                        .append(methodDefinition)
+                        .append(lineSeparator());
+            });
+        }
+        if (!interfaceImports.isEmpty()) {
+            stringBuilder.insert(0, lineSeparator());
+            interfaceImports.forEach(i -> {
+                i = IMPORT.concat(i.endsWith(";") ? i : i + ";");
+                stringBuilder.insert(0, i + lineSeparator());
+            });
+        }
+        return stringBuilder;
+    }
+
+    //  Экранирование кавычек
+    private static String esc(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 }

@@ -28,7 +28,7 @@ As such, any keyword available for those vocabularies is by definition available
 1. [x] `title`
 2. [x] `type`
 3. [x] `required`
-4. [ ] `multipleOf`
+4. [x] `multipleOf`
 5. [x] `maximum`
 6. [ ] `exclusiveMaximum`
 7. [x] `minimum`
@@ -185,15 +185,15 @@ In the end, you will easily obtain such a class:
 | float            | number  | float          | Float          |
 | double           | number  | double         | Double         |
 | byte             | string  | byte           | Byte           |
-| bigInteger       | number  | bigInteger     | BigInteger     |
-| bigDecimal       | number  | bigDecimal     | BigDecimal     |
+| bigDecimal       | number  | big-integer     | BigInteger     |
+| bigInteger       | number  | big-decimal     | BigDecimal     |
 | boolean          | boolean | -              | Boolean        |
 | string           | string  | -              | String         |
 | uuid             | string  | uuid           | UUID           |
 | date             | object  | simple-date    | Date           |
 | date             | string  | date           | LocalDate      |
-| dateTime         | string  | date-time      | LocalDateTime  |
-| offsetDateTime   | string  | offsetDateTime | OffsetDateTime |
+| dateTime         | string  | date-time      | OffsetDateTime  |
+| local-date-time  | string  | offset-date-time | LocalDateTime |
 
 The list is constantly being updated; for more details, see the examples.
 

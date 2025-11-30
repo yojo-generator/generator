@@ -9,7 +9,6 @@ import ru.yojo.codegen.domain.schema.Schema;
 import ru.yojo.codegen.exception.SchemaFillException;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -21,15 +20,8 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 @Component
 public class SchemaMapper extends AbstractMapper {
 
-    public SchemaMapper(Helper helper) {
-        super(helper);
-        this.helper = helper;
-    }
-
-    private final Helper helper;
-
     public List<Schema> mapSchemasToObjects(ProcessContext processContext) {
-        helper.setIsMappedFromSchemas(true);
+        processContext.getHelper().setIsMappedFromSchemas(true);
         List<Schema> schemaList = new ArrayList<>();
         processContext.getSchemasMap().forEach((schemaName, schemaValues) -> {
             LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(processContext.getLombokProperties());
@@ -46,7 +38,7 @@ public class SchemaMapper extends AbstractMapper {
                 schema.setInterface(true);
                 schema.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap));
                 schema.setMethods(castObjectToMap(schemaMap.get(METHODS)));
-                schema.setImports(getSetValueIfExistsOrElseEmptySet(IMPORTS, schemaMap));
+                schema.setInterfaceImports(getSetValueIfExistsOrElseEmptySet(IMPORTS, schemaMap));
                 schemaList.add(schema);
                 return;
             }
@@ -106,7 +98,7 @@ public class SchemaMapper extends AbstractMapper {
                                     processContext.getSchemasMap(),
                                     castObjectToMap(schemaMap.get(PROPERTIES)),
                                     processContext,
-                                    helper.getInnerSchemas()
+                                    processContext.getHelper().getInnerSchemas()
                             )
                     );
                 } else {
@@ -119,12 +111,26 @@ public class SchemaMapper extends AbstractMapper {
                 throw new SchemaFillException("NOT DEFINED TYPE OF SCHEMA! Schema: " + schemaName);
             }
         });
-        if (!helper.getInnerSchemas().isEmpty()) {
-            helper.getInnerSchemas().forEach((schemaName, schemaValues) -> {
+        if (!processContext.getHelper().getInnerSchemas().isEmpty()) {
+            processContext.getHelper().getInnerSchemas().forEach((schemaName, schemaValues) -> {
                 LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(processContext.getLombokProperties());
                 System.out.println("START MAPPING OF INNER SCHEMA: " + schemaName);
                 Map<String, Object> schemaMap = castObjectToMap(schemaValues);
+
+                // 🔑 Критичное исправление: fallback `type: object`, если type отсутствует, но есть свойства
                 String schemaType = getStringValueIfExistOrElseNull(TYPE, schemaMap);
+                if (schemaType == null) {
+                    // Check heuristicly if it's object: has properties/enum/$ref
+                    if (schemaMap.containsKey(PROPERTIES) ||
+                        schemaMap.containsKey(ENUMERATION) ||
+                        schemaMap.containsKey(REFERENCE) ||
+                        POLYMORPHS.stream().anyMatch(schemaMap::containsKey)) {
+                        schemaType = OBJECT;
+                        schemaMap.put(TYPE, OBJECT); // patch in-place for downstream logic
+                        System.out.println("  → inferred missing 'type' as 'object'");
+                    }
+                }
+
                 if (schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
                     Schema schema = new Schema();
                     schema.setSchemaName(capitalize(schemaName));
@@ -135,15 +141,18 @@ public class SchemaMapper extends AbstractMapper {
                             getSchemaVariableProperties(
                                     schemaName,
                                     schemaMap,
-                                    helper.getInnerSchemas(),
+                                    processContext.getHelper().getInnerSchemas(),
                                     castObjectToMap(schemaMap.get(PROPERTIES)),
                                     processContext,
-                                    helper.getInnerSchemas()
+                                    processContext.getHelper().getInnerSchemas()
                             )
                     );
                     schemaList.add(schema);
+                } else if (schemaType != null && JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
+                    System.out.println("SKIP INNER SCHEMA (primitive): " + schemaName + ", type=" + schemaType);
                 } else {
-                    throw new SchemaFillException("NOT DEFINED TYPE OF INNER SCHEMA! Schema: " + schemaName);
+                    // 🔁 Soft skip — не бросаем исключение!
+                    System.out.println("SKIP INNER SCHEMA (no type + no props/enum/ref): " + schemaName);
                 }
             });
         }
@@ -168,7 +177,7 @@ public class SchemaMapper extends AbstractMapper {
                         propertyName,
                         castObjectToMap(propertyValue),
                         processContext,
-                        helper.getInnerSchemas());
+                        processContext.getHelper().getInnerSchemas());
                 variableProperties.add(vp);
             });
         }
@@ -195,7 +204,7 @@ public class SchemaMapper extends AbstractMapper {
                             propertyName,
                             castObjectToMap(propertyValue),
                             processContext,
-                            helper.getInnerSchemas());
+                            processContext.getHelper().getInnerSchemas());
                     variableProperties.add(vp);
                 }
             });
@@ -204,7 +213,7 @@ public class SchemaMapper extends AbstractMapper {
             VariableProperties vp = new VariableProperties();
             vp.setValid(false);
             vp.setEnum(true);
-            fillProperties(schemaName, vp, currentSchema, schemas, schemaName, currentSchema, processContext, helper.getInnerSchemas());
+            fillProperties(schemaName, vp, currentSchema, schemas, schemaName, currentSchema, processContext, processContext.getHelper().getInnerSchemas());
             variableProperties.add(vp);
         }
         return new FillParameters(variableProperties);

@@ -1,6 +1,7 @@
 package ru.yojo.codegen.context;
 
 import ru.yojo.codegen.domain.lombok.LombokProperties;
+import ru.yojo.codegen.mapper.Helper;
 
 import java.io.File;
 import java.util.Map;
@@ -10,11 +11,13 @@ import static ru.yojo.codegen.constants.Dictionary.MESSAGE_PACKAGE_IMPORT;
 import static ru.yojo.codegen.util.MapperUtil.getPackage;
 
 public class ProcessContext {
+
     public ProcessContext(Map<String, Object> content) {
         this.content = content;
     }
 
     private String springBootVersion;
+
     /**
      * All content from YAML-file
      */
@@ -26,36 +29,42 @@ public class ProcessContext {
     private String filePath;
 
     /**
-     * Output Directory
+     * Output directory (e.g. "src/test/resources/example/testGenerate/")
      */
     private String outputDirectory;
+
     /**
-     * Package, which will write in each generated class
-     * specify package like: com.example.myproject
+     * Base package location (e.g. "example.testGenerate")
      */
     private String packageLocation;
+
     /**
-     * Properties for lombok {@link LombokProperties}
+     * Lombok properties
      */
     private LombokProperties lombokProperties;
 
     /**
-     * Replaced filePath
+     * ⚠️ DEPRECATED — DO NOT USE in new logic.
+     * Used only for legacy compatibility; ignored in new generation flow.
      */
+    @Deprecated
     private String outputDirectoryName;
 
     /**
-     * Path to write file
+     * Final directory to write files (e.g. "src/test/resources/example/testGenerate/common/")
+     * Must be set explicitly — NOT derived from fileName.
      */
     private String pathToWrite;
 
     /**
-     * Package of messages, which will write in each generated class
+     * Full package for messages (e.g. "example.testGenerate.messages;")
+     * Must be set explicitly or derived from packageLocation + ".messages;"
      */
     private String messagePackage;
 
     /**
-     * Package of schemas, which will write in each generated class
+     * Full package for schemas (e.g. "example.testGenerate.common;")
+     * Must be set explicitly or derived from packageLocation + ".common;"
      */
     private String commonPackage;
 
@@ -67,9 +76,22 @@ public class ProcessContext {
     private Map<String, Object> messagesMap;
 
     /**
-     * Prepared messages map, from components.schemas
+     * Prepared schemas map, from components.schemas
      */
     private Map<String, Object> schemasMap;
+
+    private Helper helper = new Helper();
+
+    public Helper getHelper() {
+        return helper;
+    }
+
+    public void setHelper(Helper helper) {
+        this.helper = helper;
+    }
+    // ---------------------------------------------
+    // Getters & Setters
+    // ---------------------------------------------
 
     public String getSpringBootVersion() {
         return springBootVersion;
@@ -99,12 +121,12 @@ public class ProcessContext {
         this.outputDirectory = outputDirectory;
     }
 
-    public void setPackageLocation(String packageLocation) {
-        this.packageLocation = packageLocation;
-    }
-
     public String getPackageLocation() {
         return packageLocation;
+    }
+
+    public void setPackageLocation(String packageLocation) {
+        this.packageLocation = packageLocation;
     }
 
     public LombokProperties getLombokProperties() {
@@ -115,10 +137,12 @@ public class ProcessContext {
         this.lombokProperties = lombokProperties;
     }
 
+    @Deprecated
     public String getOutputDirectoryName() {
         return outputDirectoryName;
     }
 
+    @Deprecated
     public void setOutputDirectoryName(String outputDirectoryName) {
         this.outputDirectoryName = outputDirectoryName;
     }
@@ -127,22 +151,45 @@ public class ProcessContext {
         return pathToWrite;
     }
 
+    /**
+     * Sets pathToWrite and ensures directory exists.
+     * Does NOT append outputDirectoryName — caller must provide full path.
+     */
     public void setPathToWrite(String pathToWrite) {
-        new File(pathToWrite).mkdirs();
-        this.pathToWrite = pathToWrite;
+        if (pathToWrite != null) {
+            new File(pathToWrite).mkdirs();
+            this.pathToWrite = pathToWrite;
+        }
     }
 
     public String getMessagePackage() {
+        if (messagePackage == null && packageLocation != null) {
+            return packageLocation + "." + "messages;";
+        }
         return messagePackage;
     }
 
+    public void setMessagePackage(String messagePackage) {
+        this.messagePackage = messagePackage;
+    }
+
     public String getCommonPackage() {
+        if (commonPackage == null && packageLocation != null) {
+            return packageLocation + "." + "common;";
+        }
         return commonPackage;
     }
 
-    public void preparePackages() {
-        messagePackage = getPackage(packageLocation, outputDirectoryName, MESSAGE_PACKAGE_IMPORT);
-        commonPackage = getPackage(packageLocation, outputDirectoryName, COMMON_PACKAGE_IMPORT);
+    public void setCommonPackage(String commonPackage) {
+        this.commonPackage = commonPackage;
+    }
+
+    public void setJsonPropertyDescription(boolean jsonPropertyDescription) {
+        this.jsonPropertyDescription = jsonPropertyDescription;
+    }
+
+    public boolean isJsonPropertyDescription() {
+        return jsonPropertyDescription;
     }
 
     public Map<String, Object> getMessagesMap() {
@@ -161,11 +208,19 @@ public class ProcessContext {
         this.schemasMap = schemasMap;
     }
 
-    public void setJsonPropertyDescription(boolean jsonPropertyDescription) {
-        jsonPropertyDescription = jsonPropertyDescription;
-    }
-
-    public boolean isJsonPropertyDescription() {
-        return jsonPropertyDescription;
+    /**
+     * ⚠️ DEPRECATED — DO NOT USE.
+     * This method injects outputDirectoryName into package string, causing unwanted "test." in imports.
+     */
+    @Deprecated
+    public void preparePackages() {
+        // Legacy fallback only — do not call in new flow.
+        if (outputDirectoryName != null && !outputDirectoryName.isEmpty()) {
+            messagePackage = getPackage(packageLocation, outputDirectoryName, MESSAGE_PACKAGE_IMPORT);
+            commonPackage = getPackage(packageLocation, outputDirectoryName, COMMON_PACKAGE_IMPORT);
+        } else {
+            messagePackage = packageLocation + "." + "messages;";
+            commonPackage = packageLocation + "." + "common;";
+        }
     }
 }

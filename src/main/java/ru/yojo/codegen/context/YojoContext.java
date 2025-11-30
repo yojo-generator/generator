@@ -2,6 +2,8 @@ package ru.yojo.codegen.context;
 
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 
+import java.util.List;
+
 
 /**
  * Context for code generation properties
@@ -12,8 +14,7 @@ public class YojoContext {
     private String packageLocation;
     private LombokProperties lombokProperties;
     private String springBootVersion;
-    private boolean jsonPropertyDescription;
-
+    private List<SpecificationProperties> specificationProperties;
     public String getDirectory() {
         return directory;
     }
@@ -54,11 +55,12 @@ public class YojoContext {
         this.springBootVersion = springBootVersion;
     }
 
-    public boolean isJsonPropertyDescription() {
-        return jsonPropertyDescription;
+    public List<SpecificationProperties> getSpecificationProperties() {
+        return specificationProperties;
     }
 
-    public void setJsonPropertyDescription(boolean jsonPropertyDescription) {
-        this.jsonPropertyDescription = jsonPropertyDescription;
+    public void setSpecificationProperties(List<SpecificationProperties> specificationProperties) {
+        this.specificationProperties = specificationProperties;
     }
+
 }

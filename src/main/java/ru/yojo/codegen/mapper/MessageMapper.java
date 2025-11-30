@@ -18,14 +18,10 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 @SuppressWarnings("all")
 @Component
 public class MessageMapper extends AbstractMapper {
-
-    private final Helper helper;
     private final SchemaMapper schemaMapper;
     private boolean filledByRef = false;
 
-    public MessageMapper(Helper helper, SchemaMapper schemaMapper) {
-        super(helper);
-        this.helper = helper;
+    public MessageMapper(SchemaMapper schemaMapper) {
         this.schemaMapper = schemaMapper;
     }
 
@@ -36,34 +32,33 @@ public class MessageMapper extends AbstractMapper {
     public List<Message> mapMessagesToObjects(ProcessContext processContext) {
         List<Message> messageList = new ArrayList<>();
         processContext.getMessagesMap().forEach((messageName, messageValues) -> {
-            //flag will true if message was filled by schemas propeties
+            // flag will true if message was filled by schemas properties
             filledByRef = false;
             System.out.println("START MAPPING OF MESSAGE: " + messageName);
             Map<String, Object> messageMap = castObjectToMap(messageValues);
             Message message = new Message();
             message.setMessageName(capitalize(messageName));
             message.setLombokProperties(LombokProperties.newLombokProperties(processContext.getLombokProperties()));
-
             Map<String, Object> payloadMap = castObjectToMap(messageMap.get(PAYLOAD));
             String refObject = getStringValueIfExistOrElseNull(REFERENCE, payloadMap);
             message.setPathForGenerateMessage(getStringValueIfExistOrElseNull("pathForGenerateMessage", payloadMap));
 
-            //see extendsAndImplFilling method
+            // see extendsAndImplFilling method
             AtomicBoolean needToFill = new AtomicBoolean(true);
-            extendsAndImplFilling(helper.getExcludeInheritanceSchemas(), message, payloadMap, refObject, needToFill);
+            extendsAndImplFilling(processContext.getHelper().getExcludeInheritanceSchemas(), message, payloadMap, refObject, needToFill);
 
             if (needToFill.get()) {
                 filledByRef = false;
-                message.setFillParameters(
-                        getFillParameters(
-                                messageName,
-                                payloadMap,
-                                processContext,
-                                helper.getRemoveSchemas(),
-                                helper.getExcludeRemoveSchemas(),
-                                message.getLombokProperties()
-                        )
+                FillParameters fillParams = getFillParameters(
+                        messageName,
+                        payloadMap,
+                        processContext,
+                        processContext.getHelper().getRemoveSchemas(),
+                        processContext.getHelper().getExcludeRemoveSchemas(),
+                        message.getLombokProperties()
                 );
+                message.setFillParameters(fillParams);
+
                 if (refObject != null) {
                     payloadMap.remove(PROPERTIES);
                     message.enrichFillParameters(
@@ -71,19 +66,20 @@ public class MessageMapper extends AbstractMapper {
                                     messageName,
                                     payloadMap,
                                     processContext,
-                                    helper.getRemoveSchemas(),
-                                    helper.getExcludeRemoveSchemas(),
+                                    processContext.getHelper().getRemoveSchemas(),
+                                    processContext.getHelper().getExcludeRemoveSchemas(),
                                     message.getLombokProperties()));
                 }
-                //Check inhiritance from schema
+
+                // Check inheritance from schema
                 if (message.getImplementsFrom().isEmpty() && isBlank(message.getExtendsFrom())) {
                     if (refObject != null) {
                         Map<String, Object> refMap = castObjectToMap(processContext.getSchemasMap().get(refReplace(refObject)));
                         refMap.forEach((mk, mv) -> {
                             if (mk.equals(EXTENDS)) {
                                 String fromClass = prepareExtendsMessage(message, mv);
-                                //If the object reference is equal to the fromClass field,
-                                //the message will not be filled with data from the schema and the extends keyword will be inserted.
+                                // If the object reference is equal to the fromClass field,
+                                // the message will not be filled with data from the schema and the extends keyword will be inserted.
                                 if (refObject != null && refReplace(refObject).equals(fromClass)) {
                                     needToFill.set(false);
                                 }
@@ -103,13 +99,13 @@ public class MessageMapper extends AbstractMapper {
             message.setCommonPackageName(processContext.getCommonPackage());
             messageList.add(message);
         });
-        helper.getExcludeRemoveSchemas().addAll(helper.getExcludeInheritanceSchemas());
-        if (!helper.getExcludeRemoveSchemas().isEmpty()) {
-            helper.getExcludeRemoveSchemas().forEach(helper.getRemoveSchemas()::remove);
-        }
 
-        System.out.println("FINISH MAPPING OF MESSAGES! CLEAN UP SCHEMAS: " + helper.getRemoveSchemas());
-        helper.getRemoveSchemas().forEach(processContext.getSchemasMap()::remove);
+        processContext.getHelper().getExcludeRemoveSchemas().addAll(processContext.getHelper().getExcludeInheritanceSchemas());
+        if (!processContext.getHelper().getExcludeRemoveSchemas().isEmpty()) {
+            processContext.getHelper().getExcludeRemoveSchemas().forEach(processContext.getHelper().getRemoveSchemas()::remove);
+        }
+        System.out.println("FINISH MAPPING OF MESSAGES! CLEAN UP SCHEMAS: " + processContext.getHelper().getRemoveSchemas());
+        processContext.getHelper().getRemoveSchemas().forEach(processContext.getSchemasMap()::remove);
         return messageList;
     }
 
@@ -149,8 +145,8 @@ public class MessageMapper extends AbstractMapper {
         payloadMap.forEach((mk, mv) -> {
             if (mk.equals(EXTENDS)) {
                 String fromClass = prepareExtendsMessage(message, mv);
-                //If the object reference is equal to the fromClass field,
-                //the message will not be filled with data from the schema and the extends keyword will be inserted.
+                // If the object reference is equal to the fromClass field,
+                // the message will not be filled with data from the schema and the extends keyword will be inserted.
                 if (refObject != null && refReplace(refObject).equals(fromClass)) {
                     needToFill.set(false);
                     excludeInheritanceSchemas.add(refReplace(refObject));
@@ -164,11 +160,10 @@ public class MessageMapper extends AbstractMapper {
 
     /**
      * @param payload              payload from message
-     * @param commonPackage        directory named common for generate schemas(here used for schema-like mapping)
-     * @param schemasMap           map of schemas
+     * @param processContext       context
      * @param removeSchemas        schemas for remove
      * @param excludeRemoveSchemas exclude schemas for remove
-     * @param lombokProperties     lombokProperties properties for lombok {@link LombokProperties}
+     * @param lombokProperties     lombokProperties
      * @return mapped parameters of message
      */
     private FillParameters getFillParameters(String messageName,
@@ -178,12 +173,13 @@ public class MessageMapper extends AbstractMapper {
                                              Set<String> excludeRemoveSchemas,
                                              LombokProperties lombokProperties) {
         FillParameters parameters = new FillParameters();
-        helper.setIsMappedFromMessages(true);
-        helper.setIsMappedFromSchemas(false);
+        processContext.getHelper().setIsMappedFromMessages(true);
+        processContext.getHelper().setIsMappedFromSchemas(false);
+
         if (payload.containsKey(LOMBOK)) {
             Map<String, Object> lombokProps = castObjectToMap(payload.get(LOMBOK));
             if (lombokProps.containsKey(ENABLE) &&
-                    "false".equals(getStringValueIfExistOrElseNull(ENABLE, lombokProps))) {
+                "false".equals(getStringValueIfExistOrElseNull(ENABLE, lombokProps))) {
                 lombokProperties.setEnableLombok(Boolean.valueOf(getStringValueIfExistOrElseNull(ENABLE, lombokProps)));
             } else {
                 fillLombokAccessors(lombokProperties, lombokProps);
@@ -191,54 +187,106 @@ public class MessageMapper extends AbstractMapper {
                 fillLombokConstructors(lombokProperties, lombokProps);
             }
         }
+
+        // ✅ Полиморфизм: oneOf/allOf/anyOf — делегируем в SchemaMapper
+        if (POLYMORPHS.stream().anyMatch(payload::containsKey)) {
+            System.out.println("POLYMORPHIC MESSAGE DETECTED: " + messageName);
+            return schemaMapper.getSchemaVariableProperties(
+                    messageName,
+                    payload,
+                    processContext.getSchemasMap(),
+                    Collections.emptyMap(),
+                    processContext,
+                    processContext.getHelper().getInnerSchemas()
+            );
+        }
+
+        // ✅ Top-level enum — leaf: не создаём message-класс с полем, только enum в common/
+        if (isLeafEnum(payload)) {
+            // Генерируем enum через SchemaMapper — он добавит его в innerSchemas → потом в common/
+            schemaMapper.getSchemaVariableProperties(
+                    messageName,
+                    payload,
+                    processContext.getSchemasMap(),
+                    Collections.emptyMap(),
+                    processContext,
+                    processContext.getHelper().getInnerSchemas()
+            );
+            // Возвращаем пустой FillParameters → message будет без полей (можно даже skip, но пока оставим класс пустым)
+            return new FillParameters(Collections.emptyList());
+        }
+
+        // ✅ payload.schema — раскрываем один раз
+        if (payload.containsKey("schema") && payload.get("schema") instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> innerSchema = (Map<String, Object>) payload.get("schema");
+            // Рекурсивный вызов для inner schema
+            return getFillParameters(messageName, innerSchema, processContext, removeSchemas, excludeRemoveSchemas, lombokProperties);
+        }
+
+        // ✅ properties — стандартная обработка
         if (getStringValueIfExistOrElseNull(PROPERTIES, payload) != null) {
             System.out.println("Properties Mapping from message");
             Map<String, Object> propertiesMap = castObjectToMap(payload.get(PROPERTIES));
             List<VariableProperties> variableProperties = new LinkedList<>();
-
             propertiesMap.forEach((propertyName, propertyValue) -> {
-
                 VariableProperties mvp = new VariableProperties();
-
-                fillProperties(messageName, mvp, payload, payload, propertyName, castObjectToMap(propertyValue), processContext, helper.getInnerSchemas());
-
+                // payload здесь — оригинальный, effectively final ✅
+                fillProperties(messageName, mvp, payload, payload, propertyName, castObjectToMap(propertyValue), processContext, processContext.getHelper().getInnerSchemas());
                 if (mvp.getItems() != null && !JAVA_DEFAULT_TYPES.contains(mvp.getItems())) {
                     excludeRemoveSchemas.add(mvp.getItems());
                 }
                 variableProperties.add(mvp);
             });
             return new FillParameters(variableProperties);
-        } else {
-            //Here we go only if payload filled by one field $ref
-            if (getStringValueIfExistOrElseNull(REFERENCE, payload) != null && !filledByRef) {
-                filledByRef = true;
-                helper.setIsMappedFromMessages(true);
-                helper.setIsMappedFromSchemas(false);
-                System.out.println("Starting schema-like mapping");
-                String schemaName = getStringValueIfExistOrElseNull(REFERENCE, payload).replaceAll(".+/", "");
-                Map<String, Object> schema = castObjectToMap(processContext.getSchemasMap().get(schemaName));
-                System.out.println("SCHEMA: " + schemaName);
-
-                SchemaMapper schemaMapper = new SchemaMapper(helper);
-
-                Set<String> requiredPropertiesSet = getSetValueIfExistsOrElseEmptySet(REQUIRED, schema);
-                Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
-                parameters = schemaMapper.getSchemaVariableProperties(schemaName,
-                        schema, processContext.getSchemasMap(), castObjectToMap(schema.get(PROPERTIES)), processContext, innerSchemas);
-                if (getStringValueIfExistOrElseNull(REMOVE_SCHEMA, payload) != null &&
-                        getStringValueIfExistOrElseNull(REMOVE_SCHEMA, payload).equals("true")) {
-                    removeSchemas.add(schemaName);
-                }
-                if (!innerSchemas.isEmpty()) {
-                    innerSchemas.forEach((pk, pv) -> excludeRemoveSchemas.add(pk));
-                    processContext.getSchemasMap().putAll(innerSchemas);
-                }
-                return parameters;
-            } else if (filledByRef) {
-                return new FillParameters();
-            } else {
-                throw new RuntimeException("Not correct filled block messages!");
-            }
         }
+
+        // ✅ $ref — как раньше
+        if (getStringValueIfExistOrElseNull(REFERENCE, payload) != null && !filledByRef) {
+            filledByRef = true;
+            processContext.getHelper().setIsMappedFromMessages(true);
+            processContext.getHelper().setIsMappedFromSchemas(false);
+            System.out.println("Starting schema-like mapping");
+            String schemaName = getStringValueIfExistOrElseNull(REFERENCE, payload).replaceAll(".+/", "");
+            Map<String, Object> schema = castObjectToMap(processContext.getSchemasMap().get(schemaName));
+            System.out.println("SCHEMA: " + schemaName);
+            Set<String> requiredPropertiesSet = getSetValueIfExistsOrElseEmptySet(REQUIRED, schema);
+            Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
+            parameters = schemaMapper.getSchemaVariableProperties(
+                    schemaName,
+                    schema,
+                    processContext.getSchemasMap(),
+                    castObjectToMap(schema.get(PROPERTIES)),
+                    processContext,
+                    innerSchemas
+            );
+            if (getStringValueIfExistOrElseNull(REMOVE_SCHEMA, payload) != null &&
+                getStringValueIfExistOrElseNull(REMOVE_SCHEMA, payload).equals("true")) {
+                removeSchemas.add(schemaName);
+            }
+            if (!innerSchemas.isEmpty()) {
+                innerSchemas.forEach((pk, pv) -> excludeRemoveSchemas.add(pk));
+                processContext.getSchemasMap().putAll(innerSchemas);
+            }
+            return parameters;
+        }
+
+        if (filledByRef) {
+            return new FillParameters();
+        }
+
+        // ❌ fallback
+        throw new RuntimeException("Not correct filled block messages! Payload: " + payload);
+    }
+
+    // ✅ Helper: проверяет, является ли payload top-level enum-листом
+    private boolean isLeafEnum(Map<String, Object> payload) {
+        if (payload == null || payload.isEmpty()) return false;
+        if (POLYMORPHS.stream().anyMatch(payload::containsKey)) return false;
+        if (payload.containsKey(PROPERTIES)) return false;
+        if (payload.containsKey(REFERENCE)) return false;
+        // ✅ type + enum → leaf
+        return getStringValueIfExistOrElseNull(TYPE, payload) != null &&
+               getStringValueIfExistOrElseNull(ENUMERATION, payload) != null;
     }
 }
