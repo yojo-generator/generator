@@ -5,9 +5,6 @@ import ru.yojo.codegen.context.YojoContext;
 import ru.yojo.codegen.domain.lombok.Accessors;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.generator.YojoGenerator;
-import ru.yojo.codegen.mapper.Helper;
-import ru.yojo.codegen.mapper.MessageMapper;
-import ru.yojo.codegen.mapper.SchemaMapper;
 
 import java.util.Collections;
 

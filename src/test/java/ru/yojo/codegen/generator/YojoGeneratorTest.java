@@ -1,10 +1,8 @@
 package ru.yojo.codegen.generator;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.util.FileSystemUtils;
 import ru.yojo.codegen.context.SpecificationProperties;
 import ru.yojo.codegen.context.YojoContext;
 import ru.yojo.codegen.domain.lombok.Accessors;
@@ -16,19 +14,84 @@ import ru.yojo.codegen.mapper.SchemaMapper;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = {YojoGenerator.class, SchemaMapper.class, MessageMapper.class, Helper.class})
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class YojoGeneratorTest {
 
     @Autowired
     private YojoGenerator yojoGenerator;
 
+    private static final List<String> OUTPUT_DIRECTORIES = List.of(
+            "src/test/resources/example/testGenerate/",
+            "src/test/resources/example/testGenerate/asyncapi/lombok/",
+            "src/test/resources/example/testGenerate/gitter/lombok/",
+            "src/test/resources/example/testGenerate/slack/lombok/",
+            "src/test/resources/example/testGenerate/asyncapi/",
+            "src/test/resources/example/testGenerate/gitter/",
+            "src/test/resources/example/testGenerate/slack/"
+    );
+
+    @BeforeEach
+    void cleanupBeforeTest() throws IOException {
+        // Очищаем все выходные директории перед каждым тестом
+        for (String dir : OUTPUT_DIRECTORIES) {
+            Path path = Paths.get(dir);
+            if (Files.exists(path)) {
+                try (Stream<Path> walk = Files.walk(path)) {
+                    walk.sorted((a, b) -> -a.compareTo(b))
+                            .forEach(p -> {
+                                try {
+                                    Files.deleteIfExists(p);
+                                } catch (IOException e) {
+                                    // Игнорируем ошибки удаления
+                                }
+                            });
+                }
+                Files.deleteIfExists(path);
+            }
+        }
+    }
+
+    @AfterAll
+    static void cleanupAfterAll() throws IOException {
+        for (String dir : OUTPUT_DIRECTORIES) {
+            Path path = Paths.get(dir);
+            if (Files.exists(path)) {
+                try (Stream<Path> walk = Files.walk(path)) {
+                    walk.sorted((a, b) -> -a.compareTo(b))
+                            .forEach(p -> {
+                                try {
+                                    Files.deleteIfExists(p);
+                                } catch (IOException e) {
+                                    // Игнорируем ошибки удаления
+                                }
+                            });
+                }
+                Files.deleteIfExists(path);
+            }
+        }
+
+        Path parentDir = Paths.get("src/test/resources/example/testGenerate");
+        if (Files.exists(parentDir)) {
+            try (Stream<Path> stream = Files.list(parentDir)) {
+                if (stream.findAny().isEmpty()) {
+                    Files.deleteIfExists(parentDir);
+                }
+            }
+        }
+    }
+
     @Test
+    @Order(1)
     void generateAllWithSingleSpecificationAndSpringBootVersionLombok() throws IOException {
         SpecificationProperties spec = new SpecificationProperties();
         spec.setSpecName("test.yaml");
@@ -46,41 +109,28 @@ class YojoGeneratorTest {
         File outputRoot = new File("src/test/resources/example/testGenerate/");
         assertTrue(outputRoot.exists(), "Output directory must exist");
 
-        //  messages/ — для сообщений БЕЗ pathForGenerateMessage
         File messagesDir = new File(outputRoot, "messages");
         File commonDir = new File(outputRoot, "common");
         assertTrue(messagesDir.exists(), "messages dir must be generated");
         assertTrue(commonDir.exists(), "common dir must be generated");
 
-        //  RequestDtoByRef — с pathForGenerateMessage → в io/github/somepath/
         File customPathDir = new File(outputRoot, "io/github/somepath");
         assertTrue(customPathDir.exists(), "Custom path dir must exist for pathForGenerateMessage");
         assertTrue(new File(customPathDir, "RequestDtoByRef.java").exists());
 
-        //  RequestDtoByRefAndProperties — НЕТ pathForGenerateMessage → в messages/
         assertTrue(new File(messagesDir, "RequestDtoByRefAndProperties.java").exists());
-
-        //  RequestDtoWithProperties — в messages/
         assertTrue(new File(messagesDir, "RequestDtoWithProperties.java").exists());
-
-        //  RequestDtoWithDoubleInheritance — в messages/
         assertTrue(new File(messagesDir, "RequestDtoWithDoubleInheritance.java").exists());
-
-        //  RequestDtoInheritanceFromSchema — в messages/
         assertTrue(new File(messagesDir, "RequestDtoInheritanceFromSchema.java").exists());
-
-        //  RequestDtoSchema — в common/ (в корне, т.к. в test.yaml)
         assertTrue(new File(commonDir, "RequestDtoSchema.java").exists());
-
-        //  SomeObject — в common/
         assertTrue(new File(commonDir, "SomeObject.java").exists());
 
-        //  Убедимся, что папки test/ и test-spec/ НЕ создаются
-        Assertions.assertFalse(new File(outputRoot, "test").exists());
-        Assertions.assertFalse(new File(outputRoot, "test-spec").exists());
+        assertFalse(new File(outputRoot, "test").exists());
+        assertFalse(new File(outputRoot, "test-spec").exists());
     }
 
     @Test
+    @Order(2)
     void generateWithAsyncApiV3Lombok() throws IOException {
         SpecificationProperties spec = new SpecificationProperties();
         spec.setSpecName("async-api-official-v3.0.yaml");
@@ -95,11 +145,13 @@ class YojoGeneratorTest {
         yojoGenerator.generateAll(ctx);
 
         File out = new File("src/test/resources/example/testGenerate/asyncapi/lombok/");
+        assertTrue(out.exists(), "Output directory must exist");
         assertTrue(new File(out, "messages/LightMeasured.java").exists());
         assertTrue(new File(out, "common/LightMeasuredPayload.java").exists());
     }
 
     @Test
+    @Order(3)
     void generateWithAsyncApiV3GitterLombok() throws IOException {
         SpecificationProperties spec = new SpecificationProperties();
         spec.setSpecName("gitter-streaming-async-api-v3.0.yaml");
@@ -114,9 +166,11 @@ class YojoGeneratorTest {
         yojoGenerator.generateAll(ctx);
 
         File out = new File("src/test/resources/example/testGenerate/gitter/lombok/");
+        assertTrue(out.exists(), "Output directory must exist");
     }
 
     @Test
+    @Order(4)
     void generateWithAsyncApiV3SlackLombok() throws IOException {
         SpecificationProperties spec = new SpecificationProperties();
         spec.setSpecName("slack-real-time-async-api-v3.0.yaml");
@@ -131,9 +185,11 @@ class YojoGeneratorTest {
         yojoGenerator.generateAll(ctx);
 
         File out = new File("src/test/resources/example/testGenerate/slack/lombok/");
+        assertTrue(out.exists(), "Output directory must exist");
     }
 
     @Test
+    @Order(5)
     void generateWithAsyncApiV3() throws IOException {
         SpecificationProperties spec = new SpecificationProperties();
         spec.setSpecName("async-api-official-v3.0.yaml");
@@ -148,11 +204,13 @@ class YojoGeneratorTest {
         yojoGenerator.generateAll(ctx);
 
         File out = new File("src/test/resources/example/testGenerate/asyncapi/");
+        assertTrue(out.exists(), "Output directory must exist");
         assertTrue(new File(out, "messages/LightMeasured.java").exists());
         assertTrue(new File(out, "common/LightMeasuredPayload.java").exists());
     }
 
     @Test
+    @Order(6)
     void generateWithAsyncApiV3Gitter() throws IOException {
         SpecificationProperties spec = new SpecificationProperties();
         spec.setSpecName("gitter-streaming-async-api-v3.0.yaml");
@@ -167,9 +225,11 @@ class YojoGeneratorTest {
         yojoGenerator.generateAll(ctx);
 
         File out = new File("src/test/resources/example/testGenerate/gitter/");
+        assertTrue(out.exists(), "Output directory must exist");
     }
 
     @Test
+    @Order(7)
     void generateWithAsyncApiV3Slack() throws IOException {
         SpecificationProperties spec = new SpecificationProperties();
         spec.setSpecName("slack-real-time-async-api-v3.0.yaml");
@@ -184,9 +244,11 @@ class YojoGeneratorTest {
         yojoGenerator.generateAll(ctx);
 
         File out = new File("src/test/resources/example/testGenerate/slack/");
+        assertTrue(out.exists(), "Output directory must exist");
     }
 
     @Test
+    @Order(8)
     void generateTest() throws IOException {
         List<SpecificationProperties> list = new ArrayList<>();
         SpecificationProperties specSlack = new SpecificationProperties();
@@ -223,5 +285,10 @@ class YojoGeneratorTest {
         ctx.setLombokProperties(new LombokProperties(false, false, new Accessors(false, false, false)));
 
         yojoGenerator.generateAll(ctx);
+
+        assertTrue(new File("src/test/resources/example/testGenerate/slack/").exists());
+        assertTrue(new File("src/test/resources/example/testGenerate/gitter/").exists());
+        assertTrue(new File("src/test/resources/example/testGenerate/asyncapi/").exists());
+        assertTrue(new File("src/test/resources/example/testGenerate/").exists());
     }
 }

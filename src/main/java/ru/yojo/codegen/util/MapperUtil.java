@@ -149,7 +149,11 @@ public class MapperUtil {
     }
 
     /**
-     * Creates a {@code StringBuilder} initialized with {@code public interface X { }.
+     * Creates a {@code StringBuilder} initialized with:
+     * <pre>
+     * public interface X {
+     * }
+     * </pre>
      *
      * @param schemaName interface name
      * @return builder with interface header
@@ -165,7 +169,11 @@ public class MapperUtil {
     }
 
     /**
-     * Creates a {@code StringBuilder} initialized with {@code public class X { }.
+     * Creates a {@code StringBuilder} initialized with:
+     * <pre>
+     * public class X {
+     * }
+     * </pre>
      *
      * @param schemaName class name
      * @return builder with class header
@@ -180,7 +188,11 @@ public class MapperUtil {
     }
 
     /**
-     * Creates a {@code StringBuilder} initialized with {@code public enum X { }.
+     * Creates a {@code StringBuilder} initialized with:
+     * <pre>
+     * public enum X {
+     * }
+     * </pre>
      *
      * @param schemaName enum name
      * @return builder with enum header
@@ -195,9 +207,13 @@ public class MapperUtil {
     }
 
     /**
-     * Creates a {@code StringBuilder} for {@code public class X implements I1, I2 { }.
+     * Creates a {@code StringBuilder} initialized with:
+     * <pre>
+     * public class X implements I1, I2 {
+     * }
+     * </pre>
      *
-     * @param schemaName     class name
+     * @param schemaName class name
      * @param implementsFrom set of interface simple names
      * @return builder with class+implements header
      */
@@ -216,9 +232,13 @@ public class MapperUtil {
     }
 
     /**
-     * Creates a {@code StringBuilder} for {@code public class X extends Y { }.
+     * Creates a {@code StringBuilder} initialized with:
+     * <pre>
+     * public class X extends Y {
+     * }
+     * </pre>
      *
-     * @param schemaName   class name
+     * @param schemaName class name
      * @param extendsClass superclass name
      * @return builder with class+extends header
      */
@@ -236,10 +256,14 @@ public class MapperUtil {
     }
 
     /**
-     * Creates a {@code StringBuilder} for {@code public class X extends Y implements I1, I2 { }.
+     * Creates a {@code StringBuilder} initialized with:
+     * <pre>
+     * public class X extends Y implements I1, I2 {
+     * }
+     * </pre>
      *
-     * @param schemaName     class name
-     * @param extendsClass   superclass name
+     * @param schemaName class name
+     * @param extendsClass superclass name
      * @param implementsFrom set of interface names
      * @return builder with full inheritance header
      */
