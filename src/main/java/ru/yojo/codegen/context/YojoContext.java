@@ -33,7 +33,7 @@ public class YojoContext {
     private LombokProperties lombokProperties;
 
     /**
-     * Spring Boot version (e.g., {@code "3.2.0"}) used to select jakarta vs javax validation imports.
+     * Spring Boot version (e.g., {@code "3.x.x"}) used to select jakarta vs javax validation imports.
      */
     private String springBootVersion;
 
@@ -129,7 +129,7 @@ public class YojoContext {
     /**
      * Returns the Spring Boot version string.
      *
-     * @return version (e.g., {@code "2.7.0"} or {@code "3.2.0"})
+     * @return version (e.g., {@code "2.7.0"} or {@code "3.x.x"})
      */
     public String getSpringBootVersion() {
         return springBootVersion;

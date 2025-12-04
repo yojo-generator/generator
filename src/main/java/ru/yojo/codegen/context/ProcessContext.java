@@ -112,7 +112,7 @@ public class ProcessContext {
     }
 
     /**
-     * Returns the Spring Boot version string (e.g., {@code "3.2.0"}).
+     * Returns the Spring Boot version string (e.g., {@code "3.x.x"}).
      * Used to select correct validation annotation packages (jakarta vs javax).
      *
      * @return Spring Boot version or {@code null} if unspecified
@@ -124,7 +124,7 @@ public class ProcessContext {
     /**
      * Sets the Spring Boot version.
      *
-     * @param springBootVersion version string (e.g., {@code "3.2.0"})
+     * @param springBootVersion version string (e.g., {@code "3.x.x"})
      */
     public void setSpringBootVersion(String springBootVersion) {
         this.springBootVersion = springBootVersion;

@@ -85,7 +85,7 @@ public class YojoCLI {
         spec.setPackageLocation(packageLocation);
 
         context.setSpecificationProperties(Collections.singletonList(spec));
-        context.setSpringBootVersion("3.2.0"); // fixed default; could be made configurable
+        context.setSpringBootVersion("3.x.x"); // fixed default; could be made configurable
         context.setLombokProperties(new LombokProperties(
                 lombokEnabled,
                 allArgs,

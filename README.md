@@ -249,7 +249,7 @@ MyDto:
 
 ```gradle
 plugins {
-    id 'ru.yojo.codegen.gradle-plugin' version '0.5.0'
+    id 'ru.yojo.codegen.gradle-plugin' version '1.0.0'
 }
 
 yojo {
@@ -271,7 +271,7 @@ yojo {
             }
 
             // Global defaults
-            springBootVersion = "3.2.0"  // selects jakarta/javax
+            springBootVersion = "3"  // selects jakarta/javax
             lombok {
                 enable = true
                 accessors {
