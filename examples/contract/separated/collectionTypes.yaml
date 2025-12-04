@@ -39,15 +39,15 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/StandaloneDate'
-        listOftDateTime:
+        listOfLocalDateTime:
           type: array
           items:
             type: string
-            format: date-time
+            format: local-date-time
         listOfOffsetDateTime:
           type: array
           items:
-            format: offsetDateTime
+            format: date-time
         listOfInteger:
           type: array
           items:
@@ -67,11 +67,11 @@ components:
         listOfBigInteger:
           type: array
           items:
-            format: bigInteger
+            format: big-integer
         listOfBigDecimal:
           type: array
           items:
-            format: bigDecimal
+            format: big-decimal
         listOfLongsWithRealization:
           type: array
           items:
@@ -123,17 +123,17 @@ components:
           format: set
           items:
             format: date
-        setOftDateTime:
+        setOfLocalDateTime:
           type: array
           format: set
           items:
             type: string
-            format: date-time
+            format: local-date-time
         setOfOffsetDateTime:
           type: array
           format: set
           items:
-            format: offsetDateTime
+            format: date-time
         setOfInteger:
           type: array
           format: set
@@ -158,12 +158,12 @@ components:
           type: array
           format: set
           items:
-            format: bigInteger
+            format: big-integer
         setOfBigDecimal:
           type: array
           format: set
           items:
-            format: bigDecimal
+            format: big-decimal
         setOfLongsWithRealization:
           type: array
           format: set

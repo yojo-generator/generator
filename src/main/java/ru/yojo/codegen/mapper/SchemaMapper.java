@@ -7,9 +7,9 @@ import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.schema.Schema;
 import ru.yojo.codegen.exception.SchemaFillException;
+import ru.yojo.codegen.util.MapperUtil;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -17,19 +17,41 @@ import static ru.yojo.codegen.constants.Dictionary.*;
 import static ru.yojo.codegen.util.LombokUtils.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
+/**
+ * Maps AsyncAPI schema definitions ({@code components.schemas.*}) to {@link Schema} objects.
+ * <p>
+ * Supports:
+ * <ul>
+ *   <li>Regular DTO classes (with fields, Lombok, validation)</li>
+ *   <li>Enums (with/without descriptions)</li>
+ *   <li>Interfaces (marker or with method definitions)</li>
+ *   <li>Polymorphism ({@code oneOf}, {@code allOf}, {@code anyOf})</li>
+ *   <li>Inheritance ({@code extends}, {@code implements})</li>
+ *   <li>Inner schemas (e.g., nested enums, DTOs)</li>
+ * </ul>
+ *
+ * @author Vladimir Morozkin (TG @vmorozkin)
+ */
 @SuppressWarnings("all")
 @Component
 public class SchemaMapper extends AbstractMapper {
 
-    public SchemaMapper(Helper helper) {
-        super(helper);
-        this.helper = helper;
-    }
-
-    private final Helper helper;
-
+    /**
+     * Transforms all schemas in the context into {@link Schema} instances.
+     * <p>
+     * For each schema:
+     * <ul>
+     *   <li>Skips primitive-type schemas (e.g., {@code type: string})</li>
+     *   <li>Processes interfaces (if {@code format: interface})</li>
+     *   <li>Handles inheritance, Lombok config, and field filling</li>
+     *   <li>Recursively processes inner schemas (e.g., from enums or polymorphic resolution)</li>
+     * </ul>
+     *
+     * @param processContext generation context
+     * @return list of fully prepared {@link Schema} instances
+     */
     public List<Schema> mapSchemasToObjects(ProcessContext processContext) {
-        helper.setIsMappedFromSchemas(true);
+        processContext.getHelper().setIsMappedFromSchemas(true);
         List<Schema> schemaList = new ArrayList<>();
         processContext.getSchemasMap().forEach((schemaName, schemaValues) -> {
             LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(processContext.getLombokProperties());
@@ -37,7 +59,7 @@ public class SchemaMapper extends AbstractMapper {
             Map<String, Object> schemaMap = castObjectToMap(schemaValues);
             String schemaType = getStringValueIfExistOrElseNull(TYPE, schemaMap);
             String format = getStringValueIfExistOrElseNull(FORMAT, schemaMap);
-            //Added support of use interfaces like marker, or with some methods and imports
+            // Interface marker (format: interface)
             if (format != null && format.equals(INTERFACE)) {
                 Schema schema = new Schema();
                 schema.setSchemaName(capitalize(schemaName));
@@ -46,14 +68,14 @@ public class SchemaMapper extends AbstractMapper {
                 schema.setInterface(true);
                 schema.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap));
                 schema.setMethods(castObjectToMap(schemaMap.get(METHODS)));
-                schema.setImports(getSetValueIfExistsOrElseEmptySet(IMPORTS, schemaMap));
+                schema.setInterfaceImports(getSetValueIfExistsOrElseEmptySet(IMPORTS, schemaMap));
                 schemaList.add(schema);
                 return;
             }
             if (schemaMap != null && schemaMap.containsKey(LOMBOK)) {
                 Map<String, Object> lombokProps = castObjectToMap(schemaMap.get(LOMBOK));
                 if (lombokProps.containsKey(ENABLE) &&
-                        "false".equals(getStringValueIfExistOrElseNull(ENABLE, lombokProps))) {
+                    "false".equals(getStringValueIfExistOrElseNull(ENABLE, lombokProps))) {
                     finalLombokProperties.setEnableLombok(Boolean.valueOf(getStringValueIfExistOrElseNull(ENABLE, lombokProps)));
                 } else {
                     fillLombokAccessors(finalLombokProperties, lombokProps);
@@ -68,9 +90,7 @@ public class SchemaMapper extends AbstractMapper {
                 schema.setLombokProperties(finalLombokProperties);
                 schema.setPackageName(processContext.getCommonPackage());
 
-                // Marker for extending
-                // Check, if there are no attributes other than inheritance,
-                // then do not fill the DTO with attributes of the parent class
+                // Handle extends/implements early to determine field-filling strategy
                 AtomicBoolean needToFill = new AtomicBoolean(true);
 
                 schemaMap.forEach((sk, sv) -> {
@@ -106,7 +126,7 @@ public class SchemaMapper extends AbstractMapper {
                                     processContext.getSchemasMap(),
                                     castObjectToMap(schemaMap.get(PROPERTIES)),
                                     processContext,
-                                    helper.getInnerSchemas()
+                                    processContext.getHelper().getInnerSchemas()
                             )
                     );
                 } else {
@@ -119,12 +139,25 @@ public class SchemaMapper extends AbstractMapper {
                 throw new SchemaFillException("NOT DEFINED TYPE OF SCHEMA! Schema: " + schemaName);
             }
         });
-        if (!helper.getInnerSchemas().isEmpty()) {
-            helper.getInnerSchemas().forEach((schemaName, schemaValues) -> {
+        if (!processContext.getHelper().getInnerSchemas().isEmpty()) {
+            processContext.getHelper().getInnerSchemas().forEach((schemaName, schemaValues) -> {
                 LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(processContext.getLombokProperties());
                 System.out.println("START MAPPING OF INNER SCHEMA: " + schemaName);
                 Map<String, Object> schemaMap = castObjectToMap(schemaValues);
+
+                // Infer missing 'type: object' when properties/enum/$ref present (AsyncAPI v3 compatibility)
                 String schemaType = getStringValueIfExistOrElseNull(TYPE, schemaMap);
+                if (schemaType == null) {
+                    if (schemaMap.containsKey(PROPERTIES) ||
+                        schemaMap.containsKey(ENUMERATION) ||
+                        schemaMap.containsKey(REFERENCE) ||
+                        POLYMORPHS.stream().anyMatch(schemaMap::containsKey)) {
+                        schemaType = OBJECT;
+                        schemaMap.put(TYPE, OBJECT); // patch in-place
+                        System.out.println("  → inferred missing 'type' as 'object'");
+                    }
+                }
+
                 if (schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
                     Schema schema = new Schema();
                     schema.setSchemaName(capitalize(schemaName));
@@ -135,21 +168,42 @@ public class SchemaMapper extends AbstractMapper {
                             getSchemaVariableProperties(
                                     schemaName,
                                     schemaMap,
-                                    helper.getInnerSchemas(),
+                                    processContext.getHelper().getInnerSchemas(),
                                     castObjectToMap(schemaMap.get(PROPERTIES)),
                                     processContext,
-                                    helper.getInnerSchemas()
+                                    processContext.getHelper().getInnerSchemas()
                             )
                     );
                     schemaList.add(schema);
+                } else if (schemaType != null && JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
+                    System.out.println("SKIP INNER SCHEMA (primitive): " + schemaName + ", type=" + schemaType);
                 } else {
-                    throw new SchemaFillException("NOT DEFINED TYPE OF INNER SCHEMA! Schema: " + schemaName);
+                    // Soft skip: no type + no structural keys → ignore silently
+                    System.out.println("SKIP INNER SCHEMA (no type + no props/enum/ref): " + schemaName);
                 }
             });
         }
         return schemaList;
     }
 
+    /**
+     * Extracts field definitions and metadata for a schema.
+     * <p>
+     * Handles:
+     * <ul>
+     *   <li>Direct {@code properties} map</li>
+     *   <li>Polymorphic schemas (merges fields from all variants)</li>
+     *   <li>Top-level enums (delegates to {@link AbstractMapper#fillProperties})</li>
+     * </ul>
+     *
+     * @param schemaName     schema name (for diagnostics)
+     * @param currentSchema  full schema map
+     * @param schemas        global schemas map (for {@code $ref} resolution)
+     * @param properties     {@code properties} map (may be empty)
+     * @param processContext generation context
+     * @param innerSchemas   accumulator for discovered inner schemas
+     * @return filled {@link FillParameters}
+     */
     public FillParameters getSchemaVariableProperties(String schemaName,
                                                       Map<String, Object> currentSchema,
                                                       Map<String, Object> schemas,
@@ -160,30 +214,30 @@ public class SchemaMapper extends AbstractMapper {
         if (!properties.isEmpty()) {
             properties.forEach((propertyName, propertyValue) -> {
                 VariableProperties vp = new VariableProperties();
+                String javaName = MapperUtil.toValidJavaFieldName(propertyName);
                 fillProperties(
                         schemaName,
                         vp,
                         currentSchema,
                         schemas,
-                        propertyName,
+                        javaName,
                         castObjectToMap(propertyValue),
                         processContext,
-                        helper.getInnerSchemas());
+                        processContext.getHelper().getInnerSchemas());
                 variableProperties.add(vp);
             });
         }
         if (POLYMORPHS.stream().anyMatch(p -> currentSchema.containsKey(p))) {
             System.out.println("POLYMORPH: " + schemaName);
             System.out.println("POLYMORPH: " + currentSchema);
-            //Found a polymorph schema names here
+            // Recursively collect all referenced schema names (including nested polymorphism)
             List<String> polymorphSchemasNames = getPolymorphSchemasNames(currentSchema, schemas);
-
             System.out.println(polymorphSchemasNames);
 
-            //Getting merged polymorph properties
+            // Merge all properties from referenced schemas
             Map<String, Object> mergedProperties = mergeProperties(polymorphSchemasNames, currentSchema, schemas);
 
-            //Prepare VariableProperties
+            // Add each merged property (avoid duplicates)
             mergedProperties.forEach((propertyName, propertyValue) -> {
                 if (variableProperties.stream().noneMatch(vp -> vp.getName().equals(propertyName))) {
                     VariableProperties vp = new VariableProperties();
@@ -195,27 +249,29 @@ public class SchemaMapper extends AbstractMapper {
                             propertyName,
                             castObjectToMap(propertyValue),
                             processContext,
-                            helper.getInnerSchemas());
+                            processContext.getHelper().getInnerSchemas());
                     variableProperties.add(vp);
                 }
             });
         } else if (getStringValueIfExistOrElseNull(ENUMERATION, currentSchema) != null) {
-            currentSchema.get(ENUMERATION);
+            // Top-level enum: fill as enum field (no properties)
             VariableProperties vp = new VariableProperties();
             vp.setValid(false);
             vp.setEnum(true);
-            fillProperties(schemaName, vp, currentSchema, schemas, schemaName, currentSchema, processContext, helper.getInnerSchemas());
+            fillProperties(schemaName, vp, currentSchema, schemas, schemaName, currentSchema, processContext, processContext.getHelper().getInnerSchemas());
             variableProperties.add(vp);
         }
         return new FillParameters(variableProperties);
     }
 
     /**
-     * Method for getting polymorph schemas names with recursion
+     * Recursively collects all schema names referenced via {@code oneOf}/{@code allOf}/{@code anyOf}.
+     * <p>
+     * Supports nested polymorphism (e.g., {@code A → oneOf: B, C; B → allOf: D, E} → [D, E, B, C]).
      *
-     * @param currentSchema
-     * @param schemas
-     * @return
+     * @param currentSchema schema with polymorphic keys
+     * @param schemas       global schema map
+     * @return list of fully resolved schema names
      */
     private static List<String> getPolymorphSchemasNames(Map<String, Object> currentSchema, Map<String, Object> schemas) {
         return POLYMORPHS.stream()
@@ -226,22 +282,37 @@ public class SchemaMapper extends AbstractMapper {
                 .filter(Objects::nonNull)
                 .map(p -> refReplace(p.toString()))
                 .flatMap(ref -> {
-                    //recursievly get polymorph schemas names here
-                    if (castObjectToMap(schemas.get(ref)).containsKey(ALL_OF) || castObjectToMap(schemas.get(ref)).containsKey(ANY_OF) || castObjectToMap(schemas.get(ref)).containsKey(ONE_OF)) {
-                        List<String> polymorphSchemasNames = getPolymorphSchemasNames(castObjectToMap(schemas.get(ref)), schemas);
-                        polymorphSchemasNames.add(ref);
-                        return polymorphSchemasNames.stream();
+                    // Recursively resolve nested polymorphic schemas
+                    Map<String, Object> referencedSchema = castObjectToMap(schemas.get(ref));
+                    if (referencedSchema.containsKey(ALL_OF) ||
+                        referencedSchema.containsKey(ANY_OF) ||
+                        referencedSchema.containsKey(ONE_OF)) {
+                        List<String> nestedNames = getPolymorphSchemasNames(referencedSchema, schemas);
+                        nestedNames.add(ref);
+                        return nestedNames.stream();
                     }
                     return List.of(ref).stream();
                 })
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Merges properties from multiple schemas (used for polymorphism).
+     * <p>
+     * Collects {@code properties} from each referenced schema and merges them into one flat map.
+     * Duplicates are resolved by keeping the first occurrence.
+     *
+     * @param polymorphSchemasNames referenced schema names
+     * @param currentSchema         current (polymorphic) schema
+     * @param schemas               schema registry
+     * @return merged properties map
+     */
     private Map<String, Object> mergeProperties(List<String> polymorphSchemasNames, Map<String, Object> currentSchema, Map<String, Object> schemas) {
         return polymorphSchemasNames.stream()
                 .flatMap(name -> {
                     Map<String, Object> schema = castObjectToMap(schemas.get(name));
                     if (schema.containsKey(ALL_OF) || schema.containsKey(ANY_OF) || schema.containsKey(ONE_OF)) {
+                        // For polymorphic schemas, prefer top-level properties over embedded ones
                         Map<String, Object> propertyMap = schema.entrySet().stream()
                                 .filter(en -> en.getKey().equals(PROPERTIES))
                                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (existing, replacement) -> existing));
@@ -251,8 +322,6 @@ public class SchemaMapper extends AbstractMapper {
                     return castObjectToMap(schemas.get(name)).entrySet().stream();
                 })
                 .filter(en -> en.getKey().equals(PROPERTIES))
-//                .flatMap(en -> getMap(schemas, currentSchema, en).stream())
-                .distinct()
                 .map(pr -> castObjectToMap(pr.getValue()))
                 .flatMap(map -> map.entrySet().stream())
                 .distinct()

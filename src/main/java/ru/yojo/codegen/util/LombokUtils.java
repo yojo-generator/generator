@@ -7,12 +7,33 @@ import ru.yojo.codegen.domain.lombok.LombokProperties;
 import java.util.Map;
 
 import static ru.yojo.codegen.constants.Dictionary.*;
-import static ru.yojo.codegen.constants.Dictionary.ENABLE;
 import static ru.yojo.codegen.util.MapperUtil.castObjectToMap;
 import static ru.yojo.codegen.util.MapperUtil.getStringValueIfExistOrElseNull;
 
+/**
+ * Utility class for parsing and populating Lombok configuration from AsyncAPI contract.
+ * <p>
+ * Extracts Lombok-related attributes (e.g., {@code accessors}, {@code equalsAndHashCode},
+ * {@code allArgsConstructor}) from YAML and applies them to {@link LombokProperties}.
+ *
+ * @author Vladimir Morozkin (TG @vmorozkin)
+ */
 @SuppressWarnings("all")
 public class LombokUtils {
+
+    /**
+     * Populates {@link Accessors} configuration from the {@code accessors} section of Lombok props.
+     * <p>
+     * Supports:
+     * <ul>
+     *   <li>{@code fluent: true|false}</li>
+     *   <li>{@code chain: true|false}</li>
+     *   <li>{@code enable: true|false} (defaults to {@code true} if section present)</li>
+     * </ul>
+     *
+     * @param lombokProperties target Lombok config to update
+     * @param lombokProps      parsed {@code lombok} map from YAML
+     */
     public static void fillLombokAccessors(LombokProperties lombokProperties, Map<String, Object> lombokProps) {
         if (lombokProps.containsKey(ACCESSORS)) {
             Accessors acc = new Accessors(true, false, false);
@@ -30,6 +51,18 @@ public class LombokUtils {
         }
     }
 
+    /**
+     * Populates {@link EqualsAndHashCode} configuration from the {@code equalsAndHashCode} section.
+     * <p>
+     * Supports:
+     * <ul>
+     *   <li>Presence of section → enables {@code @EqualsAndHashCode}</li>
+     *   <li>{@code callSuper: true|false} → controls {@code callSuper} attribute</li>
+     * </ul>
+     *
+     * @param lombokProperties target Lombok config to update
+     * @param lombokProps      parsed {@code lombok} map from YAML
+     */
     public static void fillLombokEqualsAndHashCode(LombokProperties lombokProperties, Map<String, Object> lombokProps) {
         if (lombokProps.containsKey(EQUALS_AND_HASH_CODE)) {
             EqualsAndHashCode equalsAndHashCode = new EqualsAndHashCode();
@@ -44,6 +77,14 @@ public class LombokUtils {
         }
     }
 
+    /**
+     * Populates constructor-related Lombok settings: {@code @AllArgsConstructor} and {@code @NoArgsConstructor}.
+     * <p>
+     * Reads boolean flags {@code allArgsConstructor} and {@code noArgsConstructor} from the config.
+     *
+     * @param lombokProperties target Lombok config to update
+     * @param lombokProps      parsed {@code lombok} map from YAML
+     */
     public static void fillLombokConstructors(LombokProperties lombokProperties, Map<String, Object> lombokProps) {
         if (lombokProps.containsKey(ALL_ARGS) || lombokProps.containsKey(NO_ARGS)) {
             String allArgs = getStringValueIfExistOrElseNull(ALL_ARGS, lombokProps);

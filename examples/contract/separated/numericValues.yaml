@@ -56,11 +56,11 @@ components:
         #Custom attribute
         bigDecimalValue:
           type: number
-          format: bigDecimal
+          multipleOf: 10.01
         #Custom attribute
         bigIntegerValue:
           type: number
-          format: bigInteger
+          format: big-integer
 
         byteValueWithAnnotations:
           type: number
@@ -93,14 +93,14 @@ components:
         #Custom attribute
         bigDecimalValueWithAnnotations:
           type: number
-          format: bigDecimal
+          format: big-decimal
           digits: integer = 2, fraction = 2
           minimum: 22
           maximum: 44
         #Custom attribute
         bigIntegerValueWithAnnotations:
           type: number
-          format: bigInteger
+          format: big-integer
           digits: integer = 2, fraction = 2
           minimum: 22
           maximum: 44

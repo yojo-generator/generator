@@ -8,21 +8,26 @@ channels:
     subscribe:
       message:
         $ref: '#/components/messages/RequestDtoByRef'
-#  PolymorphMessage:
-#    subscribe:
-#      message:
-#        payload:
-#          oneOf:
-#            - $ref: '#/components/schemas/PolymorphExampleOne'
-#            - $ref: '#/components/schemas/PolymorphExampleTwo'
-#    publish:
-#      message:
-#        payload:
-#          oneOf:
-#            - $ref: '#/components/schemas/PolymorphExampleThree'
-#            - $ref: '#/components/schemas/PolymorphExampleFour'
+  PolymorphMessage:
+    subscribe:
+      message:
+        payload:
+          oneOf:
+            - $ref: '#/components/schemas/PolymorphExampleOne'
+            - $ref: '#/components/schemas/PolymorphExampleTwo'
+    publish:
+      message:
+        payload:
+          oneOf:
+            - $ref: '#/components/schemas/PolymorphExampleThree'
+            - $ref: '#/components/schemas/PolymorphExampleFour'
 components:
   messages:
+    PolymorphicMessageInComponents:
+      payload:
+        oneOf:
+          - $ref: '#/components/schemas/PolymorphExampleOne'
+          - $ref: '#/components/schemas/PolymorphExampleTwo'
     RequestDtoByRef:
       payload:
         pathForGenerateMessage: 'io.github.somepath'
@@ -33,7 +38,7 @@ components:
         $ref: '#/components/schemas/RequestDtoSchema'
         properties:
           someString:
-            type: String
+            type: string
     RequestDtoWithProperties:
       payload:
         properties:
@@ -76,13 +81,13 @@ components:
             - testGenerate.InterfaceForImpl2
         extends:
           fromClass: ClassForExtends
-          fromPackage: example.testGenerate.contract.test.common
+          fromPackage: example.testGenerate.common
     RequestDtoInheritanceFromSchema:
       payload:
         $ref: '#/components/schemas/RequestDtoSchema'
         extends:
           fromClass: RequestDtoSchema
-          fromPackage: example.testGenerate.contract.test.common
+          fromPackage: example.testGenerate.common
   schemas:
     PolymorphExampleOne:
       type: object
@@ -159,7 +164,7 @@ components:
           - testGenerate.InterfaceForImpl2
       extends:
         fromClass: ClassForExtends
-        fromPackage: example.testGenerate.contract.test.common
+        fromPackage: example.testGenerate.common
       #Validation Groups was added for backward compatibility. Must be used with required.
       #validationGroups contains name of Class
 #      validationGroups:
@@ -470,7 +475,7 @@ components:
           callSuper: false
       extends:
         fromClass: ClassForExtends
-        fromPackage: example.testGenerate.contract.test.common
+        fromPackage: example.testGenerate.common
       properties:
         someInteger:
           type: integer
@@ -493,12 +498,6 @@ components:
       properties:
         someInteger:
           type: integer
-
-    StandAloneExtendsObject:
-      type: object
-      extends:
-        fromClass: ClassForExtending
-        fromPackage: testGenerate
 
     EnumResultWithDescription:
       type: object
@@ -566,7 +565,7 @@ components:
       format: interface
       description: It is interface with Methods
       imports:
-        - example.testGenerate.contract.test.common.InnerSchema
+        - example.testGenerate.common.InnerSchema
       methods:
         methodOne:
           description: This is void method
@@ -579,7 +578,7 @@ components:
       type: object
       format: interface
       imports:
-        - example.testGenerate.contract.test.common.InnerSchema
+        - example.testGenerate.common.InnerSchema
       methods:
         methodOne:
           definition: void someOne(String someString, InnerSchema schema)
