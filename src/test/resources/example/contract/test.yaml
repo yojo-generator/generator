@@ -499,12 +499,6 @@ components:
         someInteger:
           type: integer
 
-    StandAloneExtendsObject:
-      type: object
-      extends:
-        fromClass: ClassForExtending
-        fromPackage: testGenerate
-
     EnumResultWithDescription:
       type: object
       enum:
