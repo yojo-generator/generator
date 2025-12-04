@@ -248,53 +248,50 @@ MyDto:
 ## 📦 Integration: YOJO Gradle Plugin (recommended)
 
 ```gradle
-plugins {
-    id 'ru.yojo.codegen.gradle-plugin' version '1.0.0'
-}
-
 yojo {
     configurations {
-        main {
+        create("main") {
             specificationProperties {
-                api {
-                    specName = "asyncapi.yaml"
-                    inputDirectory = "./asyncapi/"
-                    outputDirectory = "${layout.buildDirectory.get()}/generated/sources/yojo/main/java"
-                    packageLocation = "com.mycompany.api"
+                register("api") {
+                    specName("api.yaml")
+                    inputDirectory(layout.projectDirectory.dir("contract").asFile.absolutePath)
+                    outputDirectory(layout.buildDirectory.dir("generated/sources/yojo/api").get().asFile.absolutePath)
+                    packageLocation("com.example.api")
                 }
-                // Multiple specs supported:
-                // events {
-                //     specName = "events.yaml"
-                //     inputDirectory = "./asyncapi/events/"
-                //     ...
-                // }
+                register("events-api") {
+                    specName("events.yaml")
+                    inputDirectory(layout.projectDirectory.dir("contract").asFile.absolutePath)
+                    outputDirectory(layout.buildDirectory.dir("generated/sources/yojo/events").get().asFile.absolutePath)
+                    packageLocation("com.example.events")
+                }
             }
 
-            // Global defaults
-            springBootVersion = "3"  // selects jakarta/javax
+            springBootVersion("3.2.0")
             lombok {
-                enable = true
+                enable(true)
+                allArgsConstructor(true)
+                noArgsConstructor(true)
                 accessors {
-                    enable = true
-                    fluent = false
-                    chain = true
+                    enable(true)
+                    fluent(false)
+                    chain(true)
                 }
                 equalsAndHashCode {
-                    enable = true
-                    callSuper = false
+                    enable(true)
+                    callSuper(false)
                 }
-                allArgsConstructor = true
-                noArgsConstructor = true
             }
         }
     }
 }
 
 sourceSets {
-    main.java.srcDir("${layout.buildDirectory.get()}/generated/sources/yojo/main/java")
+    main.java.srcDir(layout.buildDirectory.dir("generated/sources/yojo"))
 }
 
-tasks.compileJava.dependsOn(generateClasses)
+tasks.compileJava {
+    dependsOn("generateClasses")
+}
 ```
 
 🔗 [Official Gradle Plugin](https://plugins.gradle.org/plugin/io.github.yojo-generator.gradle-plugin)  
