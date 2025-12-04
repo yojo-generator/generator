@@ -8,11 +8,22 @@ import static java.lang.System.lineSeparator;
 import static java.util.Map.entry;
 import static java.util.Map.ofEntries;
 
+/**
+ * Central registry of constant string values used throughout code generation.
+ * <p>
+ * Contains:
+ * <ul>
+ *   <li>YAML keys (e.g., {@code "properties"}, {@code "$ref"})</li>
+ *   <li>Custom extension attributes (e.g., {@code "realization"}, {@code "primitive"})</li>
+ *   <li>Java type names, package names, annotation strings, and code templates</li>
+ * </ul>
+ * @author Vladimir Morozkin(TG @vmorozkin)
+ */
 @SuppressWarnings("all")
 public final class Dictionary {
 
     /**
-     * Attributes Yaml
+     * Standard AsyncAPI/OpenAPI YAML attribute names.
      */
     public static final String PROPERTIES = "properties";
     public static final String TYPE = "type";
@@ -50,7 +61,7 @@ public final class Dictionary {
     public static final List<String> POLYMORPHS = List.of(ALL_OF, ONE_OF, ANY_OF);
 
     /**
-     * Custom YAML attributes
+     * Custom YAML extension attributes supported by Yojo generator.
      */
     public static final String REALIZATION = "realization";
     public static final String PRIMITIVE = "primitive";
@@ -70,25 +81,21 @@ public final class Dictionary {
     public static final String DIGITS = "digits";
     public static final String MULTIPLE_OF = "multipleOf";
 
-
     /**
-     * lombok manual properties
+     * Lombok configuration keys (manual override section).
      */
     public static final String LOMBOK = "lombok";
     public static final String ENABLE = "enable";
-
     public static final String ACCESSORS = "accessors";
     public static final String FLUENT = "fluent";
     public static final String CHAIN = "chain";
-
     public static final String EQUALS_AND_HASH_CODE = "equalsAndHashCode";
     public static final String CALL_SUPER = "callSuper";
-
     public static final String ALL_ARGS = "allArgsConstructor";
     public static final String NO_ARGS = "noArgsConstructor";
 
     /**
-     * Schema Types
+     * Schema format identifiers used to map YAML types to Java.
      */
     public static final String ST_SIMPLE_DATE = "simple-date";
     public static final String ST_LOCAL_DATE = "date";
@@ -108,7 +115,7 @@ public final class Dictionary {
     public static final String ST_URI = "uri";
 
     /**
-     * Annotations
+     * Validation annotation templates (with optional placeholder formatting).
      */
     public static final String NOT_EMPTY_ANNOTATION = "@NotEmpty";
     public static final String NOT_NULL_ANNOTATION = "@NotNull";
@@ -128,7 +135,7 @@ public final class Dictionary {
     public static final String JSON_PROPERTY_DESCRIPTION_ANNOTATION = "@JsonPropertyDescription()";
 
     /**
-     * Lombok annotations
+     * Lombok annotation string templates.
      */
     public static final String LOMBOK_ALL_ARGS_CONSTRUCTOR_ANNOTATION = "@AllArgsConstructor";
     public static final String LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION = "@NoArgsConstructor";
@@ -143,7 +150,7 @@ public final class Dictionary {
     public static final String EQUALS_AND_HASH_CODE_CALL_SUPER_TRUE_ANNOTATION = "@EqualsAndHashCode(callSuper = true)";
 
     /**
-     * Lombok Imports
+     * Import declarations for Lombok annotations.
      */
     public static final String LOMBOK_ALL_ARGS_CONSTRUCTOR_IMPORT = "lombok.AllArgsConstructor;";
     public static final String LOMBOK_NO_ARGS_CONSTRUCTOR_IMPORT = "lombok.NoArgsConstructor;";
@@ -153,7 +160,7 @@ public final class Dictionary {
     public static final String LOMBOK_EQUALS_AND_HASH_CODE_IMPORT = "lombok.EqualsAndHashCode;";
 
     /**
-     * Java Types
+     * Canonical Java class simple names (used in field types, etc.).
      */
     public static final String SIMPLE_DATE = "Date";
     public static final String LOCAL_DATE = "LocalDate";
@@ -173,7 +180,7 @@ public final class Dictionary {
     public static final String URI = "URI";
 
     /**
-     * Packages
+     * Fully qualified import declarations for Java standard types.
      */
     public static final String BIG_DECIMAL_IMPORT = "java.math.BigDecimal;";
     public static final String BIG_INTEGER_IMPORT = "java.math.BigInteger;";
@@ -183,9 +190,23 @@ public final class Dictionary {
     public static final String OFFSET_DATE_TIME_IMPORT = "java.time.OffsetDateTime;";
     public static final String UUID_IMPORT = "java.util.UUID;";
 
+    /**
+     * Import declarations for Jakarta Validation (Spring Boot 3+).
+     */
+    public static final String JAKARTA_NOT_BLANK_IMPORT = "jakarta.validation.constraints.NotBlank;";
+    public static final String JAKARTA_NOT_EMPTY_IMPORT = "jakarta.validation.constraints.NotEmpty;";
+    public static final String JAKARTA_NOT_NULL_IMPORT = "jakarta.validation.constraints.NotNull;";
+    public static final String JAKARTA_SIZE_IMPORT = "jakarta.validation.constraints.Size;";
+    public static final String JAKARTA_PATTERN_IMPORT = "jakarta.validation.constraints.Pattern;";
+    public static final String JAKARTA_VALID_IMPORT = "jakarta.validation.Valid;";
+    public static final String JAKARTA_DIGITS_IMPORT = "jakarta.validation.constraints.Digits;";
+    public static final String JAKARTA_DECIMAL_MIN_IMPORT = "jakarta.validation.constraints.DecimalMin;";
+    public static final String JAKARTA_DECIMAL_MAX_IMPORT = "jakarta.validation.constraints.DecimalMax;";
+    public static final String JAKARTA_MIN_IMPORT = "jakarta.validation.constraints.Min;";
+    public static final String JAKARTA_MAX_IMPORT = "jakarta.validation.constraints.Max;";
 
     /**
-     * JAVAX
+     * Import declarations for legacy javax.validation (Spring Boot < 3).
      */
     public static final String JAVAX_NOT_BLANK_IMPORT = "javax.validation.constraints.NotBlank;";
     public static final String JAVAX_NOT_EMPTY_IMPORT = "javax.validation.constraints.NotEmpty;";
@@ -200,21 +221,8 @@ public final class Dictionary {
     public static final String JAVAX_MAX_IMPORT = "javax.validation.constraints.Max;";
 
     /**
-     * JAKARTA
+     * Standard collection and utility imports.
      */
-    public static final String JAKARTA_NOT_BLANK_IMPORT = "jakarta.validation.constraints.NotBlank;";
-    public static final String JAKARTA_NOT_EMPTY_IMPORT = "jakarta.validation.constraints.NotEmpty;";
-    public static final String JAKARTA_NOT_NULL_IMPORT = "jakarta.validation.constraints.NotNull;";
-    public static final String JAKARTA_SIZE_IMPORT = "jakarta.validation.constraints.Size;";
-    public static final String JAKARTA_PATTERN_IMPORT = "jakarta.validation.constraints.Pattern;";
-    public static final String JAKARTA_VALID_IMPORT = "jakarta.validation.Valid;";
-    public static final String JAKARTA_DIGITS_IMPORT = "jakarta.validation.constraints.Digits;";
-    public static final String JAKARTA_DECIMAL_MIN_IMPORT = "jakarta.validation.constraints.DecimalMin;";
-    public static final String JAKARTA_DECIMAL_MAX_IMPORT = "jakarta.validation.constraints.DecimalMax;";
-    public static final String JAKARTA_MIN_IMPORT = "jakarta.validation.constraints.Min;";
-    public static final String JAKARTA_MAX_IMPORT = "jakarta.validation.constraints.Max;";
-
-
     public static final String LIST_IMPORT = "java.util.List;";
     public static final String ARRAY_LIST_IMPORT = "java.util.ArrayList;";
     public static final String LINKED_LIST_IMPORT = "java.util.LinkedList;";
@@ -227,7 +235,7 @@ public final class Dictionary {
     public static final String URI_IMPORT = "java.net.URI;";
 
     /**
-     * Java Doc
+     * JavaDoc comment templates (indented for field-level usage).
      */
     public static final String JAVA_DOC_START = "    /**";
     public static final String JAVA_DOC_END = "     */";
@@ -238,26 +246,26 @@ public final class Dictionary {
     public static final String JAVA_DOC_CLASS_LINE = "* %s";
 
     /**
-     * Getters and Setters
+     * Getter/Setter code templates (formatted with line separators).
      */
     public static final String GETTER = "    public %s get%s() {" +
-            lineSeparator() +
-            "        return %s;" +
-            lineSeparator() + "    }";
+                                        lineSeparator() +
+                                        "        return %s;" +
+                                        lineSeparator() + "    }";
     public static final String SETTER = "    public void set%s(%s %s) {" +
-            lineSeparator() +
-            "        this.%s = %s;" +
-            lineSeparator() + "    }";
+                                        lineSeparator() +
+                                        "        this.%s = %s;" +
+                                        lineSeparator() + "    }";
 
     /**
-     * Constructors
+     * Enum constructor template.
      */
     public static final String ENUM_CONSTRUCTOR = "    %s(%s %s) {" +
-            lineSeparator() +
-            "    }";
+                                                  lineSeparator() +
+                                                  "    }";
 
     /**
-     * Realizations
+     * Collection/map initialization expressions.
      */
     public static final String ARRAY_LIST_REALISATION = "new ArrayList<>()";
     public static final String LINKED_LIST_REALISATION = "new LinkedList<>()";
@@ -266,7 +274,7 @@ public final class Dictionary {
     public static final String LINKED_HASH_MAP_REALISATION = "new LinkedHashMap<>()";
 
     /**
-     * Others
+     * Generic code generation templates and constants.
      */
     public static final String FIELD = "    private %s %s;";
     public static final String FIELD_WITH_DEFAULT_VALUE = "    private %s %s = %s;";
@@ -290,7 +298,7 @@ public final class Dictionary {
     public static final String IMPORTS = "imports";
 
     /**
-     * Java keywords
+     * Reserved Java keywords (used to avoid invalid field names).
      */
     private static final Set<String> JAVA_KEYWORDS = Set.of(
             "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char",
@@ -302,6 +310,12 @@ public final class Dictionary {
             "transient", "try", "void", "volatile", "while"
     );
 
+    /**
+     * Returns a safe Java field name, appending "Field" if the input is a reserved keyword.
+     *
+     * @param name original field name (e.g., from YAML property key)
+     * @return safe Java identifier
+     */
     public static String safeFieldName(String name) {
         if (JAVA_KEYWORDS.contains(name)) {
             return name + "Field";
@@ -309,6 +323,9 @@ public final class Dictionary {
         return name;
     }
 
+    /**
+     * Maps Java field types to corresponding validation annotations for {@code required} fields.
+     */
     public static final Map<String, String> JAVA_TYPES_REQUIRED_ANNOTATIONS = ofEntries(
             entry(STRING, NOT_BLANK_ANNOTATION),
             entry(BYTE, NOT_NULL_ANNOTATION),
@@ -326,6 +343,9 @@ public final class Dictionary {
             entry(OBJECT_TYPE, NOT_NULL_ANNOTATION)
     );
 
+    /**
+     * Maps annotation names to javax.validation import declarations.
+     */
     public static final Map<String, String> JAVAX_JAVA_TYPES_REQUIRED_IMPORTS = ofEntries(
             entry(NOT_BLANK_ANNOTATION, JAVAX_NOT_BLANK_IMPORT),
             entry(NOT_EMPTY_ANNOTATION, JAVAX_NOT_EMPTY_IMPORT),
@@ -335,6 +355,9 @@ public final class Dictionary {
             entry(VALID_ANNOTATION, JAVAX_VALID_IMPORT)
     );
 
+    /**
+     * Maps annotation names to jakarta.validation import declarations.
+     */
     public static final Map<String, String> JAKARTA_JAVA_TYPES_REQUIRED_IMPORTS = ofEntries(
             entry(NOT_BLANK_ANNOTATION, JAKARTA_NOT_BLANK_IMPORT),
             entry(NOT_EMPTY_ANNOTATION, JAKARTA_NOT_EMPTY_IMPORT),
@@ -344,6 +367,9 @@ public final class Dictionary {
             entry(VALID_ANNOTATION, JAKARTA_VALID_IMPORT)
     );
 
+    /**
+     * List of Java wrapper types generated as simple fields (not collections/maps).
+     */
     public static final List<String> JAVA_DEFAULT_TYPES = List.of(
             STRING,
             BYTE,
@@ -362,6 +388,9 @@ public final class Dictionary {
             URI
     );
 
+    /**
+     * Maps YAML {@code format} values (e.g., {@code "date"}) to Java type names (e.g., {@code "LocalDate"}).
+     */
     public static final Map<String, Object> JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER = ofEntries(
             entry(ST_STRING, STRING),
             entry(ST_BYTE, BYTE),
@@ -380,6 +409,9 @@ public final class Dictionary {
             entry(ST_URI, URI)
     );
 
+    /**
+     * Reverse map: Java type names → YAML format strings.
+     */
     public static final Map<String, Object> JAVA_UPPER_CASE_TYPES_CHECK_CONVERTER = ofEntries(
             entry(STRING, ST_STRING),
             entry(BYTE, ST_BYTE),

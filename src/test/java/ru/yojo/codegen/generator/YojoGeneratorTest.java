@@ -223,7 +223,5 @@ class YojoGeneratorTest {
         ctx.setLombokProperties(new LombokProperties(false, false, new Accessors(false, false, false)));
 
         yojoGenerator.generateAll(ctx);
-
-        File out = new File("src/test/resources/example/testGenerate/slack/");
     }
 }
