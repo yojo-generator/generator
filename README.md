@@ -297,8 +297,8 @@ sourceSets {
 tasks.compileJava.dependsOn(generateClasses)
 ```
 
-🔗 [Official Gradle Plugin](https://plugins.gradle.org/plugin/ru.yojo.codegen.gradle-plugin)  
-📦 [Maven Central](https://central.sonatype.com/artifact/ru.yojo.codegen/yojo-gradle-plugin)
+🔗 [Official Gradle Plugin](https://plugins.gradle.org/plugin/io.github.yojo-generator.gradle-plugin)  
+📦 [GitHub](https://github.com/yojo-generator/gradle-plugin)
 
 ---
 
