@@ -9,7 +9,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static ru.yojo.codegen.constants.Dictionary.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
@@ -288,24 +287,11 @@ public class Schema {
                         .flatMap(variableProperties -> {
                             Set<String> i = variableProperties.getRequiredImports();
                             if (!lombokProperties.enableLombok() && variableProperties.getEnumeration() == null) {
-                                if (variableProperties.isPrimitive()) {
-                                    String name = variableProperties.getName();
-                                    String type = variableProperties.getType();
-                                    finalStringBuilder
-                                            .append(lineSeparator())
-                                            .append(format(SETTER, capitalize(name), type, name, name, name))
-                                            .append(lineSeparator())
-                                            .append(format(GETTER, type, capitalize(name), name));
-                                } else {
                                     finalStringBuilder
                                             .append(lineSeparator())
                                             .append(generateSetter(variableProperties.getType(), variableProperties.getName()))
                                             .append(lineSeparator())
                                             .append(generateGetter(variableProperties.getType(), variableProperties.getName()));
-                                }
-                            }
-                            if (variableProperties.isPrimitive()) {
-                                i.clear();
                             }
                             return i.stream();
                         })

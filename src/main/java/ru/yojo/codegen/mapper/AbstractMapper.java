@@ -61,7 +61,6 @@ public class AbstractMapper {
         variableProperties.setName(safeFieldName(uncapitalize(propertyName)));
         variableProperties.setDefaultProperty(getStringValueIfExistOrElseNull(DEFAULT, propertiesMap));
         variableProperties.setType(capitalize(getStringValueIfExistOrElseNull(TYPE, propertiesMap)));
-        variableProperties.setPrimitive(getStringValueIfExistOrElseNull(PRIMITIVE, propertiesMap));
         variableProperties.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, propertiesMap));
         variableProperties.setExample(getStringValueIfExistOrElseNull(EXAMPLE, propertiesMap));
         variableProperties.setTitle(getStringValueIfExistOrElseNull(TITLE, propertiesMap));
@@ -675,7 +674,7 @@ public class AbstractMapper {
                       key.equals(EXAMPLE) || key.equals(DEFAULT) || key.equals(PATTERN) ||
                       key.equals(MIN_LENGTH) || key.equals(MAX_LENGTH) ||
                       key.equals(MINIMUM) || key.equals(MAXIMUM) ||
-                      key.equals(DIGITS) || key.equals(PRIMITIVE) ||
+                      key.equals(DIGITS) ||
                       key.equals(REALIZATION) || key.equals(NAME) || key.equals(PACKAGE))) {
                     actualProps.put(key, entry.getValue());
                     it.remove(); // move out of root into properties

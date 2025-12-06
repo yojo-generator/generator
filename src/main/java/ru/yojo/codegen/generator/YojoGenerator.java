@@ -146,6 +146,8 @@ public class YojoGenerator {
         ctx.setSchemasMap(globalSchemas);
         ctx.setMessagesMap(globalMessages);
 
+        ctx.setExperimental(yojoContext.isExperimental());
+
         process(ctx, schemaMapper, messageMapper);
     }
 
@@ -225,7 +227,7 @@ public class YojoGenerator {
                 collectExternalRefs(item, baseDir, schemas, messages, visited);
             }
         }
-        // else: primitive — ignore
+        // else: ignore
     }
 
     // ————————————————————————————————————————
@@ -494,18 +496,6 @@ public class YojoGenerator {
 
     /**
      * Preprocesses YAML content to inject {@code name} and {@code package} for external {@code $ref} resolution.
-     * <p>
-     * Converts:
-     * <pre>
-     *   $ref: './separated/primitives.yaml#/components/schemas/Primitives'
-     * </pre>
-     * to:
-     * <pre>
-     *   name: Primitives
-     *   package: com.example.common
-     *   $ref: './separated/primitives.yaml#/components/schemas/Primitives'
-     * </pre>
-     *
      * @param content         raw YAML
      * @param packageLocation base package (e.g., {@code com.example})
      * @return preprocessed YAML

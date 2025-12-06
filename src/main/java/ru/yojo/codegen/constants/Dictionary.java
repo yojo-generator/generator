@@ -14,7 +14,6 @@ import static java.util.Map.ofEntries;
  * Contains:
  * <ul>
  *   <li>YAML keys (e.g., {@code "properties"}, {@code "$ref"})</li>
- *   <li>Custom extension attributes (e.g., {@code "realization"}, {@code "primitive"})</li>
  *   <li>Java type names, package names, annotation strings, and code templates</li>
  * </ul>
  * @author Vladimir Morozkin(TG @vmorozkin)
@@ -134,9 +133,6 @@ public final class Dictionary {
 
     /** Custom attribute for specifying collection implementation */
     public static final String REALIZATION = "realization";
-
-    /** Custom attribute for marking primitive type fields */
-    public static final String PRIMITIVE = "primitive";
 
     /** Custom attribute for validation groups */
     public static final String VALIDATION_GROUPS = "validationGroups";
