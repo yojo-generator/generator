@@ -1,6 +1,5 @@
 package ru.yojo.codegen.generator;
 
-import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 import ru.yojo.codegen.context.ProcessContext;
 import ru.yojo.codegen.context.SpecificationProperties;
@@ -48,7 +47,6 @@ import static ru.yojo.codegen.util.MapperUtil.*;
  *
  * @author Vladimir Morozkin (TG @vmorozkin)
  */
-@Component
 public class YojoGenerator {
 
     /**
