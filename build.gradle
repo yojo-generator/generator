@@ -15,16 +15,29 @@ java {
 }
 
 group 'io.github.yojo-generator'
-version '2.1.1'
+//archivesBaseName = "generator"
+version '2.0.1'
 
 publishing {
     repositories {
+//        maven {
+//            name = "GitHubPackages"
+//            url = uri("https://maven.pkg.github.com/yojo-generator/generator")
+//            credentials {
+//                username = project.findProperty("user") ?: System.getenv("USERNAME")
+//                password = project.findProperty("token") ?: System.getenv("TOKEN")
+//            }
+//        }
+
         maven {
             url = layout.buildDirectory.dir('staging-deploy')
         }
     }
 
     publications {
+//        gpr(MavenPublication) {
+//            from(components.java)
+//        }
         mavenJava(MavenPublication) {
             groupId = 'io.github.yojo-generator'
             artifactId = 'generator'
@@ -69,6 +82,9 @@ jreleaser {
         armored = true
         verify = true
     }
+    // environment {
+    //     variables 'config.toml'
+    // }
     release {
         github {
             skipRelease = true
