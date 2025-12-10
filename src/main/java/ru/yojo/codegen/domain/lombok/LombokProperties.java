@@ -24,7 +24,7 @@ public class LombokProperties {
      * Whether {@code @NoArgsConstructor} should be generated.
      * Default: {@code true}.
      */
-    private boolean noArgsConstructor = true;
+    private boolean noArgsConstructor;
 
     /**
      * Configuration for {@code @Accessors} (fluent/chained setters).
@@ -90,6 +90,21 @@ public class LombokProperties {
     public LombokProperties(boolean enableLombok, boolean allArgsConstructor, Accessors accessors) {
         this.enableLombok = enableLombok;
         this.allArgsConstructor = allArgsConstructor;
+        this.accessors = accessors;
+    }
+
+    /**
+     * Constructs a Lombok configuration with explicit values.
+     *
+     * @param enableLombok       whether Lombok is enabled
+     * @param allArgsConstructor whether {@code @AllArgsConstructor} is enabled
+     * @param noArgsConstructor whether {@code @NoArgsConstructor} is enabled
+     * @param accessors          accessor configuration (may be {@code null})
+     */
+    public LombokProperties(boolean enableLombok, boolean allArgsConstructor, boolean noArgsConstructor, Accessors accessors) {
+        this.enableLombok = enableLombok;
+        this.allArgsConstructor = allArgsConstructor;
+        this.noArgsConstructor = noArgsConstructor;
         this.accessors = accessors;
     }
 
