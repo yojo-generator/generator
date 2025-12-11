@@ -1,8 +1,6 @@
 package ru.yojo.codegen.generator;
 
 import org.junit.jupiter.api.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import ru.yojo.codegen.context.SpecificationProperties;
 import ru.yojo.codegen.context.YojoContext;
 import ru.yojo.codegen.domain.lombok.Accessors;
@@ -23,12 +21,10 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(classes = {YojoGenerator.class, SchemaMapper.class, MessageMapper.class, Helper.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class YojoGeneratorTest {
 
-    @Autowired
-    private YojoGenerator yojoGenerator;
+    private YojoGenerator yojoGenerator = new YojoGenerator();
 
     private static final List<String> OUTPUT_DIRECTORIES = List.of(
             "src/test/resources/example/testGenerate/",
