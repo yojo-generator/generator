@@ -28,27 +28,27 @@ class MapperUtilTest {
     })
     void buildLombokAnnotationsTest(boolean isAccessorsEnable, boolean isFluent, boolean isChain, String expectedResult) {
         Accessors accessors = new Accessors(isAccessorsEnable, isFluent, isChain);
-        LombokProperties lombokProperties = new LombokProperties(true, false, accessors);
+        LombokProperties lombokProperties = new LombokProperties(true, false, false, false,false, accessors);
 
         StringBuilder actualResultStringBuilder = new StringBuilder();
 
         String expected = expectedResult.trim() +
-                        lineSeparator();
+                lineSeparator();
 
-        MapperUtil.buildLombokAnnotations(lombokProperties, new HashSet<>(), actualResultStringBuilder);
+        MapperUtil.buildLombokAnnotations(lombokProperties, new HashSet<>(), actualResultStringBuilder, "class");
 
         assertThat(actualResultStringBuilder.toString()).hasToString(expected);
     }
 
     @ParameterizedTest
     @CsvSource({
-            "true, true, true, @NoArgsConstructor @AllArgsConstructor",
-            "true, true, false, @AllArgsConstructor",
-            "true, false, true, @NoArgsConstructor",
-            "true, false, false, "
+            "true, true, true, true, true, @NoArgsConstructor @AllArgsConstructor",
+            "true, true, false, true, true, @AllArgsConstructor",
+            "true, false, true, true, true, @NoArgsConstructor",
+            "true, false, false, true, true, ",
     })
-    void buildLombokAnnotationsTestEnum(boolean enableLombok, boolean allArgsEnabled, boolean noArgsEnabled, String expectedResult) {
-        LombokProperties lombokProperties = new LombokProperties(enableLombok, allArgsEnabled, noArgsEnabled, new Accessors(false, false, false));
+    void buildLombokAnnotationsTest(boolean enableLombok, boolean allArgsEnabled, boolean noArgsEnabled, boolean enumAllArgsEnabled, boolean enumNoArgsEnabled, String expectedResult) {
+        LombokProperties lombokProperties = new LombokProperties(enableLombok, allArgsEnabled, noArgsEnabled, enumAllArgsEnabled, enumNoArgsEnabled, new Accessors(false, false, false));
 
         StringBuilder actualResultStringBuilder = new StringBuilder();
 
@@ -57,7 +57,76 @@ class MapperUtilTest {
         if (!trim.isEmpty()) {
             expected = Arrays.asList(trim.split(" "));
         }
-        MapperUtil.buildLombokAnnotations(lombokProperties, new HashSet<>(), actualResultStringBuilder);
+        MapperUtil.buildLombokAnnotations(lombokProperties, new HashSet<>(), actualResultStringBuilder,"class");
+        List<String> actual = Arrays.asList(actualResultStringBuilder.toString().split(lineSeparator()));
+        assertTrue(actual.containsAll(expected));
+        assertTrue(expected.containsAll(actual));
+        assertEquals(expected.size(), actual.size());
+    }
+    @ParameterizedTest
+    @CsvSource({
+            "true, true, true, false, false, @NoArgsConstructor @AllArgsConstructor",
+            "true, true, false, false, false, @AllArgsConstructor",
+            "true, false, true, false, false, @NoArgsConstructor",
+            "true, false, false, false, false, ",
+    })
+    void buildLombokAnnotationsTestWithDisabledEnumAllArgsEnumNoArgs(boolean enableLombok, boolean allArgsEnabled, boolean noArgsEnabled, boolean enumAllArgsEnabled, boolean enumNoArgsEnabled, String expectedResult) {
+        LombokProperties lombokProperties = new LombokProperties(enableLombok, allArgsEnabled, noArgsEnabled, enumAllArgsEnabled, enumNoArgsEnabled, new Accessors(false, false, false));
+
+        StringBuilder actualResultStringBuilder = new StringBuilder();
+
+        String trim = expectedResult != null ? expectedResult.trim() : "";
+        List<String> expected = List.of("");
+        if (!trim.isEmpty()) {
+            expected = Arrays.asList(trim.split(" "));
+        }
+        MapperUtil.buildLombokAnnotations(lombokProperties, new HashSet<>(), actualResultStringBuilder,"class");
+        List<String> actual = Arrays.asList(actualResultStringBuilder.toString().split(lineSeparator()));
+        assertTrue(actual.containsAll(expected));
+        assertTrue(expected.containsAll(actual));
+        assertEquals(expected.size(), actual.size());
+    }
+    @ParameterizedTest
+    @CsvSource({
+            "true, true, true, true, true, @NoArgsConstructor @AllArgsConstructor",
+            "true, true, true, true, false, @AllArgsConstructor",
+            "true, true, true, false, true, @NoArgsConstructor",
+            "true, true, true, false, false, ",
+    })
+    void buildLombokAnnotationsTestEnumClassType(boolean enableLombok, boolean allArgsEnabled, boolean noArgsEnabled, boolean enumAllArgsEnabled, boolean enumNoArgsEnabled, String expectedResult) {
+        LombokProperties lombokProperties = new LombokProperties(enableLombok, allArgsEnabled, noArgsEnabled, enumAllArgsEnabled, enumNoArgsEnabled, new Accessors(false, false, false));
+
+        StringBuilder actualResultStringBuilder = new StringBuilder();
+
+        String trim = expectedResult != null ? expectedResult.trim() : "";
+        List<String> expected = List.of("");
+        if (!trim.isEmpty()) {
+            expected = Arrays.asList(trim.split(" "));
+        }
+        MapperUtil.buildLombokAnnotations(lombokProperties, new HashSet<>(), actualResultStringBuilder,"enum");
+        List<String> actual = Arrays.asList(actualResultStringBuilder.toString().split(lineSeparator()));
+        assertTrue(actual.containsAll(expected));
+        assertTrue(expected.containsAll(actual));
+        assertEquals(expected.size(), actual.size());
+    }
+    @ParameterizedTest
+    @CsvSource({
+            "true, false, false, true, true, @NoArgsConstructor @AllArgsConstructor",
+            "true, false, false, true, false, @AllArgsConstructor",
+            "true, false, false, false, true, @NoArgsConstructor",
+            "true, false, false, false, false, ",
+    })
+    void buildLombokAnnotationsTestEnumClassTypeNoArgsAllArgsDisabled(boolean enableLombok, boolean allArgsEnabled, boolean noArgsEnabled, boolean enumAllArgsEnabled, boolean enumNoArgsEnabled, String expectedResult) {
+        LombokProperties lombokProperties = new LombokProperties(enableLombok, allArgsEnabled, noArgsEnabled, enumAllArgsEnabled, enumNoArgsEnabled, new Accessors(false, false, false));
+
+        StringBuilder actualResultStringBuilder = new StringBuilder();
+
+        String trim = expectedResult != null ? expectedResult.trim() : "";
+        List<String> expected = List.of("");
+        if (!trim.isEmpty()) {
+            expected = Arrays.asList(trim.split(" "));
+        }
+        MapperUtil.buildLombokAnnotations(lombokProperties, new HashSet<>(), actualResultStringBuilder,"enum");
         List<String> actual = Arrays.asList(actualResultStringBuilder.toString().split(lineSeparator()));
         assertTrue(actual.containsAll(expected));
         assertTrue(expected.containsAll(actual));
@@ -67,11 +136,11 @@ class MapperUtilTest {
     @Test
     void buildLombokAnnotationsTestAccessorsDisable() {
         Accessors accessors = new Accessors(false, true, true);
-        LombokProperties lombokProperties = new LombokProperties(true, false, true, accessors);
+        LombokProperties lombokProperties = new LombokProperties(true, false, true, false,false, accessors);
 
         StringBuilder actualResultStringBuilder = new StringBuilder();
         String expected = LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION + lineSeparator();
-        MapperUtil.buildLombokAnnotations(lombokProperties, new HashSet<>(), actualResultStringBuilder);
+        MapperUtil.buildLombokAnnotations(lombokProperties, new HashSet<>(), actualResultStringBuilder, "class");
 
         assertThat(actualResultStringBuilder.toString()).hasToString(expected);
     }
@@ -79,11 +148,11 @@ class MapperUtilTest {
     @Test
     void buildLombokAnnotationsTestAccessorsDisableWithAllArgsEnabled() {
         Accessors accessors = new Accessors(false, true, true);
-        LombokProperties lombokProperties = new LombokProperties(true, true, false, accessors);
+        LombokProperties lombokProperties = new LombokProperties(true, true, false, false,false, accessors);
 
         StringBuilder actualResultStringBuilder = new StringBuilder();
         String expected = LOMBOK_ALL_ARGS_CONSTRUCTOR_ANNOTATION + lineSeparator();
-        MapperUtil.buildLombokAnnotations(lombokProperties, new HashSet<>(), actualResultStringBuilder);
+        MapperUtil.buildLombokAnnotations(lombokProperties, new HashSet<>(), actualResultStringBuilder, "class");
 
         assertThat(actualResultStringBuilder.toString()).hasToString(expected);
     }

@@ -22,9 +22,36 @@ public class LombokProperties {
 
     /**
      * Whether {@code @NoArgsConstructor} should be generated.
-     * Default: {@code true}.
+     * Default: {@code false}.
      */
     private boolean noArgsConstructor;
+
+    /**
+     * Whether {@code @AllArgsConstructor} should be generated.
+     */
+    private boolean enumAllArgsConstructor;
+
+    public boolean isEnumAllArgsConstructor() {
+        return enumAllArgsConstructor;
+    }
+
+    public void setEnumAllArgsConstructor(boolean enumAllArgsConstructor) {
+        this.enumAllArgsConstructor = enumAllArgsConstructor;
+    }
+
+    public boolean isEnumNoArgsConstructor() {
+        return enumNoArgsConstructor;
+    }
+
+    public void setEnumNoArgsConstructor(boolean enumNoArgsConstructor) {
+        this.enumNoArgsConstructor = enumNoArgsConstructor;
+    }
+
+    /**
+     * Whether {@code @NoArgsConstructor} should be generated.
+     * Default: {@code false}.
+     */
+    private boolean enumNoArgsConstructor;
 
     /**
      * Configuration for {@code @Accessors} (fluent/chained setters).
@@ -58,6 +85,9 @@ public class LombokProperties {
         return new LombokProperties(
                 lombokProperties.enableLombok,
                 lombokProperties.allArgsConstructor,
+                lombokProperties.noArgsConstructor,
+                lombokProperties.enumAllArgsConstructor,
+                lombokProperties.enumNoArgsConstructor,
                 lombokProperties.getAccessors()
         );
     }
@@ -85,26 +115,20 @@ public class LombokProperties {
      *
      * @param enableLombok       whether Lombok is enabled
      * @param allArgsConstructor whether {@code @AllArgsConstructor} is enabled
+     * @param noArgsConstructor  whether {@code @NoArgsConstructor} is enabled
      * @param accessors          accessor configuration (may be {@code null})
      */
-    public LombokProperties(boolean enableLombok, boolean allArgsConstructor, Accessors accessors) {
-        this.enableLombok = enableLombok;
-        this.allArgsConstructor = allArgsConstructor;
-        this.accessors = accessors;
-    }
-
-    /**
-     * Constructs a Lombok configuration with explicit values.
-     *
-     * @param enableLombok       whether Lombok is enabled
-     * @param allArgsConstructor whether {@code @AllArgsConstructor} is enabled
-     * @param noArgsConstructor whether {@code @NoArgsConstructor} is enabled
-     * @param accessors          accessor configuration (may be {@code null})
-     */
-    public LombokProperties(boolean enableLombok, boolean allArgsConstructor, boolean noArgsConstructor, Accessors accessors) {
+    public LombokProperties(boolean enableLombok,
+                            boolean allArgsConstructor,
+                            boolean noArgsConstructor,
+                            boolean enumAllArgsConstructor,
+                            boolean enumNoArgsConstructor,
+                            Accessors accessors) {
         this.enableLombok = enableLombok;
         this.allArgsConstructor = allArgsConstructor;
         this.noArgsConstructor = noArgsConstructor;
+        this.enumAllArgsConstructor = enumAllArgsConstructor;
+        this.enumNoArgsConstructor = enumNoArgsConstructor;
         this.accessors = accessors;
     }
 
