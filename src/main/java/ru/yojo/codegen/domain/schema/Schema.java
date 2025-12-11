@@ -378,9 +378,8 @@ public class Schema {
                 // 4️⃣ Lombok (exclude @NoArgsConstructor for enums with constructors)
                 if (lombokProperties.enableLombok()) {
                     LombokProperties effectiveLombok = LombokProperties.newLombokProperties(lombokProperties);
-                    if (hasEnumWithDescription) {
-                        effectiveLombok.setNoArgsConstructor(false);
-                    }
+                    effectiveLombok.setNoArgsConstructor(false);
+                    effectiveLombok.setAllArgsConstructor(false);
                     buildLombokAnnotations(effectiveLombok, requiredImports, lombokAnnotationBuilder);
                 }
             }

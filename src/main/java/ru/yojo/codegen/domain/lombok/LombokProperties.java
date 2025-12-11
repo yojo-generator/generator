@@ -58,6 +58,7 @@ public class LombokProperties {
         return new LombokProperties(
                 lombokProperties.enableLombok,
                 lombokProperties.allArgsConstructor,
+                lombokProperties.noArgsConstructor,
                 lombokProperties.getAccessors()
         );
     }
