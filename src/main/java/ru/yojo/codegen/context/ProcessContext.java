@@ -13,7 +13,7 @@ import java.util.Map;
  * @author Vladimir Morozkin (TG @vmorozkin)
  */
 public class ProcessContext {
-
+    private boolean experimental = false;
     /**
      * Constructs a new context with the raw parsed YAML content.
      *
@@ -93,6 +93,8 @@ public class ProcessContext {
      */
     private Helper helper = new Helper();
 
+    public boolean isExperimental() { return experimental; }
+    public void setExperimental(boolean experimental) { this.experimental = experimental; }
     /**
      * Returns the shared helper instance.
      *

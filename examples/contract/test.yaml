@@ -186,8 +186,6 @@ components:
         - collectionTypes
         - integerValidationField
         - uuidValidationList
-        - listOfPrimitivesRequired
-        - setOfPrimitivesRequired
         - StringValues
       properties:
         polymorph:
@@ -199,11 +197,6 @@ components:
           $ref: '#/components/schemas/PolymorphExampleThree'
 
         #If you want to use plugin AsynApi - all references must be in main contract
-
-        primitives:
-          type: object
-          description: Here was located all supported primitives
-          $ref: './separated/primitives.yaml#/components/schemas/Primitives'
 
         objectTypes:
           type: object
@@ -228,47 +221,6 @@ components:
             #Attribute Type object is required attribute if you use separated contract
             type: object
             $ref: './separated/collectionTypes.yaml#/components/schemas/CollectionTypes'
-        listOfPrimitives:
-          type: array
-          items:
-            #Attribute Type object is required attribute if you use separated contract
-            type: object
-            $ref: './separated/primitives.yaml#/components/schemas/Primitives'
-        listOfPrimitivesRequired:
-          type: array
-          items:
-            #Attribute Type object is required attribute if you use separated contract
-            type: object
-            $ref: './separated/primitives.yaml#/components/schemas/Primitives'
-        listOfPrimitivesWithRealization:
-          type: array
-          items:
-            #Attribute Type object is required attribute if you use separated contract
-            type: object
-            $ref: './separated/primitives.yaml#/components/schemas/Primitives'
-            realization: LinkedList
-        setOfPrimitives:
-          type: array
-          format: set
-          items:
-            #Attribute Type object is required attribute if you use separated contract
-            type: object
-            $ref: './separated/primitives.yaml#/components/schemas/Primitives'
-        setOfPrimitivesRequired:
-          type: array
-          format: set
-          items:
-            #Attribute Type object is required attribute if you use separated contract
-            type: object
-            $ref: './separated/primitives.yaml#/components/schemas/Primitives'
-        setOfPrimitivesWithRealization:
-          type: array
-          format: set
-          items:
-            #Attribute Type object is required attribute if you use separated contract
-            type: object
-            $ref: './separated/primitives.yaml#/components/schemas/Primitives'
-            realization: HashSet
 
         integerValidationField:
           type: integer

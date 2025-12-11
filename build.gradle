@@ -116,10 +116,6 @@ repositories {
     mavenCentral()
 }
 
-ext {
-    junitVersion = '5.8.2'
-}
-
 //Uncomment this if you need to test by YojoCLI
 //sourceSets {
 ////    main {
@@ -158,10 +154,13 @@ jar {
 
 dependencies {
     implementation 'org.yaml:snakeyaml:2.0'
+
     compileOnly 'org.projectlombok:lombok:1.18.26'
     testCompileOnly 'org.projectlombok:lombok:1.18.26'
 
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.14.1'
+    testImplementation platform('org.junit:junit-bom:5.10.2') // или 5.14.1 — но единая!
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.assertj:assertj-core:3.27.3'
 }
 

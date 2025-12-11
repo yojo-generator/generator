@@ -38,7 +38,7 @@ public class VariableProperties {
     private String name;
 
     /**
-     * Java type (e.g., {@code String}, {@code List<LocalDate>}, {@code MyCustomDto}, {@code boolean} for primitives).
+     * Java type (e.g., {@code String}, {@code List<LocalDate>}, {@code MyCustomDto}, {@code boolean} ).
      */
     private String type;
 
@@ -143,11 +143,6 @@ public class VariableProperties {
      * {@code false} for collections/enums where {@code @Valid} should NOT be added.
      */
     private boolean valid = true;
-
-    /**
-     * {@code true} if field should be a primitive type (e.g., {@code int} instead of {@code Integer}).
-     */
-    private Boolean primitive;
 
     /**
      * Collection type: {@code "list"} (default) or {@code "set"}.
@@ -575,26 +570,6 @@ public class VariableProperties {
             } else {
                 requiredImports.add(JAVAX_MAX_IMPORT);
             }
-        }
-    }
-
-    /**
-     * Returns whether this field should be a primitive type.
-     *
-     * @return {@code true} for {@code int}, {@code boolean}, etc.
-     */
-    public boolean isPrimitive() {
-        return primitive != null && primitive;
-    }
-
-    /**
-     * Sets whether this field should be a primitive type.
-     *
-     * @param primitive {@code "true"} or {@code "false"}
-     */
-    public void setPrimitive(String primitive) {
-        if (primitive != null) {
-            this.primitive = Boolean.valueOf(primitive);
         }
     }
 
@@ -1048,34 +1023,11 @@ public class VariableProperties {
         StringBuilder stringBuilder = new StringBuilder();
         generateJavaDoc(stringBuilder, getDescription(), getExample());
         Comparator<String> stringComparator = (a, b) -> Integer.compare(a.length(), b.length());
-        getAnnotationSet().stream().filter(annotation -> !isPrimitive()).sorted().sorted(stringComparator).forEach(annotation -> {
+        getAnnotationSet().stream().sorted(stringComparator).forEach(annotation -> {
             stringBuilder.append(lineSeparator())
                     .append(TABULATION)
                     .append(annotation);
         });
-
-        if (primitive != null) {
-            switch (type) {
-                case BOOLEAN:
-                    setType("boolean");
-                    break;
-                case BYTE:
-                    setType("byte");
-                    break;
-                case INTEGER:
-                    setType("int");
-                    break;
-                case LONG:
-                    setType("long");
-                    break;
-                case DOUBLE:
-                    setType("double");
-                    break;
-                case FLOAT:
-                    setType("float");
-                    break;
-            }
-        }
 
         if (defaultProperty != null) {
             if (defaultProperty.equals("new")) {

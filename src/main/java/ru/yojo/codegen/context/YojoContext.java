@@ -11,7 +11,7 @@ import java.util.List;
  * @author Vladimir Morozkin (TG @vmorozkin)
  */
 public class YojoContext {
-
+    private boolean experimental = false;
     /**
      * Base input directory (deprecated/legacy — prefer {@link SpecificationProperties#getInputDirectory()}).
      */
@@ -41,6 +41,9 @@ public class YojoContext {
      * List of specification definitions to process (main entry point for multi-file generation).
      */
     private List<SpecificationProperties> specificationProperties;
+
+    public boolean isExperimental() { return experimental; }
+    public void setExperimental(boolean experimental) { this.experimental = experimental; }
 
     /**
      * Returns the legacy base input directory (if used).
