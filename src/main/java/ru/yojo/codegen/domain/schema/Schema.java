@@ -280,7 +280,7 @@ public class Schema {
                                 .append(lineSeparator());
                         requiredImports.add(LOMBOK_DATA_IMPORT);
                     }
-                    buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder);
+                    buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder,  getClassType(stringBuilder.toString()));
                 }
 
                 StringBuilder finalStringBuilder = stringBuilder;
@@ -395,7 +395,7 @@ public class Schema {
                     if (hasEnumWithDescription) {
                         effectiveLombok.setNoArgsConstructor(false);
                     }
-                    buildLombokAnnotations(effectiveLombok, requiredImports, lombokAnnotationBuilder);
+                    buildLombokAnnotations(effectiveLombok, requiredImports, lombokAnnotationBuilder, getClassType(stringBuilder.toString()));
                 }
             }
         }

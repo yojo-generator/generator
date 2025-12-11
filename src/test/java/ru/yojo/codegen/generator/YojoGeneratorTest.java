@@ -102,7 +102,7 @@ class YojoGeneratorTest {
         YojoContext yojoContext = new YojoContext();
         yojoContext.setSpringBootVersion("2.7.0");
         yojoContext.setSpecificationProperties(Collections.singletonList(spec));
-        yojoContext.setLombokProperties(new LombokProperties(true, false, new Accessors(false, false, false)));
+        yojoContext.setLombokProperties(new LombokProperties(true, false,false,false,false, new Accessors(false, false, false)));
 
         yojoGenerator.generateAll(yojoContext);
 
@@ -140,7 +140,7 @@ class YojoGeneratorTest {
 
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
-        ctx.setLombokProperties(new LombokProperties(true, false, new Accessors(false, false, false)));
+        ctx.setLombokProperties(new LombokProperties(true, false,false, false,false,new Accessors(false, false, false)));
 
         yojoGenerator.generateAll(ctx);
 
@@ -161,7 +161,7 @@ class YojoGeneratorTest {
 
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
-        ctx.setLombokProperties(new LombokProperties(true, false, new Accessors(false, false, false)));
+        ctx.setLombokProperties(new LombokProperties(true, false,false,false,false, new Accessors(false, false, false)));
 
         yojoGenerator.generateAll(ctx);
 
@@ -180,7 +180,7 @@ class YojoGeneratorTest {
 
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
-        ctx.setLombokProperties(new LombokProperties(true, false, new Accessors(false, false, false)));
+        ctx.setLombokProperties(new LombokProperties(true, false,false, false,false,new Accessors(false, false, false)));
 
         yojoGenerator.generateAll(ctx);
 
@@ -199,7 +199,7 @@ class YojoGeneratorTest {
 
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
-        ctx.setLombokProperties(new LombokProperties(false, false, new Accessors(false, false, false)));
+        ctx.setLombokProperties(new LombokProperties(false, false,false,false,false, new Accessors(false, false, false)));
 
         yojoGenerator.generateAll(ctx);
 
@@ -220,7 +220,7 @@ class YojoGeneratorTest {
 
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
-        ctx.setLombokProperties(new LombokProperties(false, false, new Accessors(false, false, false)));
+        ctx.setLombokProperties(new LombokProperties(false, false,false, false,false,new Accessors(false, false, false)));
 
         yojoGenerator.generateAll(ctx);
 
@@ -239,7 +239,7 @@ class YojoGeneratorTest {
 
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
-        ctx.setLombokProperties(new LombokProperties(false, false, new Accessors(false, false, false)));
+        ctx.setLombokProperties(new LombokProperties(false, false,false, false,false,new Accessors(false, false, false)));
 
         yojoGenerator.generateAll(ctx);
 
@@ -282,7 +282,7 @@ class YojoGeneratorTest {
 
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(list);
-        ctx.setLombokProperties(new LombokProperties(false, false, new Accessors(false, false, false)));
+        ctx.setLombokProperties(new LombokProperties(false, false,false,false,false, new Accessors(false, false, false)));
 
         yojoGenerator.generateAll(ctx);
 

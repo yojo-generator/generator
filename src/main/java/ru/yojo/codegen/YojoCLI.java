@@ -34,6 +34,7 @@ import static ru.yojo.codegen.util.MapperUtil.isTrue;
  *   <li>{@code packageLocation} — base Java package (e.g., {@code com.example.api})</li>
  *   <li>{@code lombokEnabled} — enable Lombok annotations (default: {@code false})</li>
  *   <li>{@code allArgs} — generate {@code @AllArgsConstructor} (default: {@code false})</li>
+ *   <li>{@code noArgs} — generate {@code @NoArgsConstructor} (default: {@code false})</li>
  *   <li>{@code accessors} — enable {@code @Accessors(fluent = true, chain = true)} (default: {@code false})</li>
  * </ul>
  *
@@ -49,7 +50,7 @@ public class YojoCLI {
      */
     public static void main(String[] args) {
         if (args.length < 3) {
-            System.err.println("Usage: java -cp ... YojoCLI <inputFileOrDir> <outputDir> <packageLocation> [lombokEnabled=false] [allArgs=false] [accessors=false]");
+            System.err.println("Usage: java -cp ... YojoCLI <inputFileOrDir> <outputDir> <packageLocation> [lombokEnabled=false] [allArgs=false] [noArgs=false] [enumAllArgs=false] [enumNoArgs=false] [accessors=false]");
             System.exit(1);
         }
 
@@ -59,7 +60,10 @@ public class YojoCLI {
 
         boolean lombokEnabled = args.length > 3 && isTrue(Boolean.valueOf(args[3]));
         boolean allArgs = args.length > 4 && isTrue(Boolean.valueOf(args[4]));
-        boolean accessorsEnabled = args.length > 5 && isTrue(Boolean.valueOf(args[5]));
+        boolean noArgs = args.length > 5 && isTrue(Boolean.valueOf(args[5]));
+        boolean enumAllArgs = args.length > 6 && isTrue(Boolean.valueOf(args[6]));
+        boolean enumNoArgs = args.length > 7 && isTrue(Boolean.valueOf(args[7]));
+        boolean accessorsEnabled = args.length > 8 && isTrue(Boolean.valueOf(args[8]));
 
         // --- Context setup ---
         YojoContext context = new YojoContext();
@@ -89,6 +93,9 @@ public class YojoCLI {
         context.setLombokProperties(new LombokProperties(
                 lombokEnabled,
                 allArgs,
+                noArgs,
+                enumAllArgs,
+                enumNoArgs,
                 new Accessors(accessorsEnabled, accessorsEnabled, accessorsEnabled)
         ));
 

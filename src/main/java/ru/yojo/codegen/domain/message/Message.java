@@ -252,7 +252,7 @@ public class Message {
                     this.lombokProperties.setAccessors(fillParameters.getLombokProperties().getAccessors());
                 }
             }
-            buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder);
+            buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder, getClassType(stringBuilder.toString()));
         }
 
         if (!lombokProperties.enableLombok()) {
@@ -300,4 +300,6 @@ public class Message {
 
         return finishBuild(stringBuilder, requiredImports, messagePackageName);
     }
+
+
 }

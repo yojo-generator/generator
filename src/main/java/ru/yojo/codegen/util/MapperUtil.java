@@ -382,8 +382,17 @@ public class MapperUtil {
      */
     public static void buildLombokAnnotations(LombokProperties lombokProperties,
                                               Set<String> requiredImports,
-                                              StringBuilder lombokAnnotationBuilder) {
-        if (lombokProperties.noArgsConstructor()) {
+                                              StringBuilder lombokAnnotationBuilder, String classType) {
+        boolean isEnum = classType.equalsIgnoreCase("enum");
+
+        boolean needsNoArgsConstructor = isEnum
+                ? lombokProperties.isEnumNoArgsConstructor()
+                : lombokProperties.noArgsConstructor();
+        boolean needsAllArgsConstructor = isEnum
+                ? lombokProperties.isEnumAllArgsConstructor()
+                : lombokProperties.allArgsConstructor();
+
+        if (needsNoArgsConstructor) {
             lombokAnnotationBuilder
                     .append(LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION)
                     .append(lineSeparator());
@@ -395,7 +404,7 @@ public class MapperUtil {
                     .append(lineSeparator());
             requiredImports.add(LOMBOK_ACCESSORS_IMPORT);
         }
-        if (lombokProperties.allArgsConstructor()) {
+        if (needsAllArgsConstructor) {
             lombokAnnotationBuilder.append(LOMBOK_ALL_ARGS_CONSTRUCTOR_ANNOTATION)
                     .append(lineSeparator());
             requiredImports.add(LOMBOK_ALL_ARGS_CONSTRUCTOR_IMPORT);
@@ -775,5 +784,19 @@ public class MapperUtil {
         if (result.isEmpty()) result = "VALUE";
 
         return safeFieldName(result);
+    }
+
+    public static String getClassType(String classSignature) {
+        int braceIndex = classSignature.indexOf("{");
+        String signature = (braceIndex != -1)
+                ? classSignature.substring(0, braceIndex)
+                : classSignature;
+
+        Set<String> specialTypes = Set.of("enum", "record", "interface");
+
+        return Arrays.stream(signature.split(" "))
+                .filter(specialTypes::contains)
+                .findFirst()
+                .orElse("class"); // class - значение по умолчанию
     }
 }
