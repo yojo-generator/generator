@@ -3,11 +3,9 @@ package ru.yojo.codegen.generator;
 import org.junit.jupiter.api.*;
 import ru.yojo.codegen.context.SpecificationProperties;
 import ru.yojo.codegen.context.YojoContext;
+import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.lombok.Accessors;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
-import ru.yojo.codegen.mapper.Helper;
-import ru.yojo.codegen.mapper.MessageMapper;
-import ru.yojo.codegen.mapper.SchemaMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,9 +15,12 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class YojoGeneratorTest {
@@ -286,5 +287,20 @@ class YojoGeneratorTest {
         assertTrue(new File("src/test/resources/example/testGenerate/gitter/").exists());
         assertTrue(new File("src/test/resources/example/testGenerate/asyncapi/").exists());
         assertTrue(new File("src/test/resources/example/testGenerate/").exists());
+    }
+
+    @Test
+    @Order(9)
+    void testPatternEscaping() {
+        VariableProperties vp = new VariableProperties();
+        vp.setSpringBootVersion("3.2.0");
+        vp.setPattern("^\\d+\\.\\d{2}$");  // ← исходный паттерн с одним \ (как в YAML)
+
+        Set<String> annotations = vp.getAnnotationSet();
+        assertThat(annotations).containsExactly("@Pattern(regexp = \"^\\\\d+\\\\.\\\\d{2}$\")");
+
+        // Проверим, что импорт добавлен
+        Set<String> imports = vp.getRequiredImports();
+        assertThat(imports).contains("jakarta.validation.constraints.Pattern;");
     }
 }

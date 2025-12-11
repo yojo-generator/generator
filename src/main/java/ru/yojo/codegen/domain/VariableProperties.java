@@ -832,7 +832,8 @@ public class VariableProperties {
      */
     public void setPattern(String pattern) {
         if (pattern != null) {
-            annotationSet.add(format(PATTERN_ANNOTATION, pattern));
+            String escapedPattern = pattern.replace("\\", "\\\\");
+            annotationSet.add(format(PATTERN_ANNOTATION, escapedPattern));
             if (springBootVersion != null && springBootVersion.startsWith("3")) {
                 requiredImports.add(JAKARTA_JAVA_TYPES_REQUIRED_IMPORTS.get(substringBefore(PATTERN_ANNOTATION, "(")));
             } else {
