@@ -37,33 +37,7 @@ All examples use **valid AsyncAPI-compliant YAML** — no abbreviated forms like
 
 ---
 
-### 1. Primitives + `primitive: true`
-**YAML**
-```yaml
-booleanValueWithRequired:
-  type: boolean
-  primitive: true
-byteValueWithAnnotations:
-  type: number
-  format: byte
-  multipleOf: 1
-  minimum: 2
-  maximum: 4
-```
-→ **Java**
-```java
-private boolean booleanValueWithRequired;
-
-@Max(4)
-@Min(2)
-@NotNull
-@Digits(integer = 1, fraction = 0)  // multipleOf: 1 → fraction = 0
-private byte byteValueWithAnnotations;
-```
-
----
-
-### 2. Collections — correct `items` structure
+### 1. Collections — correct `items` structure
 **YAML**
 ```yaml
 listOfLongs:
@@ -88,7 +62,7 @@ private Set<LocalDate> setOfDates = new HashSet<>();
 
 ---
 
-### 3. Map with UUID keys
+### 2. Map with UUID keys
 **YAML**
 ```yaml
 mapUUIDCustomObject:
@@ -104,7 +78,7 @@ private Map<UUID, User> mapUUIDCustomObject;
 
 ---
 
-### 4. Enum with descriptions (`x-enumNames`)
+### 3. Enum with descriptions (`x-enumNames`)
 **YAML**
 ```yaml
 Result:
@@ -253,19 +227,18 @@ yojo {
         create("main") {
             specificationProperties {
                 register("api") {
-                    specName("api.yaml")
+                    specName("test.yaml")
                     inputDirectory(layout.projectDirectory.dir("contract").asFile.absolutePath)
-                    outputDirectory(layout.buildDirectory.dir("generated/sources/yojo/api").get().asFile.absolutePath)
+                    outputDirectory(layout.buildDirectory.dir("generated/sources/yojo/com/example/api").get().asFile.absolutePath)
                     packageLocation("com.example.api")
                 }
-                register("events-api") {
-                    specName("events.yaml")
+                register("one-more-api") {
+                    specName("test.yaml")
                     inputDirectory(layout.projectDirectory.dir("contract").asFile.absolutePath)
-                    outputDirectory(layout.buildDirectory.dir("generated/sources/yojo/events").get().asFile.absolutePath)
-                    packageLocation("com.example.events")
+                    outputDirectory(layout.buildDirectory.dir("generated/sources/yojo/oneMoreApi").get().asFile.absolutePath)
+                    packageLocation("oneMoreApi")
                 }
             }
-
             springBootVersion("3.2.0")
             lombok {
                 enable(true)
