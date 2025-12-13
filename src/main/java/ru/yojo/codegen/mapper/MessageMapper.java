@@ -17,7 +17,22 @@ import static ru.yojo.codegen.util.LombokUtils.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 /**
- * Maps AsyncAPI message definitions to Message objects.
+ * Mapper responsible for converting AsyncAPI {@code components.messages} definitions into {@link Message} objects.
+ * <p>
+ * Handles:
+ * <ul>
+ *   <li>Polymorphic payloads ({@code oneOf}, {@code allOf}, {@code anyOf}) via deep merging</li>
+ *   <li>References to schemas ({@code $ref}) including inheritance/implementation</li>
+ *   <li>Leaf scalars/arrays as wrapper DTOs (e.g., {@code payload: string} → class with {@code private String payload})</li>
+ *   <li>Custom generation paths via {@code pathForGenerateMessage}</li>
+ *   <li>Schema cleanup (e.g., {@code removeSchema: true})</li>
+ *   <li>Validation groups and Lombok overrides per message</li>
+ * </ul>
+ *
+ * <p>
+ * Delegates schema-based mapping logic (e.g., field resolution, inner-schema discovery) to {@link SchemaMapper}.
+ *
+ * @author Vladimir Morozkin (TG @vmorozkin)
  */
 @SuppressWarnings("all")
 public class MessageMapper extends AbstractMapper {
@@ -25,10 +40,30 @@ public class MessageMapper extends AbstractMapper {
     private final SchemaMapper schemaMapper;
     private boolean filledByRef = false;
 
+    /**
+     * Constructs a new message mapper with the given schema mapper for delegation.
+     *
+     * @param schemaMapper schema mapper to resolve $ref and shared logic
+     */
     public MessageMapper(SchemaMapper schemaMapper) {
         this.schemaMapper = schemaMapper;
     }
 
+    /**
+     * Converts all message definitions from the given {@link ProcessContext} into {@link Message} instances.
+     * <p>
+     * For each message:
+     * <ul>
+     *   <li>Initializes message metadata (name, packages, summary)</li>
+     *   <li>Processes inheritance/implementation directives ({@code extends}, {@code implements})</li>
+     *   <li>Resolves payload structure (polymorphic, reference, inline properties, leaf types)</li>
+     *   <li>Merges fields from {@code $ref} and inline {@code properties} without duplication</li>
+     *   <li>Applies schema removal logic (e.g., via {@code removeSchema: true})</li>
+     * </ul>
+     *
+     * @param processContext current generation context
+     * @return list of fully populated {@link Message} objects ready for code generation
+     */
     public List<Message> mapMessagesToObjects(ProcessContext processContext) {
         List<Message> messageList = new ArrayList<>();
         processContext.getMessagesMap().forEach((messageName, messageValues) -> {
@@ -125,6 +160,12 @@ public class MessageMapper extends AbstractMapper {
         return messageList;
     }
 
+    /**
+     * Parses {@code implements} block and configures message to implement the specified interfaces.
+     *
+     * @param message message instance to configure
+     * @param mv      value of {@code implements} key (should be a map with {@code fromInterface} list)
+     */
     private static void prepareImplementsMessage(Message message, Object mv) {
         Map<String, Object> implementsMap = castObjectToMap(mv);
         List<String> fromInterfaceList = castObjectToList(implementsMap.get(FROM_INTERFACE));
@@ -136,6 +177,13 @@ public class MessageMapper extends AbstractMapper {
         });
     }
 
+    /**
+     * Parses {@code extends} block and configures message to extend the specified class.
+     *
+     * @param message message instance to configure
+     * @param mv      value of {@code extends} key (should be a map with {@code fromClass}, {@code fromPackage})
+     * @return resolved superclass simple name (e.g., {@code "BaseMessage"})
+     */
     private static String prepareExtendsMessage(Message message, Object mv) {
         Map<String, Object> extendsMap = castObjectToMap(mv);
         String fromClass = getStringValueIfExistOrElseNull(FROM_CLASS, extendsMap);
@@ -146,6 +194,18 @@ public class MessageMapper extends AbstractMapper {
         return fromClass;
     }
 
+    /**
+     * Processes {@code extends} and {@code implements} sections for a message payload.
+     * <p>
+     * If {@code extends} targets the same schema referenced via {@code $ref}, skips field generation
+     * and marks the schema for potential exclusion from inheritance filling.
+     *
+     * @param excludeInheritanceSchemas shared set to mark excluded schemas
+     * @param message                    message to configure
+     * @param payloadMap                 message payload definition map
+     * @param refObject                  value of {@code $ref}, if any
+     * @param needToFill                 flag to disable field population
+     */
     private static void extendsAndImplFilling(Set<String> excludeInheritanceSchemas,
                                               Message message,
                                               Map<String, Object> payloadMap,
@@ -165,6 +225,30 @@ public class MessageMapper extends AbstractMapper {
         });
     }
 
+    /**
+     * Populates {@link FillParameters} for a given message payload.
+     * <p>
+     * Handles 9 cases in order:
+     * <ol>
+     *   <li>Lombok override block</li>
+     *   <li>Polymorphic payload ({@code oneOf}/{@code allOf}/{@code anyOf}) → flattened into properties</li>
+     *   <li>Top-level enum (e.g., {@code type: object, enum: [...]})</li>
+     *   <li>Leaf scalar/array (e.g., {@code type: string}) → wrapper field named {@code payload}</li>
+     *   <li>Gitter-style {@code schema} block</li>
+     *   <li>Inline {@code properties}</li>
+     *   <li>{@code $ref} to schema</li>
+     *   <li>{@code additionalProperties} at payload root</li>
+     *   <li>Bare {@code type: object} with no content → {@code Object payload}</li>
+     * </ol>
+     *
+     * @param messageName          message key (e.g., {@code "UserSignedUp"})
+     * @param payload              payload definition map
+     * @param processContext       generation context
+     * @param removeSchemas        set to register schemas for removal (e.g., via {@code removeSchema: true})
+     * @param excludeRemoveSchemas set to preserve referenced schemas from removal
+     * @param lombokProperties     effective Lombok config for this message
+     * @return populated {@link FillParameters}
+     */
     private FillParameters getFillParameters(String messageName,
                                              Map<String, Object> payload,
                                              ProcessContext processContext,
@@ -172,8 +256,6 @@ public class MessageMapper extends AbstractMapper {
                                              Set<String> excludeRemoveSchemas,
                                              LombokProperties lombokProperties) {
         FillParameters parameters = new FillParameters();
-        processContext.getHelper().setIsMappedFromMessages(true);
-        processContext.getHelper().setIsMappedFromSchemas(false);
 
         if (payload.containsKey(LOMBOK)) {
             Map<String, Object> lombokProps = castObjectToMap(payload.get(LOMBOK));
@@ -299,8 +381,6 @@ public class MessageMapper extends AbstractMapper {
 
         if (getStringValueIfExistOrElseNull(REFERENCE, payload) != null && !filledByRef) {
             filledByRef = true;
-            processContext.getHelper().setIsMappedFromMessages(true);
-            processContext.getHelper().setIsMappedFromSchemas(false);
             System.out.println("Starting schema-like mapping");
             String schemaName = getStringValueIfExistOrElseNull(REFERENCE, payload).replaceAll(".+/", "");
             Map<String, Object> schema = castObjectToMap(processContext.getSchemasMap().get(schemaName));
@@ -373,6 +453,15 @@ public class MessageMapper extends AbstractMapper {
         throw new RuntimeException("Not correct filled block messages! Payload: " + payload);
     }
 
+    /**
+     * Registers a synthetic schema (e.g., for inner objects) if it doesn't already exist.
+     * Ensures minimal structure: {@code type: object} and empty {@code properties}.
+     *
+     * @param schemaName   proposed schema name
+     * @param payload      original payload definition
+     * @param schemasMap   global schemas map (mutated)
+     * @param innerSchemas inner schemas accumulator (mutated)
+     */
     private void registerSyntheticSchemaIfNeeded(String schemaName,
                                                  Map<String, Object> payload,
                                                  Map<String, Object> schemasMap,
@@ -394,6 +483,12 @@ public class MessageMapper extends AbstractMapper {
         System.out.println(" → registered synthetic schema: " + schemaName);
     }
 
+    /**
+     * Checks if the payload represents a leaf scalar or array (no nesting, refs, or polymorphism).
+     *
+     * @param payload payload map
+     * @return {@code true} for leaf primitives/arrays
+     */
     private boolean isLeafScalarOrArray(Map<String, Object> payload) {
         if (payload == null || payload.isEmpty()) return false;
         if (POLYMORPHS.stream().anyMatch(payload::containsKey)) return false;
@@ -410,6 +505,12 @@ public class MessageMapper extends AbstractMapper {
                "array".equals(type);
     }
 
+    /**
+     * Checks if the payload represents a top-level enum (type + enum, no properties).
+     *
+     * @param payload payload map
+     * @return {@code true} if leaf enum
+     */
     private boolean isLeafEnum(Map<String, Object> payload) {
         if (payload == null || payload.isEmpty()) return false;
         if (POLYMORPHS.stream().anyMatch(payload::containsKey)) return false;
@@ -419,6 +520,17 @@ public class MessageMapper extends AbstractMapper {
                getStringValueIfExistOrElseNull(ENUMERATION, payload) != null;
     }
 
+    /**
+     * Recursively merges properties from all {@code $ref}-ed and inline objects in polymorphic blocks.
+     * <p>
+     * Supports nested polymorphism and prioritizes later declarations (last-wins for key collisions).
+     *
+     * @param messageName  message name (for logging)
+     * @param payload      payload with {@code oneOf}/{@code allOf}/{@code anyOf}
+     * @param schemasMap   global schemas registry
+     * @param innerSchemas inner schema accumulator (mutated by recursive calls)
+     * @return merged map of field name → definition
+     */
     private Map<String, Object> mergePolymorphicProperties(
             String messageName,
             Map<String, Object> payload,
