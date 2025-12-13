@@ -34,7 +34,9 @@ class YojoGeneratorTest {
             "src/test/resources/example/testGenerate/slack/lombok/",
             "src/test/resources/example/testGenerate/asyncapi/",
             "src/test/resources/example/testGenerate/gitter/",
-            "src/test/resources/example/testGenerate/slack/"
+            "src/test/resources/example/testGenerate/slack/",
+            "src/test/resources/example/testGenerate/specFromIssue/",
+            "src/test/resources/example/testGenerate/oneMore/"
     );
 
     @BeforeEach
@@ -272,6 +274,20 @@ class YojoGeneratorTest {
         spec.setOutputDirectory("src/test/resources/example/testGenerate/");
         spec.setPackageLocation("example.testGenerate");
 
+        SpecificationProperties specFromIssue = new SpecificationProperties();
+        specFromIssue.setSpecName("spec-from-issue.yaml");
+        specFromIssue.setInputDirectory("src/test/resources/example/contract");
+        specFromIssue.setOutputDirectory("src/test/resources/example/testGenerate/specFromIssue/");
+        specFromIssue.setPackageLocation("example.testGenerate.specFromIssue");
+
+        SpecificationProperties oneMore = new SpecificationProperties();
+        oneMore.setSpecName("one-more.yaml");
+        oneMore.setInputDirectory("src/test/resources/example/contract");
+        oneMore.setOutputDirectory("src/test/resources/example/testGenerate/oneMore/");
+        oneMore.setPackageLocation("example.testGenerate.oneMore");
+
+        list.add(oneMore);
+        list.add(specFromIssue);
         list.add(specSlack);
         list.add(specGitter);
         list.add(specAsync);
@@ -286,6 +302,8 @@ class YojoGeneratorTest {
         assertTrue(new File("src/test/resources/example/testGenerate/slack/").exists());
         assertTrue(new File("src/test/resources/example/testGenerate/gitter/").exists());
         assertTrue(new File("src/test/resources/example/testGenerate/asyncapi/").exists());
+        assertTrue(new File("src/test/resources/example/testGenerate/specFromIssue/").exists());
+        assertTrue(new File("src/test/resources/example/testGenerate/oneMore/").exists());
         assertTrue(new File("src/test/resources/example/testGenerate/").exists());
     }
 

@@ -14,41 +14,10 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 
 /**
  * Base class for schema and message mapping logic.
- * <p>
- * Responsible for:
- * <ul>
- *   <li>Populating {@link VariableProperties} from YAML property definitions</li>
- *   <li>Resolving {@code $ref}, polymorphism ({@code oneOf}/{@code allOf}), collections, maps, enums</li>
- *   <li>Inferring Java types, validation annotations, and required imports</li>
- * </ul>
- *
- * @author Vladimir Morozkin (TG @vmorozkin)
  */
 @SuppressWarnings("all")
 public class AbstractMapper {
 
-    /**
-     * Populates a {@link VariableProperties} instance from a single property definition in a schema.
-     * <p>
-     * Handles:
-     * <ul>
-     *   <li>Basic metadata: name, description, example, default</li>
-     *   <li>Validation: min/max length/size, pattern, digits, min/max value</li>
-     *   <li>Type/format inference ({@code string}, {@code date}, {@code uuid}, etc.)</li>
-     *   <li>Polymorphism detection ({@code oneOf}, {@code allOf}, {@code anyOf})</li>
-     *   <li>Delegation to {@link #fillVariableProperties} for type resolution</li>
-     *   <li>Required annotations/imports for validation</li>
-     * </ul>
-     *
-     * @param schemaName         name of the containing schema (for diagnostics)
-     * @param variableProperties target to populate
-     * @param currentSchema      full current schema map (used for {@code required} lookup)
-     * @param schemas            global schemas map (for {@code $ref} resolution)
-     * @param propertyName       raw property name from YAML
-     * @param propertiesMap      property definition map (e.g., {@code { type: string, format: email }})
-     * @param processContext     current generation context
-     * @param innerSchemas       accumulator for generated inner schemas (e.g., enums, inner DTOs)
-     */
     public void fillProperties(String schemaName,
                                VariableProperties variableProperties,
                                Map<String, Object> currentSchema,
@@ -59,7 +28,13 @@ public class AbstractMapper {
                                Map<String, Object> innerSchemas) {
         variableProperties.setSpringBootVersion(processContext.getSpringBootVersion());
         variableProperties.setName(safeFieldName(uncapitalize(propertyName)));
-        variableProperties.setDefaultProperty(getStringValueIfExistOrElseNull(DEFAULT, propertiesMap));
+        // ⬇️ const → defaultProperty
+        String constValue = getStringValueIfExistOrElseNull("const", propertiesMap);
+        if (constValue != null) {
+            variableProperties.setDefaultProperty(constValue);
+        } else {
+            variableProperties.setDefaultProperty(getStringValueIfExistOrElseNull(DEFAULT, propertiesMap));
+        }
         variableProperties.setType(capitalize(getStringValueIfExistOrElseNull(TYPE, propertiesMap)));
         variableProperties.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, propertiesMap));
         variableProperties.setExample(getStringValueIfExistOrElseNull(EXAMPLE, propertiesMap));
@@ -82,35 +57,11 @@ public class AbstractMapper {
                         .map(MapperUtil::castObjectToListObjects)
                         .flatMap(objects -> objects.stream())
                         .collect(Collectors.toList()).isEmpty());
+
         fillVariableProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, processContext, innerSchemas);
         fillRequiredAnnotationsAndImports(variableProperties, currentSchema, propertyName);
     }
 
-    /**
-     * Resolves the Java type and metadata for a property, based on its definition.
-     * <p>
-     * Dispatches to specialized handlers for:
-     * <ul>
-     *   <li>Empty property → {@code Object}</li>
-     *   <li>{@code format} override for {@code type: object} (e.g., {@code uuid}, {@code date})</li>
-     *   <li>Arrays/collections</li>
-     *   <li>{@code $ref} references</li>
-     *   <li>Inner objects (with {@code properties})</li>
-     *   <li>Enums</li>
-     *   <li>Existing classes ({@code format: existing})</li>
-     *   <li>Maps ({@code additionalProperties})</li>
-     *   <li>Polymorphic types</li>
-     * </ul>
-     *
-     * @param schemaName         schema name (for diagnostics)
-     * @param variableProperties target to populate
-     * @param currentSchema      current schema map
-     * @param schemas            global schemas map
-     * @param propertyName       property name
-     * @param propertiesMap      property definition
-     * @param processContext     generation context
-     * @param innerSchemas       inner schema accumulator
-     */
     public void fillVariableProperties(String schemaName,
                                        VariableProperties variableProperties,
                                        Map<String, Object> currentSchema,
@@ -120,7 +71,6 @@ public class AbstractMapper {
                                        ProcessContext processContext,
                                        Map<String, Object> innerSchemas) {
         String commonPackage = processContext.getCommonPackage();
-        // 1. Empty property → Object
         if (propertiesMap.isEmpty()) {
             variableProperties.setType(OBJECT_TYPE);
             variableProperties.setValid(false);
@@ -128,51 +78,42 @@ public class AbstractMapper {
         }
         String type = getStringValueIfExistOrElseNull(TYPE, propertiesMap);
         String format = getStringValueIfExistOrElseNull(FORMAT, propertiesMap);
-        // 2. type: object + format → scalar (e.g. uuid/date) — handle before fallback
+
+        if (getStringValueIfExistOrElseNull(ADDITIONAL_PROPERTIES, propertiesMap) != null) {
+            fillMapProperties(variableProperties, currentSchema, schemas, propertiesMap, commonPackage);
+            return;
+        }
+
         if (OBJECT_TYPE.equalsIgnoreCase(type) && format != null &&
             JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(format)) {
             variableProperties.setFormat(format);
             return;
         }
-        // fallback: Object if type absent or 'object'
+
         variableProperties.setType(capitalize(type != null ? type : OBJECT_TYPE));
-        // Dispatch by structural type
+
         if (ARRAY.equals(uncapitalize(variableProperties.getType()))) {
             fillArrayProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, processContext, innerSchemas);
-        }
-        // $ref
-        else if (getStringValueIfExistOrElseNull(REFERENCE, propertiesMap) != null && !ARRAY.equals(uncapitalize(variableProperties.getType()))) {
+        } else if (getStringValueIfExistOrElseNull(REFERENCE, propertiesMap) != null && !ARRAY.equals(uncapitalize(variableProperties.getType()))) {
             fillReferenceProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, processContext, innerSchemas);
-        }
-        // object with properties
-        else if (OBJECT_TYPE.equals(variableProperties.getType()) &&
-                 getStringValueIfExistOrElseNull(PROPERTIES, propertiesMap) != null) {
+        } else if (OBJECT_TYPE.equals(variableProperties.getType()) &&
+                   getStringValueIfExistOrElseNull(PROPERTIES, propertiesMap) != null) {
             fillObjectProperties(schemaName, variableProperties, schemas, propertyName, propertiesMap, commonPackage, innerSchemas);
-        }
-        // enum
-        else if ((OBJECT_TYPE.equals(variableProperties.getType()) || STRING.equals(variableProperties.getType())) &&
-                 getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap) != null) {
+        } else if ((OBJECT_TYPE.equals(variableProperties.getType()) || STRING.equals(variableProperties.getType())) &&
+                   getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap) != null) {
             fillEnumProperties(variableProperties, propertyName, propertiesMap, commonPackage, innerSchemas);
-        }
-        // format: existing
-        else if (OBJECT_TYPE.equals(variableProperties.getType()) &&
-                 variableProperties.getPackageOfExisingObject() != null &&
-                 variableProperties.getNameOfExisingObject() != null) {
+        } else if (OBJECT_TYPE.equals(variableProperties.getType()) &&
+                   variableProperties.getPackageOfExisingObject() != null &&
+                   variableProperties.getNameOfExisingObject() != null) {
             fillExistingObjectProperties(variableProperties);
-        }
-        // map (additionalProperties)
-        else if (getStringValueIfExistOrElseNull(ADDITIONAL_PROPERTIES, propertiesMap) != null) {
-            fillMapProperties(variableProperties, currentSchema, schemas, propertiesMap, commonPackage);
-        }
-        // polymorphism
-        else if (variableProperties.isPolymorph()) {
+        } else if (variableProperties.isPolymorph()) {
             System.out.println("FOUND POLYMORPHISM INSIDE SCHEMA! Schema: " + variableProperties.getName());
             List<Object> polymorphList = POLYMORPHS.stream()
                     .map(p -> propertiesMap.get(p))
                     .map(MapperUtil::castObjectToListObjects)
                     .flatMap(objects -> objects.stream())
                     .collect(Collectors.toList());
-            // Merge properties from all referenced schemas
+
             Map<String, Object> mergedProperties = polymorphList.stream()
                     .flatMap(ref -> {
                         String refStr = ref.toString();
@@ -192,7 +133,7 @@ public class AbstractMapper {
                             Map.Entry::getValue,
                             (existing, replacement) -> existing
                     ));
-            // Build class name: propName + Ref1 + Ref2 + ...
+
             String className = capitalize(propertyName);
             for (Object item : polymorphList) {
                 String refName;
@@ -212,17 +153,14 @@ public class AbstractMapper {
                     Map.of(TYPE, OBJECT, PROPERTIES, mergedProperties)
             );
             innerSchemas.putAll(preparedMergedPolymorphSchema);
-        }
-        // fallback: bare object → Object
-        else {
+        } else {
             if (OBJECT_TYPE.equals(variableProperties.getType())) {
                 variableProperties.setType(OBJECT_TYPE);
                 variableProperties.setValid(false);
             }
-            // Ensure format applied even for scalars (e.g., type: string, format: uuid)
             variableProperties.setFormat(format);
         }
-        // Add imports for collection/map types
+
         String finalType = variableProperties.getType();
         if (finalType != null) {
             if (finalType.startsWith("List<")) {
@@ -235,34 +173,10 @@ public class AbstractMapper {
         }
     }
 
-    /**
-     * Prepares a full import declaration for a class in the common package.
-     *
-     * @param commonPackage base common package (e.g., {@code "com.example.common;"})
-     * @param className     simple class name
-     * @return full import string (e.g., {@code "com.example.common.MyClass;"})
-     */
     private String prepareImport(String commonPackage, String className) {
         return commonPackage.replace(";", "." + className + ";");
     }
 
-    /**
-     * Handles {@code additionalProperties} → Java {@code Map<K,V>}.
-     * <p>
-     * Supports:
-     * <ul>
-     *   <li>Scalar value types ({@code string}, {@code integer}, etc.)</li>
-     *   <li>Referenced types ({@code $ref})</li>
-     *   <li>Existing classes ({@code format: existing})</li>
-     *   <li>Nested collections/maps</li>
-     * </ul>
-     *
-     * @param variableProperties target field
-     * @param currentSchema      current schema map
-     * @param schemas            global schemas
-     * @param propertiesMap      property map containing {@code additionalProperties}
-     * @param commonPackage      target common package
-     */
     private void fillMapProperties(VariableProperties variableProperties,
                                    Map<String, Object> currentSchema,
                                    Map<String, Object> schemas,
@@ -277,7 +191,7 @@ public class AbstractMapper {
         variableProperties.addRequiredImports(MAP_IMPORT);
         variableProperties.setRealisation(getStringValueIfExistOrElseNull(REALIZATION, propertiesMap));
         variableProperties.setValid(false);
-        // Scalar value type
+
         if (type != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(type)) {
             System.out.println("CORRECT TYPE!");
             if (format != null) {
@@ -287,9 +201,7 @@ public class AbstractMapper {
             } else {
                 variableProperties.setType(format(MAP_TYPE, JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(type)));
             }
-        }
-        // Existing object (format: existing)
-        else if (OBJECT.equals(type) && referencedObject == null) {
+        } else if (OBJECT.equals(type) && referencedObject == null) {
             if (getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap) != null) {
                 if (format != null) {
                     variableProperties.setType(format(MAP_CUSTOM_TYPE,
@@ -315,9 +227,7 @@ public class AbstractMapper {
                     variableProperties.setType(format(MAP_TYPE, OBJECT_TYPE));
                 }
             }
-        }
-        // $ref to schema
-        else if (referencedObject != null && (schemas.containsKey(refReplace(referencedObject)) || currentSchema == schemas)) {
+        } else if (referencedObject != null && (schemas.containsKey(refReplace(referencedObject)) || currentSchema == schemas)) {
             String refObjectName = refReplace(referencedObject);
             System.out.println("FOUND CUSTOM OBJECT! " + refObjectName);
             if (ARRAY.equals(type)) {
@@ -364,9 +274,7 @@ public class AbstractMapper {
                     variableProperties.addRequiredImports(prepareImport(commonPackage, refObjectName));
                 }
             }
-        }
-        // Array of scalars
-        else if (ARRAY.equals(type) && getStringValueIfExistOrElseNull(ADDITIONAL_FORMAT, additionalPropertiesMap) != null) {
+        } else if (ARRAY.equals(type) && getStringValueIfExistOrElseNull(ADDITIONAL_FORMAT, additionalPropertiesMap) != null) {
             String collectionType = getStringValueIfExistOrElseNull(FORMAT, additionalPropertiesMap);
             if (collectionType != null) {
                 variableProperties.setCollectionType(collectionType);
@@ -380,9 +288,7 @@ public class AbstractMapper {
             } else {
                 variableProperties.setType(format(MAP_TYPE, format(variableProperties.getType())));
             }
-        }
-        // Array of existing objects
-        else if (ARRAY.equals(type) && getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap) != null) {
+        } else if (ARRAY.equals(type) && getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap) != null) {
             String collectionType = getStringValueIfExistOrElseNull(FORMAT, additionalPropertiesMap);
             if (collectionType != null) {
                 variableProperties.setCollectionType(collectionType);
@@ -399,11 +305,6 @@ public class AbstractMapper {
         System.out.println();
     }
 
-    /**
-     * Handles {@code format: existing} → external Java class.
-     *
-     * @param variableProperties target field
-     */
     private static void fillExistingObjectProperties(VariableProperties variableProperties) {
         variableProperties.setType(capitalize(variableProperties.getNameOfExisingObject()));
         variableProperties.addRequiredImports(variableProperties.getPackageOfExisingObject()
@@ -412,15 +313,6 @@ public class AbstractMapper {
                 .concat(";"));
     }
 
-    /**
-     * Handles enum definitions (inline or referenced).
-     *
-     * @param variableProperties target field
-     * @param propertyName       enum property name
-     * @param propertiesMap      property definition
-     * @param commonPackage      common package for enum import
-     * @param innerSchemas       accumulator for generated enum schema
-     */
     private void fillEnumProperties(VariableProperties variableProperties,
                                     String propertyName,
                                     Map<String, Object> propertiesMap,
@@ -436,17 +328,6 @@ public class AbstractMapper {
         variableProperties.addRequiredImports(prepareImport(commonPackage, capitalize(propertyName)));
     }
 
-    /**
-     * Handles inner object schemas (with {@code properties}).
-     *
-     * @param schemaName         parent schema name
-     * @param variableProperties target field
-     * @param schemas            global schemas
-     * @param propertyName       property name
-     * @param propertiesMap      inner schema definition
-     * @param commonPackage      common package
-     * @param innerSchemas       accumulator
-     */
     private void fillObjectProperties(String schemaName,
                                       VariableProperties variableProperties,
                                       Map<String, Object> schemas,
@@ -464,18 +345,6 @@ public class AbstractMapper {
         fillInnerSchema(variableProperties, propName, propertiesMap, commonPackage, innerSchemas);
     }
 
-    /**
-     * Resolves {@code $ref} to external or internal schema.
-     *
-     * @param schemaName         current schema name
-     * @param variableProperties target field
-     * @param currentSchema      current schema map
-     * @param schemas            global schemas
-     * @param propertyName       property name
-     * @param propertiesMap      property definition
-     * @param processContext     generation context
-     * @param innerSchemas       accumulator
-     */
     private void fillReferenceProperties(String schemaName,
                                          VariableProperties variableProperties,
                                          Map<String, Object> currentSchema,
@@ -488,7 +357,6 @@ public class AbstractMapper {
         Map<String, Object> stringObjectMap = castObjectToMap(schemas.get(referenceObject.replaceAll(".+/", "")));
         String objectType = getStringValueIfExistOrElseNull(TYPE, stringObjectMap);
         if (objectType != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(objectType)) {
-            // Recursive fill for scalar $ref (e.g., $ref: ./schemas.yaml#/components/schemas/MyDate)
             System.out.println();
             System.out.println("Start Recursive fillProperties " + propertyName);
             System.out.println();
@@ -511,7 +379,6 @@ public class AbstractMapper {
                         variableProperties.setValid(false);
                     }
                 }
-                // Support external package from $ref (injected via preprocess)
                 String externalPackage = getStringValueIfExistOrElseNull("package", propertiesMap);
                 if (externalPackage != null) {
                     String fullImport = externalPackage + "." + refReplace + ";";
@@ -523,18 +390,6 @@ public class AbstractMapper {
         }
     }
 
-    /**
-     * Handles array/collection types.
-     *
-     * @param schemaName         schema name
-     * @param variableProperties target field
-     * @param currentSchema      current schema
-     * @param schemas            global schemas
-     * @param propertyName       property name
-     * @param propertiesMap      property definition
-     * @param processContext     context
-     * @param innerSchemas       accumulator
-     */
     private void fillArrayProperties(String schemaName,
                                      VariableProperties variableProperties,
                                      Map<String, Object> currentSchema,
@@ -548,16 +403,21 @@ public class AbstractMapper {
         String refValue = getStringValueIfExistOrElseNull(REFERENCE, items);
         String collectionFormat = getStringValueIfExistOrElseNull(FORMAT, propertiesMap);
         boolean javaType = false;
-        // Normalize empty items: {} → { type: object }
-        if (items.isEmpty()) {
+
+        Set<String> structuralKeys = Set.of(FORMAT, REFERENCE, PROPERTIES, ENUMERATION, ITEMS);
+        boolean isStructurallyEmpty = items.entrySet().stream()
+                .noneMatch(e -> structuralKeys.contains(e.getKey()));
+        if (isStructurallyEmpty) {
             variableProperties.setItems(OBJECT_TYPE);
             variableProperties.setValid(false);
             fillCollectionType(variableProperties);
             return;
         }
+
         if (collectionFormat != null) {
             variableProperties.setCollectionType(collectionFormat);
         }
+
         if (refValue != null) {
             String tryToFound = refValue.replaceAll(".+/", "");
             Map<String, Object> schemaRef = castObjectToMap(schemas.get(tryToFound));
@@ -584,7 +444,6 @@ public class AbstractMapper {
                     if (getStringValueIfExistOrElseNull(FORMAT, items).equals(EXISTING)) {
                         fillCollectionWithExistingObject(variableProperties, items);
                     } else {
-                        // Scalar format (e.g., items: { format: date })
                         variableProperties.setItems(items.get(FORMAT).toString());
                         variableProperties.setFormat(items.get(FORMAT).toString());
                     }
@@ -607,11 +466,11 @@ public class AbstractMapper {
                 fillCollectionType(variableProperties);
             }
         }
+
         if (variableProperties.getItems() != null &&
             !JAVA_DEFAULT_TYPES.contains(variableProperties.getItems()) &&
             !OBJECT_TYPE.equals(variableProperties.getItems()) && !javaType &&
             getStringValueIfExistOrElseNull(PACKAGE, items) == null) {
-            // External package support for collection items
             String externalPackage = getStringValueIfExistOrElseNull("package", items);
             if (externalPackage != null) {
                 variableProperties.addRequiredImports(externalPackage + "." + variableProperties.getItems() + ";");
@@ -621,12 +480,6 @@ public class AbstractMapper {
         }
     }
 
-    /**
-     * Handles collections of {@code format: existing} objects.
-     *
-     * @param variableProperties target field
-     * @param items              items definition map
-     */
     private static void fillCollectionWithExistingObject(VariableProperties variableProperties, Map<String, Object> items) {
         variableProperties.setItems(getStringValueIfExistOrElseNull(NAME, items));
         variableProperties.setPackageOfExisingObject(getStringValueIfExistOrElseNull(PACKAGE, items));
@@ -638,15 +491,6 @@ public class AbstractMapper {
         fillCollectionType(variableProperties);
     }
 
-    /**
-     * Registers an inner schema (e.g., for nested DTO).
-     *
-     * @param variableProperties target field
-     * @param propertyName       inner schema name
-     * @param propertiesMap      inner schema definition
-     * @param commonPackage      common package
-     * @param innerSchemas       accumulator
-     */
     private void fillInnerSchema(VariableProperties variableProperties,
                                  String propertyName,
                                  Map<String, Object> propertiesMap,
@@ -655,21 +499,18 @@ public class AbstractMapper {
         System.out.println("FOUND INNER SCHEMA!!! " + propertyName);
         variableProperties.setType(capitalize(propertyName));
         variableProperties.addRequiredImports(prepareImport(commonPackage, capitalize(propertyName)));
-        // Create a defensive copy
+
         Map<String, Object> innerSchema = new LinkedHashMap<>(propertiesMap);
-        // Ensure "type: object" is present — critical for AsyncAPI v3 where it’s optional
         if (!innerSchema.containsKey(TYPE)) {
             innerSchema.put(TYPE, OBJECT);
         }
-        // Ensure "properties" key exists if we’re dealing with a pure property map (e.g., {id: {type: string}})
+
         if (!innerSchema.containsKey(PROPERTIES) && !innerSchema.containsKey(ENUMERATION) && !innerSchema.containsKey(REFERENCE)) {
-            // Heuristic: assume top-level keys are properties if no special keys present
             Map<String, Object> actualProps = new LinkedHashMap<>();
             Iterator<Map.Entry<String, Object>> it = innerSchema.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry<String, Object> entry = it.next();
                 String key = entry.getKey();
-                // Skip known metadata keys
                 if (!(key.equals(TYPE) || key.equals(FORMAT) || key.equals(DESCRIPTION) ||
                       key.equals(EXAMPLE) || key.equals(DEFAULT) || key.equals(PATTERN) ||
                       key.equals(MIN_LENGTH) || key.equals(MAX_LENGTH) ||
@@ -677,7 +518,7 @@ public class AbstractMapper {
                       key.equals(DIGITS) ||
                       key.equals(REALIZATION) || key.equals(NAME) || key.equals(PACKAGE))) {
                     actualProps.put(key, entry.getValue());
-                    it.remove(); // move out of root into properties
+                    it.remove();
                 }
             }
             if (!actualProps.isEmpty()) {
@@ -687,16 +528,6 @@ public class AbstractMapper {
         innerSchemas.put(propertyName, innerSchema);
     }
 
-    /**
-     * Extracts message definitions from AsyncAPI 2.0 {@code channels}/{@code publish}/{@code subscribe}.
-     *
-     * @param allContent     full spec document
-     * @param messagesMap    output map to populate
-     * @param excludeSchemas schemas to preserve (for polymorphic cases)
-     * @param mapToMessage   channel message map
-     * @param channelName    channel name
-     * @param channelType    {@code "publish"} or {@code "subscribe"}
-     */
     public static void fillMessageFromChannel(Map<String, Object> allContent,
                                               Map<String, Object> messagesMap,
                                               Set<String> excludeSchemas,
@@ -748,7 +579,7 @@ public class AbstractMapper {
                                                     .collect(Collectors.toList())
                                             ))
                                     .collect(Collectors.toList());
-                            // Create propertiesMap from all referenced objects properties
+
                             Map<String, Object> propertiesMap = polymorphList.stream()
                                     .flatMap(refPair -> castObjectToMap(refPair).entrySet().stream())
                                     .map(en -> refReplace(en.getValue().toString()))
@@ -768,7 +599,7 @@ public class AbstractMapper {
                                             Map.Entry::getValue,
                                             (existing, replacement) -> existing
                                     ));
-                            // Put in the properties all from referenced schemas
+
                             filteredReferences.stream()
                                     .flatMap(en -> castObjectToListObjects(en).stream())
                                     .distinct()
@@ -781,10 +612,9 @@ public class AbstractMapper {
                                     .map(MapperUtil::castObjectToMap)
                                     .flatMap(ey -> ey.entrySet().stream())
                                     .forEach(el -> propertiesMap.put(el.getKey(), el.getValue()));
-                            // Fill message map: MessageName → { payload: { type: object, properties: {...} } }
+
                             messagesMap.put(messageName, Map.of(PAYLOAD, Map.of(TYPE, OBJECT, PROPERTIES, propertiesMap)));
                         } else {
-                            // Prepare map with merged properties
                             Map<String, Object> schemaMap = polymorphList.stream()
                                     .flatMap(refPair -> castObjectToMap(refPair).entrySet().stream())
                                     .map(en -> {
@@ -800,18 +630,12 @@ public class AbstractMapper {
                                             Map.Entry::getValue,
                                             (existing, replacement) -> existing
                                     ));
-                            // Fill message map: MessageName → { payload: { ... } }
                             messagesMap.put(messageName, Map.of(PAYLOAD, schemaMap));
                         }
                     }
                 });
     }
 
-    /**
-     * Sets collection type (List/Set) based on {@code collectionType} field.
-     *
-     * @param variableProperties target field
-     */
     private static void fillCollectionType(VariableProperties variableProperties) {
         switch (variableProperties.getCollectionType()) {
             case "list":
@@ -822,34 +646,6 @@ public class AbstractMapper {
         }
     }
 
-    /**
-     * Generates inner schema for an enum (with or without descriptions).
-     *
-     * @param propertyName  enum name
-     * @param propertiesMap property definition
-     * @param innerSchemas  accumulator
-     */
-    private static void fillEnumSchema(String propertyName,
-                                       Map<String, Object> propertiesMap,
-                                       Map<String, Object> innerSchemas) {
-        if (getStringValueIfExistOrElseNull(X_ENUM_NAMES, propertiesMap) != null) {
-            Map<String, Object> enumerationMap = castObjectToMap(propertiesMap.get(X_ENUM_NAMES));
-            Map<String, Object> enums = new LinkedHashMap<>();
-            Map<String, Object> enumWithDescription = fillByEnumWithDescription(enumerationMap);
-            innerSchemas.put(propertyName, enumWithDescription);
-        } else if (getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap) != null) {
-            List<String> enums = castObjectToList(propertiesMap.get(ENUMERATION));
-            Map<String, Object> enumsMap = fillByEnum(enums);
-            innerSchemas.put(propertyName, enumsMap);
-        }
-    }
-
-    /**
-     * Builds enum schema with human-readable descriptions.
-     *
-     * @param enums raw x-enumNames map
-     * @return prepared inner schema map
-     */
     private static Map<String, Object> fillByEnumWithDescription(Map<String, Object> enums) {
         Map<String, Object> result = new LinkedHashMap<>();
         Map<String, Object> vp = new LinkedHashMap<>();
@@ -869,12 +665,6 @@ public class AbstractMapper {
         return result;
     }
 
-    /**
-     * Builds simple enum schema (no descriptions).
-     *
-     * @param enums enum constant list
-     * @return prepared inner schema map
-     */
     private static Map<String, Object> fillByEnum(List<String> enums) {
         Map<String, Object> result = new LinkedHashMap<>();
         Map<String, Object> vp = new LinkedHashMap<>();
@@ -893,20 +683,6 @@ public class AbstractMapper {
         return result;
     }
 
-    /**
-     * Adds validation annotations and imports based on {@code required} list and field type.
-     * <p>
-     * Supports:
-     * <ul>
-     *   <li>Basic: {@code @NotNull}, {@code @NotBlank}, {@code @NotEmpty}</li>
-     *   <li>Validation groups ({@code groups = {...}})</li>
-     *   <li>{@code jakarta} vs {@code javax} packages (via Spring Boot version)</li>
-     * </ul>
-     *
-     * @param variableProperties field metadata
-     * @param currentSchema      schema containing {@code required} list
-     * @param propertyName       field name
-     */
     public static void fillRequiredAnnotationsAndImports(VariableProperties variableProperties,
                                                          Map<String, Object> currentSchema,
                                                          String propertyName) {
@@ -956,7 +732,7 @@ public class AbstractMapper {
                     if (isBlank(annotation)) {
                         annotation = JAVA_TYPES_REQUIRED_ANNOTATIONS.get(OBJECT_TYPE);
                     }
-                    // VALIDATION GROUPS FOR JAVA OBJECTS
+
                     if (validationFields.contains(propertyName) && finalGroups != null) {
                         if (variableProperties.getSpringBootVersion() != null && variableProperties.getSpringBootVersion().startsWith("3")) {
                             importSet.add(JAKARTA_JAVA_TYPES_REQUIRED_IMPORTS.get(annotation));
@@ -983,13 +759,6 @@ public class AbstractMapper {
         variableProperties.getAnnotationSet().addAll(annotationSet);
     }
 
-    /**
-     * Adds {@code @Valid} annotation for nested objects (excluding enums/collections).
-     *
-     * @param variableProperties field
-     * @param annotationSet      output annotation set
-     * @param importSet          output import set
-     */
     private static void validAnnotationCheck(VariableProperties variableProperties,
                                              Set<String> annotationSet,
                                              Set<String> importSet) {
@@ -1003,6 +772,21 @@ public class AbstractMapper {
                 importSet.add(JAVAX_JAVA_TYPES_REQUIRED_IMPORTS.get(VALID_ANNOTATION));
             }
             annotationSet.add(VALID_ANNOTATION);
+        }
+    }
+
+    private static void fillEnumSchema(String propertyName,
+                                       Map<String, Object> propertiesMap,
+                                       Map<String, Object> innerSchemas) {
+        if (getStringValueIfExistOrElseNull(X_ENUM_NAMES, propertiesMap) != null) {
+            Map<String, Object> enumerationMap = castObjectToMap(propertiesMap.get(X_ENUM_NAMES));
+            Map<String, Object> enums = new LinkedHashMap<>();
+            Map<String, Object> enumWithDescription = fillByEnumWithDescription(enumerationMap);
+            innerSchemas.put(propertyName, enumWithDescription);
+        } else if (getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap) != null) {
+            List<String> enums = castObjectToList(propertiesMap.get(ENUMERATION));
+            Map<String, Object> enumsMap = fillByEnum(enums);
+            innerSchemas.put(propertyName, enumsMap);
         }
     }
 }

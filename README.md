@@ -83,20 +83,21 @@ private Map<UUID, User> mapUUIDCustomObject;
 ```yaml
 Result:
   type: object
-  enum: [SUCCESS, DECLINE, error-case, "\r\n"]
+  enum: 
+    - SUCCESS
+    - DECLINE
+    - error-case
   x-enumNames:
     SUCCESS: "Operation succeeded"
     DECLINE: "Declined by policy"
     error-case: "Legacy lowercase"
-    "\r\n": "CRLF"
 ```
 → **Java**
 ```java
 public enum Result {
     SUCCESS("Operation succeeded"),
     DECLINE("Declined by policy"),
-    ERROR_CASE("Legacy lowercase"),
-    CARRIAGE_RETURN_LINE_FEED("CRLF");
+    ERROR_CASE("Legacy lowercase");
 
     private final String value;
     Result(String value) { this.value = value; }
@@ -104,7 +105,7 @@ public enum Result {
 }
 ```
 
-> ✅ `error-case` → `ERROR_CASE`, `\r\n` → `CARRIAGE_RETURN_LINE_FEED`, `class` → `CLASS_FIELD`
+> ✅ `error-case` → `ERROR_CASE`, `class` → `CLASS_FIELD`
 
 ---
 

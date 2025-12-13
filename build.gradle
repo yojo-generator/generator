@@ -158,6 +158,8 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.26'
     testCompileOnly 'org.projectlombok:lombok:1.18.26'
 
+    testImplementation("jakarta.validation:jakarta.validation-api:3.1.1")
+    testImplementation("javax.validation:validation-api:2.0.1.Final")
     testImplementation platform('org.junit:junit-bom:5.10.2') // или 5.14.1 — но единая!
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

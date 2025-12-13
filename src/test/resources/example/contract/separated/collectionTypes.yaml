@@ -35,6 +35,10 @@ components:
           type: array
           items:
             format: date
+        listOfStandAloneUri:
+          type: array
+          items:
+            $ref: '#/components/schemas/StandAloneUri'
         listOfStandAloneDate:
           type: array
           items:
@@ -93,6 +97,7 @@ components:
           type: array
           items:
             type: object
+            format: existing
             name: ClassForExtending
             package: testGenerate
         setOfExistingObject:
@@ -175,3 +180,7 @@ components:
       type: string
       format: date
       description: This is standalone date
+    StandAloneUri:
+      type: string
+      format: uri
+      description: This is standalone uri

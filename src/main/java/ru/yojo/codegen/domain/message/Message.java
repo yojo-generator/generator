@@ -300,4 +300,8 @@ public class Message {
 
         return finishBuild(stringBuilder, requiredImports, messagePackageName);
     }
+
+    public FillParameters getFillParameters() {
+        return fillParameters;
+    }
 }

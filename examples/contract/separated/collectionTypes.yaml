@@ -93,6 +93,7 @@ components:
           type: array
           items:
             type: object
+            format: existing
             name: ClassForExtending
             package: testGenerate
         setOfExistingObject:
