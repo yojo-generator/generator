@@ -1,0 +1,179 @@
+asyncapi: 3.0.0
+
+info:
+  title: example-async-api
+  version: 1.0.0
+
+defaultContentType: application/json
+
+servers:
+  tst2:
+    host: "{host_name}:{host_port}"
+    title: Testing polygon
+    protocol: kafka
+    description: The service consumes messages from Kafka in the cluster.
+    security:
+      - type: X509
+        description: Kafka authentication is performed via SSL certificate.
+
+channels:
+  requestTopic:
+    address: address.requestTopic
+    messages:
+      approveV1:
+        $ref: "#/components/messages/approveV1"
+
+components:
+  messages:
+    approveV1:
+      title: Approval Request Message
+      description: <h2>V1</h2>
+      payload:
+        $ref: "#/components/schemas/approveV1"
+
+  schemas:
+    requestCommonFields:
+      description: Common meta-tags
+      type: object
+      properties:
+        context:
+          description: Context
+          type: object
+          properties:
+            methodName:
+              description: Method name
+              type: string
+            businessKey:
+              description: Business key
+              type: string
+              format: uuid
+              example: "c4b74ef4-be12-49c1-992b-a98be82b7125"
+            instanceId:
+              description: Instance ID
+              type: string
+              format: uuid
+              example: "c4b74ef4-be12-49c1-992b-a98be82b7125"
+            requestId:
+              description: Request ID
+              type: string
+              format: uuid
+              example: "c4b74ef4-be12-49c1-992b-a98be82b7125"
+          required:
+            - methodName
+            - businessKey
+            - requestId
+        requestData:
+          description: Request parameters object
+          type: object
+          properties:
+            source:
+              type: string
+              description: Application source
+            orderNumber:
+              type: integer
+              description: Application number
+              minimum: 0
+              maximum: 99999999
+              example: 12365
+          required:
+            - source
+      required:
+        - context
+        - requestData
+
+    approveV1:
+      description: Approval message schema
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/requestCommonFields"
+        - type: object
+          properties:
+            context:
+              description: Integration context data
+              type: object
+              properties:
+                methodName:
+                  type: string
+                  const: "verificationApprove"
+                  description: Method name
+              required:
+                - methodName
+                - businessKey
+                - requestId
+            requestData:
+              description: Request parameters object
+              type: object
+              properties:
+                status:
+                  description: Application status
+                  type: string
+                  example: "APPROVED"
+                comment:
+                  description: Comment
+                  type: string
+                  example: "Application approved"
+                updatedAt:
+                  description: Record update timestamp
+                  type: string
+                  format: date-time
+                  example: "2025-04-02T17:32:28Z"
+              required:
+                - status
+                - updatedAt
+      required:
+        - context
+        - requestData
+
+    Management:
+      type: object
+      properties:
+        persons:
+          type: array
+          minItems: 0
+          maxItems: 500
+          description: "Persons"
+          items:
+            $ref: "#/components/schemas/CompanyPerson"
+
+    CompanyPerson:
+      type: object
+      required:
+        - actualAddress
+        - name
+      properties:
+        actualAddress:
+          description: Physical address
+          $ref: "#/components/schemas/ClientAddress"
+        name:
+          description: "Taxpayer Identification Number (TIN)"
+          type: string
+          minLength: 0
+          maxLength: 12
+          pattern: "$(pattern-Unicode)"
+          example: "772388193796"
+        sex:
+          description: "Gender"
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 2147483647
+          example: 1
+
+    ClientAddress:
+      description: "Address"
+      type: object
+      properties:
+        city:
+          description: "City"
+          type: string
+          minLength: 0
+          maxLength: 255
+          pattern: "$(pattern-Unicode)"
+          example: "Moscow"
+        country:
+          description: "Country"
+          type: string
+          minLength: 0
+          maxLength: 31
+          pattern: "$(pattern-Unicode)"
+          example: "RU"

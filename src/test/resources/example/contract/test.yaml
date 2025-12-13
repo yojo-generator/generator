@@ -175,14 +175,10 @@ components:
 #      #validateByGroups contains name of fields, which yojo will mark with annotation NotBlank, NotNull etc.
 #      #with params (groups = {Some.class})
 #      validateByGroups:
-#        - requestType
-#        - isTwoCities
 #        - collectionTypes
 #        - integerValidationField
 #        - uuidValidationList
       required:
-        - requestType
-        - isTwoCities
         - collectionTypes
         - integerValidationField
         - uuidValidationList
@@ -504,7 +500,7 @@ components:
         accessors:
           chain: true
       properties:
-        someString:
+        someAnotherString:
           type: string
 
     MarkerInterface:

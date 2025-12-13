@@ -1,0 +1,42 @@
+asyncapi: 3.0.0
+info:
+  title: Minimal Repro for Yojo Array Issue
+  version: 1.0.0
+  description: Reproduces "Array" field instead of List<Object>
+channels:
+  generateTemplatesFromTraffic:
+    address: /v2/generation/traffic/templates
+    messages:
+      generateTemplatesFromTrafficResponseMessage:
+        $ref: '#/components/messages/generateTemplatesFromTrafficResponseMessage'
+components:
+  schemas:
+    statusSchema:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+      required:
+        - code
+        - description
+  messages:
+    generateTemplatesFromTrafficResponseMessage:
+      summary: ответ с payload = array of objects (items только с examples)
+      contentType: application/json
+      payload:
+        type: object
+        properties:
+          payload:
+            type: array
+            items:
+              # ❗ Проблемный кейс: нет type/format/$ref/properties — только examples
+              examples:
+                - templates/fromTrafficRecord/template1.json
+                - templates/fromTrafficRecord/template2.json
+          status:
+            $ref: '#/components/schemas/statusSchema'
+        required:
+          - payload
+          - status
