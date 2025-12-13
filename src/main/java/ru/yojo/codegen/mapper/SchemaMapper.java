@@ -17,13 +17,39 @@ import static ru.yojo.codegen.util.LombokUtils.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 /**
- * Maps AsyncAPI schema definitions to Schema objects.
+ * Mapper responsible for converting AsyncAPI {@code components.schemas} definitions into {@link Schema} objects.
+ * <p>
+ * Handles:
+ * <ul>
+ *   <li>Regular DTO classes (with fields, Lombok, validation annotations)</li>
+ *   <li>Enums (with or without {@code x-enumNames} descriptions)</li>
+ *   <li>Interfaces (marker or with method definitions)</li>
+ *   <li>Polymorphic schemas ({@code allOf}, {@code oneOf}, {@code anyOf}) via deep merging</li>
+ *   <li>Inner schemas (anonymous objects/arrays inside properties)</li>
+ *   <li>Inheritance and interface implementation via {@code extends}/{@code implements}</li>
+ * </ul>
+ *
+ * @author Vladimir Morozkin (TG @vmorozkin)
  */
 @SuppressWarnings("all")
 public class SchemaMapper extends AbstractMapper {
 
+    /**
+     * Converts all top-level and inner schemas from the given {@link ProcessContext} into {@link Schema} instances.
+     * <p>
+     * For each schema:
+     * <ul>
+     *   <li>Resolves {@code format: interface} → interface generation</li>
+     *   <li>Parses Lombok configuration ({@code lombok: {...}})</li>
+     *   <li>Applies inheritance/implementation rules ({@code extends}, {@code implements})</li>
+     *   <li>Calls {@link #getSchemaVariableProperties} to extract field definitions</li>
+     *   <li>Recursively processes {@code innerSchemas} discovered by {@link AbstractMapper}</li>
+     * </ul>
+     *
+     * @param processContext current generation context (schemas, helper, packages, etc.)
+     * @return list of fully-populated {@link Schema} objects ready for code generation
+     */
     public List<Schema> mapSchemasToObjects(ProcessContext processContext) {
-        processContext.getHelper().setIsMappedFromSchemas(true);
         List<Schema> schemaList = new ArrayList<>();
         processContext.getSchemasMap().forEach((schemaName, schemaValues) -> {
             LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(processContext.getLombokProperties());
@@ -48,7 +74,7 @@ public class SchemaMapper extends AbstractMapper {
             if (schemaMap != null && schemaMap.containsKey(LOMBOK)) {
                 Map<String, Object> lombokProps = castObjectToMap(schemaMap.get(LOMBOK));
                 if (lombokProps.containsKey(ENABLE) &&
-                    "false".equals(getStringValueIfExistOrElseNull(ENABLE, lombokProps))) {
+                    "false" .equals(getStringValueIfExistOrElseNull(ENABLE, lombokProps))) {
                     finalLombokProperties.setEnableLombok(Boolean.valueOf(getStringValueIfExistOrElseNull(ENABLE, lombokProps)));
                 } else {
                     fillLombokAccessors(finalLombokProperties, lombokProps);
@@ -159,6 +185,24 @@ public class SchemaMapper extends AbstractMapper {
         return schemaList;
     }
 
+    /**
+     * Populates {@link VariableProperties} for a single schema, resolving:
+     * <ul>
+     *   <li>Top-level {@code properties} (always processed first)</li>
+     *   <li>Polymorphic composition ({@code allOf}/{@code oneOf}/{@code anyOf}) — merged <i>after</i> root properties (higher priority for root)</li>
+     *   <li>Top-level enums (rare; when enum is directly on schema, not in a property)</li>
+     * </ul>
+     * <p>
+     * Ensures no duplicate fields when merging polymorphic schemas (keeps first occurrence).
+     *
+     * @param schemaName     schema name (used for logging and inner schema naming)
+     * @param currentSchema  definition of the current schema
+     * @param schemas        global schema registry for $ref resolution
+     * @param properties     root {@code properties} map (may be empty)
+     * @param processContext generation context (packages, Spring Boot version, helper)
+     * @param innerSchemas   accumulator for discovered inner schemas (mutated)
+     * @return {@link FillParameters} container with all fields and metadata
+     */
     public FillParameters getSchemaVariableProperties(String schemaName,
                                                       Map<String, Object> currentSchema,
                                                       Map<String, Object> schemas,
@@ -223,6 +267,15 @@ public class SchemaMapper extends AbstractMapper {
         return new FillParameters(variableProperties);
     }
 
+    /**
+     * Recursively collects all schema names referenced via {@code $ref} within {@code allOf}/{@code oneOf}/{@code anyOf}.
+     * <p>
+     * Handles nested polymorphism (e.g., {@code A → allOf → B → oneOf → C}).
+     *
+     * @param currentSchema current schema map
+     * @param schemas       global schema registry
+     * @return list of unique schema names (simple, not qualified)
+     */
     private static List<String> getPolymorphSchemasNames(Map<String, Object> currentSchema, Map<String, Object> schemas) {
         return POLYMORPHS.stream()
                 .filter(p -> currentSchema.containsKey(p))
@@ -245,6 +298,20 @@ public class SchemaMapper extends AbstractMapper {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Merges properties from all schemas involved in {@code allOf}/{@code oneOf}/{@code anyOf}.
+     * <p>
+     * Rules:
+     * <ul>
+     *   <li>Properties from {@code $ref} and inline objects ({@code type: object, properties: {...}}) are merged</li>
+     *   <li>Root {@code properties} (outside polymorphic block) have highest priority and overwrite duplicates</li>
+     * </ul>
+     *
+     * @param polymorphSchemasNames unused (legacy signature); actual refs resolved from {@code currentSchema}
+     * @param currentSchema         schema with {@code allOf}/{@code oneOf}/{@code anyOf}
+     * @param schemas               global schema registry
+     * @return merged map of property name → definition
+     */
     private Map<String, Object> mergeProperties(List<String> polymorphSchemasNames,
                                                 Map<String, Object> currentSchema,
                                                 Map<String, Object> schemas) {
