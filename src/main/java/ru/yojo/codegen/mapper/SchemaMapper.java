@@ -326,20 +326,31 @@ public class SchemaMapper extends AbstractMapper {
                         @SuppressWarnings("unchecked")
                         Map<String, Object> itemMap = (Map<String, Object>) item;
 
-                        // a) $ref → resolve & merge props
+                        // Случай 1: $ref → разрешаем и добавляем его properties
                         String ref = getStringValueIfExistOrElseNull(REFERENCE, itemMap);
                         if (ref != null) {
                             String schemaName = refReplace(ref);
                             Map<String, Object> target = castObjectToMap(schemas.get(schemaName));
                             if (target != null) {
                                 Map<String, Object> props = castObjectToMap(target.get(PROPERTIES));
-                                if (props != null) merged.putAll(props);
+                                if (props != null) {
+                                    merged.putAll(props);
+                                }
                             }
                         }
-                        // b) inline object with properties
+                        // Случай 2: inline объект с properties
                         else if (OBJECT.equals(getStringValueIfExistOrElseNull(TYPE, itemMap))) {
                             Map<String, Object> props = castObjectToMap(itemMap.get(PROPERTIES));
-                            if (props != null) merged.putAll(props);
+                            if (props != null) {
+                                merged.putAll(props);
+                            }
+                        }
+                        // Случай 3: bare properties (редко, но возможно)
+                        else if (itemMap.containsKey(PROPERTIES)) {
+                            Map<String, Object> props = castObjectToMap(itemMap.get(PROPERTIES));
+                            if (props != null) {
+                                merged.putAll(props);
+                            }
                         }
                     }
                 }

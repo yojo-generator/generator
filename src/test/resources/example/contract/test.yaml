@@ -513,22 +513,51 @@ components:
       format: interface
       description: It is interface with Methods
       imports:
-        - example.testGenerate.common.InnerSchema
+        - example.testGenerate.common.SomeObjectInnerSchema
       methods:
         methodOne:
           description: This is void method
-          definition: void someOne(String someString, InnerSchema schema)
+          definition: void someOne(String someString, SomeObjectInnerSchema schema)
         methodTwo:
           description: This is method with return statement
-          definition: InnerSchema anotherOne(String someString, InnerSchema schema)
+          definition: SomeObjectInnerSchema anotherOne(String someString, SomeObjectInnerSchema schema)
 
     InterfaceWithMethodsWithoutDescription:
       type: object
       format: interface
       imports:
-        - example.testGenerate.common.InnerSchema
+        - example.testGenerate.common.SomeObjectInnerSchema
       methods:
         methodOne:
-          definition: void someOne(String someString, InnerSchema schema)
+          definition: void someOne(String someString, SomeObjectInnerSchema schema)
         methodTwo:
-          definition: InnerSchema anotherOne(String someString, InnerSchema schema)
+          definition: SomeObjectInnerSchema anotherOne(String someString, SomeObjectInnerSchema schema)
+    DeepNestingSchema:
+      type: object
+      properties:
+        level1:
+          type: object
+          properties:
+            level2:
+              type: object
+              properties:
+                level3:
+                  type: object
+                  properties:
+                    value:
+                      type: string
+
+    CommonBase:
+      type: object
+      properties:
+        baseField:
+          type: integer
+          format: int64
+    CustomSchema:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/CommonBase"
+        - type: object
+          properties:
+            specificField:
+              type: string
