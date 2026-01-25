@@ -225,9 +225,9 @@ class ComprehensiveFeatureTest {
         // Interface with methods + imports
         String iface = readFile("common/InterfaceWithMethods.java");
         assertThat(iface)
-                .contains("import example.testGenerate.common.InnerSchema;")
-                .contains("void someOne(String someString, InnerSchema schema);")
-                .contains("InnerSchema anotherOne(String someString, InnerSchema schema);");
+                .contains("import example.testGenerate.common.SomeObjectInnerSchema;")
+                .contains("void someOne(String someString, SomeObjectInnerSchema schema);")
+                .contains("SomeObjectInnerSchema anotherOne(String someString, SomeObjectInnerSchema schema);");
     }
 
     // ———————————————————————————————————————————————————————————————————————
@@ -577,6 +577,33 @@ class ComprehensiveFeatureTest {
         }
         assertTrue(compiled, "All generated code must compile without errors");
     }
+
+//    @Test
+//    @Order(21)
+//    void polymorphism1() throws IOException {
+//        generate("bug.yaml", "", "example.testGenerate");
+//
+////        // oneOf merge: PolymorphExampleOne + PolymorphExampleTwo
+////        String merged = readFile("common/PolymorphPolymorphExampleOnePolymorphExampleTwo.java");
+////        assertThat(merged)
+////                .contains("private String status;")
+////                .contains("private Integer someField;") // present only in second
+////                .doesNotContain("@NotNull someField"); // not required
+////
+////        // allOf: PolymorphExampleThree (ExampleOne + ExampleTwo)
+////        String allOf = readFile("common/PolymorphExampleThree.java");
+////        assertThat(allOf)
+////                .contains("private String status;")
+////                .contains("private Integer someField;");
+////
+////        // Nested allOf (ExampleFive → RequestDtoSchema + fields)
+////        String ef = readFile("common/ExampleFive.java");
+////        assertThat(ef)
+////                .contains("private Boolean oneMoreField;")
+////                .contains("private String fromFive;")
+////                .contains("private Integer integerValidationField;")
+////                .contains("private List<CollectionTypes> collectionTypes;"); // inherited from RequestDtoSchema
+//    }
 
     // ———————————————————————————————————————————————————————————————————————
     // 🔧 Вспомогательные методы
