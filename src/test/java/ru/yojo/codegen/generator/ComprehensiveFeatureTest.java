@@ -528,12 +528,47 @@ class ComprehensiveFeatureTest {
                 .contains("private List<URI> listOfStandAloneUri;");
     }
 
+    @Test
+    @Order(20)
+    void shouldMergePropertiesFromAllOfWithRefAndInlineObject() throws IOException {
+        // given
+        generate("test.yaml", "", "example.testGenerate");
+
+        // when
+        String content = readFile("common/CustomSchema.java");
+
+        // then
+        assertThat(content)
+                .contains("private Long baseField;")
+                .contains("private String specificField;");
+    }
+
+    @Test
+    @Order(21)
+    void shouldGenerateUniqueClassNamesForDeeplyNestedObjects() throws IOException {
+        generate("test.yaml", "", "example.testGenerate");
+
+        // Проверяем наличие файлов по именам
+        Path base = Paths.get("src/test/resources/example/testGenerate/common");
+
+        assertTrue(Files.exists(base.resolve("DeepNestingSchema.java")));
+        assertTrue(Files.exists(base.resolve("DeepNestingSchemaLevel1.java")));
+        assertTrue(Files.exists(base.resolve("DeepNestingSchemaLevel1Level2.java")));
+        assertTrue(Files.exists(base.resolve("DeepNestingSchemaLevel1Level2Level3.java")));
+
+        // Убеждаемся, что нет общих имён
+        assertFalse(Files.exists(base.resolve("Level1.java")));
+        assertFalse(Files.exists(base.resolve("Level2.java")));
+        assertFalse(Files.exists(base.resolve("Level3.java")));
+        assertFalse(Files.exists(base.resolve("Value.java")));
+    }
+
     // ———————————————————————————————————————————————————————————————————————
     // ✅ 20. Компиляция: все сгенерированные Java-файлы должны компилироваться (full coverage)
     // ———————————————————————————————————————————————————————————————————————
 
     @Test
-    @Order(20)
+    @Order(22)
     void allGeneratedCodeMustCompile() throws IOException {
         // Generate ALL specs
         generate("spec-from-issue.yaml", "specFromIssue", "example.testGenerate.specFromIssue");
@@ -580,11 +615,6 @@ class ComprehensiveFeatureTest {
         assertTrue(compiled, "All generated code must compile without errors");
     }
 
-//    @Test
-//    @Order(21)
-//    void polymorphism1() throws IOException {
-//        generate("bug.yaml", "", "example.testGenerate");
-//
 ////        // oneOf merge: PolymorphExampleOne + PolymorphExampleTwo
 ////        String merged = readFile("common/PolymorphPolymorphExampleOnePolymorphExampleTwo.java");
 ////        assertThat(merged)
