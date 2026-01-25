@@ -430,13 +430,7 @@ public class AbstractMapper {
                                       Map<String, Object> propertiesMap,
                                       String commonPackage,
                                       Map<String, Object> innerSchemas) {
-        String propName;
-        if (schemas.containsKey(propertyName) || schemas.containsKey(capitalize(propertyName)) ||
-            innerSchemas.containsKey(propertyName) || innerSchemas.containsKey(capitalize(propertyName))) {
-            propName = capitalize(schemaName).concat(capitalize(propertyName));
-        } else {
-            propName = propertyName;
-        }
+        String propName = capitalize(schemaName) + capitalize(propertyName);
         fillInnerSchema(variableProperties, propName, propertiesMap, commonPackage, innerSchemas);
     }
 
