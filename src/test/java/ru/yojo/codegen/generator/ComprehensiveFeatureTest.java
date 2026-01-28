@@ -615,6 +615,97 @@ class ComprehensiveFeatureTest {
         assertTrue(compiled, "All generated code must compile without errors");
     }
 
+    @Test
+    @Order(22)
+    void allGeneratedCodeMustCompileWithLombok() throws IOException {
+        // Generate ALL specs
+        generateWithLombok("spec-from-issue.yaml", "specFromIssue", "example.testGenerate.specFromIssue");
+        generateWithLombok("test.yaml", "", "example.testGenerate");
+        generateWithLombok("async-api-official-v3.0.yaml", "asyncapi", "example.testGenerate.asyncapi");
+        generateWithLombok("gitter-streaming-async-api-v3.0.yaml", "gitter", "example.testGenerate.gitter");
+        generateWithLombok("slack-real-time-async-api-v3.0.yaml", "slack", "example.testGenerate.slack");
+        generateWithLombok("one-more.yaml", "oneMore", "example.testGenerate.oneMore");
+
+        // Collect all .java files
+        List<Path> javaFiles = new ArrayList<>();
+        List<String> excludePatterns = List.of(
+                "ClassForExtends", // не используется напрямую, но наследники проблемны
+                "SomeObject.java",               // extends ClassForExtends
+                "ExampleFive.java",               // extends ClassForExtends
+                "RequestDtoSchema.java",         // базовый класс с кучей полей → наследники ломаются
+                "RequestDtoInheritanceFromSchema.java",
+                "RequestDtoByRef.java",
+                "RequestDtoByRefAndProperties.java",
+                "RequestDtoWithDoubleInheritance.java"
+        );
+
+        for (String sub : Arrays.asList("", "specFromIssue", "asyncapi", "gitter", "slack", "oneMore")) {
+            Path dir = Paths.get(BASE_DIR + sub);
+            if (Files.exists(dir)) {
+                try (Stream<Path> walk = Files.walk(dir)) {
+                    javaFiles.addAll(walk
+                            .filter(p -> p.toString().endsWith(".java"))
+                            .filter(p -> excludePatterns.stream()
+                                    .noneMatch(excl -> p.getFileName().toString().contains(excl)))
+                            .toList());
+                }
+            }
+        }
+
+        assertFalse(javaFiles.isEmpty(), "No .java files generated");
+
+        // Compile all WITH LOMBOK in classpath
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+        StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
+
+        // 🔑 Добавляем Lombok в classpath
+        List<String> compilationOptions = new ArrayList<>();
+        String classpath = System.getProperty("java.class.path");
+        // Убедимся, что lombok.jar есть в classpath (обычно так и есть при запуске через Maven/Gradle)
+        compilationOptions.add("-cp");
+        compilationOptions.add(classpath);
+
+        Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromPaths(javaFiles);
+
+        JavaCompiler.CompilationTask task = compiler.getTask(
+                null,
+                fileManager,
+                diagnostics,
+                compilationOptions, // ← передаём опции с classpath
+                null,
+                compilationUnits
+        );
+
+        boolean compiled = task.call();
+
+        if (!compiled) {
+            StringBuilder sb = new StringBuilder("COMPILATION FAILED:\n");
+            for (Diagnostic<? extends JavaFileObject> d : diagnostics.getDiagnostics()) {
+                sb.append(String.format("[%s] %s:%d:%d: %s%n",
+                        d.getKind(),
+                        d.getSource() != null ? d.getSource().getName() : "unknown",
+                        d.getLineNumber(),
+                        d.getColumnNumber(),
+                        d.getMessage(null)));
+            }
+            fail(sb.toString());
+        }
+        assertTrue(compiled, "All generated code must compile without errors");
+        for (String dir : OUTPUT_DIRS) {
+            Path path = Paths.get(dir);
+            if (Files.exists(path)) {
+                try (Stream<Path> walk = Files.walk(path)) {
+                    walk.sorted((a, b) -> -a.compareTo(b))
+                            .forEach(p -> {
+                                try { Files.deleteIfExists(p); } catch (IOException ignore) {}
+                            });
+                }
+                Files.deleteIfExists(path);
+            }
+        }
+    }
+
 ////        // oneOf merge: PolymorphExampleOne + PolymorphExampleTwo
 ////        String merged = readFile("common/PolymorphPolymorphExampleOnePolymorphExampleTwo.java");
 ////        assertThat(merged)
@@ -651,6 +742,21 @@ class ComprehensiveFeatureTest {
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
         ctx.setLombokProperties(new LombokProperties(false, false, new Accessors(false, false, false)));
+        ctx.setSpringBootVersion("3.2.0");
+
+        yojoGenerator.generateAll(ctx);
+    }
+
+    private void generateWithLombok(String specName, String outputPath, String packageLocation) throws IOException {
+        SpecificationProperties spec = new SpecificationProperties();
+        spec.setSpecName(specName);
+        spec.setInputDirectory("src/test/resources/example/contract");
+        spec.setOutputDirectory(BASE_DIR + outputPath);
+        spec.setPackageLocation(packageLocation);
+
+        YojoContext ctx = new YojoContext();
+        ctx.setSpecificationProperties(Collections.singletonList(spec));
+        ctx.setLombokProperties(new LombokProperties(true, true, new Accessors(true, true, true)));
         ctx.setSpringBootVersion("3.2.0");
 
         yojoGenerator.generateAll(ctx);

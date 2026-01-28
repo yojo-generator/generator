@@ -466,31 +466,35 @@ public class AbstractMapper {
             System.out.println();
             fillProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, stringObjectMap, processContext, innerSchemas);
         }
+
         if (variableProperties.getType() == null || OBJECT_TYPE.equals(variableProperties.getType())) {
-            String refReplace = refReplace(referenceObject);
-            if (getStringValueIfExistOrElseNull(refReplace, schemas) != null
-                && castObjectToMap(schemas.get(refReplace)).entrySet().stream()
+            String schemaKey = refReplace(referenceObject); // точное имя ключа в schemas
+            String className = capitalize(schemaKey);       // имя класса в Java — всегда с заглавной
+
+            if (getStringValueIfExistOrElseNull(schemaKey, schemas) != null
+                && castObjectToMap(schemas.get(schemaKey)).entrySet().stream()
                         .anyMatch(p -> POLYMORPHS.contains(p.getKey()))) {
-                System.out.println("SKIP INHERITANCE POLYMORPH INSIDE SCHEMA! " + refReplace);
-                variableProperties.setType(refReplace);
-                variableProperties.addRequiredImports(prepareImport(processContext.getCommonPackage(), refReplace));
+                System.out.println("SKIP INHERITANCE POLYMORPH INSIDE SCHEMA! " + className);
+                variableProperties.setType(className);
+                variableProperties.addRequiredImports(prepareImport(processContext.getCommonPackage(), className));
             } else {
-                variableProperties.setType(refReplace);
-                String possibleReferencedEnum = getStringValueIfExistOrElseNull(refReplace, schemas);
-                if (possibleReferencedEnum != null) {
-                    Map<String, Object> possibleEnumSchema = castObjectToMap(schemas.get(refReplace));
-                    if (!possibleEnumSchema.isEmpty() && getStringValueIfExistOrElseNull(ENUMERATION, possibleEnumSchema) != null) {
-                        variableProperties.setValid(false);
-                    }
-                }
-                String externalPackage = getStringValueIfExistOrElseNull("package", propertiesMap);
-                if (externalPackage != null) {
-                    String fullImport = externalPackage + "." + refReplace + ";";
-                    variableProperties.addRequiredImports(fullImport);
-                } else if (Character.isUpperCase(refReplace.charAt(0))) {
-                    variableProperties.addRequiredImports(prepareImport(processContext.getCommonPackage(), refReplace));
+            variableProperties.setType(className);
+            String possibleReferencedEnum = getStringValueIfExistOrElseNull(schemaKey, schemas);
+            if (possibleReferencedEnum != null) {
+                Map<String, Object> possibleEnumSchema = castObjectToMap(schemas.get(schemaKey));
+                if (!possibleEnumSchema.isEmpty() && getStringValueIfExistOrElseNull(ENUMERATION, possibleEnumSchema) != null) {
+                    variableProperties.setValid(false);
                 }
             }
+            String externalPackage = getStringValueIfExistOrElseNull("package", propertiesMap);
+            if (externalPackage != null) {
+                String fullImport = externalPackage + "." + className + ";";
+                variableProperties.addRequiredImports(fullImport);
+            } else {
+                // ✅ ВСЕГДА добавляем импорт для локальных классов
+                variableProperties.addRequiredImports(prepareImport(processContext.getCommonPackage(), className));
+            }
+        }
         }
     }
 
@@ -548,10 +552,10 @@ public class AbstractMapper {
                     variableProperties.setItems(formatOfRefObj);
                     variableProperties.setFormat(formatOfRefObj);
                 } else {
-                    variableProperties.setItems(refReplace(refValue));
+                    variableProperties.setItems(capitalize(refReplace(refValue)));
                 }
             } else {
-                variableProperties.setItems(refReplace(refValue));
+                variableProperties.setItems(capitalize(refReplace(refValue)));
             }
             fillCollectionType(variableProperties);
         } else {

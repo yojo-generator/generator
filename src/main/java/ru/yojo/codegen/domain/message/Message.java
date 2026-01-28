@@ -242,10 +242,14 @@ public class Message {
                         .append(LOMBOK_DATA_ANNOTATION.replace("@", "@lombok."))
                         .append(lineSeparator());
             } else {
-                lombokAnnotationBuilder
-                        .append(LOMBOK_DATA_ANNOTATION)
-                        .append(lineSeparator());
-                requiredImports.add(LOMBOK_DATA_IMPORT);
+                if (!fillParameters.getVariableProperties().isEmpty()) {
+                    lombokAnnotationBuilder
+                            .append(LOMBOK_DATA_ANNOTATION)
+                            .append(lineSeparator());
+                    requiredImports.add(LOMBOK_DATA_IMPORT);
+                } else {
+                    lombokProperties.setAllArgsConstructor(false);
+                }
             }
             if (fillParameters.getLombokProperties() != null) {
                 if (fillParameters.getLombokProperties().getAccessors() != null) {

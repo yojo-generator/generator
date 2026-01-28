@@ -24,7 +24,7 @@ public class LombokProperties {
      * Whether {@code @NoArgsConstructor} should be generated.
      * Default: {@code true}.
      */
-    private boolean noArgsConstructor;
+    private boolean noArgsConstructor = true;
 
     /**
      * Configuration for {@code @Accessors} (fluent/chained setters).

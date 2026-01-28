@@ -16,28 +16,16 @@ java {
 
 group 'io.github.yojo-generator'
 //archivesBaseName = "generator"
-version '2.0.4'
+version '2.0.5'
 
 publishing {
     repositories {
-//        maven {
-//            name = "GitHubPackages"
-//            url = uri("https://maven.pkg.github.com/yojo-generator/generator")
-//            credentials {
-//                username = project.findProperty("user") ?: System.getenv("USERNAME")
-//                password = project.findProperty("token") ?: System.getenv("TOKEN")
-//            }
-//        }
-
         maven {
             url = layout.buildDirectory.dir('staging-deploy')
         }
     }
 
     publications {
-//        gpr(MavenPublication) {
-//            from(components.java)
-//        }
         mavenJava(MavenPublication) {
             groupId = 'io.github.yojo-generator'
             artifactId = 'generator'
@@ -82,9 +70,6 @@ jreleaser {
         armored = true
         verify = true
     }
-    // environment {
-    //     variables 'config.toml'
-    // }
     release {
         github {
             skipRelease = true
@@ -117,18 +102,18 @@ repositories {
 }
 
 //Uncomment this if you need to test by YojoCLI
-//sourceSets {
+sourceSets {
 ////    main {
 ////        java {
 ////            srcDir "${buildDir}/generated-sources"
 ////        }
 ////    }
-//    test {
-//        java {
-//            srcDir "src/test/resources/"
-//        }
-//    }
-//}
+    test {
+        java {
+            srcDir "src/test/resources/"
+        }
+    }
+}
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -160,7 +145,9 @@ dependencies {
 
     testImplementation("jakarta.validation:jakarta.validation-api:3.1.1")
     testImplementation("javax.validation:validation-api:2.0.1.Final")
-    testImplementation platform('org.junit:junit-bom:5.10.2') // или 5.14.1 — но единая!
+    testImplementation 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    testImplementation platform('org.junit:junit-bom:5.10.2')
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'org.assertj:assertj-core:3.27.3'
