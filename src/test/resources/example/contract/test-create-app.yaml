@@ -1,0 +1,41 @@
+asyncapi: 2.6.0
+info:
+  title: Test Create Application
+  version: 1.0.0
+channels:
+  createApplication:
+    subscribe:
+      message:
+        $ref: '#/components/messages/createApplicationV1'
+
+components:
+  messages:
+    createApplicationV1:
+      payload:
+        type: object
+        allOf:
+          - type: object
+            properties:
+              requestData:
+                type: object
+                properties:
+                  conditions:
+                    type: object
+                    properties:
+                      requested:
+                        type: object
+                        properties:
+                          purchaseNumber:
+                            type: string
+                          bgSubtype:
+                            type: string
+                          sum:
+                            type: number
+                          endDate:
+                            type: string
+                            format: date-time
+                        required:
+                          - purchaseNumber
+                          - bgSubtype
+                          - sum
+                          - endDate

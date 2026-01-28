@@ -721,4 +721,70 @@ public class MapperUtil {
         }
         return safeFieldName(sb.toString());
     }
+
+    /**
+     * Recursively registers nested inline object definitions as synthetic inner schemas.
+     * <p>
+     * This method traverses the given {@code properties} map and, for every field of type {@code object}
+     * that contains its own {@code properties}, generates a unique schema name by concatenating
+     * the {@code parentClassName} with the capitalized field name (e.g., {@code CreateApplicationV1RequestDataConditions}).
+     * The resulting synthetic schema is then stored in {@code innerSchemas} for subsequent DTO generation.
+     * <p>
+     * This is essential for correct handling of deeply nested structures inside polymorphic compositions
+     * (e.g., {@code allOf}), where inline objects would otherwise be ignored after property merging.
+     *
+     * @param parentClassName the base class name used as a prefix for generated schema names
+     *                        (e.g., {@code "CreateApplicationV1RequestData"})
+     * @param properties      the map of property definitions at the current nesting level
+     * @param schemas         the global registry of top-level schemas (used for {@code $ref} resolution, if needed)
+     * @param innerSchemas    the accumulator map where newly discovered synthetic schemas are registered;
+     *                        keys are generated schema names, values are raw schema definitions
+     */
+    public static void registerNestedSchemas(
+            String parentClassName,
+            Map<String, Object> properties,
+            Map<String, Object> schemas,
+            Map<String, Object> innerSchemas) {
+
+        if (properties == null) return;
+
+        for (Map.Entry<String, Object> entry : properties.entrySet()) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+
+            if (value instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> fieldDef = (Map<String, Object>) value;
+
+                // Проверяем, является ли поле объектом с собственными свойствами
+                if ("object".equals(getStringValueIfExistOrElseNull("type", fieldDef)) &&
+                    fieldDef.containsKey("properties")) {
+
+                    // Генерируем уникальное имя класса: Parent + CapitalizedFieldName
+                    String nestedClassName = parentClassName + capitalize(fieldName);
+
+                    // Если такая схема ещё не зарегистрирована — регистрируем
+                    if (!innerSchemas.containsKey(nestedClassName)) {
+                        Map<String, Object> nestedProps = castObjectToMap(fieldDef.get("properties"));
+
+                        // Создаём "виртуальную" схему
+                        Map<String, Object> virtualSchema = new LinkedHashMap<>();
+                        virtualSchema.put("type", "object");
+                        virtualSchema.put("properties", nestedProps);
+                        if (fieldDef.containsKey("required")) {
+                            virtualSchema.put("required", fieldDef.get("required"));
+                        }
+                        if (fieldDef.containsKey("description")) {
+                            virtualSchema.put("description", fieldDef.get("description"));
+                        }
+
+                        innerSchemas.put(nestedClassName, virtualSchema);
+
+                        // 🔁 Рекурсивно обрабатываем вложенные объекты внутри этого объекта
+                        registerNestedSchemas(nestedClassName, nestedProps, schemas, innerSchemas);
+                    }
+                }
+            }
+        }
+    }
 }
