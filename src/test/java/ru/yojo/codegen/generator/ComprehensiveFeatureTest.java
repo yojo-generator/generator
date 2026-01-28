@@ -631,7 +631,7 @@ class ComprehensiveFeatureTest {
         List<String> excludePatterns = List.of(
                 "ClassForExtends", // не используется напрямую, но наследники проблемны
                 "SomeObject.java",               // extends ClassForExtends
-                "ExampleFive.java",               // extends ClassForExtends
+                "ExampleFive.java",
                 "RequestDtoSchema.java",         // базовый класс с кучей полей → наследники ломаются
                 "RequestDtoInheritanceFromSchema.java",
                 "RequestDtoByRef.java",
@@ -704,6 +704,26 @@ class ComprehensiveFeatureTest {
                 Files.deleteIfExists(path);
             }
         }
+    }
+
+    @Test
+    @Order(99)
+    void testCreateApplicationV1NestedObjectInAllOf() throws IOException {
+        generate("test-create-app.yaml", "createApp", "example.testGenerate.createApp");
+
+        assertTrue(new File(BASE_DIR + "createApp/messages/CreateApplicationV1.java").exists());
+
+        assertTrue(new File(BASE_DIR + "createApp/common/CreateApplicationV1RequestDataConditions.java").exists());
+
+        File requestedClass = new File(BASE_DIR + "createApp/common/CreateApplicationV1RequestDataConditionsRequested.java");
+        assertTrue(requestedClass.exists(), "CreateApplicationV1RequestDataConditionsRequested must be generated!");
+
+        String content = readFile("createApp/common/CreateApplicationV1RequestDataConditionsRequested.java");
+        assertThat(content)
+                .contains("private String purchaseNumber;")
+                .contains("private String bgSubtype;")
+                .contains("private BigDecimal sum;")
+                .contains("private OffsetDateTime endDate;");
     }
 
 ////        // oneOf merge: PolymorphExampleOne + PolymorphExampleTwo

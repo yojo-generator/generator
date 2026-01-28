@@ -236,7 +236,7 @@ public class SchemaMapper extends AbstractMapper {
             List<String> polymorphSchemasNames = getPolymorphSchemasNames(currentSchema, schemas);
             System.out.println(polymorphSchemasNames);
             Map<String, Object> mergedProperties = mergeProperties(polymorphSchemasNames, currentSchema, schemas);
-
+            registerNestedSchemas(schemaName, mergedProperties, schemas, processContext.getHelper().getInnerSchemas());
             // ➕ Добавляем НЕДОСТАЮЩИЕ поля из allOf (если их нет в корневых properties)
             mergedProperties.forEach((propertyName, propertyValue) -> {
                 if (variableProperties.stream().noneMatch(vp -> vp.getName().equals(propertyName))) {
