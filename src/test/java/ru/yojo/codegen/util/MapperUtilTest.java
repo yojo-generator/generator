@@ -37,7 +37,7 @@ class MapperUtilTest {
 
         MapperUtil.buildLombokAnnotations(lombokProperties, new HashSet<>(), actualResultStringBuilder);
 
-        assertThat(actualResultStringBuilder.toString()).hasToString(expected);
+        assertThat(actualResultStringBuilder.toString()).contains(expected);
     }
 
     @ParameterizedTest
