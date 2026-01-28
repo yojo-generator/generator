@@ -416,11 +416,7 @@ components:
     SomeObject:
       type: object
       lombok:
-        accessors:
-          chain: true
-        equalsAndHashCode:
-          enable: true
-          callSuper: false
+        enable: false
       extends:
         fromClass: ClassForExtends
         fromPackage: example.testGenerate.common
@@ -547,7 +543,7 @@ components:
                     value:
                       type: string
 
-    CommonBase:
+    commonBase:
       type: object
       properties:
         baseField:
@@ -556,7 +552,7 @@ components:
     CustomSchema:
       type: object
       allOf:
-        - $ref: "#/components/schemas/CommonBase"
+        - $ref: "#/components/schemas/commonBase"
         - type: object
           properties:
             specificField:

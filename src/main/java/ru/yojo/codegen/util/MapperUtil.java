@@ -111,7 +111,7 @@ public class MapperUtil {
      * @return capitalized schema name
      */
     public static String refReplace(String ref) {
-        return capitalize(ref.replaceAll(".+/", ""));
+        return ref.replaceAll(".+/", "");
     }
 
     /**
