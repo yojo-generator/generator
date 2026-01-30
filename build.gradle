@@ -16,7 +16,7 @@ java {
 
 group 'io.github.yojo-generator'
 //archivesBaseName = "generator"
-version '2.0.5'
+version '2.1.0'
 
 publishing {
     repositories {
@@ -102,18 +102,18 @@ repositories {
 }
 
 //Uncomment this if you need to test by YojoCLI
-sourceSets {
+//sourceSets {
 ////    main {
 ////        java {
 ////            srcDir "${buildDir}/generated-sources"
 ////        }
 ////    }
-    test {
-        java {
-            srcDir "src/test/resources/"
-        }
-    }
-}
+//    test {
+//        java {
+//            srcDir "src/test/resources/"
+//        }
+//    }
+//}
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
