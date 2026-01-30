@@ -136,7 +136,7 @@ class ComprehensiveFeatureTest {
                 .doesNotContain("value");
 
         // Small-case names preserved
-        String small = readFile("common/InnerEnumWithoutDescriptionSmall.java");
+        String small = readFile("common/RequestDtoSchemaInnerEnumWithoutDescriptionSmall.java");
         assertThat(small)
                 .contains("success,")
                 .contains("decline,")
@@ -577,6 +577,7 @@ class ComprehensiveFeatureTest {
         generate("gitter-streaming-async-api-v3.0.yaml", "gitter", "example.testGenerate.gitter");
         generate("slack-real-time-async-api-v3.0.yaml", "slack", "example.testGenerate.slack");
         generate("one-more.yaml", "oneMore", "example.testGenerate.oneMore");
+//        generate("contract.yaml", "contract", "example.testGenerate.contract");
 
         // Collect all .java files
         List<Path> javaFiles = new ArrayList<>();
@@ -625,6 +626,7 @@ class ComprehensiveFeatureTest {
         generateWithLombok("gitter-streaming-async-api-v3.0.yaml", "gitter", "example.testGenerate.gitter");
         generateWithLombok("slack-real-time-async-api-v3.0.yaml", "slack", "example.testGenerate.slack");
         generateWithLombok("one-more.yaml", "oneMore", "example.testGenerate.oneMore");
+//        generateWithLombok("contract.yaml", "contract", "example.testGenerate.contract");
 
         // Collect all .java files
         List<Path> javaFiles = new ArrayList<>();

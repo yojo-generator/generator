@@ -147,7 +147,7 @@ public class AbstractMapper {
             fillObjectProperties(schemaName, variableProperties, schemas, propertyName, propertiesMap, commonPackage, innerSchemas);
         } else if ((OBJECT_TYPE.equals(variableProperties.getType()) || STRING.equals(variableProperties.getType())) &&
                    getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap) != null) {
-            fillEnumProperties(variableProperties, propertyName, propertiesMap, commonPackage, innerSchemas);
+            fillEnumProperties(schemaName, variableProperties, propertyName, propertiesMap, commonPackage, innerSchemas);
         } else if (OBJECT_TYPE.equals(variableProperties.getType()) &&
                    variableProperties.getPackageOfExisingObject() != null &&
                    variableProperties.getNameOfExisingObject() != null) {
@@ -396,19 +396,28 @@ public class AbstractMapper {
      * @param commonPackage      base package
      * @param innerSchemas       accumulator
      */
-    private void fillEnumProperties(VariableProperties variableProperties,
+    private void fillEnumProperties(String schemaName,
+                                    VariableProperties variableProperties,
                                     String propertyName,
                                     Map<String, Object> propertiesMap,
                                     String commonPackage,
                                     Map<String, Object> innerSchemas) {
-        System.out.println("ENUMERATION FOUND: " + propertyName);
-        fillEnumSchema(propertyName, propertiesMap, innerSchemas);
-        variableProperties.setType(capitalize(propertyName));
+        System.out.println("ENUMERATION FOUND: " + propertyName + " in " + schemaName);
+        String enumClassName;
+        if (schemaName.equalsIgnoreCase(propertyName)) {
+            enumClassName = capitalize(propertyName);
+        } else {
+            enumClassName = capitalize(schemaName) + capitalize(propertyName);
+        }
+
+        fillEnumSchema(enumClassName, propertiesMap, innerSchemas);
+
+        variableProperties.setType(enumClassName);
         variableProperties.setValid(false);
         variableProperties.setEnumNames(null);
         variableProperties.setEnumeration(null);
         variableProperties.setEnum(true);
-        variableProperties.addRequiredImports(prepareImport(commonPackage, capitalize(propertyName)));
+        variableProperties.addRequiredImports(prepareImport(commonPackage, enumClassName));
     }
 
     /**
@@ -478,23 +487,23 @@ public class AbstractMapper {
                 variableProperties.setType(className);
                 variableProperties.addRequiredImports(prepareImport(processContext.getCommonPackage(), className));
             } else {
-            variableProperties.setType(className);
-            String possibleReferencedEnum = getStringValueIfExistOrElseNull(schemaKey, schemas);
-            if (possibleReferencedEnum != null) {
-                Map<String, Object> possibleEnumSchema = castObjectToMap(schemas.get(schemaKey));
-                if (!possibleEnumSchema.isEmpty() && getStringValueIfExistOrElseNull(ENUMERATION, possibleEnumSchema) != null) {
-                    variableProperties.setValid(false);
+                variableProperties.setType(className);
+                String possibleReferencedEnum = getStringValueIfExistOrElseNull(schemaKey, schemas);
+                if (possibleReferencedEnum != null) {
+                    Map<String, Object> possibleEnumSchema = castObjectToMap(schemas.get(schemaKey));
+                    if (!possibleEnumSchema.isEmpty() && getStringValueIfExistOrElseNull(ENUMERATION, possibleEnumSchema) != null) {
+                        variableProperties.setValid(false);
+                    }
+                }
+                String externalPackage = getStringValueIfExistOrElseNull("package", propertiesMap);
+                if (externalPackage != null) {
+                    String fullImport = externalPackage + "." + className + ";";
+                    variableProperties.addRequiredImports(fullImport);
+                } else {
+                    // ✅ ВСЕГДА добавляем импорт для локальных классов
+                    variableProperties.addRequiredImports(prepareImport(processContext.getCommonPackage(), className));
                 }
             }
-            String externalPackage = getStringValueIfExistOrElseNull("package", propertiesMap);
-            if (externalPackage != null) {
-                String fullImport = externalPackage + "." + className + ";";
-                variableProperties.addRequiredImports(fullImport);
-            } else {
-                // ✅ ВСЕГДА добавляем импорт для локальных классов
-                variableProperties.addRequiredImports(prepareImport(processContext.getCommonPackage(), className));
-            }
-        }
         }
     }
 
@@ -966,18 +975,19 @@ public class AbstractMapper {
      * @param propertiesMap raw enum definition
      * @param innerSchemas  accumulator
      */
-    private static void fillEnumSchema(String propertyName,
+    private static void fillEnumSchema(String enumSchemaName,
                                        Map<String, Object> propertiesMap,
                                        Map<String, Object> innerSchemas) {
+        System.out.println(">>> ADDING ENUM TO INNER SCHEMAS: " + enumSchemaName);
         if (getStringValueIfExistOrElseNull(X_ENUM_NAMES, propertiesMap) != null) {
             Map<String, Object> enumerationMap = castObjectToMap(propertiesMap.get(X_ENUM_NAMES));
             Map<String, Object> enums = new LinkedHashMap<>();
             Map<String, Object> enumWithDescription = fillByEnumWithDescription(enumerationMap);
-            innerSchemas.put(propertyName, enumWithDescription);
+            innerSchemas.put(uncapitalize(enumSchemaName), enumWithDescription);
         } else if (getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap) != null) {
             List<String> enums = castObjectToList(propertiesMap.get(ENUMERATION));
             Map<String, Object> enumsMap = fillByEnum(enums);
-            innerSchemas.put(propertyName, enumsMap);
+            innerSchemas.put(uncapitalize(enumSchemaName), enumsMap);
         }
     }
 }
