@@ -14,6 +14,8 @@ import java.util.Map;
  */
 public class ProcessContext {
     private boolean experimental = false;
+
+    private boolean splitModels = true;
     /**
      * Constructs a new context with the raw parsed YAML content.
      *
@@ -95,6 +97,14 @@ public class ProcessContext {
 
     public boolean isExperimental() { return experimental; }
     public void setExperimental(boolean experimental) { this.experimental = experimental; }
+
+    public boolean isSplitModels() {
+        return splitModels;
+    }
+
+    public void setSplitModels(boolean splitModels) {
+        this.splitModels = splitModels;
+    }
     /**
      * Returns the shared helper instance.
      *
@@ -335,4 +345,18 @@ public class ProcessContext {
     public void setSchemasMap(Map<String, Object> schemasMap) {
         this.schemasMap = schemasMap;
     }
+
+    /**
+     * Return package, which real generates all DTOs.
+     * if splitModels == true → return commonPackage.
+     * if splitModels == false → return unified package.
+     */
+    public String getEffectiveCommonPackage() {
+        if (isSplitModels()) {
+            return getCommonPackage();
+        } else {
+            return getPackageLocation() + ";";
+        }
+    }
+
 }

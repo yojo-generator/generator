@@ -129,7 +129,7 @@ public class AbstractMapper {
         String type = getStringValueIfExistOrElseNull(TYPE, propertiesMap);
         String format = getStringValueIfExistOrElseNull(FORMAT, propertiesMap);
         if (getStringValueIfExistOrElseNull(ADDITIONAL_PROPERTIES, propertiesMap) != null) {
-            fillMapProperties(variableProperties, currentSchema, schemas, propertiesMap, commonPackage);
+            fillMapProperties(variableProperties, currentSchema, schemas, propertiesMap, processContext);
             return;
         }
         if (OBJECT_TYPE.equalsIgnoreCase(type) && format != null &&
@@ -144,10 +144,10 @@ public class AbstractMapper {
             fillReferenceProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, processContext, innerSchemas);
         } else if (OBJECT_TYPE.equals(variableProperties.getType()) &&
                    getStringValueIfExistOrElseNull(PROPERTIES, propertiesMap) != null) {
-            fillObjectProperties(schemaName, variableProperties, schemas, propertyName, propertiesMap, commonPackage, innerSchemas);
+            fillObjectProperties(schemaName, variableProperties, schemas, propertyName, propertiesMap, processContext, innerSchemas);
         } else if ((OBJECT_TYPE.equals(variableProperties.getType()) || STRING.equals(variableProperties.getType())) &&
                    getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap) != null) {
-            fillEnumProperties(schemaName, variableProperties, propertyName, propertiesMap, commonPackage, innerSchemas);
+            fillEnumProperties(schemaName, variableProperties, propertyName, propertiesMap, processContext, innerSchemas);
         } else if (OBJECT_TYPE.equals(variableProperties.getType()) &&
                    variableProperties.getPackageOfExisingObject() != null &&
                    variableProperties.getNameOfExisingObject() != null) {
@@ -191,7 +191,7 @@ public class AbstractMapper {
                 className += refName;
             }
             variableProperties.setType(className);
-            variableProperties.addRequiredImports(prepareImport(commonPackage, className));
+            variableProperties.addRequiredImports(prepareImport(processContext, className));
             Map<String, Object> preparedMergedPolymorphSchema = Map.of(
                     className,
                     Map.of(TYPE, OBJECT, PROPERTIES, mergedProperties)
@@ -223,8 +223,9 @@ public class AbstractMapper {
      * @param className     simple class name
      * @return full import, e.g., {@code "com.example.common.MyClass;"}
      */
-    private String prepareImport(String commonPackage, String className) {
-        return commonPackage.replace(";", "." + className + ";");
+    private String prepareImport(ProcessContext ctx, String className) {
+        String effectivePackage = ctx.getEffectiveCommonPackage(); // ← новое
+        return effectivePackage.replace(";", "." + className + ";");
     }
 
     /**
@@ -242,13 +243,13 @@ public class AbstractMapper {
      * @param currentSchema      current schema map
      * @param schemas            global schemas
      * @param propertiesMap      field definition (must contain {@code additionalProperties})
-     * @param commonPackage      base package for imports
+     * @param processContext     context
      */
     private void fillMapProperties(VariableProperties variableProperties,
                                    Map<String, Object> currentSchema,
                                    Map<String, Object> schemas,
                                    Map<String, Object> propertiesMap,
-                                   String commonPackage) {
+                                   ProcessContext processContext) {
         System.out.println();
         System.out.println("ADDITIONAL PROPERTIES");
         Map<String, Object> additionalPropertiesMap = castObjectToMap(propertiesMap.get(ADDITIONAL_PROPERTIES));
@@ -321,12 +322,12 @@ public class AbstractMapper {
                         variableProperties.setType(format(MAP_CUSTOM_TYPE,
                                 JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(variableProperties.getFormat()),
                                 variableProperties.getType()));
-                        variableProperties.addRequiredImports(prepareImport(commonPackage, refObjectName));
+                        variableProperties.addRequiredImports(prepareImport(processContext, refObjectName));
                     } else {
                         variableProperties.setItems(refObjectName);
                         fillCollectionType(variableProperties);
                         variableProperties.setType(format(MAP_TYPE, format(variableProperties.getType())));
-                        variableProperties.addRequiredImports(prepareImport(commonPackage, refObjectName));
+                        variableProperties.addRequiredImports(prepareImport(processContext, refObjectName));
                     }
                 }
             } else {
@@ -334,10 +335,10 @@ public class AbstractMapper {
                     variableProperties.setType(format(MAP_CUSTOM_TYPE,
                             JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(variableProperties.getFormat()),
                             refObjectName));
-                    variableProperties.addRequiredImports(prepareImport(commonPackage, refObjectName));
+                    variableProperties.addRequiredImports(prepareImport(processContext, refObjectName));
                 } else {
                     variableProperties.setType(format(MAP_TYPE, refObjectName));
-                    variableProperties.addRequiredImports(prepareImport(commonPackage, refObjectName));
+                    variableProperties.addRequiredImports(prepareImport(processContext, refObjectName));
                 }
             }
         } else if (ARRAY.equals(type) && getStringValueIfExistOrElseNull(ADDITIONAL_FORMAT, additionalPropertiesMap) != null) {
@@ -393,14 +394,14 @@ public class AbstractMapper {
      * @param variableProperties field container
      * @param propertyName       YAML key
      * @param propertiesMap      raw enum definition
-     * @param commonPackage      base package
+     * @param processContext     context
      * @param innerSchemas       accumulator
      */
     private void fillEnumProperties(String schemaName,
                                     VariableProperties variableProperties,
                                     String propertyName,
                                     Map<String, Object> propertiesMap,
-                                    String commonPackage,
+                                    ProcessContext processContext,
                                     Map<String, Object> innerSchemas) {
         System.out.println("ENUMERATION FOUND: " + propertyName + " in " + schemaName);
         String enumClassName;
@@ -417,7 +418,7 @@ public class AbstractMapper {
         variableProperties.setEnumNames(null);
         variableProperties.setEnumeration(null);
         variableProperties.setEnum(true);
-        variableProperties.addRequiredImports(prepareImport(commonPackage, enumClassName));
+        variableProperties.addRequiredImports(prepareImport(processContext, enumClassName));
     }
 
     /**
@@ -429,7 +430,7 @@ public class AbstractMapper {
      * @param variableProperties field container
      * @param propertyName       YAML key
      * @param propertiesMap      raw object definition
-     * @param commonPackage      base package
+     * @param processContext     context
      * @param innerSchemas       accumulator
      */
     private void fillObjectProperties(String schemaName,
@@ -437,10 +438,10 @@ public class AbstractMapper {
                                       Map<String, Object> schemas,
                                       String propertyName,
                                       Map<String, Object> propertiesMap,
-                                      String commonPackage,
+                                      ProcessContext processContext,
                                       Map<String, Object> innerSchemas) {
         String propName = capitalize(schemaName) + capitalize(propertyName);
-        fillInnerSchema(variableProperties, propName, propertiesMap, commonPackage, innerSchemas);
+        fillInnerSchema(variableProperties, propName, propertiesMap, processContext, innerSchemas);
     }
 
     /**
@@ -485,7 +486,7 @@ public class AbstractMapper {
                         .anyMatch(p -> POLYMORPHS.contains(p.getKey()))) {
                 System.out.println("SKIP INHERITANCE POLYMORPH INSIDE SCHEMA! " + className);
                 variableProperties.setType(className);
-                variableProperties.addRequiredImports(prepareImport(processContext.getCommonPackage(), className));
+                variableProperties.addRequiredImports(prepareImport(processContext, className));
             } else {
                 variableProperties.setType(className);
                 String possibleReferencedEnum = getStringValueIfExistOrElseNull(schemaKey, schemas);
@@ -500,8 +501,8 @@ public class AbstractMapper {
                     String fullImport = externalPackage + "." + className + ";";
                     variableProperties.addRequiredImports(fullImport);
                 } else {
-                    // ✅ ВСЕГДА добавляем импорт для локальных классов
-                    variableProperties.addRequiredImports(prepareImport(processContext.getCommonPackage(), className));
+                    // Always add import for local classes
+                    variableProperties.addRequiredImports(prepareImport(processContext, className));
                 }
             }
         }
@@ -578,7 +579,7 @@ public class AbstractMapper {
                     }
                 } else {
                     if (getStringValueIfExistOrElseNull(PROPERTIES, items) != null) {
-                        fillObjectProperties(schemaName, variableProperties, schemas, propertyName, items, processContext.getCommonPackage(), innerSchemas);
+                        fillObjectProperties(schemaName, variableProperties, schemas, propertyName, items, processContext, innerSchemas);
                         variableProperties.setType(format(LIST_TYPE, variableProperties.getType()));
                     } else {
                         if (getStringValueIfExistOrElseNull(PACKAGE, items) != null) {
@@ -603,7 +604,7 @@ public class AbstractMapper {
             if (externalPackage != null) {
                 variableProperties.addRequiredImports(externalPackage + "." + variableProperties.getItems() + ";");
             } else {
-                variableProperties.addRequiredImports(prepareImport(processContext.getCommonPackage(), variableProperties.getItems()));
+                variableProperties.addRequiredImports(prepareImport(processContext, variableProperties.getItems()));
             }
         }
     }
@@ -633,17 +634,17 @@ public class AbstractMapper {
      * @param variableProperties field container
      * @param propertyName       proposed inner schema name
      * @param propertiesMap      raw inner schema definition
-     * @param commonPackage      base package
+     * @param processContext     context
      * @param innerSchemas       accumulator
      */
     private void fillInnerSchema(VariableProperties variableProperties,
                                  String propertyName,
                                  Map<String, Object> propertiesMap,
-                                 String commonPackage,
+                                 ProcessContext processContext,
                                  Map<String, Object> innerSchemas) {
         System.out.println("FOUND INNER SCHEMA!!! " + propertyName);
         variableProperties.setType(capitalize(propertyName));
-        variableProperties.addRequiredImports(prepareImport(commonPackage, capitalize(propertyName)));
+        variableProperties.addRequiredImports(prepareImport(processContext, capitalize(propertyName)));
         Map<String, Object> innerSchema = new LinkedHashMap<>(propertiesMap);
         if (!innerSchema.containsKey(TYPE)) {
             innerSchema.put(TYPE, OBJECT);
