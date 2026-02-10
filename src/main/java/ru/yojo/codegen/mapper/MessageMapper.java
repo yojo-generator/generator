@@ -78,7 +78,7 @@ public class MessageMapper extends AbstractMapper {
             message.setPathForGenerateMessage(getStringValueIfExistOrElseNull("pathForGenerateMessage", payloadMap));
 
             AtomicBoolean needToFill = new AtomicBoolean(true);
-            extendsAndImplFilling(processContext.getHelper().getExcludeInheritanceSchemas(), message, payloadMap, refObject, needToFill);
+            extendsAndImplFilling(processContext.getHelper().getExcludeInheritanceSchemas(), message, payloadMap, refObject, needToFill, processContext);
             if (needToFill.get()) {
                 filledByRef = false;
                 FillParameters fillParams = getFillParameters(
@@ -131,7 +131,7 @@ public class MessageMapper extends AbstractMapper {
                         Map<String, Object> refMap = castObjectToMap(processContext.getSchemasMap().get(refReplace(refObject)));
                         refMap.forEach((mk, mv) -> {
                             if (mk.equals(EXTENDS)) {
-                                String fromClass = prepareExtendsMessage(message, mv);
+                                String fromClass = prepareExtendsMessage(message, mv, processContext);
                                 if (refObject != null && refReplace(refObject).equals(fromClass)) {
                                     needToFill.set(false);
                                 }
@@ -180,17 +180,28 @@ public class MessageMapper extends AbstractMapper {
     /**
      * Parses {@code extends} block and configures message to extend the specified class.
      *
-     * @param message message instance to configure
-     * @param mv      value of {@code extends} key (should be a map with {@code fromClass}, {@code fromPackage})
+     * @param message             message instance to configure
+     * @param mv                  value of {@code extends} key (should be a map with {@code fromClass}, {@code fromPackage})
+     * @param processContext      context
      * @return resolved superclass simple name (e.g., {@code "BaseMessage"})
      */
-    private static String prepareExtendsMessage(Message message, Object mv) {
+    private static String prepareExtendsMessage(Message message, Object mv, ProcessContext processContext) {
         Map<String, Object> extendsMap = castObjectToMap(mv);
         String fromClass = getStringValueIfExistOrElseNull(FROM_CLASS, extendsMap);
         String fromPackage = getStringValueIfExistOrElseNull(FROM_PACKAGE, extendsMap);
         System.out.println("SHOULD EXTENDS FROM: " + fromClass);
+        if (fromClass != null && processContext.getSchemasMap().containsKey(fromClass)) {
+            fromPackage = null;
+        }
+
+        if (fromPackage != null) {
+            message.getImportSet().add(fromPackage + "." + fromClass + ";");
+        } else {
+            String effectivePkg = processContext.getEffectiveCommonPackage().replace(";", "");
+            message.getImportSet().add(effectivePkg + "." + fromClass + ";");
+        }
+
         message.setExtendsFrom(fromClass);
-        message.getImportSet().add(fromPackage + "." + fromClass + ";");
         return fromClass;
     }
 
@@ -205,15 +216,17 @@ public class MessageMapper extends AbstractMapper {
      * @param payloadMap                 message payload definition map
      * @param refObject                  value of {@code $ref}, if any
      * @param needToFill                 flag to disable field population
+     * @param processContext             context
      */
     private static void extendsAndImplFilling(Set<String> excludeInheritanceSchemas,
                                               Message message,
                                               Map<String, Object> payloadMap,
                                               String refObject,
-                                              AtomicBoolean needToFill) {
+                                              AtomicBoolean needToFill,
+                                              ProcessContext processContext) {
         payloadMap.forEach((mk, mv) -> {
             if (mk.equals(EXTENDS)) {
-                String fromClass = prepareExtendsMessage(message, mv);
+                String fromClass = prepareExtendsMessage(message, mv, processContext);
                 if (refObject != null && refReplace(refObject).equals(fromClass)) {
                     needToFill.set(false);
                     excludeInheritanceSchemas.add(refReplace(refObject));

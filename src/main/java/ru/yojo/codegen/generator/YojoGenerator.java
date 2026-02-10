@@ -139,8 +139,18 @@ public class YojoGenerator {
         ctx.setSpringBootVersion(yojoContext.getSpringBootVersion());
         ctx.setOutputDirectory(spec.getOutputDirectory());
         ctx.setPathToWrite(spec.getOutputDirectory());
-        ctx.setMessagePackage(spec.getPackageLocation() + ".messages;");
-        ctx.setCommonPackage(spec.getPackageLocation() + ".common;");
+        boolean splitModels = spec.isSplitModels();
+        ctx.setSplitModels(splitModels);
+
+        String basePackage = spec.getPackageLocation();
+        if (splitModels) {
+            ctx.setMessagePackage(basePackage + ".messages;");
+            ctx.setCommonPackage(basePackage + ".common;");
+        } else {
+            String unified = basePackage + ";";
+            ctx.setMessagePackage(unified);
+            ctx.setCommonPackage(unified);
+        }
         ctx.setSchemasMap(globalSchemas);
         ctx.setMessagesMap(globalMessages);
 
@@ -429,47 +439,51 @@ public class YojoGenerator {
         System.out.println();
     }
 
-    /**
-     * Writes all message DTOs to the filesystem.
-     *
-     * @param ctx           generation context
-     * @param messageMapper mapper
-     */
     private void writeMessages(ProcessContext ctx, MessageMapper messageMapper) {
         List<Message> messageList = messageMapper.mapMessagesToObjects(ctx);
-        String baseOutputPath = ctx.getPathToWrite();
-        final String defaultMessagesPath = baseOutputPath.endsWith("/")
-                ? baseOutputPath + "messages/"
-                : baseOutputPath + "/messages/";
-        messageList.forEach(message -> {
-            String messagesPath = defaultMessagesPath;
-            String pathForGenerateMessage = message.getPathForGenerateMessage();
-            if (pathForGenerateMessage != null) {
-                String customPath = pathForGenerateMessage.replace('.', '/');
-                messagesPath = baseOutputPath.endsWith("/")
-                        ? baseOutputPath + customPath + "/"
-                        : baseOutputPath + "/" + customPath + "/";
-                message.setMessagePackageName(pathForGenerateMessage + ";");
+        for (Message message : messageList) {
+            String customPath = message.getPathForGenerateMessage();
+            if (customPath != null) {
+                String fullPackage = ctx.getPackageLocation() + "." + customPath;
+                message.setMessagePackageName(fullPackage + ";");
+                writeFileUnified(ctx, message.getMessageName(), message.toWrite(), true, customPath);
+            } else {
+                message.setMessagePackageName(ctx.getMessagePackage());
+                writeFileUnified(ctx, message.getMessageName(), message.toWrite(), true, null);
             }
-            writeFile(messagesPath, message.getMessageName(), message.toWrite());
-        });
+        }
     }
 
-    /**
-     * Writes all schema classes to the filesystem.
-     *
-     * @param ctx          generation context
-     * @param schemaMapper mapper
-     */
     private void writeSchemas(ProcessContext ctx, SchemaMapper schemaMapper) {
         List<Schema> schemaList = schemaMapper.mapSchemasToObjects(ctx);
-        String baseOutputPath = ctx.getPathToWrite();
-        final String schemasPath = baseOutputPath.endsWith("/")
-                ? baseOutputPath + "common/"
-                : baseOutputPath + "/common/";
-        schemaList.forEach(schema -> {
-            writeFile(schemasPath, schema.getSchemaName(), schema.toWrite());
-        });
+        for (Schema schema : schemaList) {
+            writeFileUnified(ctx, schema.getSchemaName(), schema.toWrite(), false, null);
+        }
+    }
+
+    private void writeFileUnified(ProcessContext ctx, String fileName, String content, boolean isMessage, String customPath) {
+        String baseOutput = ctx.getOutputDirectory();
+        if (!baseOutput.endsWith("/")) {
+            baseOutput += "/";
+        }
+
+        String targetDir;
+        if (customPath != null && !customPath.trim().isEmpty()) {
+            // customPath — это относительный путь (например, "io.github.somepath")
+            targetDir = baseOutput + customPath.replace('.', '/') + "/";
+        } else if (ctx.isSplitModels()) {
+            targetDir = baseOutput + (isMessage ? "messages/" : "common/");
+        } else {
+            targetDir = baseOutput;
+        }
+
+        new File(targetDir).mkdirs();
+        try (PrintWriter pw = new PrintWriter(new File(targetDir, fileName + ".java"), StandardCharsets.UTF_8)) {
+            pw.write(content);
+            System.out.println(" Written: " + fileName + ".java → " + targetDir);
+        } catch (IOException ex) {
+            throw new RuntimeException("Failed to write: " + fileName, ex);
+        }
     }
 
     /**

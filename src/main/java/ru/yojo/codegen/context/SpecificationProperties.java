@@ -31,6 +31,8 @@ public class SpecificationProperties {
      */
     private String packageLocation;
 
+    private boolean splitModels = true;
+
     /**
      * Constructs an empty specification properties instance.
      */
@@ -107,5 +109,13 @@ public class SpecificationProperties {
      */
     public void setPackageLocation(String packageLocation) {
         this.packageLocation = packageLocation;
+    }
+
+    public boolean isSplitModels() {
+        return splitModels;
+    }
+
+    public void setSplitModels(boolean splitModels) {
+        this.splitModels = splitModels;
     }
 }

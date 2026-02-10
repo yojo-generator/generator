@@ -98,7 +98,12 @@ public class SchemaMapper extends AbstractMapper {
                         String fromPackage = getStringValueIfExistOrElseNull(FROM_PACKAGE, extendsMap);
                         System.out.println("SHOULD EXTENDS FROM: " + fromClass);
                         schema.setExtendsFrom(fromClass);
-                        schema.getImportSet().add(fromPackage + "." + fromClass + ";");
+                        if (fromPackage != null) {
+                            schema.getImportSet().add(fromPackage + "." + fromClass + ";");
+                        } else {
+                            String effectivePkg = processContext.getEffectiveCommonPackage().replace(";", "");
+                            schema.getImportSet().add(effectivePkg + "." + fromClass + ";");
+                        }
                         String refObject = getStringValueIfExistOrElseNull(REFERENCE, schemaMap);
                         if (refObject != null && refReplace(refObject).equals(fromClass)) {
                             needToFill.set(false);
