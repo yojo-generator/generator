@@ -332,7 +332,10 @@ public final class Dictionary {
      * Format for URI
      */
     public static final String ST_URI = "uri";
-
+    /**
+     * Format for email
+     */
+    public static final String ST_EMAIL = "email";
     /**
      * Validation annotation templates (with optional placeholder formatting).
      */
@@ -376,6 +379,10 @@ public final class Dictionary {
      * Valid annotation template
      */
     public static final String VALID_ANNOTATION = "@Valid";
+    /**
+     * Email annotation template
+     */
+    public static final String EMAIL_ANNOTATION = "@Email";
     /**
      * Digits annotation template
      */
@@ -624,6 +631,10 @@ public final class Dictionary {
      * Jakarta Max import
      */
     public static final String JAKARTA_MAX_IMPORT = "jakarta.validation.constraints.Max;";
+    /**
+     * Jakarta Email import
+     */
+    public static final String JAKARTA_EMAIL_IMPORT = "jakarta.validation.constraints.Email;";
 
     /**
      * Import declarations for legacy javax.validation (Spring Boot lower 3).
@@ -672,7 +683,10 @@ public final class Dictionary {
      * Javax Max import
      */
     public static final String JAVAX_MAX_IMPORT = "javax.validation.constraints.Max;";
-
+    /**
+     * Javax Email import
+     */
+    public static final String JAVAX_EMAIL_IMPORT = "javax.validation.constraints.Email;";
     /**
      * Standard collection and utility imports.
      */
@@ -940,7 +954,8 @@ public final class Dictionary {
             Map.entry(NOT_NULL_ANNOTATION, JAVAX_NOT_NULL_IMPORT),
             Map.entry(SIZE_ANNOTATION, JAVAX_SIZE_IMPORT),
             Map.entry(PATTERN_ANNOTATION_WITHOUT_REGEXP, JAVAX_PATTERN_IMPORT),
-            Map.entry(VALID_ANNOTATION, JAVAX_VALID_IMPORT)
+            Map.entry(VALID_ANNOTATION, JAVAX_VALID_IMPORT),
+            Map.entry(EMAIL_ANNOTATION, JAVAX_EMAIL_IMPORT)
     );
 
     /**
@@ -952,7 +967,8 @@ public final class Dictionary {
             Map.entry(NOT_NULL_ANNOTATION, JAKARTA_NOT_NULL_IMPORT),
             Map.entry(SIZE_ANNOTATION, JAKARTA_SIZE_IMPORT),
             Map.entry(PATTERN_ANNOTATION_WITHOUT_REGEXP, JAKARTA_PATTERN_IMPORT),
-            Map.entry(VALID_ANNOTATION, JAKARTA_VALID_IMPORT)
+            Map.entry(VALID_ANNOTATION, JAKARTA_VALID_IMPORT),
+            Map.entry(EMAIL_ANNOTATION, JAKARTA_EMAIL_IMPORT)
     );
 
     /**
@@ -994,7 +1010,8 @@ public final class Dictionary {
             Map.entry(ST_DATE_TIME, OFFSET_DATE_TIME),
             Map.entry(ST_SIMPLE_DATE, SIMPLE_DATE),
             Map.entry(ST_UUID, UUID),
-            Map.entry(ST_URI, URI)
+            Map.entry(ST_URI, URI),
+            Map.entry(ST_EMAIL, STRING)
     );
 
     /**

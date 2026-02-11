@@ -820,6 +820,22 @@ public class VariableProperties {
                         annotationSet.add(format(DIGITS_ANNOTATION, digits));
                     }
                     break;
+                case "email":
+                    this.type = STRING;
+                    requiredImports.add(springBootVersion != null && springBootVersion.startsWith("3")
+                            ? JAKARTA_EMAIL_IMPORT
+                            : JAVAX_EMAIL_IMPORT);
+                    annotationSet.add(EMAIL_ANNOTATION);
+                    if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
+                        this.items = STRING;
+                        this.type = format(collectionPattern, STRING);
+                        this.valid = false;
+                    }
+                    break;
             }
             this.format = format;
         }
