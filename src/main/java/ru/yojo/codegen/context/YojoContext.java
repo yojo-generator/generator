@@ -42,7 +42,32 @@ public class YojoContext {
      */
     private List<SpecificationProperties> specificationProperties;
 
+    /**
+     * Fully qualified class name of the @Nullable annotation to use for non-required fields.
+     * Example: "org.jspecify.annotations.Nullable"
+     */
+    private String nullableAnnotation;
+
+    /**
+     * Returns the fully qualified class name of the @Nullable annotation to use.
+     *
+     * @return nullable annotation FQN or {@code null} if not configured
+     */
+    public String getNullableAnnotation() {
+        return nullableAnnotation;
+    }
+
+    /**
+     * Sets the fully qualified class name of the @Nullable annotation.
+     *
+     * @param nullableAnnotation FQN like "org.jspecify.annotations.Nullable"
+     */
+    public void setNullableAnnotation(String nullableAnnotation) {
+        this.nullableAnnotation = nullableAnnotation;
+    }
+
     public boolean isExperimental() { return experimental; }
+
     public void setExperimental(boolean experimental) { this.experimental = experimental; }
 
     /**

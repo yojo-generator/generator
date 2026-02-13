@@ -708,7 +708,7 @@ class ComprehensiveFeatureTest {
     }
 
     @Test
-    @Order(22)
+    @Order(23)
     void allGeneratedCodeMustCompileWithLombokSingle() throws IOException {
         // Generate ALL specs
         generateSingle("spec-from-issue.yaml", "specFromIssue", "example.testGenerate.specFromIssue");
@@ -794,6 +794,81 @@ class ComprehensiveFeatureTest {
                 }
                 Files.deleteIfExists(path);
             }
+        }
+    }
+
+    // ———————————————————————————————————————————————————————————————————————
+// ✅ 24. Nullable annotation: non-required fields annotated with @Nullable if configured
+// ———————————————————————————————————————————————————————————————————————
+    @Test
+    @Order(24)
+    void nullableAnnotationOnNonRequiredFields() throws IOException {
+        // given
+        SpecificationProperties spec = new SpecificationProperties();
+        spec.setSpecName("test.yaml");
+        spec.setInputDirectory("src/test/resources/example/contract");
+        spec.setOutputDirectory(BASE_DIR);
+        spec.setPackageLocation("example.testGenerate");
+
+        YojoContext ctx = new YojoContext();
+        ctx.setSpecificationProperties(Collections.singletonList(spec));
+        ctx.setLombokProperties(new LombokProperties(false, false, new Accessors(false, false, false)));
+        ctx.setSpringBootVersion("3.2.0");
+        ctx.setNullableAnnotation("org.jspecify.annotations.Nullable"); // ← ключевая настройка
+
+        // when
+        yojoGenerator.generateAll(ctx);
+
+        // then
+        String content = readFile("common/StringValues.java");
+
+        // Non-required field must have @Nullable
+        assertThat(content)
+                .contains("@Nullable")
+                .contains("private String stringValueWithoutRequired;");
+
+        // Required field must NOT have @Nullable
+        assertThat(content)
+                .contains("private String stringValueWithRequired;")
+                .doesNotContain("@Nullable private String stringValueWithRequired;");
+
+        // Import must be present
+        assertThat(content)
+                .contains("import org.jspecify.annotations.Nullable;");
+
+        // Compile to ensure validity
+        List<Path> javaFiles = new ArrayList<>();
+        try (Stream<Path> walk = Files.walk(Paths.get(BASE_DIR))) {
+            javaFiles.addAll(walk.filter(p -> p.toString().endsWith(".java")).toList());
+        }
+        assertFalse(javaFiles.isEmpty(), "No .java files generated for nullable test");
+
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+        StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
+        Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromPaths(javaFiles);
+        JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null, null, compilationUnits);
+        boolean compiled = task.call();
+
+        if (!compiled) {
+            StringBuilder sb = new StringBuilder("COMPILATION FAILED:\n");
+            for (Diagnostic<? extends JavaFileObject> d : diagnostics.getDiagnostics()) {
+                sb.append(String.format("[%s] %s:%d:%d: %s%n",
+                        d.getKind(),
+                        d.getSource() != null ? d.getSource().getName() : "unknown",
+                        d.getLineNumber(),
+                        d.getColumnNumber(),
+                        d.getMessage(null)));
+            }
+            fail(sb.toString());
+        }
+
+        // Cleanup after this specific test
+        try (Stream<Path> walk = Files.walk(Paths.get(BASE_DIR))) {
+            walk.sorted((a, b) -> -a.compareTo(b))
+                    .forEach(p -> {
+                        try { Files.deleteIfExists(p); } catch (IOException ignore) {}
+                    });
         }
     }
 

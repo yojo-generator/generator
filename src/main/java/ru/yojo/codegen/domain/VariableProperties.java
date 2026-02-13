@@ -174,6 +174,13 @@ public class VariableProperties {
      */
     private Set<String> requiredImports = new HashSet<>();
 
+    /**
+     * Fully qualified class name of the @Nullable annotation to apply when the field is not required.
+     * Used only if the field is not annotated with @NotNull/@NotBlank/@NotEmpty.
+     */
+    private String nullableAnnotation;
+
+
     // ——— Getters & Setters ——— //
 
     /**
@@ -489,6 +496,24 @@ public class VariableProperties {
      */
     public boolean isPolymorph() {
         return polymorph;
+    }
+
+    /**
+     * Sets the fully qualified class name of the @Nullable annotation.
+     *
+     * @param nullableAnnotation FQN like "org.jspecify.annotations.Nullable"
+     */
+    public void setNullableAnnotation(String nullableAnnotation) {
+        this.nullableAnnotation = nullableAnnotation;
+    }
+
+    /**
+     * Returns the fully qualified class name of the @Nullable annotation.
+     *
+     * @return nullable annotation FQN or {@code null} if not set
+     */
+    public String getNullableAnnotation() {
+        return nullableAnnotation;
     }
 
     /**
@@ -820,6 +845,22 @@ public class VariableProperties {
                         annotationSet.add(format(DIGITS_ANNOTATION, digits));
                     }
                     break;
+                case "email":
+                    this.type = STRING;
+                    requiredImports.add(springBootVersion != null && springBootVersion.startsWith("3")
+                            ? JAKARTA_EMAIL_IMPORT
+                            : JAVAX_EMAIL_IMPORT);
+                    annotationSet.add(EMAIL_ANNOTATION);
+                    if (items != null) {
+                        String collectionPattern = LIST_TYPE;
+                        if ("set".equalsIgnoreCase(collectionType)) {
+                            collectionPattern = SET_TYPE;
+                        }
+                        this.items = STRING;
+                        this.type = format(collectionPattern, STRING);
+                        this.valid = false;
+                    }
+                    break;
             }
             this.format = format;
         }
@@ -1023,6 +1064,17 @@ public class VariableProperties {
     public String toWrite() {
         StringBuilder stringBuilder = new StringBuilder();
         generateJavaDoc(stringBuilder, getDescription(), getExample());
+        if (this.nullableAnnotation != null && !this.nullableAnnotation.trim().isEmpty()) {
+            boolean hasNonNullAnnotation = getAnnotationSet().stream()
+                    .anyMatch(a -> a.startsWith("@NotNull") || a.startsWith("@NotEmpty") || a.startsWith("@NotBlank"));
+            if (!hasNonNullAnnotation) {
+                String simpleName = this.nullableAnnotation.substring(this.nullableAnnotation.lastIndexOf('.') + 1);
+                stringBuilder.append(lineSeparator())
+                        .append(TABULATION)
+                        .append("@").append(simpleName);
+                getRequiredImports().add(this.nullableAnnotation + ";");
+            }
+        }
         Comparator<String> stringComparator = (a, b) -> Integer.compare(a.length(), b.length());
         getAnnotationSet().stream().sorted(stringComparator).forEach(annotation -> {
             stringBuilder.append(lineSeparator())
