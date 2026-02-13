@@ -384,6 +384,10 @@ public final class Dictionary {
      */
     public static final String EMAIL_ANNOTATION = "@Email";
     /**
+     * Generated annotation
+     */
+    public static final String GENERATED_ANNOTATION = "@Generated(\"Yojo\")";
+    /**
      * Digits annotation template
      */
     public static final String DIGITS_ANNOTATION = "@Digits(%s)";
@@ -687,6 +691,10 @@ public final class Dictionary {
      * Javax Email import
      */
     public static final String JAVAX_EMAIL_IMPORT = "javax.validation.constraints.Email;";
+    /**
+     * Javax Generated import
+     */
+    public static final String JAVAX_GENERATED_IMPORT = "javax.annotation.processing.Generated;";
     /**
      * Standard collection and utility imports.
      */

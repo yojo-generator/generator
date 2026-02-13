@@ -7,7 +7,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static java.lang.System.lineSeparator;
-import static ru.yojo.codegen.constants.Dictionary.*;
+import static ru.yojo.codegen.constants.Dictionary.LOMBOK_DATA_ANNOTATION;
+import static ru.yojo.codegen.constants.Dictionary.LOMBOK_DATA_IMPORT;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 /**
@@ -290,19 +291,9 @@ public class Message {
 
         stringBuilder.insert(0, lombokAnnotationBuilder);
 
-        if (isNotBlank(summary)) {
-            StringBuilder javadoc = new StringBuilder();
-            javadoc.append(lineSeparator()).append(JAVA_DOC_CLASS_START);
-            javadoc.append(lineSeparator()).append(String.format(JAVA_DOC_CLASS_LINE, summary));
-            javadoc.append(lineSeparator()).append(JAVA_DOC_CLASS_END);
-            javadoc.append(lineSeparator());
-
-            stringBuilder.insert(0, javadoc);
-        }
-
         fillParameters.getVariableProperties().forEach(vp -> requiredImports.addAll(vp.getRequiredImports()));
 
-        return finishBuild(stringBuilder, requiredImports, messagePackageName);
+        return finishBuild(stringBuilder, requiredImports, messagePackageName, summary);
     }
 
     public FillParameters getFillParameters() {

@@ -26,7 +26,6 @@ import static ru.yojo.codegen.constants.Dictionary.*;
  */
 @SuppressWarnings("all")
 public class MapperUtil {
-
     /**
      * Safely extracts a {@code Set<String>} value from a map for the given key, or returns an empty set.
      *
@@ -213,7 +212,7 @@ public class MapperUtil {
      * }
      * </pre>
      *
-     * @param schemaName class name
+     * @param schemaName     class name
      * @param implementsFrom set of interface simple names
      * @return builder with class+implements header
      */
@@ -238,7 +237,7 @@ public class MapperUtil {
      * }
      * </pre>
      *
-     * @param schemaName class name
+     * @param schemaName   class name
      * @param extendsClass superclass name
      * @return builder with class+extends header
      */
@@ -262,8 +261,8 @@ public class MapperUtil {
      * }
      * </pre>
      *
-     * @param schemaName class name
-     * @param extendsClass superclass name
+     * @param schemaName     class name
+     * @param extendsClass   superclass name
      * @param implementsFrom set of interface names
      * @return builder with full inheritance header
      */
@@ -435,28 +434,35 @@ public class MapperUtil {
     }
 
     /**
-     * Finalizes Java source by prepending package and imports, and appending closing brace.
+     * Finalizes Java source by prepending package, imports, and @Generated annotation, and appending closing brace.
      *
      * @param sb              builder with class body
      * @param requiredImports set of import strings
-     * @param packageName     package name (with semicolon)
+     * @param packageName     package name
+     * @param javaDoc         javaDoc text
      * @return complete Java source
      */
-    public static String finishBuild(StringBuilder sb, Set<String> requiredImports, String packageName) {
+    public static String finishBuild(StringBuilder sb, Set<String> requiredImports, String packageName, String javaDoc) {
         StringBuilder importBuilder = new StringBuilder();
+
+        requiredImports.add(JAVAX_GENERATED_IMPORT);
+
         requiredImports.forEach(imp -> {
             importBuilder
                     .append(IMPORT)
                     .append(imp)
                     .append(lineSeparator());
         });
-        sb.insert(0, importBuilder.append(lineSeparator()));
 
+        sb.insert(0, GENERATED_ANNOTATION + lineSeparator());
+
+        generateClassJavaDoc(sb, javaDoc);
+
+        sb.insert(0, importBuilder.append(lineSeparator()));
         sb.insert(0, new StringBuilder("package ")
                 .append(packageName)
                 .append(lineSeparator())
                 .append(lineSeparator()));
-
         return sb
                 .append(lineSeparator())
                 .append("}")
@@ -490,7 +496,6 @@ public class MapperUtil {
         } else {
             sb = getClassBuilder(schemaName);
         }
-
         requiredImports.addAll(importSet);
         sb.append(fillParameters.toWrite()).append(lineSeparator());
         return sb;
@@ -511,7 +516,6 @@ public class MapperUtil {
         if (strLen == 0) {
             return str;
         }
-
         final int firstCodepoint = str.codePointAt(0);
         final int newCodePoint = Character.toTitleCase(firstCodepoint);
         return checkPoints(firstCodepoint, newCodePoint, str, new int[strLen], strLen);
@@ -528,7 +532,6 @@ public class MapperUtil {
         if (strLen == 0) {
             return str;
         }
-
         final int firstCodepoint = str.codePointAt(0);
         final int newCodePoint = Character.toLowerCase(firstCodepoint);
         return checkPoints(firstCodepoint, newCodePoint, str, new int[strLen], strLen);
@@ -538,7 +541,6 @@ public class MapperUtil {
         if (firstCodepoint == newCodePoint) {
             return str;
         }
-
         final int[] newCodePoints = strLen;
         int outOffset = 0;
         newCodePoints[outOffset++] = newCodePoint;
@@ -745,28 +747,21 @@ public class MapperUtil {
             Map<String, Object> properties,
             Map<String, Object> schemas,
             Map<String, Object> innerSchemas) {
-
         if (properties == null) return;
-
         for (Map.Entry<String, Object> entry : properties.entrySet()) {
             String fieldName = entry.getKey();
             Object value = entry.getValue();
-
             if (value instanceof Map) {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> fieldDef = (Map<String, Object>) value;
-
                 // Проверяем, является ли поле объектом с собственными свойствами
                 if ("object".equals(getStringValueIfExistOrElseNull("type", fieldDef)) &&
                     fieldDef.containsKey("properties")) {
-
                     // Генерируем уникальное имя класса: Parent + CapitalizedFieldName
                     String nestedClassName = parentClassName + capitalize(fieldName);
-
                     // Если такая схема ещё не зарегистрирована — регистрируем
                     if (!innerSchemas.containsKey(nestedClassName)) {
                         Map<String, Object> nestedProps = castObjectToMap(fieldDef.get("properties"));
-
                         // Создаём "виртуальную" схему
                         Map<String, Object> virtualSchema = new LinkedHashMap<>();
                         virtualSchema.put("type", "object");
@@ -777,9 +772,7 @@ public class MapperUtil {
                         if (fieldDef.containsKey("description")) {
                             virtualSchema.put("description", fieldDef.get("description"));
                         }
-
                         innerSchemas.put(nestedClassName, virtualSchema);
-
                         // 🔁 Рекурсивно обрабатываем вложенные объекты внутри этого объекта
                         registerNestedSchemas(nestedClassName, nestedProps, schemas, innerSchemas);
                     }
