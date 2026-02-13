@@ -227,7 +227,6 @@ class ComprehensiveFeatureTest {
         // Interface with methods + imports
         String iface = readFile("common/InterfaceWithMethods.java");
         assertThat(iface)
-                .contains("import example.testGenerate.common.SomeObjectInnerSchema;")
                 .contains("void someOne(String someString, SomeObjectInnerSchema schema);")
                 .contains("SomeObjectInnerSchema anotherOne(String someString, SomeObjectInnerSchema schema);");
     }
@@ -873,7 +872,24 @@ class ComprehensiveFeatureTest {
     }
 
     @Test
-    @Order(99)
+    @Order(25)
+    void shouldContainsGeneratedAnnotation() throws IOException {
+        // given
+        generate("test.yaml", "", "example.testGenerate");
+
+        // when
+        String content = readFile("common/CustomSchema.java");
+
+        // then
+        assertThat(content)
+                .contains("private Long baseField;")
+                .contains("private String specificField;")
+                .contains("@Generated(\"Yojo\")")
+                .contains("import javax.annotation.processing.Generated;");
+    }
+
+    @Test
+    @Order(26)
     void testCreateApplicationV1NestedObjectInAllOf() throws IOException {
         generate("test-create-app.yaml", "createApp", "example.testGenerate.createApp");
 

@@ -389,11 +389,7 @@ public class Schema {
 
         stringBuilder.insert(0, lombokAnnotationBuilder);
 
-        if (!isInterface) {
-            generateClassJavaDoc(stringBuilder, description);
-        }
-
-        return finishBuild(stringBuilder, requiredImports, packageName);
+        return finishBuild(stringBuilder, requiredImports, packageName, description);
     }
 
     // ——— Helper methods ——— //
@@ -405,7 +401,7 @@ public class Schema {
      */
     private StringBuilder generateInterface() {
         StringBuilder stringBuilder = getInterfaceBuilder(schemaName);
-        generateClassJavaDoc(stringBuilder, description);
+//        generateClassJavaDoc(stringBuilder, description);
         if (!methods.isEmpty()) {
             methods.values().forEach(method -> {
                 Map<String, Object> currentMethod = castObjectToMap(method);
@@ -422,11 +418,12 @@ public class Schema {
             });
         }
         if (!interfaceImports.isEmpty()) {
-            stringBuilder.insert(0, lineSeparator());
-            interfaceImports.forEach(i -> {
-                i = IMPORT.concat(i.endsWith(";") ? i : i + ";");
-                stringBuilder.insert(0, i + lineSeparator());
-            });
+            getImportSet().addAll(interfaceImports);
+//            stringBuilder.insert(0, lineSeparator());
+//            interfaceImports.forEach(i -> {
+//                i = IMPORT.concat(i.endsWith(";") ? i : i + ";");
+//                stringBuilder.insert(0, i + lineSeparator());
+//            });
         }
         return stringBuilder;
     }
