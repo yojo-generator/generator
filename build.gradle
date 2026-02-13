@@ -139,18 +139,22 @@ jar {
 
 dependencies {
     implementation 'org.yaml:snakeyaml:2.0'
-
-    compileOnly 'org.projectlombok:lombok:1.18.26'
-    testCompileOnly 'org.projectlombok:lombok:1.18.26'
-
-    testImplementation("jakarta.validation:jakarta.validation-api:3.1.1")
-    testImplementation("javax.validation:validation-api:2.0.1.Final")
-    testImplementation 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    compileOnly 'org.projectlombok:lombok:1.18.26'
+
     testImplementation platform('org.junit:junit-bom:5.10.2')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.26'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'org.assertj:assertj-core:3.27.3'
+
+    testImplementation 'org.projectlombok:lombok:1.18.30'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.assertj:assertj-core:3.27.7'
+
+    testImplementation 'jakarta.validation:jakarta.validation-api:3.1.1'
+    testImplementation 'javax.validation:validation-api:2.0.1.Final'
+    testImplementation 'org.jspecify:jspecify:1.0.0'
+
 }
 
 test {

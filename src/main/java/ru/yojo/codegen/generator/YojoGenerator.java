@@ -137,6 +137,7 @@ public class YojoGenerator {
         ctx.setPackageLocation(spec.getPackageLocation());
         ctx.setLombokProperties(yojoContext.getLombokProperties());
         ctx.setSpringBootVersion(yojoContext.getSpringBootVersion());
+        ctx.setNullableAnnotation(yojoContext.getNullableAnnotation());
         ctx.setOutputDirectory(spec.getOutputDirectory());
         ctx.setPathToWrite(spec.getOutputDirectory());
         boolean splitModels = spec.isSplitModels();
