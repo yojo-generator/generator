@@ -878,6 +878,25 @@ public class AbstractMapper {
         Set<String> validationGroups = getSetValueIfExistsOrElseEmptySet(VALIDATION_GROUPS, currentSchema);
         Set<String> validationGroupsImports = getSetValueIfExistsOrElseEmptySet(VALIDATION_GROUPS_IMPORTS, currentSchema);
         Set<String> validationFields = getSetValueIfExistsOrElseEmptySet(VALIDATE_BY_GROUPS, currentSchema);
+        
+        // Process field-level annotations
+        List<String> fieldAnnotationsList = getSetValueIfExistsOrElseEmptyList(FIELD_ANNOTATIONS, currentSchema);
+        if (!fieldAnnotationsList.isEmpty()) {
+            fieldAnnotationsList.forEach(annotation -> {
+                variableProperties.getFieldAnnotations().add(annotation);
+                // Extract import from annotation if it contains fully qualified name
+                if (annotation.contains("(")) {
+                    String annotationType = annotation.substring(0, annotation.indexOf("(")).trim();
+                    if (annotationType.contains(".")) {
+                        String fqn = annotationType.substring(1); // remove @
+                        String pkg = fqn.substring(0, fqn.lastIndexOf("."));
+                        String simpleName = fqn.substring(fqn.lastIndexOf(".") + 1);
+                        importSet.add(pkg + "." + simpleName + ";");
+                    }
+                }
+            });
+        }
+        
         String groups = null;
         if (!validationGroups.isEmpty()) {
             if (validationGroupsImports.isEmpty() || validationFields.isEmpty()) {

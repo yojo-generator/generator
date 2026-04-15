@@ -175,6 +175,11 @@ public class VariableProperties {
     private Set<String> requiredImports = new HashSet<>();
 
     /**
+     * Custom field-level annotations (e.g., Jackson @JsonProperty, @JsonFormat).
+     */
+    private Set<String> fieldAnnotations = new HashSet<>();
+
+    /**
      * Fully qualified class name of the @Nullable annotation to apply when the field is not required.
      * Used only if the field is not annotated with @NotNull/@NotBlank/@NotEmpty.
      */
@@ -976,6 +981,24 @@ public class VariableProperties {
         if (preparedImport != null) {
             requiredImports.add(preparedImport);
         }
+    }
+
+    /**
+     * Returns custom field-level annotations.
+     *
+     * @return annotation strings (e.g., "@JsonProperty(\"camelCaseName\")")
+     */
+    public Set<String> getFieldAnnotations() {
+        return fieldAnnotations;
+    }
+
+    /**
+     * Sets custom field-level annotations.
+     *
+     * @param fieldAnnotations annotation strings
+     */
+    public void setFieldAnnotations(Set<String> fieldAnnotations) {
+        this.fieldAnnotations = fieldAnnotations;
     }
 
     /**

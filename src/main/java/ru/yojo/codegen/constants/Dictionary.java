@@ -224,6 +224,14 @@ public final class Dictionary {
      * Custom attribute for multiple of validation
      */
     public static final String MULTIPLE_OF = "multipleOf";
+    /**
+     * Custom attribute for class-level annotations (for Jackson polymorphism, etc.)
+     */
+    public static final String CLASS_ANNOTATIONS = "classAnnotations";
+    /**
+     * Custom attribute for field-level annotations (for Jackson serialization, etc.)
+     */
+    public static final String FIELD_ANNOTATIONS = "fieldAnnotations";
 
     /**
      * Lombok configuration keys (manual override section).

@@ -42,6 +42,21 @@ public class MapperUtil {
     }
 
     /**
+     * Safely extracts a {@code List<String>} value from a map for the given key, or returns an empty list.
+     *
+     * @param key       key to lookup
+     * @param schemaMap map to extract from
+     * @return non-null list of strings
+     */
+    public static List<String> getSetValueIfExistsOrElseEmptyList(String key, Map<String, Object> schemaMap) {
+        List<String> values = new ArrayList<>();
+        if (schemaMap.containsKey(key)) {
+            values.addAll((ArrayList<String>) schemaMap.get(key));
+        }
+        return values;
+    }
+
+    /**
      * Safely extracts a string value from a map for the given key, or returns {@code null}.
      *
      * @param key map key

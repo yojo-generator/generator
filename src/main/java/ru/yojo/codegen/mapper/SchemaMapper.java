@@ -119,6 +119,23 @@ public class SchemaMapper extends AbstractMapper {
                             schema.getImportSet().add(ifc + ";");
                         });
                     }
+                    if (sk.equals(CLASS_ANNOTATIONS)) {
+                        List<String> annotationsList = castObjectToList(sv);
+                        System.out.println("CLASS ANNOTATIONS: " + annotationsList);
+                        annotationsList.forEach(annotation -> {
+                            schema.getClassAnnotations().add(annotation);
+                            // Extract import from annotation if it contains fully qualified name
+                            if (annotation.contains("(")) {
+                                String annotationType = annotation.substring(0, annotation.indexOf("(")).trim();
+                                if (annotationType.contains(".")) {
+                                    String fqn = annotationType.substring(1); // remove @
+                                    String pkg = fqn.substring(0, fqn.lastIndexOf("."));
+                                    String simpleName = fqn.substring(fqn.lastIndexOf(".") + 1);
+                                    schema.getImportSet().add(pkg + "." + simpleName + ";");
+                                }
+                            }
+                        });
+                    }
                 });
 
                 if (needToFill.get()) {

@@ -85,6 +85,11 @@ public class Schema {
      */
     private Set<String> interfaceImports = new HashSet<>();
 
+    /**
+     * Custom class-level annotations (e.g., Jackson @JsonTypeInfo, @JsonSubTypes).
+     */
+    private Set<String> classAnnotations = new HashSet<>();
+
     // ——— Getters & Setters ——— //
 
     /**
@@ -211,6 +216,24 @@ public class Schema {
      */
     public void setInterfaceImports(Set<String> interfaceImports) {
         this.interfaceImports = interfaceImports;
+    }
+
+    /**
+     * Returns custom class-level annotations.
+     *
+     * @return annotation strings (e.g., "@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = \"type\")")
+     */
+    public Set<String> getClassAnnotations() {
+        return classAnnotations;
+    }
+
+    /**
+     * Sets custom class-level annotations.
+     *
+     * @param classAnnotations annotation strings
+     */
+    public void setClassAnnotations(Set<String> classAnnotations) {
+        this.classAnnotations = classAnnotations;
     }
 
     /**
