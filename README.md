@@ -218,6 +218,18 @@ MyDto:
 |--------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 | Marker       | <pre lang="yaml">Marker:<br>  type: object<br>  format: interface</pre>                                                                                                                                                                              | <pre lang="java">public interface Marker {}</pre>                                                                                 |
 | With methods | <pre lang="yaml">UserService:<br>  type: object<br>  format: interface<br>  imports:<br>    - com.my.dto.User<br>  methods:<br>    createUser:<br>      description: "Creates a new user"<br>      definition: "User createUser(String email)"</pre> | <pre lang="java">public interface UserService {<br>    /** Creates a new user */<br>    User createUser(String email);<br>}</pre> |
+
+---
+
+### 11. Custom Annotations (`x-class-annotation`, `x-field-annotation`)
+
+| Attribute                | YAML                                                                                                                                                                                                                               | → Java                                                                                                      |
+|--------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|
+| `x-class-annotation`     | <pre lang="yaml">MySchema:<br>  type: object<br>  x-class-annotation:<br>    - com.example.MyClassAnnotation<br>    - com.example.AnotherAnnotation("param")</pre>                        | <pre lang="java">@MyClassAnnotation<br>@AnotherAnnotation("param")<br>public class MySchema { ... }</pre>   |
+| `x-field-annotation`     | <pre lang="yaml">properties:<br>  myField:<br>    type: string<br>    x-field-annotation:<br>      - com.example.MyFieldAnnotation<br>      - com.validation.MyConstraint(value = 10)</pre> | <pre lang="java">@MyFieldAnnotation<br>@MyConstraint(value = 10)<br>private String myField;</pre>           |
+
+> ✅ Supports **schema-level** and **message-level** class annotations, plus **field-level** annotations with parameters.
+
 ---
 
 ## 📦 Integration: YOJO Gradle Plugin (recommended)
@@ -313,6 +325,8 @@ tasks.compileJava {
 | `pathForGenerateMessage`  | `message.payload`               | `string`                                    | `io.github.events`                          | custom message package                       |
 | `removeSchema`            | `message.payload`               | `boolean`                                   | `removeSchema: true`                        | skip DTO gen for `$ref` target               |
 | `x-enumNames`             | enum                            | `map`                                       | `SUCCESS: "Ok"`                             | enum + description field                     |
+| `x-class-annotation`      | schema, message                 | `list`                                      | `[com.example.MyAnnotation]`                | class-level annotations                      |
+| `x-field-annotation`      | field                           | `list`                                      | `[com.example.MyAnnotation("value")]`       | field-level annotations                      |
 
 ---
 

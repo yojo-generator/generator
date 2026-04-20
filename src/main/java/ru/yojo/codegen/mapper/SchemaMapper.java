@@ -119,6 +119,13 @@ public class SchemaMapper extends AbstractMapper {
                             schema.getImportSet().add(ifc + ";");
                         });
                     }
+                    // Process x-class-annotation
+                    if (sk.equals(X_CLASS_ANNOTATION)) {
+                        Set<String> classAnnotations = getSetValueIfExistsOrElseEmptySet(X_CLASS_ANNOTATION, schemaMap);
+                        if (!classAnnotations.isEmpty()) {
+                            schema.getClassAnnotations().addAll(classAnnotations);
+                        }
+                    }
                 });
 
                 if (needToFill.get()) {

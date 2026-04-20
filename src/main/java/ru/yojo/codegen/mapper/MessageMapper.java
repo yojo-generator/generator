@@ -145,6 +145,11 @@ public class MessageMapper extends AbstractMapper {
             } else {
                 message.setFillParameters(new FillParameters(new ArrayList<>()));
             }
+            // Process x-class-annotation for messages
+            Set<String> classAnnotations = getSetValueIfExistsOrElseEmptySet(X_CLASS_ANNOTATION, payloadMap);
+            if (!classAnnotations.isEmpty()) {
+                message.getClassAnnotations().addAll(classAnnotations);
+            }
             message.setSummary(getStringValueIfExistOrElseNull(SUMMARY, messageMap));
             message.setMessagePackageName(processContext.getMessagePackage());
             message.setCommonPackageName(processContext.getCommonPackage());

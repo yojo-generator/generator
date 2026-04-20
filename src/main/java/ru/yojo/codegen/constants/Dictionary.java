@@ -73,6 +73,14 @@ public final class Dictionary {
      */
     public static final String X_ENUM_NAMES = "x-enumNames";
     /**
+     * Custom YAML property name for class-level annotations
+     */
+    public static final String X_CLASS_ANNOTATION = "x-class-annotation";
+    /**
+     * Custom YAML property name for field-level annotations
+     */
+    public static final String X_FIELD_ANNOTATION = "x-field-annotation";
+    /**
      * YAML property name for minimum value constraint
      */
     public static final String MINIMUM = "minimum";
