@@ -557,3 +557,13 @@ components:
           properties:
             specificField:
               type: string
+    # Example with x-class-annotation and x-field-annotation
+    MySchema:
+      type: object
+      x-class-annotation:
+        - lombok.Builder
+      properties:
+        myField:
+          type: string
+          x-field-annotation:
+            - lombok.NonNull

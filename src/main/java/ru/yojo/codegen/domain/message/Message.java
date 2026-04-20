@@ -68,6 +68,11 @@ public class Message {
     private Set<String> importSet = new HashSet<>();
 
     /**
+     * Class-level annotations specified via x-class-annotation.
+     */
+    private Set<String> classAnnotations = new HashSet<>();
+
+    /**
      * Optional custom package path (e.g., {@code "io.github.somepath"}), overrides {@link #messagePackageName}.
      * Used when {@code pathForGenerateMessage} is specified in the contract.
      */
@@ -210,6 +215,24 @@ public class Message {
     }
 
     /**
+     * Returns class-level annotations.
+     *
+     * @return class annotations (e.g., "com.example.MyAnnotation")
+     */
+    public Set<String> getClassAnnotations() {
+        return classAnnotations;
+    }
+
+    /**
+     * Sets class-level annotations.
+     *
+     * @param classAnnotations set of fully qualified annotation names
+     */
+    public void setClassAnnotations(Set<String> classAnnotations) {
+        this.classAnnotations = classAnnotations;
+    }
+
+    /**
      * Generates the full Java source code for the message DTO.
      * <p>
      * Includes:
@@ -287,6 +310,14 @@ public class Message {
                             .forEach(requiredImports::add);
                 }
             });
+        }
+
+        // Add class-level annotations
+        if (!classAnnotations.isEmpty()) {
+            for (String annotation : classAnnotations) {
+                lombokAnnotationBuilder.append("@").append(annotation).append(lineSeparator());
+                requiredImports.add(annotation.endsWith(";") ? annotation : annotation + ";");
+            }
         }
 
         stringBuilder.insert(0, lombokAnnotationBuilder);
