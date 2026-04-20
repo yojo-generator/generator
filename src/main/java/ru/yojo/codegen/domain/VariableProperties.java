@@ -1091,10 +1091,13 @@ public class VariableProperties {
         // Add field-level annotations from x-field-annotation
         if (!fieldAnnotations.isEmpty()) {
             for (String annotation : fieldAnnotations) {
+                String simpleName = annotation.contains(".") 
+                    ? annotation.substring(annotation.lastIndexOf('.') + 1) 
+                    : annotation;
                 stringBuilder.append(lineSeparator())
                         .append(TABULATION)
                         .append("@")
-                        .append(annotation);
+                        .append(simpleName);
                 requiredImports.add(annotation.endsWith(";") ? annotation : annotation + ";");
             }
         }
