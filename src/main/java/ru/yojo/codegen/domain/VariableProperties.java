@@ -175,6 +175,11 @@ public class VariableProperties {
     private Set<String> requiredImports = new HashSet<>();
 
     /**
+     * Field-level annotations specified via x-field-annotation.
+     */
+    private Set<String> fieldAnnotations = new HashSet<>();
+
+    /**
      * Fully qualified class name of the @Nullable annotation to apply when the field is not required.
      * Used only if the field is not annotated with @NotNull/@NotBlank/@NotEmpty.
      */
@@ -514,6 +519,24 @@ public class VariableProperties {
      */
     public String getNullableAnnotation() {
         return nullableAnnotation;
+    }
+
+    /**
+     * Returns field-level annotations.
+     *
+     * @return field annotations (e.g., "com.example.MyFieldAnnotation(\"value\")")
+     */
+    public Set<String> getFieldAnnotations() {
+        return fieldAnnotations;
+    }
+
+    /**
+     * Sets field-level annotations.
+     *
+     * @param fieldAnnotations set of fully qualified annotation names with optional parameters
+     */
+    public void setFieldAnnotations(Set<String> fieldAnnotations) {
+        this.fieldAnnotations = fieldAnnotations;
     }
 
     /**
@@ -1064,6 +1087,18 @@ public class VariableProperties {
     public String toWrite() {
         StringBuilder stringBuilder = new StringBuilder();
         generateJavaDoc(stringBuilder, getDescription(), getExample());
+        
+        // Add field-level annotations from x-field-annotation
+        if (!fieldAnnotations.isEmpty()) {
+            for (String annotation : fieldAnnotations) {
+                stringBuilder.append(lineSeparator())
+                        .append(TABULATION)
+                        .append("@")
+                        .append(annotation);
+                requiredImports.add(annotation.endsWith(";") ? annotation : annotation + ";");
+            }
+        }
+        
         if (this.nullableAnnotation != null && !this.nullableAnnotation.trim().isEmpty()) {
             boolean hasNonNullAnnotation = getAnnotationSet().stream()
                     .anyMatch(a -> a.startsWith("@NotNull") || a.startsWith("@NotEmpty") || a.startsWith("@NotBlank"));

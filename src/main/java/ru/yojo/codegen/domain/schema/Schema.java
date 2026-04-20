@@ -85,6 +85,11 @@ public class Schema {
      */
     private Set<String> interfaceImports = new HashSet<>();
 
+    /**
+     * Class-level annotations specified via x-class-annotation.
+     */
+    private Set<String> classAnnotations = new HashSet<>();
+
     // ——— Getters & Setters ——— //
 
     /**
@@ -211,6 +216,24 @@ public class Schema {
      */
     public void setInterfaceImports(Set<String> interfaceImports) {
         this.interfaceImports = interfaceImports;
+    }
+
+    /**
+     * Returns class-level annotations.
+     *
+     * @return class annotations (e.g., "com.example.MyAnnotation")
+     */
+    public Set<String> getClassAnnotations() {
+        return classAnnotations;
+    }
+
+    /**
+     * Sets class-level annotations.
+     *
+     * @param classAnnotations set of fully qualified annotation names
+     */
+    public void setClassAnnotations(Set<String> classAnnotations) {
+        this.classAnnotations = classAnnotations;
     }
 
     /**
@@ -384,6 +407,14 @@ public class Schema {
                     effectiveLombok.setAllArgsConstructor(false);
                     buildLombokAnnotations(effectiveLombok, requiredImports, lombokAnnotationBuilder);
                 }
+            }
+        }
+
+        // Add class-level annotations
+        if (!classAnnotations.isEmpty()) {
+            for (String annotation : classAnnotations) {
+                lombokAnnotationBuilder.append("@").append(annotation).append(lineSeparator());
+                requiredImports.add(annotation.endsWith(";") ? annotation : annotation + ";");
             }
         }
 

@@ -86,6 +86,11 @@ public class AbstractMapper {
                         .map(MapperUtil::castObjectToListObjects)
                         .flatMap(objects -> objects.stream())
                         .collect(Collectors.toList()).isEmpty());
+        // Process x-field-annotation
+        Set<String> fieldAnnotations = getSetValueIfExistsOrElseEmptySet(X_FIELD_ANNOTATION, propertiesMap);
+        if (!fieldAnnotations.isEmpty()) {
+            variableProperties.getFieldAnnotations().addAll(fieldAnnotations);
+        }
         fillVariableProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, processContext, innerSchemas);
         fillRequiredAnnotationsAndImports(variableProperties, currentSchema, propertyName);
     }
