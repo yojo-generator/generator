@@ -561,21 +561,9 @@ components:
     MySchema:
       type: object
       x-class-annotation:
-        - com.example.MyClassAnnotation
+        - lombok.Builder
       properties:
         myField:
           type: string
           x-field-annotation:
-            - com.example.MyFieldAnnotation("value")
-    
-
-    # Example with x-class-annotation and x-field-annotation for SCHEMA
-    MySchema:
-      type: object
-      x-class-annotation:
-        - com.example.MyClassAnnotation
-      properties:
-        myField:
-          type: string
-          x-field-annotation:
-            - com.example.MyFieldAnnotation("value")
+            - lombok.NonNull
