@@ -413,7 +413,10 @@ public class Schema {
         // Add class-level annotations
         if (!classAnnotations.isEmpty()) {
             for (String annotation : classAnnotations) {
-                lombokAnnotationBuilder.append("@").append(annotation).append(lineSeparator());
+                String simpleName = annotation.contains(".") 
+                    ? annotation.substring(annotation.lastIndexOf('.') + 1) 
+                    : annotation;
+                lombokAnnotationBuilder.append("@").append(simpleName).append(lineSeparator());
                 requiredImports.add(annotation.endsWith(";") ? annotation : annotation + ";");
             }
         }
