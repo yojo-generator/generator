@@ -1,1 +1,1 @@
-(src/main/java/ru/yojo/codegen/domain/VariableProperties.java, src/main/java/ru/yojo/codegen/domain/schema/Schema.java)
+Nothing needs to be added to .gitignore since only a README.md file was modified and no build artifacts, dependencies, or temporary files were detected in the changes.
