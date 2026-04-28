@@ -54,6 +54,22 @@ class ComprehensiveFeatureTest {
         }
     }
 
+
+    // Cleanup after discriminator test
+    @AfterEach
+    void cleanupAfterDiscriminator() throws IOException {
+        Path path = Paths.get(BASE_DIR);
+        if (Files.exists(path)) {
+            try (Stream<Path> walk = Files.walk(path)) {
+                walk.sorted((a, b) -> -a.compareTo(b))
+                        .forEach(p -> {
+                            try { Files.deleteIfExists(p); } catch (IOException ignore) {}
+                        });
+            }
+            Files.deleteIfExists(path);
+        }
+    }
+
     // ———————————————————————————————————————————————————————————————————————
     // ✅ 1. Основной кейс: generateTemplatesFromTrafficResponseMessage → List<Object>, а не Array
     // ———————————————————————————————————————————————————————————————————————
@@ -259,6 +275,33 @@ class ComprehensiveFeatureTest {
 
         // removeSchema — RequestDtoByRef does NOT generate RequestDtoSchema in messages/
         assertFalse(new File(BASE_DIR + "messages/RequestDtoSchema.java").exists());
+    }
+
+    // ———————————————————————————————————————————————————————————————————————
+    // ✅ Discriminator: @JsonTypeInfo + @JsonSubTypes for polymorphic schemas
+    // ———————————————————————————————————————————————————————————————————————
+
+    @Test
+    @Order(15)
+    void discriminator() throws IOException {
+        generate("discriminator.yaml", "", "example.testGenerate");
+
+        // Base schema should have @JsonTypeInfo and @JsonSubTypes
+        String pet = readFile("common/Pet.java");
+        assertThat(pet)
+                .contains("@JsonTypeInfo(use = JsonTypeInfo.Id.NAME")
+                .contains("@JsonSubTypes({")
+                .contains("@JsonSubTypes.Type(value = Cat.class")
+                .contains("@JsonSubTypes.Type(value = Dog.class")
+                .contains("import com.fasterxml.jackson.annotation.JsonTypeInfo;")
+                .contains("import com.fasterxml.jackson.annotation.JsonSubTypes;");
+
+        // Subtypes should NOT have @JsonTypeInfo
+        String cat = readFile("common/Cat.java");
+        assertThat(cat).doesNotContain("@JsonTypeInfo");
+
+        String dog = readFile("common/Dog.java");
+        assertThat(dog).doesNotContain("@JsonTypeInfo");
     }
 
     // ———————————————————————————————————————————————————————————————————————
@@ -621,6 +664,7 @@ class ComprehensiveFeatureTest {
         // Generate ALL specs
         generateWithLombok("spec-from-issue.yaml", "specFromIssue", "example.testGenerate.specFromIssue");
         generateWithLombok("test.yaml", "", "example.testGenerate");
+        generateWithLombok("discriminator.yaml", "", "example.testGenerate");
         generateWithLombok("async-api-official-v3.0.yaml", "asyncapi", "example.testGenerate.asyncapi");
         generateWithLombok("gitter-streaming-async-api-v3.0.yaml", "gitter", "example.testGenerate.gitter");
         generateWithLombok("slack-real-time-async-api-v3.0.yaml", "slack", "example.testGenerate.slack");

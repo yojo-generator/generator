@@ -152,6 +152,57 @@ public class PolymorphStatusOnlyStatusWithCode {
 
 ---
 
+### 6.1 Discriminator (`discriminator` + `allOf`)
+**YAML** — для явной типизации при десериализации
+```yaml
+Pet:
+  type: object
+  discriminator: petType
+  properties:
+    name:
+      type: string
+    petType:
+      type: string
+
+Cat:
+  allOf:
+    - $ref: '#/components/schemas/Pet'
+  properties:
+    huntingSkill:
+      type: string
+
+Dog:
+  allOf:
+    - $ref: '#/components/schemas/Pet'
+  properties:
+    packSize:
+      type: integer
+```
+→ **Java**
+```java
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "petType", visible = true)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = Cat.class, name = "Cat"),
+    @JsonSubTypes.Type(value = Dog.class, name = "Dog")
+})
+public class Pet {
+    private String name;
+    private String petType;
+}
+
+public class Cat extends Pet {
+    private String huntingSkill;
+}
+
+public class Dog extends Pet {
+    private Integer packSize;
+}
+```
+
+> ✅ Полиморфная десериализация работает автоматически: Jackson читает поле `petType` и создаёт нужный класс (`Cat` или `Dog`).
+
+---
+
 ### 7. Inheritance & Interfaces (complete cases)
 
 #### 7.1 Simple inheritance
@@ -218,6 +269,44 @@ MyDto:
 |--------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
 | Marker       | <pre lang="yaml">Marker:<br>  type: object<br>  format: interface</pre>                                                                                                                                                                              | <pre lang="java">public interface Marker {}</pre>                                                                                 |
 | With methods | <pre lang="yaml">UserService:<br>  type: object<br>  format: interface<br>  imports:<br>    - com.my.dto.User<br>  methods:<br>    createUser:<br>      description: "Creates a new user"<br>      definition: "User createUser(String email)"</pre> | <pre lang="java">public interface UserService {<br>    /** Creates a new user */<br>    User createUser(String email);<br>}</pre> |
+
+---
+
+### 10.1 Discriminator (`discriminator` + `allOf`)
+
+| Attribute       | YAML                                                                                                                                                                                                 | → Java                                                                                               |
+|----------------|--------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| `discriminator` | <pre lang="yaml">Pet:<br>  type: object<br>  discriminator: type<br>  properties:<br>    name: string<br>    type: string</pre> | `@JsonTypeInfo`, `@JsonSubTypes` annotations |
+
+**Example:**
+```yaml
+Pet:
+  type: object
+  discriminator: petType
+  properties:
+    name:
+      type: string
+    petType:
+      type: string
+
+Cat:
+  allOf:
+    - $ref: '#/components/schemas/Pet'
+  properties:
+    huntingSkill:
+      type: string
+```
+
+→ **Java:**
+```java
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "petType", visible = true)
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = Cat.class, name = "Cat")
+})
+public class Pet { ... }
+```
+
+> ✅ Jackson автоматически десериализует в нужный класс по значению дискриминатора.
 
 ---
 
@@ -334,11 +423,13 @@ tasks.compileJava {
 
 | Feature                      | Status                 | Description                                      |
 |------------------------------|------------------------|--------------------------------------------------|
-| **Jackson annotations**      | ✅ In progress          | `@JsonProperty`, `@JsonFormat`, `@JsonInclude`   |
-| **AsyncAPI spec validation** | ✅ In progress          | Validate `$ref`, `type`, `format`, circular refs |
-| **Lombok extensions**        | ✅ In progress          | `@Builder`, `@Singular`, `@SuperBuilder`         |
-| **OpenAPI 3.1 support**      | 🚧 Planned for Q2 2026 | Only after AsyncAPI 3.0 stabilization            |
-| **Freemarker templates**     | 🚧 Planned             | For enterprise customizations                    |
+| **Discriminator**            | ✅ Done                 | `@JsonTypeInfo`, `@JsonSubTypes` for polymorphism |
+| **@JsonTypeId on fields**   | 📋 Future              | Add `@JsonTypeId` to discriminator field in subtypes |
+| **Jackson annotations**      | 🟡 Partial             | `@JsonProperty`, `@JsonInclude` done                |
+| **AsyncAPI spec validation** | 🚧 Planned              | Validate `$ref`, `type`, `format`, circular refs   |
+| **Lombok extensions**        | 🚧 Planned              | `@Builder`, `@Singular`, `@SuperBuilder`            |
+| **OpenAPI 3.1 support**     | 🚧 Planned for Q2 2026  | Only after AsyncAPI 3.0 stabilization            |
+| **Freemarker templates**      | 🚧 Planned              | For enterprise customizations                    |
 
 ---
 
