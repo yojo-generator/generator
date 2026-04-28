@@ -1,0 +1,45 @@
+asyncapi: 2.0.0
+info:
+  title: Discriminator Example
+  version: 1.0.0
+channels:
+  pet:
+    subscribe:
+      message:
+        payload:
+          oneOf:
+            - $ref: '#/components/schemas/Cat'
+            - $ref: '#/components/schemas/Dog'
+components:
+  schemas:
+    Pet:
+      type: object
+      discriminator: petType
+      lombok:
+        accessors:
+          chain: true
+        allArgsConstructor: true
+        noArgsConstructor: true
+      properties:
+        name:
+          type: string
+        petType:
+          type: string
+    Cat:
+      allOf:
+        - $ref: '#/components/schemas/Pet'
+        - type: object
+          lombok:
+            allArgsConstructor: true
+          properties:
+            huntingSkill:
+              type: string
+    Dog:
+      allOf:
+        - $ref: '#/components/schemas/Pet'
+        - type: object
+          lombok:
+            allArgsConstructor: true
+          properties:
+            packSize:
+              type: integer

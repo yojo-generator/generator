@@ -16,7 +16,7 @@ java {
 
 group 'io.github.yojo-generator'
 //archivesBaseName = "generator"
-version '2.2.0'
+version '3.0.0'
 
 publishing {
     repositories {
@@ -150,6 +150,9 @@ dependencies {
     testImplementation 'org.projectlombok:lombok:1.18.30'
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.assertj:assertj-core:3.27.7'
+
+    // Jackson for @JsonTypeInfo/@JsonSubTypes tests
+    testImplementation 'com.fasterxml.jackson.core:jackson-annotations:2.18.3'
 
     testImplementation 'jakarta.validation:jakarta.validation-api:3.1.1'
     testImplementation 'javax.validation:validation-api:2.0.1.Final'

@@ -232,6 +232,10 @@ public final class Dictionary {
      * Custom attribute for multiple of validation
      */
     public static final String MULTIPLE_OF = "multipleOf";
+    /**
+     * YAML property name for discriminator
+     */
+    public static final String DISCRIMINATOR = "discriminator";
 
     /**
      * Lombok configuration keys (manual override section).
@@ -419,6 +423,26 @@ public final class Dictionary {
      * JsonPropertyDescription annotation template
      */
     public static final String JSON_PROPERTY_DESCRIPTION_ANNOTATION = "@JsonPropertyDescription()";
+    /**
+     * Jackson JsonTypeInfo annotation template
+     */
+    public static final String JSON_TYPE_INFO_ANNOTATION = "@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = \"%s\", visible = true)";
+    /**
+     * Jackson JsonSubTypes annotation template
+     */
+    public static final String JSON_SUB_TYPES_ANNOTATION = "@JsonSubTypes({%s})";
+    /**
+     * Jackson JsonSubTypes.Type annotation template
+     */
+    public static final String JSON_SUB_TYPE_ANNOTATION = "        @JsonSubTypes.Type(value = %s.class, name = \"%s\")";
+    /**
+     * Jackson @JsonTypeId annotation (for discriminator field in subtypes)
+     */
+    public static final String JSON_TYPE_ID_ANNOTATION = "@JsonTypeId";
+    /**
+     * Jackson @JsonTypeId import
+     */
+    public static final String JSON_TYPE_ID_IMPORT = "com.fasterxml.jackson.annotation.JsonTypeId;";
 
     /**
      * Lombok annotation string templates.
@@ -495,6 +519,15 @@ public final class Dictionary {
      * Import for Lombok EqualsAndHashCode
      */
     public static final String LOMBOK_EQUALS_AND_HASH_CODE_IMPORT = "lombok.EqualsAndHashCode;";
+
+    /**
+     * Jackson @JsonTypeInfo import
+     */
+    public static final String JSON_TYPE_INFO_IMPORT = "com.fasterxml.jackson.annotation.JsonTypeInfo;";
+    /**
+     * Jackson @JsonSubTypes import
+     */
+    public static final String JSON_SUB_TYPES_IMPORT = "com.fasterxml.jackson.annotation.JsonSubTypes;";
 
     /**
      * Canonical Java class simple names (used in field types, etc.).
@@ -742,6 +775,7 @@ public final class Dictionary {
      * Import for JsonPropertyDescription annotation
      */
     public static final String JSON_PROPERTY_DESCRIPTION_IMPORT = "com.fasterxml.jackson.annotation.JsonPropertyDescription;";
+
     /**
      * Import for URI class
      */

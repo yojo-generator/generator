@@ -194,7 +194,78 @@ public class SchemaMapper extends AbstractMapper {
             });
         }
 
+        // Process discriminator-based polymorphism
+        processDiscriminators(schemaList, processContext.getSchemasMap());
+
         return schemaList;
+    }
+
+    /**
+     * Processes discriminator-based polymorphism.
+     * <p>
+     * Scans all schemas to find:
+     * <ul>
+     *   <li>Base schemas with {@code discriminator} field — marks them as polymorphic roots</li>
+     *   <li>Subtypes via {@code allOf} with {@code $ref} to base schema — adds them to subtypes list</li>
+     * </ul>
+     * <p>
+     * Result: base schema gets @JsonTypeInfo + @JsonSubTypes annotations.
+     */
+    private void processDiscriminators(List<Schema> schemaList, Map<String, Object> schemasMap) {
+        // Clear existing subtypes to avoid duplication
+        for (Schema schema : schemaList) {
+            schema.clearSubtypes();
+        }
+        
+        Map<String, String> baseDiscriminator = new HashMap<>();
+        Map<String, Schema> schemaByName = new HashMap<>();
+        
+// Find base schemas with discriminator
+        for (Schema schema : schemaList) {
+            String key = capitalize(schema.getSchemaName());
+            Map<String, Object> schemaMap = castObjectToMap(schemasMap.get(key));
+            if (schemaMap != null && schemaMap.containsKey(DISCRIMINATOR)) {
+                String disc = getStringValueIfExistOrElseNull(DISCRIMINATOR, schemaMap);
+                if (disc != null && !disc.isEmpty()) {
+                    baseDiscriminator.put(schema.getSchemaName(), disc);
+                    schema.setDiscriminator(disc);
+                    schemaByName.put(schema.getSchemaName(), schema);
+                }
+            }
+        }
+
+        // Find subtypes
+        for (Schema schema : schemaList) {
+            String schemaName = schema.getSchemaName();
+            if (baseDiscriminator.containsKey(schemaName)) continue;
+
+            String key = capitalize(schemaName);
+            Map<String, Object> schemaMap = castObjectToMap(schemasMap.get(key));
+            if (schemaMap == null || !schemaMap.containsKey(ALL_OF)) continue;
+
+            List<Object> allOfList = castObjectToListObjects(schemaMap.get(ALL_OF));
+            for (Object item : allOfList) {
+                Map<String, Object> itemMap = castObjectToMap(item);
+                if (itemMap == null) continue;
+                String ref = getStringValueIfExistOrElseNull(REFERENCE, itemMap);
+                if (ref == null) continue;
+                String baseName = refReplace(ref);
+                if (baseDiscriminator.containsKey(baseName)) {
+                    Schema baseSchema = schemaByName.get(baseName);
+                    if (baseSchema != null) {
+                        baseSchema.getSubtypes().add(schemaName);
+                    }
+                }
+            }
+}
+    }
+
+    /**
+     * Capitalize first letter.
+     */
+    private static String capitalize(String s) {
+        if (s == null || s.isEmpty()) return s;
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 
     /**

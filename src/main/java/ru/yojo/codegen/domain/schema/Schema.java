@@ -4,8 +4,10 @@ import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -89,6 +91,39 @@ public class Schema {
      * Class-level annotations specified via x-class-annotation.
      */
     private Set<String> classAnnotations = new HashSet<>();
+
+    /**
+     * Discriminator field name for polymorphic serialization.
+     */
+    private String discriminator;
+
+    /**
+     * List of subtypes for @JsonSubTypes annotation.
+     */
+    private List<String> subtypes = new ArrayList<>();
+
+    /**
+     * Set of unique subtypes (deduplicated).
+     */
+    private Set<String> uniqueSubtypes = new HashSet<>();
+
+    /**
+     * Adds a subtype (deduplicates automatically).
+     */
+    public void addSubtype(String subtype) {
+        if (!uniqueSubtypes.contains(subtype)) {
+            uniqueSubtypes.add(subtype);
+            subtypes.add(subtype);
+        }
+    }
+
+    /**
+     * Clears all subtypes.
+     */
+    public void clearSubtypes() {
+        subtypes.clear();
+        uniqueSubtypes.clear();
+    }
 
     // ——— Getters & Setters ——— //
 
@@ -234,6 +269,34 @@ public class Schema {
      */
     public void setClassAnnotations(Set<String> classAnnotations) {
         this.classAnnotations = classAnnotations;
+    }
+
+    /**
+     * Returns the discriminator field name.
+     */
+    public String getDiscriminator() {
+        return discriminator;
+    }
+
+    /**
+     * Sets the discriminator field name.
+     */
+    public void setDiscriminator(String discriminator) {
+        this.discriminator = discriminator;
+    }
+
+    /**
+     * Returns list of subtypes.
+     */
+    public List<String> getSubtypes() {
+        return subtypes;
+    }
+
+    /**
+     * Sets list of subtypes.
+     */
+    public void setSubtypes(List<String> subtypes) {
+        this.subtypes = subtypes;
     }
 
     /**
@@ -418,6 +481,28 @@ public class Schema {
                     : annotation;
                 lombokAnnotationBuilder.append("@").append(simpleName).append(lineSeparator());
                 requiredImports.add(annotation.endsWith(";") ? annotation : annotation + ";");
+            }
+        }
+
+        // Add Jackson polymorphic annotations (discriminator)
+        if (discriminator != null && !discriminator.isEmpty()) {
+            requiredImports.add(JSON_TYPE_INFO_IMPORT);
+            requiredImports.add(JSON_SUB_TYPES_IMPORT);
+            lombokAnnotationBuilder.append(String.format(JSON_TYPE_INFO_ANNOTATION, discriminator)).append(lineSeparator());
+            
+            if (!subtypes.isEmpty()) {
+                StringBuilder subtypesBuilder = new StringBuilder();
+                subtypesBuilder.append("@JsonSubTypes({").append(lineSeparator());
+                for (int i = 0; i < subtypes.size(); i++) {
+                    subtypesBuilder.append(String.format("    @JsonSubTypes.Type(value = %s.class, name = \"%s\")", subtypes.get(i), subtypes.get(i)));
+                    if (i < subtypes.size() - 1) {
+                        subtypesBuilder.append(",").append(lineSeparator());
+                    } else {
+                        subtypesBuilder.append(lineSeparator());
+                    }
+                }
+                subtypesBuilder.append("})");
+                lombokAnnotationBuilder.append(subtypesBuilder).append(lineSeparator());
             }
         }
 
