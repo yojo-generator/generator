@@ -275,8 +275,8 @@ MyDto:
 ### 10.1 Discriminator (`discriminator` + `allOf`)
 
 | Attribute       | YAML                                                                                                                                                                                                 | → Java                                                                                               |
-|----------------|--------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
-| `discriminator` | <pre lang="yaml">Pet:<br>  type: object<br>  discriminator: type<br>  properties:<br>    name: string<br>    type: string</pre> | `@JsonTypeInfo`, `@JsonSubTypes` annotations |
+|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| `discriminator` | <pre lang="yaml">Pet:<br>  type: object<br>  discriminator: petType<br>  properties:<br>    name: string<br>    petType: string</pre> | `@JsonTypeInfo`, `@JsonSubTypes` annotations |
 
 **Example:**
 ```yaml
@@ -303,10 +303,21 @@ Cat:
 @JsonSubTypes({
     @JsonSubTypes.Type(value = Cat.class, name = "Cat")
 })
-public class Pet { ... }
+public class Pet { 
+    private String name;
+    private String petType;
+}
+
+public class Cat extends Pet {
+    @JsonTypeId
+    private String petType;
+    
+    private String huntingSkill;
+}
 ```
 
 > ✅ Jackson автоматически десериализует в нужный класс по значению дискриминатора.
+> ✅ Поле-дискриминатор в подтипах помечается аннотацией `@JsonTypeId` для корректной сериализации.
 
 ---
 
@@ -424,7 +435,7 @@ tasks.compileJava {
 | Feature                      | Status                 | Description                                      |
 |------------------------------|------------------------|--------------------------------------------------|
 | **Discriminator**            | ✅ Done                 | `@JsonTypeInfo`, `@JsonSubTypes` for polymorphism |
-| **@JsonTypeId on fields**   | 📋 Future              | Add `@JsonTypeId` to discriminator field in subtypes |
+| **@JsonTypeId on fields**   | ✅ Done                 | Add `@JsonTypeId` to discriminator field in subtypes |
 | **Jackson annotations**      | 🟡 Partial             | `@JsonProperty`, `@JsonInclude` done                |
 | **AsyncAPI spec validation** | 🚧 Planned              | Validate `$ref`, `type`, `format`, circular refs   |
 | **Lombok extensions**        | 🚧 Planned              | `@Builder`, `@Singular`, `@SuperBuilder`            |
