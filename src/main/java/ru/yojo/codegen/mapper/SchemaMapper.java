@@ -220,7 +220,7 @@ public class SchemaMapper extends AbstractMapper {
         Map<String, String> baseDiscriminator = new HashMap<>();
         Map<String, Schema> schemaByName = new HashMap<>();
         
-// Find base schemas with discriminator
+        // Find base schemas with discriminator
         for (Schema schema : schemaList) {
             String key = capitalize(schema.getSchemaName());
             Map<String, Object> schemaMap = castObjectToMap(schemasMap.get(key));
@@ -230,6 +230,16 @@ public class SchemaMapper extends AbstractMapper {
                     baseDiscriminator.put(schema.getSchemaName(), disc);
                     schema.setDiscriminator(disc);
                     schemaByName.put(schema.getSchemaName(), schema);
+                    
+                    // Find the discriminator field name from properties
+                    Map<String, Object> properties = castObjectToMap(schemaMap.get(PROPERTIES));
+                    if (properties != null) {
+                        // Look for the field that matches discriminator value
+                        String discriminatorField = findDiscriminatorField(properties, disc);
+                        if (discriminatorField != null) {
+                            schema.setDiscriminatorField(discriminatorField);
+                        }
+                    }
                 }
             }
         }
@@ -254,10 +264,35 @@ public class SchemaMapper extends AbstractMapper {
                     Schema baseSchema = schemaByName.get(baseName);
                     if (baseSchema != null) {
                         baseSchema.getSubtypes().add(schemaName);
+                        
+                        // Pass discriminator field name to subtype
+                        if (baseSchema.getDiscriminatorField() != null) {
+                            schema.setDiscriminatorField(baseSchema.getDiscriminatorField());
+                            
+                            // Update VariableProperties in the subtype to mark the discriminator field
+                            markDiscriminatorFieldInSchema(schema, baseSchema.getDiscriminatorField());
+                        }
                     }
                 }
             }
-}
+        }
+    }
+    
+    /**
+     * Marks the field with the given name as discriminator field in the schema's VariableProperties.
+     * 
+     * @param schema the schema to update
+     * @param discriminatorFieldName the name of the discriminator field
+     */
+    private void markDiscriminatorFieldInSchema(Schema schema, String discriminatorFieldName) {
+        if (schema.getFillParameters() == null) return;
+        
+        for (VariableProperties vp : schema.getFillParameters().getVariableProperties()) {
+            if (vp.getName() != null && vp.getName().equals(discriminatorFieldName)) {
+                vp.setDiscriminatorField(true);
+                break;
+            }
+        }
     }
 
     /**
@@ -266,6 +301,42 @@ public class SchemaMapper extends AbstractMapper {
     private static String capitalize(String s) {
         if (s == null || s.isEmpty()) return s;
         return s.substring(0, 1).toUpperCase() + s.substring(1);
+    }
+
+    /**
+     * Find the field name that matches the discriminator value.
+     * Looks through properties to find a field whose value matches the discriminator.
+     *
+     * @param properties map of property name → property definition
+     * @param discriminator discriminator value (e.g., "Cat", "Dog")
+     * @return field name that should be annotated with @JsonTypeId, or null if not found
+     */
+    private static String findDiscriminatorField(Map<String, Object> properties, String discriminator) {
+        if (properties == null || discriminator == null) return null;
+        
+        for (Map.Entry<String, Object> entry : properties.entrySet()) {
+            String propertyName = entry.getKey();
+            Map<String, Object> propertyMap = castObjectToMap(entry.getValue());
+            if (propertyMap == null) continue;
+            
+            // Check if this property has enum with discriminator value
+            Object enumObj = propertyMap.get(ENUMERATION);
+            if (enumObj instanceof List) {
+                List<Object> enumList = (List<Object>) enumObj;
+                if (enumList.contains(discriminator)) {
+                    return propertyName;
+                }
+            }
+            
+            // Also check if property name matches discriminator (common case)
+            if (propertyName.equalsIgnoreCase(discriminator) || 
+                propertyName.equalsIgnoreCase("type")) {
+                return propertyName;
+            }
+        }
+        
+        // Default: return "type" or discriminator field name
+        return properties.containsKey("type") ? "type" : null;
     }
 
     /**
@@ -287,11 +358,11 @@ public class SchemaMapper extends AbstractMapper {
      * @return {@link FillParameters} container with all fields and metadata
      */
     public FillParameters getSchemaVariableProperties(String schemaName,
-                                                      Map<String, Object> currentSchema,
-                                                      Map<String, Object> schemas,
-                                                      Map<String, Object> properties,
-                                                      ProcessContext processContext,
-                                                      Map<String, Object> innerSchemas) {
+                                                       Map<String, Object> currentSchema,
+                                                       Map<String, Object> schemas,
+                                                       Map<String, Object> properties,
+                                                       ProcessContext processContext,
+                                                       Map<String, Object> innerSchemas) {
         List<VariableProperties> variableProperties = new LinkedList<>();
 
         // 🔹 ШАГ 1: ВСЕГДА обрабатываем корневые properties (если есть)
@@ -307,7 +378,8 @@ public class SchemaMapper extends AbstractMapper {
                         javaName,
                         castObjectToMap(propertyValue),
                         processContext,
-                        processContext.getHelper().getInnerSchemas());
+                        innerSchemas);
+                
                 variableProperties.add(vp);
             });
         }
@@ -333,6 +405,7 @@ public class SchemaMapper extends AbstractMapper {
                             castObjectToMap(propertyValue),
                             processContext,
                             processContext.getHelper().getInnerSchemas());
+
                     variableProperties.add(vp);
                 }
             });
@@ -343,7 +416,7 @@ public class SchemaMapper extends AbstractMapper {
             VariableProperties vp = new VariableProperties();
             vp.setValid(false);
             vp.setEnum(true);
-            fillProperties(schemaName, vp, currentSchema, schemas, schemaName, currentSchema, processContext, processContext.getHelper().getInnerSchemas());
+            fillProperties(schemaName, vp, currentSchema, schemas, schemaName, currentSchema, processContext, innerSchemas);
             variableProperties.add(vp);
         }
 

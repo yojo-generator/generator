@@ -1,5 +1,6 @@
 package discriminator.common;
 
+import com.fasterxml.jackson.annotation.JsonTypeId;
 import javax.annotation.processing.Generated;
 
 @Generated("Yojo")
@@ -7,6 +8,7 @@ public class Cat {
 
     private String name;
 
+    @JsonTypeId
     private String petType;
 
     private String huntingSkill;

@@ -1,5 +1,6 @@
 package discriminator.common;
 
+import com.fasterxml.jackson.annotation.JsonTypeId;
 import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ public class Dog {
 
     private String name;
 
+    @JsonTypeId
     private String petType;
 
     private Integer packSize;
