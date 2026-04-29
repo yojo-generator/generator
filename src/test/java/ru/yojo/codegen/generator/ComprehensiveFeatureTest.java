@@ -38,37 +38,37 @@ class ComprehensiveFeatureTest {
 
     private YojoGenerator yojoGenerator = new YojoGenerator();
 
-    @BeforeEach
-    void cleanupBeforeTest() throws IOException {
-        for (String dir : OUTPUT_DIRS) {
-            Path path = Paths.get(dir);
-            if (Files.exists(path)) {
-                try (Stream<Path> walk = Files.walk(path)) {
-                    walk.sorted((a, b) -> -a.compareTo(b))
-                            .forEach(p -> {
-                                try { Files.deleteIfExists(p); } catch (IOException ignore) {}
-                            });
-                }
-                Files.deleteIfExists(path);
-            }
-        }
-    }
-
-
-    // Cleanup after discriminator test
-    @AfterEach
-    void cleanupAfterDiscriminator() throws IOException {
-        Path path = Paths.get(BASE_DIR);
-        if (Files.exists(path)) {
-            try (Stream<Path> walk = Files.walk(path)) {
-                walk.sorted((a, b) -> -a.compareTo(b))
-                        .forEach(p -> {
-                            try { Files.deleteIfExists(p); } catch (IOException ignore) {}
-                        });
-            }
-            Files.deleteIfExists(path);
-        }
-    }
+//    @BeforeEach
+//    void cleanupBeforeTest() throws IOException {
+//        for (String dir : OUTPUT_DIRS) {
+//            Path path = Paths.get(dir);
+//            if (Files.exists(path)) {
+//                try (Stream<Path> walk = Files.walk(path)) {
+//                    walk.sorted((a, b) -> -a.compareTo(b))
+//                            .forEach(p -> {
+//                                try { Files.deleteIfExists(p); } catch (IOException ignore) {}
+//                            });
+//                }
+//                Files.deleteIfExists(path);
+//            }
+//        }
+//    }
+//
+//
+//    // Cleanup after discriminator test
+//    @AfterEach
+//    void cleanupAfterDiscriminator() throws IOException {
+//        Path path = Paths.get(BASE_DIR);
+//        if (Files.exists(path)) {
+//            try (Stream<Path> walk = Files.walk(path)) {
+//                walk.sorted((a, b) -> -a.compareTo(b))
+//                        .forEach(p -> {
+//                            try { Files.deleteIfExists(p); } catch (IOException ignore) {}
+//                        });
+//            }
+//            Files.deleteIfExists(path);
+//        }
+//    }
 
     // ———————————————————————————————————————————————————————————————————————
     // ✅ 1. Основной кейс: generateTemplatesFromTrafficResponseMessage → List<Object>, а не Array
@@ -614,12 +614,13 @@ class ComprehensiveFeatureTest {
     void allGeneratedCodeMustCompile() throws IOException {
         // Generate ALL specs
         generate("spec-from-issue.yaml", "specFromIssue", "example.testGenerate.specFromIssue");
-        generate("test.yaml", "", "example.testGenerate");
+        generate("test.yaml", "test", "example.testGenerate.test");
+        generate("discriminator.yaml", "discriminator", "example.testGenerate.discriminator");
+        generate("test-create-app.yaml", "testCreateApp", "example.testGenerate.testCreateApp");
         generate("async-api-official-v3.0.yaml", "asyncapi", "example.testGenerate.asyncapi");
         generate("gitter-streaming-async-api-v3.0.yaml", "gitter", "example.testGenerate.gitter");
         generate("slack-real-time-async-api-v3.0.yaml", "slack", "example.testGenerate.slack");
         generate("one-more.yaml", "oneMore", "example.testGenerate.oneMore");
-//        generate("contract.yaml", "contract", "example.testGenerate.contract");
 
         // Collect all .java files
         List<Path> javaFiles = new ArrayList<>();
@@ -662,14 +663,14 @@ class ComprehensiveFeatureTest {
     @Order(22)
     void allGeneratedCodeMustCompileWithLombok() throws IOException {
         // Generate ALL specs
-        generateWithLombok("spec-from-issue.yaml", "specFromIssue", "example.testGenerate.specFromIssue");
-        generateWithLombok("test.yaml", "", "example.testGenerate");
-        generateWithLombok("discriminator.yaml", "", "example.testGenerate");
         generateWithLombok("async-api-official-v3.0.yaml", "asyncapi", "example.testGenerate.asyncapi");
+        generateWithLombok("discriminator.yaml", "discriminator", "example.testGenerate.discriminator");
         generateWithLombok("gitter-streaming-async-api-v3.0.yaml", "gitter", "example.testGenerate.gitter");
-        generateWithLombok("slack-real-time-async-api-v3.0.yaml", "slack", "example.testGenerate.slack");
         generateWithLombok("one-more.yaml", "oneMore", "example.testGenerate.oneMore");
-//        generateWithLombok("contract.yaml", "contract", "example.testGenerate.contract");
+        generateWithLombok("slack-real-time-async-api-v3.0.yaml", "slack", "example.testGenerate.slack");
+        generateWithLombok("spec-from-issue.yaml", "specFromIssue", "example.testGenerate.specFromIssue");
+        generateWithLombok("test.yaml", "test", "example.testGenerate.test");
+        generateWithLombok("test-create-app.yaml", "testCreateApp", "example.testGenerate.testCreateApp");
 
         // Collect all .java files
         List<Path> javaFiles = new ArrayList<>();
@@ -850,8 +851,8 @@ class ComprehensiveFeatureTest {
         SpecificationProperties spec = new SpecificationProperties();
         spec.setSpecName("test.yaml");
         spec.setInputDirectory("src/test/resources/example/contract");
-        spec.setOutputDirectory(BASE_DIR);
-        spec.setPackageLocation("example.testGenerate");
+        spec.setOutputDirectory(BASE_DIR + "test/");
+        spec.setPackageLocation("example.testGenerate.test");
 
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
@@ -863,7 +864,7 @@ class ComprehensiveFeatureTest {
         yojoGenerator.generateAll(ctx);
 
         // then
-        String content = readFile("common/StringValues.java");
+        String content = readFile("test/common/StringValues.java");
 
         // Non-required field must have @Nullable
         assertThat(content)
