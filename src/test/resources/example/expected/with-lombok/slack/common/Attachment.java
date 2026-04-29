@@ -1,9 +1,9 @@
-package example.testGenerate.slack.common;
+package slack.common;
 
 import java.util.List;
-import example.testGenerate.slack.common.AttachmentFields;
+import slack.common.AttachmentFields;
+import javax.validation.Valid;
 import lombok.Data;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;

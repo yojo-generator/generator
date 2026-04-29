@@ -1,9 +1,9 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.FileUnsharedFile;
-import example.testGenerate.slack.common.FileUnsharedType;
+import slack.common.FileUnsharedType;
+import slack.common.FileUnsharedFile;
+import javax.validation.Valid;
 import lombok.Data;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;

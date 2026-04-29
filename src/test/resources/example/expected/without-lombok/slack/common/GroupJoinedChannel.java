@@ -1,4 +1,4 @@
-package example.testGenerate.slack.common;
+package slack.common;
 
 import javax.annotation.processing.Generated;
 import java.math.BigDecimal;

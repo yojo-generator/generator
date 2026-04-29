@@ -1,9 +1,9 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.ChannelJoinedChannel;
-import jakarta.validation.Valid;
+import slack.common.ChannelJoinedType;
+import slack.common.ChannelJoinedChannel;
+import javax.validation.Valid;
 import javax.annotation.processing.Generated;
-import example.testGenerate.slack.common.ChannelJoinedType;
 
 /**
 * You joined a channel.

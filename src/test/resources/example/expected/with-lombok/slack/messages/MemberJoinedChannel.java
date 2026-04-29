@@ -1,12 +1,12 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.MemberJoinedChannelType;
-import example.testGenerate.slack.common.MemberJoinedChannelChannelType;
+import slack.common.MemberJoinedChannelChannelType;
 import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
+import slack.common.MemberJoinedChannelType;
 
 /**
 * A user joined a public or private channel.

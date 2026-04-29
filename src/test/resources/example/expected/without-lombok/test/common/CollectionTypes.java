@@ -11,7 +11,7 @@ import example.testGenerate.test.common.CollectionTypesInnerSchema;
 import java.math.BigInteger;
 import java.util.Set;
 import java.time.LocalDate;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import javax.annotation.processing.Generated;
 import java.net.URI;
 import java.math.BigDecimal;

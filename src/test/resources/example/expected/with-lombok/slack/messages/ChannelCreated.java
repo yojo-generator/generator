@@ -1,9 +1,9 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.ChannelCreatedType;
-import example.testGenerate.slack.common.ChannelCreatedChannel;
+import javax.validation.Valid;
+import slack.common.ChannelCreatedType;
+import slack.common.ChannelCreatedChannel;
 import lombok.Data;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;

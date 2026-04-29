@@ -1,7 +1,7 @@
 package example.testGenerate.test.common;
 
+import javax.validation.Valid;
 import example.testGenerate.test.common.SomeObjectInnerSchema;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import example.testGenerate.test.common.ClassForExtends;
 

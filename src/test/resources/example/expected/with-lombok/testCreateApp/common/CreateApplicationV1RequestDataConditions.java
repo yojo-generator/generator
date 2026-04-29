@@ -1,12 +1,12 @@
-package example.testGenerate.testCreateApp.common;
+package testCreateApp.common;
 
+import testCreateApp.common.CreateApplicationV1RequestDataConditionsRequested;
+import javax.validation.Valid;
 import lombok.Data;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
-import example.testGenerate.testCreateApp.common.CreateApplicationV1RequestDataConditionsRequested;
 
 @Generated("Yojo")
 @Data

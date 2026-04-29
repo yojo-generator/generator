@@ -1,8 +1,8 @@
-package example.testGenerate.asyncapi.common;
+package asyncapi.common;
 
 import java.time.OffsetDateTime;
 import javax.annotation.processing.Generated;
-import example.testGenerate.asyncapi.common.TurnOnOffPayloadCommand;
+import asyncapi.common.TurnOnOffPayloadCommand;
 
 @Generated("Yojo")
 public class TurnOnOffPayload {

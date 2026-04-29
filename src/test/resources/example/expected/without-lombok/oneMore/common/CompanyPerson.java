@@ -1,14 +1,14 @@
-package example.testGenerate.oneMore.common;
+package oneMore.common;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
-import example.testGenerate.oneMore.common.ClientAddress;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Pattern;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.validation.Valid;
+import oneMore.common.ClientAddress;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Min;
 
 @Generated("Yojo")
 public class CompanyPerson {

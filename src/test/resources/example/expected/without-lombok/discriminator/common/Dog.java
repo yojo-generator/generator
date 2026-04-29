@@ -1,4 +1,4 @@
-package example.testGenerate.discriminator.common;
+package discriminator.common;
 
 import javax.annotation.processing.Generated;
 

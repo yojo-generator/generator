@@ -1,6 +1,6 @@
-package example.testGenerate.specFromIssue.common;
+package specFromIssue.common;
 
-import jakarta.validation.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;

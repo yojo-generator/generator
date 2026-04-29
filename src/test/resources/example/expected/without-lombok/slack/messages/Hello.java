@@ -1,6 +1,6 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.HelloType;
+import slack.common.HelloType;
 import javax.annotation.processing.Generated;
 
 /**

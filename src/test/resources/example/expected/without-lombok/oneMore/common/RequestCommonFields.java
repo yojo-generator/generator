@@ -1,10 +1,10 @@
-package example.testGenerate.oneMore.common;
+package oneMore.common;
 
-import example.testGenerate.oneMore.common.RequestCommonFieldsContext;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.Valid;
-import example.testGenerate.oneMore.common.RequestCommonFieldsRequestData;
+import oneMore.common.RequestCommonFieldsContext;
+import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
 import javax.annotation.processing.Generated;
+import oneMore.common.RequestCommonFieldsRequestData;
 
 /**
 * Common meta-tags

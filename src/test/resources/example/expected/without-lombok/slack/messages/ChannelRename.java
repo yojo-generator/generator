@@ -1,8 +1,8 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.ChannelRenameChannel;
-import example.testGenerate.slack.common.ChannelRenameType;
-import jakarta.validation.Valid;
+import slack.common.ChannelRenameType;
+import slack.common.ChannelRenameChannel;
+import javax.validation.Valid;
 import javax.annotation.processing.Generated;
 
 /**

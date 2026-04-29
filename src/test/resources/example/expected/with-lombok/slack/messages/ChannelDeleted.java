@@ -1,7 +1,7 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
+import slack.common.ChannelDeletedType;
 import lombok.Data;
-import example.testGenerate.slack.common.ChannelDeletedType;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;

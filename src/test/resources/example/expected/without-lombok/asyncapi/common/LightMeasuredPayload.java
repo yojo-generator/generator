@@ -1,8 +1,8 @@
-package example.testGenerate.asyncapi.common;
+package asyncapi.common;
 
 import java.time.OffsetDateTime;
-import jakarta.validation.constraints.Min;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.Min;
 
 @Generated("Yojo")
 public class LightMeasuredPayload {

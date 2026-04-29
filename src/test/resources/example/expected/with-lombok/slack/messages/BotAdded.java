@@ -1,9 +1,9 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.BotAddedType;
+import slack.common.BotAddedType;
+import javax.validation.Valid;
+import slack.common.BotAddedBot;
 import lombok.Data;
-import example.testGenerate.slack.common.BotAddedBot;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;

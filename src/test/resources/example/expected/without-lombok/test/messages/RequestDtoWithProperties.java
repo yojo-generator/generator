@@ -1,7 +1,7 @@
 package example.testGenerate.test.messages;
 
 import example.testGenerate.test.common.RequestDtoWithPropertiesAComplexProperty;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import javax.annotation.processing.Generated;
 import example.testGenerate.test.common.RequestDtoWithPropertiesSomeOneObject;
 

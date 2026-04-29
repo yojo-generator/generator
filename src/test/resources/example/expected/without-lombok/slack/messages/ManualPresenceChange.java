@@ -1,6 +1,6 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.ManualPresenceChangeType;
+import slack.common.ManualPresenceChangeType;
 import javax.annotation.processing.Generated;
 
 /**

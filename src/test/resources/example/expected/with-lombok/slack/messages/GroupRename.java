@@ -1,9 +1,9 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.GroupRenameChannel;
-import example.testGenerate.slack.common.GroupRenameType;
+import slack.common.GroupRenameChannel;
+import javax.validation.Valid;
+import slack.common.GroupRenameType;
 import lombok.Data;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;

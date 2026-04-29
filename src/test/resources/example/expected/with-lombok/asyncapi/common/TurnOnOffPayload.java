@@ -1,12 +1,12 @@
-package example.testGenerate.asyncapi.common;
+package asyncapi.common;
 
 import java.time.OffsetDateTime;
 import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
+import asyncapi.common.TurnOnOffPayloadCommand;
 import lombok.NoArgsConstructor;
-import example.testGenerate.asyncapi.common.TurnOnOffPayloadCommand;
 
 @Generated("Yojo")
 @Data

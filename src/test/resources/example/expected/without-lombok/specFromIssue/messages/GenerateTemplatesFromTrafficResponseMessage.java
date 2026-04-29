@@ -1,11 +1,11 @@
-package example.testGenerate.specFromIssue.messages;
+package specFromIssue.messages;
 
 import java.util.List;
-import jakarta.validation.constraints.NotNull;
-import example.testGenerate.specFromIssue.common.StatusSchema;
-import jakarta.validation.Valid;
+import specFromIssue.common.StatusSchema;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
 import javax.annotation.processing.Generated;
-import jakarta.validation.constraints.NotEmpty;
 
 /**
 * ответ с payload = array of objects (items только с examples)

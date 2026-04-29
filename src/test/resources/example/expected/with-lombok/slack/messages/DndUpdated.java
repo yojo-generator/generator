@@ -1,13 +1,13 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.DndUpdatedDndStatus;
-import example.testGenerate.slack.common.DndUpdatedType;
+import slack.common.DndUpdatedType;
+import javax.validation.Valid;
 import lombok.Data;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
+import slack.common.DndUpdatedDndStatus;
 
 /**
 * Do not Disturb settings changed for the current user.

@@ -1,6 +1,6 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.GroupLeftType;
+import slack.common.GroupLeftType;
 import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;

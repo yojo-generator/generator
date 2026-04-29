@@ -1,12 +1,12 @@
 package example.testGenerate.test.common;
 
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotNull;
 import java.math.BigInteger;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Max;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.Max;
 import java.math.BigDecimal;
+import javax.validation.constraints.Min;
 
 /**
 * Here was located all supported numeric values

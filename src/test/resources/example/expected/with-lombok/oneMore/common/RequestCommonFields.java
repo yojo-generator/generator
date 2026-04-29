@@ -1,12 +1,12 @@
-package example.testGenerate.oneMore.common;
+package oneMore.common;
 
-import example.testGenerate.oneMore.common.RequestCommonFieldsContext;
-import jakarta.validation.constraints.NotNull;
+import oneMore.common.RequestCommonFieldsContext;
+import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
 import lombok.Data;
-import jakarta.validation.Valid;
-import example.testGenerate.oneMore.common.RequestCommonFieldsRequestData;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
+import oneMore.common.RequestCommonFieldsRequestData;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
 

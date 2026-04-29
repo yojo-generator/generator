@@ -1,8 +1,8 @@
-package example.testGenerate.asyncapi.messages;
+package asyncapi.messages;
 
 import java.time.OffsetDateTime;
-import jakarta.validation.constraints.Min;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.Min;
 
 /**
 * Inform about environmental lighting conditions of a particular streetlight.

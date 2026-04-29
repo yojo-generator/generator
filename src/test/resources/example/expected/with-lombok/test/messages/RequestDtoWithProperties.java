@@ -1,8 +1,8 @@
 package example.testGenerate.test.messages;
 
 import example.testGenerate.test.common.RequestDtoWithPropertiesAComplexProperty;
+import javax.validation.Valid;
 import lombok.Data;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;

@@ -1,9 +1,9 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.ImCreatedChannel;
-import jakarta.validation.Valid;
+import slack.common.ImCreatedType;
+import javax.validation.Valid;
+import slack.common.ImCreatedChannel;
 import javax.annotation.processing.Generated;
-import example.testGenerate.slack.common.ImCreatedType;
 
 /**
 * A DM was created.

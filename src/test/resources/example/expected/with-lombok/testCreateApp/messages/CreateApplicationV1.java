@@ -1,8 +1,8 @@
-package example.testGenerate.testCreateApp.messages;
+package testCreateApp.messages;
 
-import example.testGenerate.testCreateApp.common.CreateApplicationV1RequestData;
+import javax.validation.Valid;
+import testCreateApp.common.CreateApplicationV1RequestData;
 import lombok.Data;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;

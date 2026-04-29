@@ -1,9 +1,9 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.ConnectionErrorError;
-import jakarta.validation.Valid;
+import slack.common.ConnectionErrorType;
+import slack.common.ConnectionErrorError;
+import javax.validation.Valid;
 import javax.annotation.processing.Generated;
-import example.testGenerate.slack.common.ConnectionErrorType;
 
 /**
 * Event received when a connection error happens.

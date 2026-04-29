@@ -1,4 +1,4 @@
-package example.testGenerate.gitter.common;
+package gitter.common;
 
 import java.util.List;
 import javax.annotation.processing.Generated;

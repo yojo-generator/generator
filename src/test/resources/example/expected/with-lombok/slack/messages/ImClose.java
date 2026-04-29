@@ -1,9 +1,9 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.ImCloseType;
 import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
+import slack.common.ImCloseType;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
 

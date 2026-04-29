@@ -1,13 +1,13 @@
-package example.testGenerate.specFromIssue.messages;
+package specFromIssue.messages;
 
 import java.util.List;
-import jakarta.validation.constraints.NotNull;
-import example.testGenerate.specFromIssue.common.StatusSchema;
+import specFromIssue.common.StatusSchema;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
 import lombok.Data;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
 

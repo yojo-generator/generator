@@ -1,12 +1,12 @@
-package example.testGenerate.oneMore.common;
+package oneMore.common;
 
 import java.util.List;
-import example.testGenerate.oneMore.common.CompanyPerson;
+import javax.validation.Valid;
 import lombok.Data;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
+import oneMore.common.CompanyPerson;
 import lombok.NoArgsConstructor;
 
 @Generated("Yojo")

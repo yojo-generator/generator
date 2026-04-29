@@ -1,4 +1,4 @@
-package example.testGenerate.slack.common;
+package slack.common;
 
 import java.util.Map;
 import javax.annotation.processing.Generated;

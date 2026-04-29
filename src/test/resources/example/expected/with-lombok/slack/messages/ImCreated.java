@@ -1,13 +1,13 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.ImCreatedChannel;
+import slack.common.ImCreatedType;
+import javax.validation.Valid;
+import slack.common.ImCreatedChannel;
 import lombok.Data;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
-import example.testGenerate.slack.common.ImCreatedType;
 
 /**
 * A DM was created.

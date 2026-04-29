@@ -1,8 +1,8 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.OutgoingMessageType;
 import javax.annotation.processing.Generated;
 import java.math.BigDecimal;
+import slack.common.OutgoingMessageType;
 
 /**
 * A message was sent to a channel.

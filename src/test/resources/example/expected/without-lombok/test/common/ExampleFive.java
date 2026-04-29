@@ -14,13 +14,13 @@ import example.testGenerate.test.common.EnumResultWithoutDescription;
 import java.util.UUID;
 import example.testGenerate.test.common.ExampleFiveInnerEnumWithDescription;
 import java.util.Set;
+import javax.validation.Valid;
 import example.testGenerate.test.common.CollectionTypes;
 import example.testGenerate.test.common.ExampleFiveInnerSchema;
 import testGenerate.ExistingClass;
 import java.util.LinkedHashMap;
 import example.testGenerate.test.common.PolymorphPolymorphExampleOnePolymorphExampleTwo;
 import example.testGenerate.test.common.ObjectTypes;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 
 @Generated("Yojo")

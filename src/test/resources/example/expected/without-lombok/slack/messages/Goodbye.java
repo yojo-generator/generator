@@ -1,7 +1,7 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
+import slack.common.GoodbyeType;
 import javax.annotation.processing.Generated;
-import example.testGenerate.slack.common.GoodbyeType;
 
 /**
 * The server intends to close the connection soon.

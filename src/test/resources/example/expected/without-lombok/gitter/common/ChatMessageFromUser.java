@@ -1,4 +1,4 @@
-package example.testGenerate.gitter.common;
+package gitter.common;
 
 import javax.annotation.processing.Generated;
 import java.net.URI;

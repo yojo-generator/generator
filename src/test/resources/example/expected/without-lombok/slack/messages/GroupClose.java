@@ -1,6 +1,6 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.GroupCloseType;
+import slack.common.GroupCloseType;
 import javax.annotation.processing.Generated;
 
 /**

@@ -1,12 +1,12 @@
-package example.testGenerate.asyncapi.common;
+package asyncapi.common;
 
 import java.time.OffsetDateTime;
-import jakarta.validation.constraints.Min;
 import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
+import javax.validation.constraints.Min;
 
 @Generated("Yojo")
 @Data

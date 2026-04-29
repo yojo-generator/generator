@@ -1,9 +1,9 @@
-package example.testGenerate.asyncapi.messages;
+package asyncapi.messages;
 
 import java.time.OffsetDateTime;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Max;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 /**
 * Command a particular streetlight to dim the lights.

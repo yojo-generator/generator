@@ -1,7 +1,7 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.ImCloseType;
 import javax.annotation.processing.Generated;
+import slack.common.ImCloseType;
 
 /**
 * You closed a DM.

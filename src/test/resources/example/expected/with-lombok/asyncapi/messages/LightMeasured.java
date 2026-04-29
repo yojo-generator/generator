@@ -1,12 +1,12 @@
-package example.testGenerate.asyncapi.messages;
+package asyncapi.messages;
 
 import java.time.OffsetDateTime;
-import jakarta.validation.constraints.Min;
 import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
+import javax.validation.constraints.Min;
 
 /**
 * Inform about environmental lighting conditions of a particular streetlight.

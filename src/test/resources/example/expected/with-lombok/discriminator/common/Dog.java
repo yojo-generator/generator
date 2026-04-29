@@ -1,4 +1,4 @@
-package example.testGenerate.discriminator.common;
+package discriminator.common;
 
 import lombok.Data;
 import javax.annotation.processing.Generated;

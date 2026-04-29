@@ -1,8 +1,8 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.EmojiRemovedSubtype;
 import java.util.List;
-import example.testGenerate.slack.common.EmojiRemovedType;
+import slack.common.EmojiRemovedType;
+import slack.common.EmojiRemovedSubtype;
 import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;

@@ -1,8 +1,8 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.ChannelCreatedType;
-import example.testGenerate.slack.common.ChannelCreatedChannel;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
+import slack.common.ChannelCreatedType;
+import slack.common.ChannelCreatedChannel;
 import javax.annotation.processing.Generated;
 
 /**

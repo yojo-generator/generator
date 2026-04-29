@@ -1,6 +1,6 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.ChannelHistoryChangedType;
+import slack.common.ChannelHistoryChangedType;
 import javax.annotation.processing.Generated;
 
 /**

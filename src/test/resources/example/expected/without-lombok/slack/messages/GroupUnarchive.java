@@ -1,6 +1,6 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.GroupUnarchiveType;
+import slack.common.GroupUnarchiveType;
 import javax.annotation.processing.Generated;
 
 /**

@@ -1,8 +1,8 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.MemberJoinedChannelType;
-import example.testGenerate.slack.common.MemberJoinedChannelChannelType;
+import slack.common.MemberJoinedChannelChannelType;
 import javax.annotation.processing.Generated;
+import slack.common.MemberJoinedChannelType;
 
 /**
 * A user joined a public or private channel.

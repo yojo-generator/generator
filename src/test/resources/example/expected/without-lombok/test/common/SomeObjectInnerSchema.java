@@ -1,7 +1,7 @@
 package example.testGenerate.test.common;
 
+import javax.validation.Valid;
 import testGenerate.ExistingClass;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 
 @Generated("Yojo")

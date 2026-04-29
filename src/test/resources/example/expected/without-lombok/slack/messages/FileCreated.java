@@ -1,9 +1,9 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.FileCreatedFile;
-import example.testGenerate.slack.common.FileCreatedType;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
+import slack.common.FileCreatedType;
 import javax.annotation.processing.Generated;
+import slack.common.FileCreatedFile;
 
 /**
 * A file was created.

@@ -1,8 +1,8 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.EmojiAddedSubtype;
+import slack.common.EmojiAddedSubtype;
+import slack.common.EmojiAddedType;
 import javax.annotation.processing.Generated;
-import example.testGenerate.slack.common.EmojiAddedType;
 import java.net.URI;
 
 /**

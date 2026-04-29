@@ -1,9 +1,9 @@
-package example.testGenerate.oneMore.common;
+package oneMore.common;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Max;
+import javax.validation.constraints.NotBlank;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 /**
 * Request parameters object

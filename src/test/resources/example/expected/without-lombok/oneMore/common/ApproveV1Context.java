@@ -1,6 +1,6 @@
-package example.testGenerate.oneMore.common;
+package oneMore.common;
 
-import jakarta.validation.constraints.NotBlank;
+import javax.validation.constraints.NotBlank;
 import javax.annotation.processing.Generated;
 
 /**

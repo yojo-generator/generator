@@ -1,9 +1,9 @@
-package example.testGenerate.oneMore.common;
+package oneMore.common;
 
 import java.util.List;
-import example.testGenerate.oneMore.common.CompanyPerson;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import javax.annotation.processing.Generated;
+import oneMore.common.CompanyPerson;
 
 @Generated("Yojo")
 public class Management {

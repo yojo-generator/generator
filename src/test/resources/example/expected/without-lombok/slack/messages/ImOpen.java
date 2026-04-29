@@ -1,7 +1,7 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.ImOpenType;
 import javax.annotation.processing.Generated;
+import slack.common.ImOpenType;
 
 /**
 * You opened a DM.

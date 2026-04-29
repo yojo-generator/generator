@@ -1,10 +1,10 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.EmojiAddedSubtype;
+import slack.common.EmojiAddedSubtype;
+import slack.common.EmojiAddedType;
 import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import example.testGenerate.slack.common.EmojiAddedType;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
 import java.net.URI;

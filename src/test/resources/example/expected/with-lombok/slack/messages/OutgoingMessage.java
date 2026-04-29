@@ -1,12 +1,12 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.OutgoingMessageType;
 import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
+import slack.common.OutgoingMessageType;
 
 /**
 * A message was sent to a channel.

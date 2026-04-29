@@ -1,8 +1,8 @@
 package example.testGenerate.test.common;
 
 import java.util.UUID;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;

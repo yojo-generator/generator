@@ -2,14 +2,15 @@ package example.testGenerate.test.io.github.somepath;
 
 import example.testGenerate.test.common.PolymorphExampleThree;
 import java.util.List;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 import example.testGenerate.test.common.RequestDtoSchemaInnerSchema;
 import testGenerate.InterfaceForImpl2;
+import javax.validation.constraints.NotNull;
 import java.util.UUID;
+import javax.validation.Valid;
 import testGenerate.InterfaceForImpl;
 import java.util.LinkedHashMap;
 import example.testGenerate.test.common.PolymorphPolymorphExampleOnePolymorphExampleTwo;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import example.testGenerate.test.common.RequestDtoSchemaInnerEnumWithDescription;
 import example.testGenerate.test.common.SomeObject;
@@ -17,7 +18,6 @@ import example.testGenerate.test.common.RequestDtoSchemaInnerEnumWithoutDescript
 import example.testGenerate.test.common.EnumResultWithDescription;
 import example.testGenerate.test.common.NumericsValues;
 import example.testGenerate.test.common.StringValues;
-import jakarta.validation.constraints.NotEmpty;
 import java.util.HashMap;
 import java.util.Map;
 import example.testGenerate.test.common.EnumResultWithoutDescription;

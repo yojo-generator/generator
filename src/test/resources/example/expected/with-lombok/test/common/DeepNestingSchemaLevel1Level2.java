@@ -1,8 +1,8 @@
 package example.testGenerate.test.common;
 
+import javax.validation.Valid;
 import example.testGenerate.test.common.DeepNestingSchemaLevel1Level2Level3;
 import lombok.Data;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;

@@ -1,4 +1,4 @@
-package example.testGenerate.asyncapi.common;
+package asyncapi.common;
 
 import javax.annotation.processing.Generated;
 import lombok.experimental.Accessors;

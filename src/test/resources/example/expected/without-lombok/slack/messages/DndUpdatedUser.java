@@ -1,9 +1,9 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.DndUpdatedUserType;
-import example.testGenerate.slack.common.DndUpdatedUserDndStatus;
-import jakarta.validation.Valid;
+import slack.common.DndUpdatedUserType;
+import javax.validation.Valid;
 import javax.annotation.processing.Generated;
+import slack.common.DndUpdatedUserDndStatus;
 
 /**
 * Do not Disturb settings changed for a member.

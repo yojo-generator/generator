@@ -1,7 +1,7 @@
 package example.testGenerate.test.common;
 
 import example.testGenerate.test.common.DeepNestingSchemaLevel1;
-import jakarta.validation.Valid;
+import javax.validation.Valid;
 import javax.annotation.processing.Generated;
 
 @Generated("Yojo")

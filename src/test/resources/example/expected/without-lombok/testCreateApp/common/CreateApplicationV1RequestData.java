@@ -1,8 +1,8 @@
-package example.testGenerate.testCreateApp.common;
+package testCreateApp.common;
 
-import jakarta.validation.Valid;
+import testCreateApp.common.CreateApplicationV1RequestDataConditions;
+import javax.validation.Valid;
 import javax.annotation.processing.Generated;
-import example.testGenerate.testCreateApp.common.CreateApplicationV1RequestDataConditions;
 
 @Generated("Yojo")
 public class CreateApplicationV1RequestData {

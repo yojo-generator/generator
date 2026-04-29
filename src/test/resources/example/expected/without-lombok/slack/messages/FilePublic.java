@@ -1,9 +1,9 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.FilePublicFile;
-import jakarta.validation.Valid;
+import slack.common.FilePublicType;
+import javax.validation.Valid;
+import slack.common.FilePublicFile;
 import javax.annotation.processing.Generated;
-import example.testGenerate.slack.common.FilePublicType;
 
 /**
 * A file was made public.

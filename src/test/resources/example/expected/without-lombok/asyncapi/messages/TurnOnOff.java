@@ -1,8 +1,8 @@
-package example.testGenerate.asyncapi.messages;
+package asyncapi.messages;
 
 import java.time.OffsetDateTime;
 import javax.annotation.processing.Generated;
-import example.testGenerate.asyncapi.common.TurnOnOffPayloadCommand;
+import asyncapi.common.TurnOnOffPayloadCommand;
 
 /**
 * Command a particular streetlight to turn the lights on or off.

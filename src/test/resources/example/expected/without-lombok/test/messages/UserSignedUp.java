@@ -1,6 +1,6 @@
 package example.testGenerate.test.messages;
 
-import jakarta.validation.constraints.Email;
+import javax.validation.constraints.Email;
 import javax.annotation.processing.Generated;
 
 @Generated("Yojo")

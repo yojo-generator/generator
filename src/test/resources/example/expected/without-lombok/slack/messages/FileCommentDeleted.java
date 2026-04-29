@@ -1,8 +1,8 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.FileCommentDeletedType;
-import example.testGenerate.slack.common.FileCommentDeletedFile;
-import jakarta.validation.Valid;
+import slack.common.FileCommentDeletedFile;
+import javax.validation.Valid;
+import slack.common.FileCommentDeletedType;
 import javax.annotation.processing.Generated;
 
 /**

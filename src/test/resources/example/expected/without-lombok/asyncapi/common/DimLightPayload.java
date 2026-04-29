@@ -1,9 +1,9 @@
-package example.testGenerate.asyncapi.common;
+package asyncapi.common;
 
 import java.time.OffsetDateTime;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Max;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 @Generated("Yojo")
 public class DimLightPayload {

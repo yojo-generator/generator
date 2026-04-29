@@ -1,6 +1,6 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.ChannelMarkedType;
+import slack.common.ChannelMarkedType;
 import javax.annotation.processing.Generated;
 
 /**

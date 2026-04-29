@@ -1,13 +1,13 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
 import java.util.List;
-import example.testGenerate.slack.common.Attachment;
-import example.testGenerate.slack.common.MessageEdited;
+import slack.common.MessageEdited;
+import slack.common.MessageType;
+import javax.validation.Valid;
 import lombok.Data;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import example.testGenerate.slack.common.MessageType;
+import slack.common.Attachment;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
 

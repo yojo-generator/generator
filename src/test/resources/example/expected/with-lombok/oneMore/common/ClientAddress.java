@@ -1,11 +1,11 @@
-package example.testGenerate.oneMore.common;
+package oneMore.common;
 
-import jakarta.validation.constraints.Size;
+import javax.validation.constraints.Size;
 import lombok.Data;
-import jakarta.validation.constraints.Pattern;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
+import javax.validation.constraints.Pattern;
 import lombok.NoArgsConstructor;
 
 /**

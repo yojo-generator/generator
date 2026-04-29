@@ -1,11 +1,11 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.FileChangeType;
+import slack.common.FileChangeFile;
+import javax.validation.Valid;
+import slack.common.FileChangeType;
 import lombok.Data;
-import jakarta.validation.Valid;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import example.testGenerate.slack.common.FileChangeFile;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
 

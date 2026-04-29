@@ -1,9 +1,9 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.FileChangeType;
-import jakarta.validation.Valid;
+import slack.common.FileChangeFile;
+import javax.validation.Valid;
+import slack.common.FileChangeType;
 import javax.annotation.processing.Generated;
-import example.testGenerate.slack.common.FileChangeFile;
 
 /**
 * A file was changed.

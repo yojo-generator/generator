@@ -1,4 +1,4 @@
-package example.testGenerate.gitter.messages;
+package gitter.messages;
 
 import javax.annotation.processing.Generated;
 

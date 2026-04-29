@@ -1,10 +1,10 @@
-package example.testGenerate.oneMore.common;
+package oneMore.common;
 
-import example.testGenerate.oneMore.common.ApproveV1Context;
-import jakarta.validation.constraints.NotNull;
-import example.testGenerate.oneMore.common.ApproveV1RequestData;
-import jakarta.validation.Valid;
+import oneMore.common.ApproveV1Context;
+import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
 import javax.annotation.processing.Generated;
+import oneMore.common.ApproveV1RequestData;
 
 /**
 * Approval message schema

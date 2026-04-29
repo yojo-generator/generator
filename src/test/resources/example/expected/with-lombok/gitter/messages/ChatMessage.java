@@ -1,16 +1,16 @@
-package example.testGenerate.gitter.messages;
+package gitter.messages;
 
 import java.util.List;
-import example.testGenerate.gitter.common.ChatMessageIssues;
 import java.time.OffsetDateTime;
 import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
-import jakarta.validation.Valid;
+import gitter.common.ChatMessageMentions;
+import javax.validation.Valid;
+import gitter.common.ChatMessageFromUser;
+import gitter.common.ChatMessageIssues;
 import javax.annotation.processing.Generated;
-import example.testGenerate.gitter.common.ChatMessageMentions;
-import example.testGenerate.gitter.common.ChatMessageFromUser;
 import java.math.BigDecimal;
 import java.net.URI;
 

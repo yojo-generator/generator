@@ -1,6 +1,6 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.ChannelDeletedType;
+import slack.common.ChannelDeletedType;
 import javax.annotation.processing.Generated;
 
 /**

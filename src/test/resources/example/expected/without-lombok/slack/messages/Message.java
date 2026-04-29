@@ -1,11 +1,11 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
 import java.util.List;
-import example.testGenerate.slack.common.Attachment;
-import example.testGenerate.slack.common.MessageEdited;
-import jakarta.validation.Valid;
+import slack.common.MessageEdited;
+import slack.common.MessageType;
+import javax.validation.Valid;
 import javax.annotation.processing.Generated;
-import example.testGenerate.slack.common.MessageType;
+import slack.common.Attachment;
 
 /**
 * A message was sent to a channel.

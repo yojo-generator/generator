@@ -1,13 +1,13 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.FilePublicFile;
+import slack.common.FilePublicType;
+import javax.validation.Valid;
 import lombok.Data;
-import jakarta.validation.Valid;
+import slack.common.FilePublicFile;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
-import example.testGenerate.slack.common.FilePublicType;
 
 /**
 * A file was made public.

@@ -1,8 +1,8 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.FileSharedFile;
-import example.testGenerate.slack.common.FileSharedType;
-import jakarta.validation.Valid;
+import slack.common.FileSharedFile;
+import javax.validation.Valid;
+import slack.common.FileSharedType;
 import javax.annotation.processing.Generated;
 
 /**

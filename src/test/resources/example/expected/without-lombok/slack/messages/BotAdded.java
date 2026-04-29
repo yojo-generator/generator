@@ -1,8 +1,8 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.BotAddedType;
-import example.testGenerate.slack.common.BotAddedBot;
-import jakarta.validation.Valid;
+import slack.common.BotAddedType;
+import javax.validation.Valid;
+import slack.common.BotAddedBot;
 import javax.annotation.processing.Generated;
 
 /**

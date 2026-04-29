@@ -1,6 +1,6 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.CommandsChangedType;
+import slack.common.CommandsChangedType;
 import javax.annotation.processing.Generated;
 
 /**

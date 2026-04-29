@@ -1,4 +1,4 @@
-package example.testGenerate.discriminator.common;
+package discriminator.common;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

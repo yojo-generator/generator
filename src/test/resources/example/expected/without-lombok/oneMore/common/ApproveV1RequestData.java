@@ -1,7 +1,7 @@
-package example.testGenerate.oneMore.common;
+package oneMore.common;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import javax.annotation.processing.Generated;
 

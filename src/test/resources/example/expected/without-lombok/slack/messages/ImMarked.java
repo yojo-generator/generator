@@ -1,6 +1,6 @@
-package example.testGenerate.slack.messages;
+package slack.messages;
 
-import example.testGenerate.slack.common.ImMarkedType;
+import slack.common.ImMarkedType;
 import javax.annotation.processing.Generated;
 
 /**

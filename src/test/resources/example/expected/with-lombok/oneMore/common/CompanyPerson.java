@@ -1,18 +1,18 @@
-package example.testGenerate.oneMore.common;
+package oneMore.common;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Min;
-import example.testGenerate.oneMore.common.ClientAddress;
+import javax.validation.constraints.Size;
 import lombok.Data;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
-import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
+import oneMore.common.ClientAddress;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Pattern;
 
 @Generated("Yojo")
 @Data

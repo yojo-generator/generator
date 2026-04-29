@@ -1,8 +1,8 @@
-package example.testGenerate.oneMore.common;
+package oneMore.common;
 
-import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.Pattern;
 
 /**
 * Address
