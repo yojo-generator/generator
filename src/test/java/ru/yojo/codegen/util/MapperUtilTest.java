@@ -87,4 +87,19 @@ class MapperUtilTest {
 
         assertThat(actualResultStringBuilder.toString()).hasToString(expected);
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "firstName, firstName",      // camelCase preserved
+            "FirstName, FirstName",      // PascalCase preserved (as in contract)
+            "URL, URL",                 // ALL CAPS preserved (as in contract)
+            "user-name, userName",      // kebab-case -> camelCase
+            "user_name, userName",      // snake_case -> camelCase
+            "User Name, UserName",      // space -> camelCase (first letter after space uppercase)
+            "class, classField",        // Java keyword -> append "Field"
+    })
+    void toValidJavaFieldNamePreservesCaseTest(String input, String expected) {
+        String actual = MapperUtil.toValidJavaFieldName(input);
+        assertThat(actual).isEqualTo(expected);
+    }
 }

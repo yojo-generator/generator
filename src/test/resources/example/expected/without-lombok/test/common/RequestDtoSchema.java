@@ -51,7 +51,7 @@ public class RequestDtoSchema extends ClassForExtends implements InterfaceForImp
      */
     @Valid
     @NotNull
-    private StringValues stringValues;
+    private StringValues StringValues;
 
     /**
      * Here was located all supported numeric values
@@ -223,11 +223,11 @@ public class RequestDtoSchema extends ClassForExtends implements InterfaceForImp
     public ObjectTypes getObjectTypes() {
         return objectTypes;
     }
-    public void setStringValues(StringValues stringValues) {
-        this.stringValues = stringValues;
+    public void setStringValues(StringValues StringValues) {
+        this.StringValues = StringValues;
     }
     public StringValues getStringValues() {
-        return stringValues;
+        return StringValues;
     }
     public void setNumericsValues(NumericsValues numericsValues) {
         this.numericsValues = numericsValues;

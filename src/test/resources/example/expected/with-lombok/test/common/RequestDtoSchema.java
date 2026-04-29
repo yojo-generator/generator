@@ -57,7 +57,7 @@ public class RequestDtoSchema extends ClassForExtends implements InterfaceForImp
      */
     @Valid
     @NotNull
-    private StringValues stringValues;
+    private StringValues StringValues;
 
     /**
      * Here was located all supported numeric values

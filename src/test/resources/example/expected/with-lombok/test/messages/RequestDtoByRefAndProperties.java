@@ -58,7 +58,7 @@ public class RequestDtoByRefAndProperties extends ClassForExtends implements Int
      */
     @Valid
     @NotNull
-    private StringValues stringValues;
+    private StringValues StringValues;
 
     /**
      * Here was located all supported numeric values

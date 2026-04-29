@@ -58,7 +58,7 @@ public class RequestDtoWithDoubleInheritance extends ClassForExtends implements 
      */
     @Valid
     @NotNull
-    private StringValues stringValues;
+    private StringValues StringValues;
 
     /**
      * Here was located all supported numeric values

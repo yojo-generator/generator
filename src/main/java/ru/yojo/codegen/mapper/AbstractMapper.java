@@ -55,7 +55,8 @@ public class AbstractMapper {
                                ProcessContext processContext,
                                Map<String, Object> innerSchemas) {
         variableProperties.setSpringBootVersion(processContext.getSpringBootVersion());
-        variableProperties.setName(safeFieldName(uncapitalize(propertyName)));
+        // Keep original case from contract: "FirstName" stays "FirstName", "firstName" stays "firstName"
+        variableProperties.setName(safeFieldName(propertyName));
         // ⬇️ const → defaultProperty
         String constValue = getStringValueIfExistOrElseNull("const", propertiesMap);
         if (constValue != null) {

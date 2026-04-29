@@ -56,7 +56,7 @@ public class RequestDtoByRef extends ClassForExtends implements InterfaceForImpl
      */
     @Valid
     @NotNull
-    private StringValues stringValues;
+    private StringValues StringValues;
 
     /**
      * Here was located all supported numeric values

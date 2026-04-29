@@ -46,7 +46,7 @@ public class ExampleFive {
      * Here was located all supported strings values
      */
     @Valid
-    private StringValues stringValues;
+    private StringValues StringValues;
 
     /**
      * Here was located all supported numeric values
@@ -227,11 +227,11 @@ public class ExampleFive {
     public ObjectTypes getObjectTypes() {
         return objectTypes;
     }
-    public void setStringValues(StringValues stringValues) {
-        this.stringValues = stringValues;
+    public void setStringValues(StringValues StringValues) {
+        this.StringValues = StringValues;
     }
     public StringValues getStringValues() {
-        return stringValues;
+        return StringValues;
     }
     public void setNumericsValues(NumericsValues numericsValues) {
         this.numericsValues = numericsValues;

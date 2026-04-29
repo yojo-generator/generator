@@ -54,7 +54,7 @@ public class ExampleFive {
      * Here was located all supported strings values
      */
     @Valid
-    private StringValues stringValues;
+    private StringValues StringValues;
 
     /**
      * Here was located all supported numeric values
