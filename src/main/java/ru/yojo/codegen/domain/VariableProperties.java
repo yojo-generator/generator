@@ -145,6 +145,11 @@ public class VariableProperties {
     private boolean valid = true;
 
     /**
+     * {@code true} if this field is the discriminator field in a subtype (should get @JsonTypeId).
+     */
+    private boolean isDiscriminatorField = false;
+
+    /**
      * Collection type: {@code "list"} (default) or {@code "set"}.
      */
     private String collectionType = "list";
@@ -1065,9 +1070,21 @@ public class VariableProperties {
     }
 
     /**
-     * Returns the {@code multipleOf} value.
-     *
-     * @return multiple-of constraint or {@code null}
+     * @return {@code true} if this field is the discriminator field (should get @JsonTypeId)
+     */
+    public boolean isDiscriminatorField() {
+        return isDiscriminatorField;
+    }
+
+    /**
+     * @param discriminatorField {@code true} if this field is the discriminator field
+     */
+    public void setDiscriminatorField(boolean discriminatorField) {
+        isDiscriminatorField = discriminatorField;
+    }
+
+    /**
+     * @return original name or {@code null}
      */
     public String getMultipleOf() {
         return multipleOf;
@@ -1100,6 +1117,14 @@ public class VariableProperties {
                         .append(simpleName);
                 requiredImports.add(annotation.endsWith(";") ? annotation : annotation + ";");
             }
+        }
+        
+        // Add @JsonTypeId for discriminator fields in subtypes
+        if (isDiscriminatorField) {
+            stringBuilder.append(lineSeparator())
+                    .append(TABULATION)
+                    .append(JSON_TYPE_ID_ANNOTATION);
+            requiredImports.add(JSON_TYPE_ID_IMPORT);
         }
         
         if (this.nullableAnnotation != null && !this.nullableAnnotation.trim().isEmpty()) {

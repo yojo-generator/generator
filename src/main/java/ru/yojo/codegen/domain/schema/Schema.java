@@ -98,6 +98,11 @@ public class Schema {
     private String discriminator;
 
     /**
+     * Discriminator field name in subtypes (the field that should get @JsonTypeId).
+     */
+    private String discriminatorField;
+
+    /**
      * List of subtypes for @JsonSubTypes annotation.
      */
     private List<String> subtypes = new ArrayList<>();
@@ -179,6 +184,15 @@ public class Schema {
      */
     public void setFillParameters(FillParameters fillParameters) {
         this.fillParameters = fillParameters;
+    }
+
+    /**
+     * Returns the field and validation container.
+     *
+     * @return fill parameters with all fields
+     */
+    public FillParameters getFillParameters() {
+        return fillParameters;
     }
 
     /**
@@ -283,6 +297,20 @@ public class Schema {
      */
     public void setDiscriminator(String discriminator) {
         this.discriminator = discriminator;
+    }
+
+    /**
+     * Returns the discriminator field name for subtypes (the field to annotate with @JsonTypeId).
+     */
+    public String getDiscriminatorField() {
+        return discriminatorField;
+    }
+
+    /**
+     * Sets the discriminator field name for subtypes.
+     */
+    public void setDiscriminatorField(String discriminatorField) {
+        this.discriminatorField = discriminatorField;
     }
 
     /**

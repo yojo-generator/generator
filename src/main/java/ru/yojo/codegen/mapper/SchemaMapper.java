@@ -34,6 +34,12 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 @SuppressWarnings("all")
 public class SchemaMapper extends AbstractMapper {
 
+    // ⚡ PRE-SCAN: Set of discriminator base schema names
+    private Set<String> discriminatorBases = new HashSet<>();
+    
+    // ⚡ PRE-SCAN: Map from base schema name to discriminator field name
+    private Map<String, String> discriminatorFieldMap = new HashMap<>();
+
     /**
      * Converts all top-level and inner schemas from the given {@link ProcessContext} into {@link Schema} instances.
      * <p>
@@ -51,6 +57,24 @@ public class SchemaMapper extends AbstractMapper {
      */
     public List<Schema> mapSchemasToObjects(ProcessContext processContext) {
         List<Schema> schemaList = new ArrayList<>();
+        
+        // ⚡ PRE-SCAN: Collect all discriminator base schemas (use class field!)
+        discriminatorBases.clear(); // Clear before filling
+        discriminatorFieldMap.clear(); // Clear before filling
+        processContext.getSchemasMap().forEach((schemaName, schemaValues) -> {
+            Map<String, Object> schemaMap = castObjectToMap(schemaValues);
+            if (schemaMap != null && schemaMap.containsKey(DISCRIMINATOR)) {
+                String baseName = capitalize(schemaName);
+                discriminatorBases.add(baseName);
+                // Store the discriminator field name
+                String discField = getStringValueIfExistOrElseNull(DISCRIMINATOR, schemaMap);
+                discriminatorFieldMap.put(baseName, discField);
+                System.out.println("DISCRIMINATOR PRE-SCAN: Found base schema: " + schemaName + " with discriminator field: " + discField);
+            }
+        });
+        System.out.println("DISCRIMINATOR PRE-SCAN: Discriminator bases: " + discriminatorBases);
+        System.out.println("DISCRIMINATOR PRE-SCAN: Discriminator field map: " + discriminatorFieldMap);
+        
         processContext.getSchemasMap().forEach((schemaName, schemaValues) -> {
             LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(processContext.getLombokProperties());
             System.out.println("START MAPPING OF SCHEMA: " + schemaName);
@@ -136,7 +160,8 @@ public class SchemaMapper extends AbstractMapper {
                                     processContext.getSchemasMap(),
                                     castObjectToMap(schemaMap.get(PROPERTIES)),
                                     processContext,
-                                    processContext.getHelper().getInnerSchemas()
+                                    processContext.getHelper().getInnerSchemas(),
+                                    discriminatorBases
                             )
                     );
                 } else {
@@ -182,7 +207,8 @@ public class SchemaMapper extends AbstractMapper {
                                     processContext.getHelper().getInnerSchemas(),
                                     castObjectToMap(schemaMap.get(PROPERTIES)),
                                     processContext,
-                                    processContext.getHelper().getInnerSchemas()
+                                    processContext.getHelper().getInnerSchemas(),
+                                    discriminatorBases
                             )
                     );
                     schemaList.add(schema);
@@ -220,7 +246,7 @@ public class SchemaMapper extends AbstractMapper {
         Map<String, String> baseDiscriminator = new HashMap<>();
         Map<String, Schema> schemaByName = new HashMap<>();
         
-// Find base schemas with discriminator
+        // Find base schemas with discriminator
         for (Schema schema : schemaList) {
             String key = capitalize(schema.getSchemaName());
             Map<String, Object> schemaMap = castObjectToMap(schemasMap.get(key));
@@ -230,6 +256,12 @@ public class SchemaMapper extends AbstractMapper {
                     baseDiscriminator.put(schema.getSchemaName(), disc);
                     schema.setDiscriminator(disc);
                     schemaByName.put(schema.getSchemaName(), schema);
+                    
+                    // ⚡ SIMPLIFIED: discriminator value IS the field name
+                    // In AsyncAPI: discriminator: petType means the field "petType" is the discriminator
+                    schema.setDiscriminatorField(disc);
+                    System.out.println("DISCRIMINATOR: Base schema " + schema.getSchemaName() + 
+                                      " has discriminator field: " + disc);
                 }
             }
         }
@@ -238,11 +270,11 @@ public class SchemaMapper extends AbstractMapper {
         for (Schema schema : schemaList) {
             String schemaName = schema.getSchemaName();
             if (baseDiscriminator.containsKey(schemaName)) continue;
-
+            
             String key = capitalize(schemaName);
             Map<String, Object> schemaMap = castObjectToMap(schemasMap.get(key));
             if (schemaMap == null || !schemaMap.containsKey(ALL_OF)) continue;
-
+            
             List<Object> allOfList = castObjectToListObjects(schemaMap.get(ALL_OF));
             for (Object item : allOfList) {
                 Map<String, Object> itemMap = castObjectToMap(item);
@@ -254,18 +286,114 @@ public class SchemaMapper extends AbstractMapper {
                     Schema baseSchema = schemaByName.get(baseName);
                     if (baseSchema != null) {
                         baseSchema.getSubtypes().add(schemaName);
+                        
+                        // ⚡ Set extendsFrom for discriminator-based inheritance
+                        schema.setExtendsFrom(baseName);
+                        System.out.println("DISCRIMINATOR: Setting extendsFrom=" + baseName + " for subtype: " + schemaName);
+                        
+                        // Mark discriminator field in BASE schema (where @JsonTypeId will be added)
+                        String discriminatorField = baseDiscriminator.get(baseName);
+                        if (discriminatorField != null) {
+                            baseSchema.setDiscriminatorField(discriminatorField);
+                            // Mark the field in the base schema's VariableProperties
+                            markDiscriminatorFieldInSchema(baseSchema, discriminatorField);
+                            System.out.println("DISCRIMINATOR: Marked discriminator field '" + discriminatorField + "' in BASE class: " + baseName);
+                        }
                     }
                 }
             }
-}
+        }
     }
-
+    
+    /**
+     * Marks the field with the given name as discriminator field in the schema's VariableProperties.
+     * 
+     * @param schema the schema to update
+     * @param discriminatorFieldName the name of the discriminator field
+     */
+    private void markDiscriminatorFieldInSchema(Schema schema, String discriminatorFieldName) {
+        if (schema.getFillParameters() == null) return;
+        
+        for (VariableProperties vp : schema.getFillParameters().getVariableProperties()) {
+            if (vp.getName() != null && vp.getName().equals(discriminatorFieldName)) {
+                vp.setDiscriminatorField(true);
+                break;
+            }
+        }
+    }
+    
     /**
      * Capitalize first letter.
      */
     private static String capitalize(String s) {
         if (s == null || s.isEmpty()) return s;
         return s.substring(0, 1).toUpperCase() + s.substring(1);
+    }
+
+    /**
+     * Find the field name that matches the discriminator value.
+     * Looks through properties to find a field whose value matches the discriminator.
+     *
+     * @param properties map of property name → property definition
+     * @param discriminator discriminator value (e.g., "Cat", "Dog")
+     * @return field name that should be annotated with @JsonTypeId, or null if not found
+     */
+    private static String findDiscriminatorField(Map<String, Object> properties, String discriminator) {
+        if (properties == null || discriminator == null) return null;
+        
+        for (Map.Entry<String, Object> entry : properties.entrySet()) {
+            String propertyName = entry.getKey();
+            Map<String, Object> propertyMap = castObjectToMap(entry.getValue());
+            if (propertyMap == null) continue;
+            
+            // Check if this property has enum with discriminator value
+            Object enumObj = propertyMap.get(ENUMERATION);
+            if (enumObj instanceof List) {
+                List<Object> enumList = (List<Object>) enumObj;
+                if (enumList.contains(discriminator)) {
+                    return propertyName;
+                }
+            }
+            
+            // Also check if property name matches discriminator (common case)
+            if (propertyName.equalsIgnoreCase(discriminator) || 
+                propertyName.equalsIgnoreCase("type")) {
+                return propertyName;
+            }
+        }
+        
+        // Default: return "type" or discriminator field name
+        return properties.containsKey("type") ? "type" : null;
+    }
+    
+    /**
+     * Find the discriminator field for a schema by looking at its $ref to a discriminator base.
+     * If this schema has allOf with $ref to a base that has a discriminator, return that discriminator field.
+     * 
+     * @param currentSchema the schema to check
+     * @return the discriminator field name, or null if not found
+     */
+    private String findDiscriminatorFieldForSchema(Map<String, Object> currentSchema) {
+        for (String polyKey : POLYMORPHS) {
+            if (currentSchema.containsKey(polyKey)) {
+                List<Object> items = castObjectToListObjects(currentSchema.get(polyKey));
+                for (Object item : items) {
+                    if (item instanceof Map) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> itemMap = (Map<String, Object>) item;
+                        String ref = getStringValueIfExistOrElseNull(REFERENCE, itemMap);
+                        if (ref != null) {
+                            String schemaName = refReplace(ref);
+                            // Check if this is a discriminator base schema
+                            if (discriminatorFieldMap.containsKey(schemaName)) {
+                                return discriminatorFieldMap.get(schemaName);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -284,14 +412,16 @@ public class SchemaMapper extends AbstractMapper {
      * @param properties     root {@code properties} map (may be empty)
      * @param processContext generation context (packages, Spring Boot version, helper)
      * @param innerSchemas   accumulator for discovered inner schemas (mutated)
+     * @param discriminatorBases set of discriminator base schema names to skip during merge
      * @return {@link FillParameters} container with all fields and metadata
      */
     public FillParameters getSchemaVariableProperties(String schemaName,
-                                                      Map<String, Object> currentSchema,
-                                                      Map<String, Object> schemas,
-                                                      Map<String, Object> properties,
-                                                      ProcessContext processContext,
-                                                      Map<String, Object> innerSchemas) {
+                                                       Map<String, Object> currentSchema,
+                                                       Map<String, Object> schemas,
+                                                       Map<String, Object> properties,
+                                                       ProcessContext processContext,
+                                                       Map<String, Object> innerSchemas,
+                                                       Set<String> discriminatorBases) {
         List<VariableProperties> variableProperties = new LinkedList<>();
 
         // 🔹 ШАГ 1: ВСЕГДА обрабатываем корневые properties (если есть)
@@ -307,7 +437,8 @@ public class SchemaMapper extends AbstractMapper {
                         javaName,
                         castObjectToMap(propertyValue),
                         processContext,
-                        processContext.getHelper().getInnerSchemas());
+                        innerSchemas);
+                
                 variableProperties.add(vp);
             });
         }
@@ -318,7 +449,8 @@ public class SchemaMapper extends AbstractMapper {
             System.out.println("POLYMORPH: " + currentSchema);
             List<String> polymorphSchemasNames = getPolymorphSchemasNames(currentSchema, schemas);
             System.out.println(polymorphSchemasNames);
-            Map<String, Object> mergedProperties = mergeProperties(polymorphSchemasNames, currentSchema, schemas);
+            
+            Map<String, Object> mergedProperties = mergeProperties(polymorphSchemasNames, currentSchema, schemas, discriminatorBases);
             registerNestedSchemas(schemaName, mergedProperties, schemas, processContext.getHelper().getInnerSchemas());
             // ➕ Добавляем НЕДОСТАЮЩИЕ поля из allOf (если их нет в корневых properties)
             mergedProperties.forEach((propertyName, propertyValue) -> {
@@ -333,6 +465,7 @@ public class SchemaMapper extends AbstractMapper {
                             castObjectToMap(propertyValue),
                             processContext,
                             processContext.getHelper().getInnerSchemas());
+
                     variableProperties.add(vp);
                 }
             });
@@ -343,7 +476,7 @@ public class SchemaMapper extends AbstractMapper {
             VariableProperties vp = new VariableProperties();
             vp.setValid(false);
             vp.setEnum(true);
-            fillProperties(schemaName, vp, currentSchema, schemas, schemaName, currentSchema, processContext, processContext.getHelper().getInnerSchemas());
+            fillProperties(schemaName, vp, currentSchema, schemas, schemaName, currentSchema, processContext, innerSchemas);
             variableProperties.add(vp);
         }
 
@@ -388,65 +521,90 @@ public class SchemaMapper extends AbstractMapper {
      * <ul>
      *   <li>Properties from {@code $ref} and inline objects ({@code type: object, properties: {...}}) are merged</li>
      *   <li>Root {@code properties} (outside polymorphic block) have highest priority and overwrite duplicates</li>
+     *   <li>For discriminator base schemas, ALL fields are skipped - inherited via 'extends'</li>
      * </ul>
      *
      * @param polymorphSchemasNames unused (legacy signature); actual refs resolved from {@code currentSchema}
      * @param currentSchema         schema with {@code allOf}/{@code oneOf}/{@code anyOf}
      * @param schemas               global schema registry
+     * @param discriminatorBases    set of discriminator base schema names to skip during merge
      * @return merged map of property name → definition
      */
     private Map<String, Object> mergeProperties(List<String> polymorphSchemasNames,
-                                                Map<String, Object> currentSchema,
-                                                Map<String, Object> schemas) {
+                                                  Map<String, Object> currentSchema,
+                                                  Map<String, Object> schemas,
+                                                  Set<String> discriminatorBases) {
         Map<String, Object> merged = new LinkedHashMap<>();
-
+        
+        System.out.println("MERGE: Starting merge for schema with keys: " + currentSchema.keySet());
+        System.out.println("MERGE: Discriminator bases: " + discriminatorBases);
+        
         // 1. Сначала обрабатываем allOf/oneOf/anyOf: добавляем свойства из $ref и inline-объектов
         for (String polyKey : POLYMORPHS) {
             if (currentSchema.containsKey(polyKey)) {
+                System.out.println("MERGE: Processing " + polyKey + " for schema");
                 List<Object> items = castObjectToListObjects(currentSchema.get(polyKey));
                 for (Object item : items) {
                     if (item instanceof Map) {
                         @SuppressWarnings("unchecked")
                         Map<String, Object> itemMap = (Map<String, Object>) item;
-
+                        
                         // Случай 1: $ref → разрешаем и добавляем его properties
                         String ref = getStringValueIfExistOrElseNull(REFERENCE, itemMap);
                         if (ref != null) {
                             String schemaName = refReplace(ref);
-                            Map<String, Object> target = castObjectToMap(schemas.get(schemaName));
-                            if (target != null) {
-                                Map<String, Object> props = castObjectToMap(target.get(PROPERTIES));
-                                if (props != null) {
-                                    merged.putAll(props);
+                            System.out.println("MERGE: Found $ref: " + schemaName);
+                            
+                            // ⚡ CRITICAL: Skip if this is a discriminator base schema
+                            if (discriminatorBases.contains(schemaName)) {
+                                System.out.println("MERGE: SKIPPING " + schemaName + " - it's a discriminator base, fields will be inherited via 'extends'");
+                            } else {
+                                Map<String, Object> target = castObjectToMap(schemas.get(schemaName));
+                                if (target != null) {
+                                    Map<String, Object> props = castObjectToMap(target.get(PROPERTIES));
+                                    if (props != null) {
+                                        merged.putAll(props);
+                                        System.out.println("MERGE: Added properties from " + schemaName + ": " + props.keySet());
+                                    } else {
+                                        System.out.println("MERGE: WARNING - No properties found in " + schemaName);
+                                    }
                                 }
                             }
                         }
                         // Случай 2: inline объект с properties
                         else if (OBJECT.equals(getStringValueIfExistOrElseNull(TYPE, itemMap))) {
+                            System.out.println("MERGE: Found inline object");
                             Map<String, Object> props = castObjectToMap(itemMap.get(PROPERTIES));
                             if (props != null) {
                                 merged.putAll(props);
-                            }
-                        }
-                        // Случай 3: bare properties (редко, но возможно)
-                        else if (itemMap.containsKey(PROPERTIES)) {
-                            Map<String, Object> props = castObjectToMap(itemMap.get(PROPERTIES));
-                            if (props != null) {
-                                merged.putAll(props);
+                                System.out.println("MERGE: Added inline properties: " + props.keySet());
                             }
                         }
                     }
                 }
             }
         }
-
+        
+        System.out.println("MERGE: After processing allOf/oneOf/anyOf, merged keys: " + merged.keySet());
+        
         // 2. Если есть корневые properties — мержим их поверх (приоритет highest)
-        //    Это нужно для ExampleFive: allOf + корневые properties
         Map<String, Object> rootProps = castObjectToMap(currentSchema.get(PROPERTIES));
         if (rootProps != null && !rootProps.isEmpty()) {
             merged.putAll(rootProps);
+            System.out.println("MERGE: Added root properties: " + rootProps.keySet());
         }
-
+        
+        System.out.println("MERGE: Final merged keys: " + merged.keySet());
         return merged;
+    }
+
+    /**
+     * Returns the set of discriminator base schema names collected during pre-scan.
+     * Used by {@link MessageMapper} to skip fields from discriminator base schemas.
+     *
+     * @return immutable view of discriminator base schema names
+     */
+    public Set<String> getDiscriminatorBases() {
+        return Collections.unmodifiableSet(discriminatorBases);
     }
 }

@@ -1,0 +1,28 @@
+package example.testGenerate.test.messages;
+
+import javax.validation.constraints.Email;
+import lombok.Data;
+import javax.annotation.processing.Generated;
+import lombok.AllArgsConstructor;
+import lombok.experimental.Accessors;
+import lombok.NoArgsConstructor;
+
+@Generated("Yojo")
+@Data
+@NoArgsConstructor
+@Accessors(fluent = true, chain = true)
+@AllArgsConstructor
+public class UserSignedUp {
+
+    /**
+     * Name of the user
+     */
+    private String displayName;
+
+    /**
+     * Email of the user
+     */
+    @Email
+    private String email;
+
+}
