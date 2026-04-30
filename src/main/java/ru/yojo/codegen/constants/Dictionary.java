@@ -235,7 +235,14 @@ public final class Dictionary {
     /**
      * YAML property name for discriminator
      */
-    public static final String DISCRIMINATOR = "discriminator";
+    public static final String DISCRIMINATOR = "discriminator"; 
+
+    /**
+     * YAML property name for const value (used in discriminator fields to override default value)
+     * Example: {@code petType: { const: StickBug }}
+     */
+    public static final String CONST = "const";
+
 
     /**
      * Lombok configuration keys (manual override section).
