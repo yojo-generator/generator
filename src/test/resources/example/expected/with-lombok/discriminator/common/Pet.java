@@ -2,6 +2,7 @@ package discriminator.common;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeId;
 import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,7 @@ public class Pet {
 
     private String name;
 
+    @JsonTypeId
     private String petType;
 
 }

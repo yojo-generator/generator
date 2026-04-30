@@ -2,6 +2,7 @@ package discriminator.common;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeId;
 import javax.annotation.processing.Generated;
 
 @Generated("Yojo")
@@ -14,6 +15,7 @@ public class Pet {
 
     private String name;
 
+    @JsonTypeId
     private String petType;
 
     public void setName(String name) {

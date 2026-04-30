@@ -1,6 +1,5 @@
 package discriminator.common;
 
-import com.fasterxml.jackson.annotation.JsonTypeId;
 import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
@@ -12,12 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
-public class Cat {
-
-    private String name;
-
-    @JsonTypeId
-    private String petType;
+public class Cat extends Pet {
 
     private String huntingSkill;
 
