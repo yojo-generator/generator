@@ -113,13 +113,40 @@ public class Schema {
     private Set<String> uniqueSubtypes = new HashSet<>();
 
     /**
-     * Adds a subtype (deduplicates automatically).
+     * Map from subtype schema name to discriminator value (for @JsonSubTypes.Type name = "...").
+     * If a subtype has a const value in the discriminator field, that value is used instead of schema name.
+     */
+    private Map<String, String> subtypeDiscriminatorValues = new LinkedHashMap<>();
+
+    /**
+     * Adds a subtype with default discriminator value (schema name).
      */
     public void addSubtype(String subtype) {
+        addSubtype(subtype, subtype);
+    }
+
+    /**
+     * Adds a subtype with explicit discriminator value.
+     *
+     * @param subtype           schema name of the subtype
+     * @param discriminatorValue value for @JsonSubTypes.Type(name = "...")
+     */
+    public void addSubtype(String subtype, String discriminatorValue) {
         if (!uniqueSubtypes.contains(subtype)) {
             uniqueSubtypes.add(subtype);
             subtypes.add(subtype);
+            subtypeDiscriminatorValues.put(subtype, discriminatorValue);
         }
+    }
+
+    /**
+     * Returns the discriminator value for a given subtype.
+     *
+     * @param subtype schema name
+     * @return discriminator value (defaults to subtype name if not explicitly set)
+     */
+    public String getSubtypeDiscriminatorValue(String subtype) {
+        return subtypeDiscriminatorValues.getOrDefault(subtype, subtype);
     }
 
     /**
@@ -128,6 +155,7 @@ public class Schema {
     public void clearSubtypes() {
         subtypes.clear();
         uniqueSubtypes.clear();
+        subtypeDiscriminatorValues.clear();
     }
 
     // ——— Getters & Setters ——— //
@@ -522,7 +550,9 @@ public class Schema {
                 StringBuilder subtypesBuilder = new StringBuilder();
                 subtypesBuilder.append("@JsonSubTypes({").append(lineSeparator());
                 for (int i = 0; i < subtypes.size(); i++) {
-                    subtypesBuilder.append(String.format("    @JsonSubTypes.Type(value = %s.class, name = \"%s\")", subtypes.get(i), subtypes.get(i)));
+                    String subtype = subtypes.get(i);
+                    String discriminatorValue = subtypeDiscriminatorValues.getOrDefault(subtype, subtype);
+                    subtypesBuilder.append(String.format("    @JsonSubTypes.Type(value = %s.class, name = \"%s\")", subtype, discriminatorValue));
                     if (i < subtypes.size() - 1) {
                         subtypesBuilder.append(",").append(lineSeparator());
                     } else {

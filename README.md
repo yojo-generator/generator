@@ -153,6 +153,9 @@ public class PolymorphStatusOnlyStatusWithCode {
 ---
 
 ### 6.1 Discriminator (`discriminator` + `allOf`)
+
+**Supports `const` in discriminator field to override default discriminator value!**
+
 **YAML** — для явной типизации при десериализации
 ```yaml
 Pet:
@@ -177,16 +180,32 @@ Dog:
   properties:
     packSize:
       type: integer
+
+# ✅ const support: discriminator value is "StickBug", not "StickInsect"
+StickInsect:
+  description: A representation of an Australian walking stick
+  allOf:
+    - $ref: '#/components/schemas/Pet'
+    - type: object
+      properties:
+        petType:
+          const: StickBug
+        color:
+          type: string
+      required:
+        - color
 ```
 → **Java**
 ```java
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "petType", visible = true)
 @JsonSubTypes({
     @JsonSubTypes.Type(value = Cat.class, name = "Cat"),
-    @JsonSubTypes.Type(value = Dog.class, name = "Dog")
+    @JsonSubTypes.Type(value = Dog.class, name = "Dog"),
+    @JsonSubTypes.Type(value = StickInsect.class, name = "StickBug")  // ← const value!
 })
 public class Pet {
     private String name;
+    @JsonTypeId
     private String petType;
 }
 
@@ -197,127 +216,16 @@ public class Cat extends Pet {
 public class Dog extends Pet {
     private Integer packSize;
 }
-```
 
-> ✅ Полиморфная десериализация работает автоматически: Jackson читает поле `petType` и создаёт нужный класс (`Cat` или `Dog`).
-
----
-
-### 7. Inheritance & Interfaces (complete cases)
-
-#### 7.1 Simple inheritance
-**YAML**
-```yaml
-UserDto:
-  type: object
-  extends:
-    fromClass: BaseEntity
-    fromPackage: com.my.base
-  properties:
-    name: { type: string }
-```
-→ `class UserDto extends BaseEntity { private String name; }`
-
-#### 7.2 Override in message
-**YAML**
-```yaml
-CreateUserMessage:
-  payload:
-    $ref: '#/components/schemas/UserDto'
-    extends:
-      fromClass: BaseEvent
-      fromPackage: com.my.events
-```
-→ `class CreateUserMessage extends BaseEvent { /* fields from UserDto */ }`  
-(⚠️ `UserDto` is **not generated** if `UserDto` == `BaseEvent`)
-
-#### 7.3 `extends: SchemaName` — skip field duplication
-```yaml
-MyDto:
-  type: object
-  $ref: './User.yaml#/components/schemas/User'
-  extends:
-    fromClass: User
-    fromPackage: com.example.common
-```
-→ `class MyDto extends User { }` — **no field duplication**.
-
----
-
-### 8. `realization` — Collections and Maps
-
-| Attribute        | YAML                                                                                                                             | → Java                                                 |
-|------------------|----------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------|
-| `realization`    | <pre lang="yaml">users:<br>  type: array<br>  items:<br>    $ref: '#/components/schemas/User'<br>  realization: LinkedList</pre> | `private List<User> users = new LinkedList<>();`       |
-|                  | <pre lang="yaml">cache:<br>  type: object<br>  realization: HashMap<br>  additionalProperties:<br>    type: string</pre>         | `private Map<String, String> cache = new HashMap<>();` |
-| Supported values | `ArrayList`, `LinkedList`, `HashSet`, `HashMap`, `LinkedHashMap`                                                                 |                                                        |
-
----
-
-### 9. `format: existing`, `pathForGenerateMessage`, `removeSchema`
-
-| Attribute                | YAML                                                                                                                                       | → Java                                                     |
-|--------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|
-| `format: existing`       | <pre lang="yaml">user:<br>  type: object<br>  format: existing<br>  name: User<br>  package: com.my.domain</pre>                           | `private User user;` + `import com.my.domain.User;`        |
-| `pathForGenerateMessage` | <pre lang="yaml">RequestDto:<br>  payload:<br>    pathForGenerateMessage: 'io.github.events'<br>    $ref: '#/components/schemas/Dto'</pre> | class generated in `.../io/github/events/RequestDto.java`  |
-| `removeSchema: true`     | <pre lang="yaml">payload:<br>  $ref: '#/components/schemas/Temp'<br>  removeSchema: true</pre>                                             | schema `Temp` is **not generated**, only fields in message |
----
-
-### 10. Interfaces
-
-| Type         | YAML                                                                                                                                                                                                                                                 | → Java                                                                                                                            |
-|--------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| Marker       | <pre lang="yaml">Marker:<br>  type: object<br>  format: interface</pre>                                                                                                                                                                              | <pre lang="java">public interface Marker {}</pre>                                                                                 |
-| With methods | <pre lang="yaml">UserService:<br>  type: object<br>  format: interface<br>  imports:<br>    - com.my.dto.User<br>  methods:<br>    createUser:<br>      description: "Creates a new user"<br>      definition: "User createUser(String email)"</pre> | <pre lang="java">public interface UserService {<br>    /** Creates a new user */<br>    User createUser(String email);<br>}</pre> |
-
----
-
-### 10.1 Discriminator (`discriminator` + `allOf`)
-
-| Attribute       | YAML                                                                                                                                                                                                 | → Java                                                                                               |
-|----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------|
-| `discriminator` | <pre lang="yaml">Pet:<br>  type: object<br>  discriminator: petType<br>  properties:<br>    name: string<br>    petType: string</pre> | `@JsonTypeInfo`, `@JsonSubTypes` annotations |
-
-**Example:**
-```yaml
-Pet:
-  type: object
-  discriminator: petType
-  properties:
-    name:
-      type: string
-    petType:
-      type: string
-
-Cat:
-  allOf:
-    - $ref: '#/components/schemas/Pet'
-  properties:
-    huntingSkill:
-      type: string
-```
-
-→ **Java:**
-```java
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "petType", visible = true)
-@JsonSubTypes({
-    @JsonSubTypes.Type(value = Cat.class, name = "Cat")
-})
-public class Pet { 
-    private String name;
-    private String petType;
-}
-
-public class Cat extends Pet {
-    @JsonTypeId
-    private String petType;
-    
-    private String huntingSkill;
+// ✅ petType field with const is NOT generated in subtype (inherited from Pet)
+public class StickInsect extends Pet {
+    private String color;  // only the new field
 }
 ```
 
 > ✅ Jackson автоматически десериализует в нужный класс по значению дискриминатора.
-> ✅ Поле-дискриминатор в подтипах помечается аннотацией `@JsonTypeId` для корректной сериализации.
+> ✅ Поле-дискриминатор в подтипах НЕ дублируется (наследуется от базового класса).
+> ✅ Поддержка `const` позволяет использовать значение дискриминатора, отличающееся от имени схемы.
 
 ---
 
@@ -436,6 +344,7 @@ tasks.compileJava {
 |------------------------------|------------------------|--------------------------------------------------|
 | **Discriminator**            | ✅ Done                 | `@JsonTypeInfo`, `@JsonSubTypes` for polymorphism |
 | **@JsonTypeId on fields**   | ✅ Done                 | Add `@JsonTypeId` to discriminator field in subtypes |
+| **Discriminator `const` support** | ✅ Done                 | Support `const` in discriminator field to override default value |
 | **Jackson annotations**      | 🟡 Partial             | `@JsonProperty`, `@JsonInclude` done                |
 | **AsyncAPI spec validation** | 🚧 Planned              | Validate `$ref`, `type`, `format`, circular refs   |
 | **Lombok extensions**        | 🚧 Planned              | `@Builder`, `@Singular`, `@SuperBuilder`            |

@@ -1,16 +1,23 @@
 package discriminator.common;
 
+import discriminator.common.CatHuntingSkill;
 import javax.annotation.processing.Generated;
 
+/**
+* A representation of a cat
+*/
 @Generated("Yojo")
 public class Cat extends Pet {
 
-    private String huntingSkill;
+    /**
+     * The measured skill for hunting
+     */
+    private CatHuntingSkill huntingSkill;
 
-    public void setHuntingSkill(String huntingSkill) {
+    public void setHuntingSkill(CatHuntingSkill huntingSkill) {
         this.huntingSkill = huntingSkill;
     }
-    public String getHuntingSkill() {
+    public CatHuntingSkill getHuntingSkill() {
         return huntingSkill;
     }
 }
