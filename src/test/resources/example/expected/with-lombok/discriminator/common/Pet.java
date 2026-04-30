@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Generated("Yojo")
 @Data
 @NoArgsConstructor
-@Accessors(chain = true)
+@Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "petType", visible = true)
 @JsonSubTypes({
