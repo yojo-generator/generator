@@ -1,12 +1,12 @@
 package example.testGenerate.test.common;
 
 import example.testGenerate.test.common.DeepNestingSchemaLevel1;
-import javax.validation.Valid;
-import lombok.Data;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Generated("Yojo")
 @Data
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DeepNestingSchema {
 
+
     @Valid
     private DeepNestingSchemaLevel1 level1;
-
 }

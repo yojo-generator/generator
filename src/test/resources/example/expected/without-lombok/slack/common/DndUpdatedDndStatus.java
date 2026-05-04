@@ -1,10 +1,11 @@
 package slack.common;
 
-import javax.annotation.processing.Generated;
 import java.math.BigDecimal;
+import javax.annotation.processing.Generated;
 
 @Generated("Yojo")
 public class DndUpdatedDndStatus {
+
 
     private Boolean dndEnabled;
 
@@ -15,7 +16,6 @@ public class DndUpdatedDndStatus {
     private Boolean snoozeEnabled;
 
     private BigDecimal snoozeEndtime;
-
     public void setDndEnabled(Boolean dndEnabled) {
         this.dndEnabled = dndEnabled;
     }

@@ -5,10 +5,10 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class MessageEdited {
 
+
     private String user;
 
     private String ts;
-
     public void setUser(String user) {
         this.user = user;
     }

@@ -1,36 +1,36 @@
 package example.testGenerate.test.messages;
 
-import example.testGenerate.test.common.PolymorphExampleThree;
-import java.util.List;
-import javax.validation.constraints.NotEmpty;
-import example.testGenerate.test.common.RequestDtoSchemaInnerSchema;
-import lombok.AllArgsConstructor;
-import testGenerate.InterfaceForImpl2;
-import lombok.experimental.Accessors;
-import lombok.NoArgsConstructor;
-import javax.validation.constraints.NotNull;
-import java.util.UUID;
-import javax.validation.Valid;
-import testGenerate.InterfaceForImpl;
-import java.util.LinkedHashMap;
-import example.testGenerate.test.common.PolymorphPolymorphExampleOnePolymorphExampleTwo;
-import javax.annotation.processing.Generated;
-import example.testGenerate.test.common.RequestDtoSchemaInnerEnumWithDescription;
-import example.testGenerate.test.common.SomeObject;
-import example.testGenerate.test.common.RequestDtoSchemaInnerEnumWithoutDescriptionSmall;
-import example.testGenerate.test.common.EnumResultWithDescription;
-import example.testGenerate.test.common.NumericsValues;
-import example.testGenerate.test.common.StringValues;
-import lombok.Data;
-import java.util.HashMap;
-import java.util.Map;
-import example.testGenerate.test.common.EnumResultWithoutDescription;
-import java.util.Set;
-import example.testGenerate.test.common.CollectionTypes;
-import testGenerate.ExistingClass;
-import example.testGenerate.test.common.RequestDtoSchemaInnerEnumWithoutDescription;
-import example.testGenerate.test.common.ObjectTypes;
 import example.testGenerate.test.common.ClassForExtends;
+import example.testGenerate.test.common.CollectionTypes;
+import example.testGenerate.test.common.EnumResultWithDescription;
+import example.testGenerate.test.common.EnumResultWithoutDescription;
+import example.testGenerate.test.common.NumericsValues;
+import example.testGenerate.test.common.ObjectTypes;
+import example.testGenerate.test.common.PolymorphExampleThree;
+import example.testGenerate.test.common.PolymorphPolymorphExampleOnePolymorphExampleTwo;
+import example.testGenerate.test.common.RequestDtoSchemaInnerEnumWithDescription;
+import example.testGenerate.test.common.RequestDtoSchemaInnerEnumWithoutDescription;
+import example.testGenerate.test.common.RequestDtoSchemaInnerEnumWithoutDescriptionSmall;
+import example.testGenerate.test.common.RequestDtoSchemaInnerSchema;
+import example.testGenerate.test.common.SomeObject;
+import example.testGenerate.test.common.StringValues;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import testGenerate.ExistingClass;
+import testGenerate.InterfaceForImpl2;
+import testGenerate.InterfaceForImpl;
 
 @Generated("Yojo")
 @Data
@@ -38,6 +38,7 @@ import example.testGenerate.test.common.ClassForExtends;
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class RequestDtoByRefAndProperties extends ClassForExtends implements InterfaceForImpl,InterfaceForImpl2 {
+
 
     private String someString;
 
@@ -211,5 +212,4 @@ public class RequestDtoByRefAndProperties extends ClassForExtends implements Int
 
     @Valid
     private SomeObject someObject;
-
 }

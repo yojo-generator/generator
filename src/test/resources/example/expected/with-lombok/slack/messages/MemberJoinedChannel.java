@@ -1,22 +1,23 @@
 package slack.messages;
 
-import slack.common.MemberJoinedChannelChannelType;
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.MemberJoinedChannelChannelType;
 import slack.common.MemberJoinedChannelType;
 
+@Generated("Yojo")
 /**
 * A user joined a public or private channel.
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class MemberJoinedChannel {
+
 
     private MemberJoinedChannelType type;
 
@@ -29,5 +30,4 @@ public class MemberJoinedChannel {
     private String team;
 
     private String inviter;
-
 }

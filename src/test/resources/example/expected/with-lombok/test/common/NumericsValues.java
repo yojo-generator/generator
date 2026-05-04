@@ -1,26 +1,27 @@
 package example.testGenerate.test.common;
 
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotNull;
-import java.math.BigInteger;
-import lombok.Data;
-import javax.annotation.processing.Generated;
-import lombok.AllArgsConstructor;
-import javax.validation.constraints.Max;
-import lombok.experimental.Accessors;
-import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import javax.annotation.processing.Generated;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+@Generated("Yojo")
 /**
 * Here was located all supported numeric values
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class NumericsValues {
+
 
     private Byte byteValue;
 
@@ -74,5 +75,4 @@ public class NumericsValues {
     @Min(22)
     @Digits(integer = 2, fraction = 2)
     private BigInteger bigIntegerValueWithAnnotations;
-
 }

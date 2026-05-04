@@ -1,15 +1,16 @@
 package slack.messages;
 
-import javax.validation.Valid;
-import slack.common.FileCreatedType;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import slack.common.FileCreatedFile;
+import slack.common.FileCreatedType;
 
+@Generated("Yojo")
 /**
 * A file was created.
 */
-@Generated("Yojo")
 public class FileCreated {
+
 
     private FileCreatedType type;
 
@@ -17,7 +18,12 @@ public class FileCreated {
 
     @Valid
     private FileCreatedFile file;
-
+    public void setType(FileCreatedType type) {
+        this.type = type;
+    }
+    public FileCreatedType getType() {
+        return type;
+    }
     public void setFileId(String fileId) {
         this.fileId = fileId;
     }

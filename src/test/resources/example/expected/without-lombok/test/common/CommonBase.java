@@ -5,8 +5,8 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class CommonBase {
 
-    private Long baseField;
 
+    private Long baseField;
     public void setBaseField(Long baseField) {
         this.baseField = baseField;
     }

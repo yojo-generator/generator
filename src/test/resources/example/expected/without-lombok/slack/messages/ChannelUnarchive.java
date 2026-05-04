@@ -1,20 +1,26 @@
 package slack.messages;
 
-import slack.common.ChannelUnarchiveType;
 import javax.annotation.processing.Generated;
+import slack.common.ChannelUnarchiveType;
 
+@Generated("Yojo")
 /**
 * A channel was unarchived.
 */
-@Generated("Yojo")
 public class ChannelUnarchive {
+
 
     private ChannelUnarchiveType type;
 
     private String channel;
 
     private String user;
-
+    public void setType(ChannelUnarchiveType type) {
+        this.type = type;
+    }
+    public ChannelUnarchiveType getType() {
+        return type;
+    }
     public void setChannel(String channel) {
         this.channel = channel;
     }

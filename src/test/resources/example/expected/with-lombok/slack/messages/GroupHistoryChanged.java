@@ -1,21 +1,22 @@
 package slack.messages;
 
-import slack.common.GroupHistoryChangedType;
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.GroupHistoryChangedType;
 
+@Generated("Yojo")
 /**
 * Bulk updates were made to a private channel's history.
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class GroupHistoryChanged {
+
 
     private GroupHistoryChangedType type;
 
@@ -24,5 +25,4 @@ public class GroupHistoryChanged {
     private String ts;
 
     private String eventTs;
-
 }

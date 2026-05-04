@@ -1,14 +1,15 @@
 package oneMore.common;
 
-import javax.validation.constraints.Size;
 import javax.annotation.processing.Generated;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
+@Generated("Yojo")
 /**
 * Address
 */
-@Generated("Yojo")
 public class ClientAddress {
+
 
     /**
      * City
@@ -25,7 +26,6 @@ public class ClientAddress {
     @Size(min = 0, max = 31)
     @Pattern(regexp = "$(pattern-Unicode)")
     private String country;
-
     public void setCity(String city) {
         this.city = city;
     }

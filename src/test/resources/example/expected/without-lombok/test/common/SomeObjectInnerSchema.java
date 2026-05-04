@@ -1,17 +1,17 @@
 package example.testGenerate.test.common;
 
+import javax.annotation.processing.Generated;
 import javax.validation.Valid;
 import testGenerate.ExistingClass;
-import javax.annotation.processing.Generated;
 
 @Generated("Yojo")
 public class SomeObjectInnerSchema {
+
 
     private String someString;
 
     @Valid
     private ExistingClass someExistingObject;
-
     public void setSomeString(String someString) {
         this.someString = someString;
     }

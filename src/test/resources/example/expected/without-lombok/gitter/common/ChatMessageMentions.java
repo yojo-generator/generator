@@ -6,12 +6,12 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class ChatMessageMentions {
 
+
     private String screenName;
 
     private String userId;
 
     private List<Object> userIds;
-
     public void setScreenName(String screenName) {
         this.screenName = screenName;
     }

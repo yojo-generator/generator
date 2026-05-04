@@ -1,10 +1,10 @@
 package discriminator.common;
 
-import javax.validation.constraints.NotBlank;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeId;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.NotBlank;
 
 @Generated("Yojo")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "petType", visible = true)
@@ -15,13 +15,13 @@ import javax.annotation.processing.Generated;
 })
 public class Pet {
 
+
     @NotBlank
     private String name;
 
     @JsonTypeId
     @NotBlank
     private String petType;
-
     public void setName(String name) {
         this.name = name;
     }

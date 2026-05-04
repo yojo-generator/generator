@@ -1,10 +1,11 @@
 package slack.common;
 
-import javax.annotation.processing.Generated;
 import java.math.BigDecimal;
+import javax.annotation.processing.Generated;
 
 @Generated("Yojo")
 public class ChannelJoinedChannel {
+
 
     private String id;
 
@@ -13,7 +14,6 @@ public class ChannelJoinedChannel {
     private BigDecimal created;
 
     private String creator;
-
     public void setId(String id) {
         this.id = id;
     }

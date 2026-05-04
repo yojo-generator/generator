@@ -1,17 +1,18 @@
 package specFromIssue.messages;
 
 import java.util.List;
-import specFromIssue.common.StatusSchema;
+import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.Valid;
-import javax.annotation.processing.Generated;
+import specFromIssue.common.StatusSchema;
 
+@Generated("Yojo")
 /**
 * ответ с payload = array of objects (items только с examples)
 */
-@Generated("Yojo")
 public class GenerateTemplatesFromTrafficResponseMessage {
+
 
     @NotEmpty
     private List<Object> payload;
@@ -19,7 +20,6 @@ public class GenerateTemplatesFromTrafficResponseMessage {
     @Valid
     @NotNull
     private StatusSchema status;
-
     public void setPayload(List<Object> payload) {
         this.payload = payload;
     }

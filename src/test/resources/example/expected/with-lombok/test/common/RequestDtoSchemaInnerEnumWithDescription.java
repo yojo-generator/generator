@@ -1,7 +1,7 @@
 package example.testGenerate.test.common;
 
-import lombok.Getter;
 import javax.annotation.processing.Generated;
+import lombok.Getter;
 import lombok.experimental.Accessors;
 
 @Generated("Yojo")

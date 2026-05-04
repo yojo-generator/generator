@@ -1,20 +1,26 @@
 package slack.messages;
 
-import slack.common.GroupOpenType;
 import javax.annotation.processing.Generated;
+import slack.common.GroupOpenType;
 
+@Generated("Yojo")
 /**
 * You opened a private channel.
 */
-@Generated("Yojo")
 public class GroupOpen {
+
 
     private GroupOpenType type;
 
     private String user;
 
     private String channel;
-
+    public void setType(GroupOpenType type) {
+        this.type = type;
+    }
+    public GroupOpenType getType() {
+        return type;
+    }
     public void setUser(String user) {
         this.user = user;
     }

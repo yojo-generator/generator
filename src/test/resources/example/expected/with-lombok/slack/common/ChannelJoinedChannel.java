@@ -1,11 +1,11 @@
 package slack.common;
 
-import lombok.Data;
+import java.math.BigDecimal;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.math.BigDecimal;
+import lombok.experimental.Accessors;
 
 @Generated("Yojo")
 @Data
@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class ChannelJoinedChannel {
 
+
     private String id;
 
     private String name;
@@ -21,5 +22,4 @@ public class ChannelJoinedChannel {
     private BigDecimal created;
 
     private String creator;
-
 }

@@ -1,23 +1,24 @@
 package oneMore.common;
 
-import javax.validation.constraints.NotBlank;
-import lombok.Data;
 import javax.annotation.processing.Generated;
-import lombok.AllArgsConstructor;
 import javax.validation.constraints.Max;
-import lombok.experimental.Accessors;
-import lombok.NoArgsConstructor;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+@Generated("Yojo")
 /**
 * Request parameters object
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class RequestCommonFieldsRequestData {
+
 
     /**
      * Application source
@@ -32,5 +33,4 @@ public class RequestCommonFieldsRequestData {
     @Min(0)
     @Max(99999999)
     private Integer orderNumber;
-
 }

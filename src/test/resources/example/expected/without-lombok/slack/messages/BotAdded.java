@@ -1,21 +1,27 @@
 package slack.messages;
 
-import slack.common.BotAddedType;
+import javax.annotation.processing.Generated;
 import javax.validation.Valid;
 import slack.common.BotAddedBot;
-import javax.annotation.processing.Generated;
+import slack.common.BotAddedType;
 
+@Generated("Yojo")
 /**
 * A bot user was added.
 */
-@Generated("Yojo")
 public class BotAdded {
+
 
     private BotAddedType type;
 
     @Valid
     private BotAddedBot bot;
-
+    public void setType(BotAddedType type) {
+        this.type = type;
+    }
+    public BotAddedType getType() {
+        return type;
+    }
     public void setBot(BotAddedBot bot) {
         this.bot = bot;
     }

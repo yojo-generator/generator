@@ -1,17 +1,18 @@
 package slack.messages;
 
 import java.util.List;
+import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import slack.common.Attachment;
 import slack.common.MessageEdited;
 import slack.common.MessageType;
-import javax.validation.Valid;
-import javax.annotation.processing.Generated;
-import slack.common.Attachment;
 
+@Generated("Yojo")
 /**
 * A message was sent to a channel.
 */
-@Generated("Yojo")
 public class Message {
+
 
     private MessageType type;
 
@@ -28,7 +29,12 @@ public class Message {
 
     @Valid
     private MessageEdited edited;
-
+    public void setType(MessageType type) {
+        this.type = type;
+    }
+    public MessageType getType() {
+        return type;
+    }
     public void setUser(String user) {
         this.user = user;
     }

@@ -1,23 +1,24 @@
 package slack.messages;
 
-import slack.common.DndUpdatedUserType;
-import javax.validation.Valid;
-import lombok.Data;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
-import slack.common.DndUpdatedUserDndStatus;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.DndUpdatedUserDndStatus;
+import slack.common.DndUpdatedUserType;
 
+@Generated("Yojo")
 /**
 * Do not Disturb settings changed for a member.
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class DndUpdatedUser {
+
 
     private DndUpdatedUserType type;
 
@@ -25,5 +26,4 @@ public class DndUpdatedUser {
 
     @Valid
     private DndUpdatedUserDndStatus dndStatus;
-
 }

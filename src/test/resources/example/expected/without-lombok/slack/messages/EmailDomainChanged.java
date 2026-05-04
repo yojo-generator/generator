@@ -1,20 +1,26 @@
 package slack.messages;
 
-import slack.common.EmailDomainChangedType;
 import javax.annotation.processing.Generated;
+import slack.common.EmailDomainChangedType;
 
+@Generated("Yojo")
 /**
 * The workspace email domain has changed.
 */
-@Generated("Yojo")
 public class EmailDomainChanged {
+
 
     private EmailDomainChangedType type;
 
     private String emailDomain;
 
     private String eventTs;
-
+    public void setType(EmailDomainChangedType type) {
+        this.type = type;
+    }
+    public EmailDomainChangedType getType() {
+        return type;
+    }
     public void setEmailDomain(String emailDomain) {
         this.emailDomain = emailDomain;
     }

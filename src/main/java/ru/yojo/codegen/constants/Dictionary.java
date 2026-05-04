@@ -471,9 +471,11 @@ public final class Dictionary {
      */
     public static final String LOMBOK_GETTER_ANNOTATION = "@Getter";
     /**
-     * Lombok Accessors annotation with fluent and chain
+     * Lombok Accessors annotation template with fluent and chain placeholders.
+     * Usage: String.format(LOMBOK_ACCESSORS_ANNOTATION, fluentPart, chainPart)
+     * where fluentPart may be "fluent = true" or empty, chainPart may be "chain = true" or empty.
      */
-    public static final String LOMBOK_ACCESSORS_ANNOTATION = "@Accessors(fluent = true, chain = true)";
+    public static final String LOMBOK_ACCESSORS_ANNOTATION = "@Accessors(%s%s)";
     /**
      * Lombok Accessors empty annotation
      */

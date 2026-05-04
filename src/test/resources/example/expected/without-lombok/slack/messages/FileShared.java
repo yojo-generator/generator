@@ -1,15 +1,16 @@
 package slack.messages;
 
-import slack.common.FileSharedFile;
-import javax.validation.Valid;
-import slack.common.FileSharedType;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import slack.common.FileSharedFile;
+import slack.common.FileSharedType;
 
+@Generated("Yojo")
 /**
 * A file was shared.
 */
-@Generated("Yojo")
 public class FileShared {
+
 
     private FileSharedType type;
 
@@ -17,7 +18,12 @@ public class FileShared {
 
     @Valid
     private FileSharedFile file;
-
+    public void setType(FileSharedType type) {
+        this.type = type;
+    }
+    public FileSharedType getType() {
+        return type;
+    }
     public void setFileId(String fileId) {
         this.fileId = fileId;
     }

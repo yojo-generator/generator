@@ -4,11 +4,12 @@ import java.time.OffsetDateTime;
 import javax.annotation.processing.Generated;
 import javax.validation.constraints.Min;
 
+@Generated("Yojo")
 /**
 * Inform about environmental lighting conditions of a particular streetlight.
 */
-@Generated("Yojo")
 public class LightMeasured {
+
 
     /**
      * Light intensity measured in lumens.
@@ -20,7 +21,6 @@ public class LightMeasured {
      * Date and time when the message was sent.
      */
     private OffsetDateTime sentAt;
-
     public void setLumens(Integer lumens) {
         this.lumens = lumens;
     }

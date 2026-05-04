@@ -1,12 +1,13 @@
 package example.testGenerate.test.messages;
 
 import example.testGenerate.test.common.RequestDtoWithPropertiesAComplexProperty;
-import javax.validation.Valid;
-import javax.annotation.processing.Generated;
 import example.testGenerate.test.common.RequestDtoWithPropertiesSomeOneObject;
+import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 
 @Generated("Yojo")
 public class RequestDtoWithProperties {
+
 
     private String someString;
 
@@ -18,7 +19,6 @@ public class RequestDtoWithProperties {
 
     @Valid
     private RequestDtoWithPropertiesAComplexProperty aComplexProperty;
-
     public void setSomeString(String someString) {
         this.someString = someString;
     }

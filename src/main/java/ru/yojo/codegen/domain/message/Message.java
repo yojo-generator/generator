@@ -2,14 +2,10 @@ package ru.yojo.codegen.domain.message;
 
 import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
+import ru.yojo.codegen.generator.code.MessageCodeGenerator;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import static java.lang.System.lineSeparator;
-import static ru.yojo.codegen.constants.Dictionary.LOMBOK_DATA_ANNOTATION;
-import static ru.yojo.codegen.constants.Dictionary.LOMBOK_DATA_IMPORT;
-import static ru.yojo.codegen.util.MapperUtil.*;
 
 /**
  * Represents an AsyncAPI message (i.e., a DTO generated from a {@code components.messages.*} definition).
@@ -78,8 +74,19 @@ public class Message {
      */
     private String pathForGenerateMessage;
 
+    // —— Getters & Setters —— //
+
     /**
-     * Sets Lombok configuration for this message.
+     * Returns the Java field name.
+     *
+     * @return field name
+     */
+    public String getName() {
+        return messageName;
+    }
+
+    /**
+     * Sets the Lombok configuration for this message.
      *
      * @param lombokProperties Lombok settings
      */
@@ -124,6 +131,15 @@ public class Message {
     }
 
     /**
+     * Returns the message package name.
+     *
+     * @return package name with trailing semicolon (e.g., {@code "com.example.messages;"})
+     */
+    public String getMessagePackageName() {
+        return messagePackageName;
+    }
+
+    /**
      * Sets the common schema package (used for imports of referenced DTOs/enums).
      *
      * @param commonPackageName package with trailing semicolon (e.g., {@code "com.example.common;"})
@@ -157,6 +173,15 @@ public class Message {
      */
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    /**
+     * Returns the summary text.
+     *
+     * @return summary or {@code null}
+     */
+    public String getSummary() {
+        return summary;
     }
 
     /**
@@ -235,96 +260,13 @@ public class Message {
     /**
      * Generates the full Java source code for the message DTO.
      * <p>
-     * Includes:
-     * <ul>
-     *   <li>Class-level JavaDoc (from {@code summary})</li>
-     *   <li>Lombok annotations (if enabled)</li>
-     *   <li>Inheritance/implementation clauses</li>
-     *   <li>Fields (via {@link FillParameters#toWrite()})</li>
-     *   <li>Getters/setters (if Lombok disabled)</li>
-     *   <li>Package and imports</li>
-     * </ul>
+     * Delegates to {@link MessageCodeGenerator}.
      *
      * @return complete Java source for the message class
      */
     public String toWrite() {
-        Set<String> requiredImports = new HashSet<>();
-        StringBuilder lombokAnnotationBuilder = new StringBuilder();
-        StringBuilder stringBuilder = prepareStringBuilder(
-                requiredImports,
-                implementsFrom,
-                extendsFrom,
-                messageName,
-                importSet,
-                fillParameters
-        );
-
-        if (lombokProperties.enableLombok()) {
-            if (fillParameters.getVariableProperties().stream()
-                    .anyMatch(prop -> "Data".equals(prop.getType()))) {
-                lombokAnnotationBuilder
-                        .append(LOMBOK_DATA_ANNOTATION.replace("@", "@lombok."))
-                        .append(lineSeparator());
-            } else {
-                if (!fillParameters.getVariableProperties().isEmpty()) {
-                    lombokAnnotationBuilder
-                            .append(LOMBOK_DATA_ANNOTATION)
-                            .append(lineSeparator());
-                    requiredImports.add(LOMBOK_DATA_IMPORT);
-                } else {
-                    lombokProperties.setAllArgsConstructor(false);
-                }
-            }
-            if (fillParameters.getLombokProperties() != null) {
-                if (fillParameters.getLombokProperties().getAccessors() != null) {
-                    this.lombokProperties.setAccessors(fillParameters.getLombokProperties().getAccessors());
-                }
-            }
-            buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder);
-        }
-
-        if (!lombokProperties.enableLombok()) {
-            fillParameters.getVariableProperties().forEach(vp -> {
-                String reference = vp.getReference();
-                if (reference != null && vp.getEnumeration() == null) {
-                    stringBuilder
-                            .append(lineSeparator())
-                            .append(generateSetter(reference, uncapitalize(reference)))
-                            .append(lineSeparator())
-                            .append(generateGetter(reference, uncapitalize(reference)));
-                } else {
-                    fillParameters.getVariableProperties().stream()
-                            .filter(varProp -> vp.equals(varProp))
-                            .flatMap(variableProperties -> {
-                                Set<String> i = variableProperties.getRequiredImports();
-                                if (!variableProperties.isEnum()) {
-                                    stringBuilder
-                                            .append(lineSeparator())
-                                            .append(generateSetter(variableProperties.getType(), variableProperties.getName()))
-                                            .append(lineSeparator())
-                                            .append(generateGetter(variableProperties.getType(), variableProperties.getName()));
-                                }
-                                return i.stream();
-
-                            })
-                            .forEach(requiredImports::add);
-                }
-            });
-        }
-
-        // Add class-level annotations
-        if (!classAnnotations.isEmpty()) {
-            for (String annotation : classAnnotations) {
-                lombokAnnotationBuilder.append("@").append(annotation).append(lineSeparator());
-                requiredImports.add(annotation.endsWith(";") ? annotation : annotation + ";");
-            }
-        }
-
-        stringBuilder.insert(0, lombokAnnotationBuilder);
-
-        fillParameters.getVariableProperties().forEach(vp -> requiredImports.addAll(vp.getRequiredImports()));
-
-        return finishBuild(stringBuilder, requiredImports, messagePackageName, summary);
+        MessageCodeGenerator generator = new MessageCodeGenerator(this);
+        return generator.generate();
     }
 
     public FillParameters getFillParameters() {

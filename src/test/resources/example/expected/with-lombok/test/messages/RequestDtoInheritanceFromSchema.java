@@ -2,8 +2,8 @@ package example.testGenerate.test.messages;
 
 import example.testGenerate.test.common.RequestDtoSchema;
 import javax.annotation.processing.Generated;
-import lombok.experimental.Accessors;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Generated("Yojo")
 @NoArgsConstructor

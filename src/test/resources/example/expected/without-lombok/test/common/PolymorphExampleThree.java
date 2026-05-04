@@ -5,10 +5,10 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class PolymorphExampleThree {
 
+
     private String status;
 
     private Integer someField;
-
     public void setStatus(String status) {
         this.status = status;
     }

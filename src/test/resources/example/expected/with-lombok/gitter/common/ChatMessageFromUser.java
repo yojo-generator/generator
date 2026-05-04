@@ -1,22 +1,23 @@
 package gitter.common;
 
-import lombok.Data;
+import java.math.BigDecimal;
+import java.net.URI;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.net.URI;
-import java.math.BigDecimal;
+import lombok.experimental.Accessors;
 
+@Generated("Yojo")
 /**
 * User that sent the message.
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class ChatMessageFromUser {
+
 
     /**
      * Gitter User ID.
@@ -62,5 +63,4 @@ public class ChatMessageFromUser {
      * Stands for "Gravatar version" and is used for cache busting.
      */
     private String gv;
-
 }

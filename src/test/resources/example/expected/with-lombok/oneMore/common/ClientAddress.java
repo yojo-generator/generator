@@ -1,22 +1,23 @@
 package oneMore.common;
 
-import javax.validation.constraints.Size;
-import lombok.Data;
 import javax.annotation.processing.Generated;
-import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+@Generated("Yojo")
 /**
 * Address
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class ClientAddress {
+
 
     /**
      * City
@@ -33,5 +34,4 @@ public class ClientAddress {
     @Size(min = 0, max = 31)
     @Pattern(regexp = "$(pattern-Unicode)")
     private String country;
-
 }

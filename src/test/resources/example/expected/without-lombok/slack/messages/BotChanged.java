@@ -1,21 +1,27 @@
 package slack.messages;
 
-import slack.common.BotChangedType;
+import javax.annotation.processing.Generated;
 import javax.validation.Valid;
 import slack.common.BotChangedBot;
-import javax.annotation.processing.Generated;
+import slack.common.BotChangedType;
 
+@Generated("Yojo")
 /**
 * A bot user was changed.
 */
-@Generated("Yojo")
 public class BotChanged {
+
 
     private BotChangedType type;
 
     @Valid
     private BotChangedBot bot;
-
+    public void setType(BotChangedType type) {
+        this.type = type;
+    }
+    public BotChangedType getType() {
+        return type;
+    }
     public void setBot(BotChangedBot bot) {
         this.bot = bot;
     }

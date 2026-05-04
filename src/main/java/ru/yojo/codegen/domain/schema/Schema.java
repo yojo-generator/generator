@@ -1,8 +1,8 @@
 package ru.yojo.codegen.domain.schema;
 
 import ru.yojo.codegen.domain.FillParameters;
-import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
+import ru.yojo.codegen.generator.code.SchemaCodeGenerator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,10 +10,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static java.lang.System.lineSeparator;
-import static ru.yojo.codegen.constants.Dictionary.*;
-import static ru.yojo.codegen.util.MapperUtil.*;
 
 /**
  * Represents a generated Java class, enum, or interface from an AsyncAPI {@code components.schemas.*} definition.
@@ -158,7 +154,7 @@ public class Schema {
         subtypeDiscriminatorValues.clear();
     }
 
-    // ——— Getters & Setters ——— //
+    // —— Getters & Setters —— //
 
     /**
      * Returns the class name (e.g., {@code "User"}).
@@ -206,6 +202,15 @@ public class Schema {
     }
 
     /**
+     * Returns the Lombok configuration.
+     *
+     * @return Lombok settings or {@code null}
+     */
+    public LombokProperties getLombokProperties() {
+        return lombokProperties;
+    }
+
+    /**
      * Sets the field and validation container.
      *
      * @param fillParameters field definitions and metadata
@@ -233,12 +238,30 @@ public class Schema {
     }
 
     /**
+     * Returns the target Java package.
+     *
+     * @return package name with trailing semicolon (e.g., {@code "com.example.common;"})
+     */
+    public String getPackageName() {
+        return packageName;
+    }
+
+    /**
      * Sets the superclass to extend.
      *
      * @param extendsFrom superclass name (simple, not qualified)
      */
     public void setExtendsFrom(String extendsFrom) {
         this.extendsFrom = extendsFrom;
+    }
+
+    /**
+     * Returns the superclass to extend (or {@code null} if none).
+     *
+     * @return superclass name
+     */
+    public String getExtendsFrom() {
+        return extendsFrom;
     }
 
     /**
@@ -373,246 +396,15 @@ public class Schema {
         this.methods = methods;
     }
 
-    // ——— CORE: toWrite() ——— //
-
     /**
      * Generates the full Java source code for this schema.
      * <p>
-     * Handles three cases:
-     * <ul>
-     *   <li><b>Interface</b> — marker or with method definitions</li>
-     *   <li><b>Enum</b> — with or without descriptions</li>
-     *   <li><b>Class</b> — regular DTO with fields, Lombok, validation</li>
-     * </ul>
+     * Delegates to {@link SchemaCodeGenerator}.
      *
      * @return complete Java source code
      */
     public String toWrite() {
-        StringBuilder stringBuilder;
-        Set<String> requiredImports = new HashSet<>();
-        StringBuilder lombokAnnotationBuilder = new StringBuilder();
-
-        if (isInterface) {
-            stringBuilder = generateInterface();
-        } else {
-            boolean hasNonEnumProperties = fillParameters.getVariableProperties().stream()
-                    .anyMatch(vp -> vp.getEnumeration() == null);
-
-            if (hasNonEnumProperties) {
-                // Regular class
-                stringBuilder = prepareStringBuilder(
-                        requiredImports,
-                        implementsFrom,
-                        extendsFrom,
-                        schemaName,
-                        importSet,
-                        fillParameters
-                );
-
-                if (lombokProperties.enableLombok()) {
-                    if (schemaName.equals("Data") ||
-                        fillParameters.getVariableProperties().stream().anyMatch(prop -> "Data".equals(prop.getType()))) {
-                        lombokAnnotationBuilder
-                                .append(LOMBOK_DATA_ANNOTATION.replace("@", "@lombok."))
-                                .append(lineSeparator());
-                    } else {
-                        if (!fillParameters.getVariableProperties().isEmpty()) {
-                            lombokAnnotationBuilder
-                                    .append(LOMBOK_DATA_ANNOTATION)
-                                    .append(lineSeparator());
-                            requiredImports.add(LOMBOK_DATA_IMPORT);
-                        }
-                    }
-                    buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder);
-                }
-
-                StringBuilder finalStringBuilder = stringBuilder;
-                fillParameters.getVariableProperties().stream()
-                        .flatMap(variableProperties -> {
-                            Set<String> i = variableProperties.getRequiredImports();
-                            if (!lombokProperties.enableLombok() && variableProperties.getEnumeration() == null) {
-                                    finalStringBuilder
-                                            .append(lineSeparator())
-                                            .append(generateSetter(variableProperties.getType(), variableProperties.getName()))
-                                            .append(lineSeparator())
-                                            .append(generateGetter(variableProperties.getType(), variableProperties.getName()));
-                            }
-                            return i.stream();
-                        })
-                        .forEach(requiredImports::add);
-            } else {
-                // ENUM
-                stringBuilder = getEnumClassBuilder(schemaName);
-
-                // Remove @Valid from enums
-                fillParameters.getVariableProperties().forEach(vp -> {
-                    vp.getRequiredImports().remove(JAVAX_VALID_IMPORT);
-                    vp.getRequiredImports().remove(JAKARTA_VALID_IMPORT);
-                });
-
-                boolean hasEnumWithDescription = fillParameters.getVariableProperties().stream()
-                        .anyMatch(vp -> vp.getEnumNames() != null);
-
-                if (hasEnumWithDescription) {
-                    // 1️⃣ Generate enum constants: SUCCESS("Success value"), ...
-                    StringBuilder constantsBuilder = new StringBuilder();
-                    for (int i = 0; i < fillParameters.getVariableProperties().size(); i++) {
-                        VariableProperties vp = fillParameters.getVariableProperties().get(i);
-                        if (vp.getEnumeration() != null) {
-                            String name = vp.getEnumeration();
-                            String desc = vp.getEnumNames() != null ? esc(vp.getEnumNames()) : "";
-                            constantsBuilder
-                                    .append(TABULATION)
-                                    .append(name)
-                                    .append("(\"")
-                                    .append(desc)
-                                    .append("\")");
-                            if (i < fillParameters.getVariableProperties().size() - 1) {
-                                constantsBuilder.append(",");
-                            }
-                            constantsBuilder.append(lineSeparator());
-                        }
-                    }
-
-                    // Trim trailing newline and append semicolon on same line
-                    String constants = constantsBuilder.toString();
-                    if (constants.endsWith(lineSeparator())) {
-                        constants = constants.substring(0, constants.length() - lineSeparator().length());
-                    }
-                    constants += ";";
-
-                    // 2️⃣ Build enum body
-                    stringBuilder
-                            .append(lineSeparator())
-                            .append(constants)
-                            .append(lineSeparator())
-                            .append(lineSeparator())
-                            .append("    private final String value;")
-                            .append(lineSeparator())
-                            .append(lineSeparator())
-                            .append("    ")
-                            .append(schemaName)
-                            .append("(String value) {")
-                            .append(lineSeparator())
-                            .append("        this.value = value;")
-                            .append(lineSeparator())
-                            .append("    }")
-                            .append(lineSeparator());
-
-                    // 3️⃣ Add @Getter or manual getter for description field
-                    if (lombokProperties.enableLombok()) {
-                        lombokAnnotationBuilder.append("@Getter").append(lineSeparator());
-                        requiredImports.add(LOMBOK_GETTER_IMPORT);
-                    } else {
-                        stringBuilder
-                                .append(lineSeparator())
-                                .append("    public String getValue() {")
-                                .append(lineSeparator())
-                                .append("        return value;")
-                                .append(lineSeparator())
-                                .append("    }")
-                                .append(lineSeparator());
-                    }
-
-                } else {
-                    // Plain enum (no descriptions)
-                    stringBuilder.append(fillParameters.toWrite()).append(lineSeparator());
-                }
-
-                // 4️⃣ Lombok (exclude @NoArgsConstructor for enums with constructors)
-                if (lombokProperties.enableLombok()) {
-                    LombokProperties effectiveLombok = LombokProperties.newLombokProperties(lombokProperties);
-                    effectiveLombok.setNoArgsConstructor(false);
-                    effectiveLombok.setAllArgsConstructor(false);
-                    buildLombokAnnotations(effectiveLombok, requiredImports, lombokAnnotationBuilder);
-                }
-            }
-        }
-
-        // Add class-level annotations
-        if (!classAnnotations.isEmpty()) {
-            for (String annotation : classAnnotations) {
-                String simpleName = annotation.contains(".") 
-                    ? annotation.substring(annotation.lastIndexOf('.') + 1) 
-                    : annotation;
-                lombokAnnotationBuilder.append("@").append(simpleName).append(lineSeparator());
-                requiredImports.add(annotation.endsWith(";") ? annotation : annotation + ";");
-            }
-        }
-
-        // Add Jackson polymorphic annotations (discriminator)
-        if (discriminator != null && !discriminator.isEmpty()) {
-            requiredImports.add(JSON_TYPE_INFO_IMPORT);
-            requiredImports.add(JSON_SUB_TYPES_IMPORT);
-            lombokAnnotationBuilder.append(String.format(JSON_TYPE_INFO_ANNOTATION, discriminator)).append(lineSeparator());
-            
-            if (!subtypes.isEmpty()) {
-                StringBuilder subtypesBuilder = new StringBuilder();
-                subtypesBuilder.append("@JsonSubTypes({").append(lineSeparator());
-                for (int i = 0; i < subtypes.size(); i++) {
-                    String subtype = subtypes.get(i);
-                    String discriminatorValue = subtypeDiscriminatorValues.getOrDefault(subtype, subtype);
-                    subtypesBuilder.append(String.format("    @JsonSubTypes.Type(value = %s.class, name = \"%s\")", subtype, discriminatorValue));
-                    if (i < subtypes.size() - 1) {
-                        subtypesBuilder.append(",").append(lineSeparator());
-                    } else {
-                        subtypesBuilder.append(lineSeparator());
-                    }
-                }
-                subtypesBuilder.append("})");
-                lombokAnnotationBuilder.append(subtypesBuilder).append(lineSeparator());
-            }
-        }
-
-        stringBuilder.insert(0, lombokAnnotationBuilder);
-
-        return finishBuild(stringBuilder, requiredImports, packageName, description);
-    }
-
-    // ——— Helper methods ——— //
-
-    /**
-     * Generates Java source for an interface (marker or with methods).
-     *
-     * @return interface source code
-     */
-    private StringBuilder generateInterface() {
-        StringBuilder stringBuilder = getInterfaceBuilder(schemaName);
-//        generateClassJavaDoc(stringBuilder, description);
-        if (!methods.isEmpty()) {
-            methods.values().forEach(method -> {
-                Map<String, Object> currentMethod = castObjectToMap(method);
-                String methodDescription = getStringValueIfExistOrElseNull(DESCRIPTION, currentMethod);
-                String methodDefinition = getStringValueIfExistOrElseNull(DEFINITION, currentMethod);
-                if (methodDescription != null) {
-                    generateJavaDoc(stringBuilder, methodDescription, null);
-                }
-                methodDefinition = TABULATION.concat(methodDefinition.endsWith(";") ? methodDefinition : methodDefinition + ";");
-                stringBuilder
-                        .append(lineSeparator())
-                        .append(methodDefinition)
-                        .append(lineSeparator());
-            });
-        }
-        if (!interfaceImports.isEmpty()) {
-            getImportSet().addAll(interfaceImports);
-//            stringBuilder.insert(0, lineSeparator());
-//            interfaceImports.forEach(i -> {
-//                i = IMPORT.concat(i.endsWith(";") ? i : i + ";");
-//                stringBuilder.insert(0, i + lineSeparator());
-//            });
-        }
-        return stringBuilder;
-    }
-
-    /**
-     * Escapes double quotes and backslashes in enum description strings.
-     *
-     * @param s input string
-     * @return escaped string suitable for Java string literal
-     */
-    private static String esc(String s) {
-        if (s == null) return "";
-        return s.replace("\\", "\\\\").replace("\"", "\\\"");
+        SchemaCodeGenerator generator = new SchemaCodeGenerator(this);
+        return generator.generate();
     }
 }

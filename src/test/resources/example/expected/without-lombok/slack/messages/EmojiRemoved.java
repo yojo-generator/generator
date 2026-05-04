@@ -1,15 +1,16 @@
 package slack.messages;
 
 import java.util.List;
-import slack.common.EmojiRemovedType;
-import slack.common.EmojiRemovedSubtype;
 import javax.annotation.processing.Generated;
+import slack.common.EmojiRemovedSubtype;
+import slack.common.EmojiRemovedType;
 
+@Generated("Yojo")
 /**
 * A custom emoji has been removed.
 */
-@Generated("Yojo")
 public class EmojiRemoved {
+
 
     private EmojiRemovedType type;
 
@@ -18,7 +19,18 @@ public class EmojiRemoved {
     private List<Object> names;
 
     private String eventTs;
-
+    public void setType(EmojiRemovedType type) {
+        this.type = type;
+    }
+    public EmojiRemovedType getType() {
+        return type;
+    }
+    public void setSubtype(EmojiRemovedSubtype subtype) {
+        this.subtype = subtype;
+    }
+    public EmojiRemovedSubtype getSubtype() {
+        return subtype;
+    }
     public void setNames(List<Object> names) {
         this.names = names;
     }
