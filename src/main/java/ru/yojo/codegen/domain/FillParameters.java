@@ -130,9 +130,9 @@ public class FillParameters {
     /**
      * Generates Java source code for all fields in this container.
      * <p>
-     * Handles two modes:
+     * Two modes:
      * <ul>
-     *   <li><b>Enum mode</b> — when all properties represent enum constants (e.g., {@code SUCCESS, ERROR;})</li>
+     *   <li><b>Enum mode</b> — constants with optional descriptions ({@code SUCCESS("desc"), ...})</li>
      *   <li><b>Field mode</b> — regular DTO fields with types, annotations, and optional default values</li>
      * </ul>
      *
@@ -160,14 +160,13 @@ public class FillParameters {
                     stringBuilder.append(lineSeparator())
                             .append(TABULATION)
                             .append(vp.getType())
-                            .append(i == variableProperties.size() - 2 ? ";" : ",")
-                            .append(i == variableProperties.size() - 2 ? lineSeparator() : "");
+                            .append(i == variableProperties.size() - 2 ? ";" : ",");
                 } else {
                     // Plain enum: CONSTANT
                     String constName = vp.getEnumeration() != null
-                                       && Character.isLowerCase(vp.getOriginalEnumName().charAt(0))
-                            ? vp.getOriginalEnumName()
-                            : vp.getType();
+                                        && Character.isLowerCase(vp.getOriginalEnumName().charAt(0))
+                             ? vp.getOriginalEnumName()
+                             : vp.getType();
                     stringBuilder.append(lineSeparator())
                             .append(TABULATION)
                             .append(constName)
@@ -177,10 +176,16 @@ public class FillParameters {
             return stringBuilder.toString();
         } else {
             // Regular fields mode
-            variableProperties.forEach(vp ->
-                    stringBuilder
-                            .append(lineSeparator())
-                            .append(vp.toWrite()));
+            System.out.println("FILL PARAMS toWrite(): fields count=" + variableProperties.size());
+            variableProperties.forEach(vp -> {
+                System.out.println("FILL PARAMS: Calling toWrite() for " + vp.getName() + ", isDiscriminatorField=" + vp.isDiscriminatorField());
+                String fieldCode = vp.toWrite();
+                System.out.println("FILL PARAMS: toWrite() returned: " + fieldCode.substring(0, Math.min(100, fieldCode.length())));
+                stringBuilder
+                        .append(lineSeparator())
+                        .append(fieldCode);
+            });
+            System.out.println("FILL PARAMS toWrite(): result length=" + stringBuilder.length());
             return stringBuilder.toString();
         }
     }

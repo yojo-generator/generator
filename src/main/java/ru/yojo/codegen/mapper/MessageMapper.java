@@ -340,8 +340,7 @@ public class MessageMapper extends AbstractMapper {
                     processContext.getSchemasMap(),
                     Collections.emptyMap(),
                     processContext,
-                    processContext.getHelper().getInnerSchemas(),
-                    schemaMapper.getDiscriminatorBases()
+                    processContext.getHelper().getInnerSchemas()
             );
         }
 
@@ -352,8 +351,7 @@ public class MessageMapper extends AbstractMapper {
                     processContext.getSchemasMap(),
                     Collections.emptyMap(),
                     processContext,
-                    processContext.getHelper().getInnerSchemas(),
-                    schemaMapper.getDiscriminatorBases()
+                    processContext.getHelper().getInnerSchemas()
             );
             return new FillParameters(Collections.emptyList());
         }
@@ -412,8 +410,7 @@ public class MessageMapper extends AbstractMapper {
                     processContext.getSchemasMap(),
                     castObjectToMap(schema.get(PROPERTIES)),
                     processContext,
-                    innerSchemas,
-                    schemaMapper.getDiscriminatorBases()
+                    innerSchemas
             );
             if (getStringValueIfExistOrElseNull(REMOVE_SCHEMA, payload) != null &&
                 getStringValueIfExistOrElseNull(REMOVE_SCHEMA, payload).equals("true")) {
