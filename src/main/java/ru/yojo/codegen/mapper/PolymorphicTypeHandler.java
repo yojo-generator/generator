@@ -1,0 +1,106 @@
+package ru.yojo.codegen.mapper;
+
+import ru.yojo.codegen.context.ProcessContext;
+import ru.yojo.codegen.domain.VariableProperties;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static ru.yojo.codegen.constants.Dictionary.OBJECT_TYPE;
+import static ru.yojo.codegen.constants.Dictionary.POLYMORPHS;
+import static ru.yojo.codegen.constants.Dictionary.PROPERTIES;
+import static ru.yojo.codegen.constants.Dictionary.TYPE;
+import static ru.yojo.codegen.util.MapperUtil.capitalize;
+import static ru.yojo.codegen.util.MapperUtil.castObjectToMap;
+import static ru.yojo.codegen.util.MapperUtil.castObjectToListObjects;
+import static ru.yojo.codegen.util.MapperUtil.refReplace;
+
+/**
+ * Handles polymorphic types (oneOf, allOf, anyOf in YAML).
+ * Merges properties from multiple schemas and creates appropriate inner schemas.
+ *
+ * @author Vladimir Morozkin (TG @vmorozkin)
+ */
+public class PolymorphicTypeHandler implements PropertyTypeHandler {
+
+    private final AbstractMapper abstractMapper;
+
+    public PolymorphicTypeHandler(AbstractMapper abstractMapper) {
+        this.abstractMapper = abstractMapper;
+    }
+
+    @Override
+    public boolean canHandle(String schemaName,
+                            VariableProperties variableProperties,
+                            Map<String, Object> currentSchema,
+                            Map<String, Object> schemas,
+                            String propertyName,
+                            Map<String, Object> propertiesMap,
+                            ProcessContext processContext,
+                            Map<String, Object> innerSchemas) {
+        return variableProperties.isPolymorph();
+    }
+
+    @Override
+    public void handle(String schemaName,
+                       VariableProperties variableProperties,
+                       Map<String, Object> currentSchema,
+                       Map<String, Object> schemas,
+                       String propertyName,
+                       Map<String, Object> propertiesMap,
+                       ProcessContext processContext,
+                       Map<String, Object> innerSchemas) {
+
+        System.out.println("FOUND POLYMORPHISM INSIDE SCHEMA! Schema: " + variableProperties.getName());
+
+        List<Object> polymorphList = POLYMORPHS.stream()
+                .map(p -> propertiesMap.get(p))
+                .map(p -> castObjectToListObjects(p))
+                .flatMap(objects -> ((List<Object>) objects).stream())
+                .collect(Collectors.toList());
+
+        Map<String, Object> mergedProperties = polymorphList.stream()
+                .flatMap(ref -> {
+                    String refStr = ref.toString();
+                    if (ref instanceof Map) {
+                        Map<?, ?> mapRef = (Map<?, ?>) ref;
+                        Object r = mapRef.get("$ref");
+                        if (r != null) refStr = r.toString();
+                    }
+                    return castObjectToMap(schemas.get(refReplace(refStr))).entrySet().stream();
+                })
+                .filter(en -> en.getKey().equals(PROPERTIES))
+                .map(pr -> castObjectToMap(pr.getValue()))
+                .flatMap(map -> map.entrySet().stream())
+                .distinct()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (existing, replacement) -> existing
+                ));
+
+        String className = capitalize(propertyName);
+        for (Object item : polymorphList) {
+            String refName;
+            if (item instanceof Map) {
+                Map<?, ?> m = (Map<?, ?>) item;
+                Object refObj = m.get("$ref");
+                refName = refObj != null ? refReplace(refObj.toString()) : "Unknown";
+            } else {
+                refName = refReplace(item.toString());
+            }
+            className += refName;
+        }
+
+        variableProperties.setType(className);
+        variableProperties.addRequiredImports(abstractMapper.prepareImport(processContext, className));
+
+        Map<String, Object> preparedMergedPolymorphSchema = Map.of(
+                className,
+                Map.of(TYPE, OBJECT_TYPE, PROPERTIES, mergedProperties)
+        );
+
+        innerSchemas.putAll(preparedMergedPolymorphSchema);
+    }
+}
