@@ -5,12 +5,12 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class PolymorphExampleFour {
 
+
     private Boolean oneMoreField;
 
     private String status;
 
     private Integer someField;
-
     public void setOneMoreField(Boolean oneMoreField) {
         this.oneMoreField = oneMoreField;
     }

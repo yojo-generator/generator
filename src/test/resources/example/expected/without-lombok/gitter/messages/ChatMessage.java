@@ -1,20 +1,21 @@
 package gitter.messages;
 
-import gitter.common.ChatMessageMentions;
-import java.util.List;
-import java.time.OffsetDateTime;
-import javax.validation.Valid;
 import gitter.common.ChatMessageFromUser;
 import gitter.common.ChatMessageIssues;
-import javax.annotation.processing.Generated;
+import gitter.common.ChatMessageMentions;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.time.OffsetDateTime;
+import java.util.List;
+import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 
+@Generated("Yojo")
 /**
 * A message represents an individual chat message sent to a room. They are a sub-resource of a room.
 */
-@Generated("Yojo")
 public class ChatMessage {
+
 
     /**
      * ID of the message.
@@ -83,7 +84,6 @@ public class ChatMessage {
      * Stands for "Gravatar version" and is used for cache busting.
      */
     private String gv;
-
     public void setId(String id) {
         this.id = id;
     }

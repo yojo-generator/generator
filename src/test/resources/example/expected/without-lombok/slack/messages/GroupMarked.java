@@ -1,20 +1,26 @@
 package slack.messages;
 
-import slack.common.GroupMarkedType;
 import javax.annotation.processing.Generated;
+import slack.common.GroupMarkedType;
 
+@Generated("Yojo")
 /**
 * A private channel read marker was updated.
 */
-@Generated("Yojo")
 public class GroupMarked {
+
 
     private GroupMarkedType type;
 
     private String channel;
 
     private String ts;
-
+    public void setType(GroupMarkedType type) {
+        this.type = type;
+    }
+    public GroupMarkedType getType() {
+        return type;
+    }
     public void setChannel(String channel) {
         this.channel = channel;
     }

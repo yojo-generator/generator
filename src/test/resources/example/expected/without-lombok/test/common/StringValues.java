@@ -1,15 +1,16 @@
 package example.testGenerate.test.common;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
+@Generated("Yojo")
 /**
 * Here was located all supported strings values
 */
-@Generated("Yojo")
 public class StringValues {
+
 
     private String stringWithDefaultValue = "5";
 
@@ -38,7 +39,6 @@ public class StringValues {
     @Size(min = 1, max = 2)
     @Pattern(regexp = "^d{6}$")
     private String stringWithAllAnnotations;
-
     public void setStringWithDefaultValue(String stringWithDefaultValue) {
         this.stringWithDefaultValue = stringWithDefaultValue;
     }

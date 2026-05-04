@@ -1,17 +1,17 @@
 package example.testGenerate.test.common;
 
-import testGenerate.ClassForExtending;
-import javax.validation.Valid;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import testGenerate.ClassForExtending;
 
 @Generated("Yojo")
 public class CollectionTypesInnerSchema {
+
 
     private String someString;
 
     @Valid
     private ClassForExtending someExistingObject;
-
     public void setSomeString(String someString) {
         this.someString = someString;
     }

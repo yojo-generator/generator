@@ -1,13 +1,14 @@
 package slack.messages;
 
-import slack.common.GroupHistoryChangedType;
 import javax.annotation.processing.Generated;
+import slack.common.GroupHistoryChangedType;
 
+@Generated("Yojo")
 /**
 * Bulk updates were made to a private channel's history.
 */
-@Generated("Yojo")
 public class GroupHistoryChanged {
+
 
     private GroupHistoryChangedType type;
 
@@ -16,7 +17,12 @@ public class GroupHistoryChanged {
     private String ts;
 
     private String eventTs;
-
+    public void setType(GroupHistoryChangedType type) {
+        this.type = type;
+    }
+    public GroupHistoryChangedType getType() {
+        return type;
+    }
     public void setLatest(String latest) {
         this.latest = latest;
     }

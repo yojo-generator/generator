@@ -1,13 +1,13 @@
 package oneMore.common;
 
 import java.util.List;
-import javax.validation.Valid;
-import lombok.Data;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import oneMore.common.CompanyPerson;
-import lombok.NoArgsConstructor;
 
 @Generated("Yojo")
 @Data
@@ -16,10 +16,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Management {
 
+
     /**
      * Persons
      */
     @Valid
     private List<CompanyPerson> persons;
-
 }

@@ -1,22 +1,23 @@
 package slack.messages;
 
-import lombok.Data;
+import java.math.BigDecimal;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.math.BigDecimal;
+import lombok.experimental.Accessors;
 import slack.common.OutgoingMessageType;
 
+@Generated("Yojo")
 /**
 * A message was sent to a channel.
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class OutgoingMessage {
+
 
     private BigDecimal id;
 
@@ -25,5 +26,4 @@ public class OutgoingMessage {
     private String channel;
 
     private String text;
-
 }

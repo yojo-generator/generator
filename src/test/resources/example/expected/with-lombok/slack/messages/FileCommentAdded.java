@@ -1,23 +1,24 @@
 package slack.messages;
 
+import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import slack.common.FileCommentAddedFile;
 import slack.common.FileCommentAddedType;
-import javax.validation.Valid;
-import lombok.Data;
-import javax.annotation.processing.Generated;
-import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
-import lombok.NoArgsConstructor;
 
+@Generated("Yojo")
 /**
 * A file comment was added.
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class FileCommentAdded {
+
 
     private FileCommentAddedType type;
 
@@ -27,5 +28,4 @@ public class FileCommentAdded {
 
     @Valid
     private FileCommentAddedFile file;
-
 }

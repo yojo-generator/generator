@@ -1,15 +1,16 @@
 package oneMore.common;
 
-import javax.validation.constraints.NotBlank;
 import javax.annotation.processing.Generated;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 
+@Generated("Yojo")
 /**
 * Request parameters object
 */
-@Generated("Yojo")
 public class RequestCommonFieldsRequestData {
+
 
     /**
      * Application source
@@ -24,7 +25,6 @@ public class RequestCommonFieldsRequestData {
     @Min(0)
     @Max(99999999)
     private Integer orderNumber;
-
     public void setSource(String source) {
         this.source = source;
     }

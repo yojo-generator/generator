@@ -1,23 +1,24 @@
 package slack.messages;
 
-import slack.common.EmojiAddedSubtype;
-import slack.common.EmojiAddedType;
-import lombok.Data;
+import java.net.URI;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.net.URI;
+import lombok.experimental.Accessors;
+import slack.common.EmojiAddedSubtype;
+import slack.common.EmojiAddedType;
 
+@Generated("Yojo")
 /**
 * A custom emoji has been added.
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class EmojiAdded {
+
 
     private EmojiAddedType type;
 
@@ -28,5 +29,4 @@ public class EmojiAdded {
     private URI value;
 
     private String eventTs;
-
 }

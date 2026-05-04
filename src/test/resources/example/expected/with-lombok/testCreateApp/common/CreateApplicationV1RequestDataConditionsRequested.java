@@ -1,14 +1,14 @@
 package testCreateApp.common;
 
+import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import javax.annotation.processing.Generated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.OffsetDateTime;
-import lombok.Data;
-import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.math.BigDecimal;
+import lombok.experimental.Accessors;
 
 @Generated("Yojo")
 @Data
@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class CreateApplicationV1RequestDataConditionsRequested {
+
 
     @NotBlank
     private String purchaseNumber;
@@ -28,5 +29,4 @@ public class CreateApplicationV1RequestDataConditionsRequested {
 
     @NotNull
     private OffsetDateTime endDate;
-
 }

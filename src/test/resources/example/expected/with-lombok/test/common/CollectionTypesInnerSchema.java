@@ -1,12 +1,12 @@
 package example.testGenerate.test.common;
 
-import testGenerate.ClassForExtending;
-import javax.validation.Valid;
-import lombok.Data;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import testGenerate.ClassForExtending;
 
 @Generated("Yojo")
 @Data
@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CollectionTypesInnerSchema {
 
+
     private String someString;
 
     @Valid
     private ClassForExtending someExistingObject;
-
 }

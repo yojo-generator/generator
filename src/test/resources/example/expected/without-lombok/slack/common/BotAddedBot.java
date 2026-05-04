@@ -6,6 +6,7 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class BotAddedBot {
 
+
     private String id;
 
     private String appId;
@@ -13,7 +14,6 @@ public class BotAddedBot {
     private String name;
 
     private Map<String, String> icons;
-
     public void setId(String id) {
         this.id = id;
     }

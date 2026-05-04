@@ -1,25 +1,25 @@
 package discriminator.common;
 
 import discriminator.common.CatHuntingSkill;
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+@Generated("Yojo")
 /**
 * A representation of a cat
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class Cat extends Pet {
 
+
     /**
      * The measured skill for hunting
      */
     private CatHuntingSkill huntingSkill;
-
 }

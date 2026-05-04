@@ -1,23 +1,24 @@
 package slack.messages;
 
-import javax.validation.Valid;
-import slack.common.FileCreatedType;
-import lombok.Data;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
-import slack.common.FileCreatedFile;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.FileCreatedFile;
+import slack.common.FileCreatedType;
 
+@Generated("Yojo")
 /**
 * A file was created.
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class FileCreated {
+
 
     private FileCreatedType type;
 
@@ -25,5 +26,4 @@ public class FileCreated {
 
     @Valid
     private FileCreatedFile file;
-
 }

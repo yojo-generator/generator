@@ -1,11 +1,12 @@
 package asyncapi.common;
 
+import asyncapi.common.TurnOnOffPayloadCommand;
 import java.time.OffsetDateTime;
 import javax.annotation.processing.Generated;
-import asyncapi.common.TurnOnOffPayloadCommand;
 
 @Generated("Yojo")
 public class TurnOnOffPayload {
+
 
     /**
      * Whether to turn on or off the light.
@@ -16,7 +17,6 @@ public class TurnOnOffPayload {
      * Date and time when the message was sent.
      */
     private OffsetDateTime sentAt;
-
     public void setCommand(TurnOnOffPayloadCommand command) {
         this.command = command;
     }

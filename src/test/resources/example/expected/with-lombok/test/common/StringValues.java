@@ -1,23 +1,24 @@
 package example.testGenerate.test.common;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-import lombok.Data;
 import javax.annotation.processing.Generated;
-import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+@Generated("Yojo")
 /**
 * Here was located all supported strings values
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class StringValues {
+
 
     private String stringWithDefaultValue = "5";
 
@@ -46,5 +47,4 @@ public class StringValues {
     @Size(min = 1, max = 2)
     @Pattern(regexp = "^d{6}$")
     private String stringWithAllAnnotations;
-
 }

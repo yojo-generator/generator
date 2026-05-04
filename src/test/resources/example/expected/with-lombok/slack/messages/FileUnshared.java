@@ -1,23 +1,24 @@
 package slack.messages;
 
-import slack.common.FileUnsharedType;
-import slack.common.FileUnsharedFile;
-import javax.validation.Valid;
-import lombok.Data;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.FileUnsharedFile;
+import slack.common.FileUnsharedType;
 
+@Generated("Yojo")
 /**
 * A file was unshared.
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class FileUnshared {
+
 
     private FileUnsharedType type;
 
@@ -25,5 +26,4 @@ public class FileUnshared {
 
     @Valid
     private FileUnsharedFile file;
-
 }

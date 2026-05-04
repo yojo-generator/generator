@@ -1,35 +1,36 @@
 package example.testGenerate.test.io.github.somepath;
 
-import example.testGenerate.test.common.PolymorphExampleThree;
-import java.util.List;
-import javax.validation.constraints.NotEmpty;
-import example.testGenerate.test.common.RequestDtoSchemaInnerSchema;
-import testGenerate.InterfaceForImpl2;
-import javax.validation.constraints.NotNull;
-import java.util.UUID;
-import javax.validation.Valid;
-import testGenerate.InterfaceForImpl;
-import java.util.LinkedHashMap;
-import example.testGenerate.test.common.PolymorphPolymorphExampleOnePolymorphExampleTwo;
-import javax.annotation.processing.Generated;
-import example.testGenerate.test.common.RequestDtoSchemaInnerEnumWithDescription;
-import example.testGenerate.test.common.SomeObject;
-import example.testGenerate.test.common.RequestDtoSchemaInnerEnumWithoutDescriptionSmall;
+import example.testGenerate.test.common.ClassForExtends;
+import example.testGenerate.test.common.CollectionTypes;
 import example.testGenerate.test.common.EnumResultWithDescription;
+import example.testGenerate.test.common.EnumResultWithoutDescription;
 import example.testGenerate.test.common.NumericsValues;
+import example.testGenerate.test.common.ObjectTypes;
+import example.testGenerate.test.common.PolymorphExampleThree;
+import example.testGenerate.test.common.PolymorphPolymorphExampleOnePolymorphExampleTwo;
+import example.testGenerate.test.common.RequestDtoSchemaInnerEnumWithDescription;
+import example.testGenerate.test.common.RequestDtoSchemaInnerEnumWithoutDescription;
+import example.testGenerate.test.common.RequestDtoSchemaInnerEnumWithoutDescriptionSmall;
+import example.testGenerate.test.common.RequestDtoSchemaInnerSchema;
+import example.testGenerate.test.common.SomeObject;
 import example.testGenerate.test.common.StringValues;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import example.testGenerate.test.common.EnumResultWithoutDescription;
 import java.util.Set;
-import example.testGenerate.test.common.CollectionTypes;
+import java.util.UUID;
+import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import testGenerate.ExistingClass;
-import example.testGenerate.test.common.RequestDtoSchemaInnerEnumWithoutDescription;
-import example.testGenerate.test.common.ObjectTypes;
-import example.testGenerate.test.common.ClassForExtends;
+import testGenerate.InterfaceForImpl2;
+import testGenerate.InterfaceForImpl;
 
 @Generated("Yojo")
 public class RequestDtoByRef extends ClassForExtends implements InterfaceForImpl,InterfaceForImpl2 {
+
 
     @Valid
     private PolymorphPolymorphExampleOnePolymorphExampleTwo polymorph;
@@ -201,7 +202,6 @@ public class RequestDtoByRef extends ClassForExtends implements InterfaceForImpl
 
     @Valid
     private SomeObject someObject;
-
     public void setPolymorph(PolymorphPolymorphExampleOnePolymorphExampleTwo polymorph) {
         this.polymorph = polymorph;
     }
@@ -363,6 +363,24 @@ public class RequestDtoByRef extends ClassForExtends implements InterfaceForImpl
     }
     public Map<UUID, Set<ExistingClass>> getMapUUIDSetOfExistingObject() {
         return mapUUIDSetOfExistingObject;
+    }
+    public void setInnerEnumWithDescription(RequestDtoSchemaInnerEnumWithDescription innerEnumWithDescription) {
+        this.innerEnumWithDescription = innerEnumWithDescription;
+    }
+    public RequestDtoSchemaInnerEnumWithDescription getInnerEnumWithDescription() {
+        return innerEnumWithDescription;
+    }
+    public void setInnerEnumWithoutDescription(RequestDtoSchemaInnerEnumWithoutDescription innerEnumWithoutDescription) {
+        this.innerEnumWithoutDescription = innerEnumWithoutDescription;
+    }
+    public RequestDtoSchemaInnerEnumWithoutDescription getInnerEnumWithoutDescription() {
+        return innerEnumWithoutDescription;
+    }
+    public void setInnerEnumWithoutDescriptionSmall(RequestDtoSchemaInnerEnumWithoutDescriptionSmall innerEnumWithoutDescriptionSmall) {
+        this.innerEnumWithoutDescriptionSmall = innerEnumWithoutDescriptionSmall;
+    }
+    public RequestDtoSchemaInnerEnumWithoutDescriptionSmall getInnerEnumWithoutDescriptionSmall() {
+        return innerEnumWithoutDescriptionSmall;
     }
     public void setEnumResultWithDescription(EnumResultWithDescription enumResultWithDescription) {
         this.enumResultWithDescription = enumResultWithDescription;

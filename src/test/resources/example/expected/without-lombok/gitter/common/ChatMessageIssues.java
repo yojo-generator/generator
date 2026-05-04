@@ -5,8 +5,8 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class ChatMessageIssues {
 
-    private String number;
 
+    private String number;
     public void setNumber(String number) {
         this.number = number;
     }

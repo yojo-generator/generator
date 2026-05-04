@@ -1,14 +1,15 @@
 package slack.messages;
 
-import slack.common.MemberJoinedChannelChannelType;
 import javax.annotation.processing.Generated;
+import slack.common.MemberJoinedChannelChannelType;
 import slack.common.MemberJoinedChannelType;
 
+@Generated("Yojo")
 /**
 * A user joined a public or private channel.
 */
-@Generated("Yojo")
 public class MemberJoinedChannel {
+
 
     private MemberJoinedChannelType type;
 
@@ -21,7 +22,12 @@ public class MemberJoinedChannel {
     private String team;
 
     private String inviter;
-
+    public void setType(MemberJoinedChannelType type) {
+        this.type = type;
+    }
+    public MemberJoinedChannelType getType() {
+        return type;
+    }
     public void setUser(String user) {
         this.user = user;
     }
@@ -33,6 +39,12 @@ public class MemberJoinedChannel {
     }
     public String getChannel() {
         return channel;
+    }
+    public void setChannelType(MemberJoinedChannelChannelType channelType) {
+        this.channelType = channelType;
+    }
+    public MemberJoinedChannelChannelType getChannelType() {
+        return channelType;
     }
     public void setTeam(String team) {
         this.team = team;

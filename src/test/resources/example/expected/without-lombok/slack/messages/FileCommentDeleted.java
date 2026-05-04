@@ -1,15 +1,16 @@
 package slack.messages;
 
-import slack.common.FileCommentDeletedFile;
-import javax.validation.Valid;
-import slack.common.FileCommentDeletedType;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import slack.common.FileCommentDeletedFile;
+import slack.common.FileCommentDeletedType;
 
+@Generated("Yojo")
 /**
 * A file comment was deleted.
 */
-@Generated("Yojo")
 public class FileCommentDeleted {
+
 
     private FileCommentDeletedType type;
 
@@ -19,7 +20,12 @@ public class FileCommentDeleted {
 
     @Valid
     private FileCommentDeletedFile file;
-
+    public void setType(FileCommentDeletedType type) {
+        this.type = type;
+    }
+    public FileCommentDeletedType getType() {
+        return type;
+    }
     public void setComment(String comment) {
         this.comment = comment;
     }

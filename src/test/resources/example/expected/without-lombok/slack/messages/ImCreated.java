@@ -1,15 +1,16 @@
 package slack.messages;
 
-import slack.common.ImCreatedType;
+import javax.annotation.processing.Generated;
 import javax.validation.Valid;
 import slack.common.ImCreatedChannel;
-import javax.annotation.processing.Generated;
+import slack.common.ImCreatedType;
 
+@Generated("Yojo")
 /**
 * A DM was created.
 */
-@Generated("Yojo")
 public class ImCreated {
+
 
     private ImCreatedType type;
 
@@ -17,7 +18,12 @@ public class ImCreated {
     private ImCreatedChannel channel;
 
     private String user;
-
+    public void setType(ImCreatedType type) {
+        this.type = type;
+    }
+    public ImCreatedType getType() {
+        return type;
+    }
     public void setChannel(ImCreatedChannel channel) {
         this.channel = channel;
     }

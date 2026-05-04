@@ -1,15 +1,16 @@
 package slack.messages;
 
-import slack.common.DndUpdatedUserType;
-import javax.validation.Valid;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import slack.common.DndUpdatedUserDndStatus;
+import slack.common.DndUpdatedUserType;
 
+@Generated("Yojo")
 /**
 * Do not Disturb settings changed for a member.
 */
-@Generated("Yojo")
 public class DndUpdatedUser {
+
 
     private DndUpdatedUserType type;
 
@@ -17,7 +18,12 @@ public class DndUpdatedUser {
 
     @Valid
     private DndUpdatedUserDndStatus dndStatus;
-
+    public void setType(DndUpdatedUserType type) {
+        this.type = type;
+    }
+    public DndUpdatedUserType getType() {
+        return type;
+    }
     public void setUser(String user) {
         this.user = user;
     }

@@ -1,23 +1,24 @@
 package oneMore.common;
 
+import java.time.OffsetDateTime;
+import javax.annotation.processing.Generated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.OffsetDateTime;
-import lombok.Data;
-import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+@Generated("Yojo")
 /**
 * Request parameters object
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class ApproveV1RequestData {
+
 
     /**
      * Application status
@@ -38,5 +39,4 @@ public class ApproveV1RequestData {
      */
     @NotNull
     private OffsetDateTime updatedAt;
-
 }

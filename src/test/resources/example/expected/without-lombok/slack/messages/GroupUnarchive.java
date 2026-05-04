@@ -1,20 +1,26 @@
 package slack.messages;
 
-import slack.common.GroupUnarchiveType;
 import javax.annotation.processing.Generated;
+import slack.common.GroupUnarchiveType;
 
+@Generated("Yojo")
 /**
 * A private channel was unarchived.
 */
-@Generated("Yojo")
 public class GroupUnarchive {
+
 
     private GroupUnarchiveType type;
 
     private String channel;
 
     private String user;
-
+    public void setType(GroupUnarchiveType type) {
+        this.type = type;
+    }
+    public GroupUnarchiveType getType() {
+        return type;
+    }
     public void setChannel(String channel) {
         this.channel = channel;
     }

@@ -1,28 +1,29 @@
 package gitter.messages;
 
-import java.util.List;
-import java.time.OffsetDateTime;
-import lombok.Data;
-import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
-import lombok.NoArgsConstructor;
-import gitter.common.ChatMessageMentions;
-import javax.validation.Valid;
 import gitter.common.ChatMessageFromUser;
 import gitter.common.ChatMessageIssues;
-import javax.annotation.processing.Generated;
+import gitter.common.ChatMessageMentions;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.time.OffsetDateTime;
+import java.util.List;
+import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+@Generated("Yojo")
 /**
 * A message represents an individual chat message sent to a room. They are a sub-resource of a room.
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class ChatMessage {
+
 
     /**
      * ID of the message.
@@ -91,5 +92,4 @@ public class ChatMessage {
      * Stands for "Gravatar version" and is used for cache busting.
      */
     private String gv;
-
 }

@@ -5,11 +5,12 @@ import javax.annotation.processing.Generated;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
+@Generated("Yojo")
 /**
 * Command a particular streetlight to dim the lights.
 */
-@Generated("Yojo")
 public class DimLight {
+
 
     /**
      * Percentage to which the light should be dimmed to.
@@ -22,7 +23,6 @@ public class DimLight {
      * Date and time when the message was sent.
      */
     private OffsetDateTime sentAt;
-
     public void setPercentage(Integer percentage) {
         this.percentage = percentage;
     }

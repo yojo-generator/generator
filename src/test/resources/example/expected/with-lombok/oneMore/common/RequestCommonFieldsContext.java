@@ -1,23 +1,24 @@
 package oneMore.common;
 
-import javax.validation.constraints.NotBlank;
 import java.util.UUID;
-import javax.validation.constraints.NotNull;
-import lombok.Data;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
+@Generated("Yojo")
 /**
 * Context
 */
-@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class RequestCommonFieldsContext {
+
 
     /**
      * Method name
@@ -44,5 +45,4 @@ public class RequestCommonFieldsContext {
      */
     @NotNull
     private UUID requestId;
-
 }

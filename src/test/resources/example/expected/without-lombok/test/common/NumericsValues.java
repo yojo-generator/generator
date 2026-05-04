@@ -1,18 +1,19 @@
 package example.testGenerate.test.common;
 
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
-import java.math.BigDecimal;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
+@Generated("Yojo")
 /**
 * Here was located all supported numeric values
 */
-@Generated("Yojo")
 public class NumericsValues {
+
 
     private Byte byteValue;
 
@@ -66,7 +67,6 @@ public class NumericsValues {
     @Min(22)
     @Digits(integer = 2, fraction = 2)
     private BigInteger bigIntegerValueWithAnnotations;
-
     public void setByteValue(Byte byteValue) {
         this.byteValue = byteValue;
     }

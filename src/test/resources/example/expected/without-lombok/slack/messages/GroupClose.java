@@ -1,20 +1,26 @@
 package slack.messages;
 
-import slack.common.GroupCloseType;
 import javax.annotation.processing.Generated;
+import slack.common.GroupCloseType;
 
+@Generated("Yojo")
 /**
 * You closed a private channel.
 */
-@Generated("Yojo")
 public class GroupClose {
+
 
     private GroupCloseType type;
 
     private String user;
 
     private String channel;
-
+    public void setType(GroupCloseType type) {
+        this.type = type;
+    }
+    public GroupCloseType getType() {
+        return type;
+    }
     public void setUser(String user) {
         this.user = user;
     }

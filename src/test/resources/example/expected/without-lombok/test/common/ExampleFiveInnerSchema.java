@@ -5,8 +5,8 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class ExampleFiveInnerSchema {
 
-    private String someString;
 
+    private String someString;
     public void setSomeString(String someString) {
         this.someString = someString;
     }
