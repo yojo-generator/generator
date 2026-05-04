@@ -379,6 +379,42 @@ public class Schema {
     }
 
     /**
+     * Returns set of unique subtypes.
+     *
+     * @return unique subtypes set
+     */
+    public Set<String> getUniqueSubtypes() {
+        return uniqueSubtypes;
+    }
+
+    /**
+     * Sets set of unique subtypes.
+     *
+     * @param uniqueSubtypes unique subtypes set
+     */
+    public void setUniqueSubtypes(Set<String> uniqueSubtypes) {
+        this.uniqueSubtypes = uniqueSubtypes;
+    }
+
+    /**
+     * Returns map from subtype name to discriminator value.
+     *
+     * @return subtype discriminator values map
+     */
+    public Map<String, String> getSubtypeDiscriminatorValues() {
+        return subtypeDiscriminatorValues;
+    }
+
+    /**
+     * Sets map from subtype name to discriminator value.
+     *
+     * @param subtypeDiscriminatorValues discriminator values map
+     */
+    public void setSubtypeDiscriminatorValues(Map<String, String> subtypeDiscriminatorValues) {
+        this.subtypeDiscriminatorValues = subtypeDiscriminatorValues;
+    }
+
+    /**
      * Returns method definitions (for interfaces only).
      *
      * @return method map: name → { description, definition }
