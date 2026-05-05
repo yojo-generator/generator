@@ -1,9 +1,10 @@
 package ru.yojo.codegen.mapper;
 
+import ru.yojo.codegen.registry.InnerSchemaRegistry;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Shared mutable state container used during schema/message mapping.
@@ -49,10 +50,9 @@ public class Helper {
     private Set<String> excludeInheritanceSchemas = new HashSet<>();
 
     /**
-     * Accumulator for inner schemas discovered during mapping (e.g., enums, inner DTOs).
-     * Key: schema name, Value: schema definition map.
+     * Registry for inner schemas discovered during mapping (e.g., enums, inner DTOs).
      */
-    private Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
+    private InnerSchemaRegistry innerSchemaRegistry = new InnerSchemaRegistry();
 
     /**
      * Returns whether the current context is mapping from messages.
@@ -145,20 +145,44 @@ public class Helper {
     }
 
     /**
-     * Returns the map of inner schemas discovered during mapping.
+     * Returns the registry of inner schemas discovered during mapping.
      *
-     * @return concurrent map: schema name → schema definition
+     * @return inner schema registry
+     */
+    public InnerSchemaRegistry getInnerSchemaRegistry() {
+        return innerSchemaRegistry;
+    }
+
+    /**
+     * Sets the inner schema registry.
+     *
+     * @param innerSchemaRegistry the registry to use
+     */
+    public void setInnerSchemaRegistry(InnerSchemaRegistry innerSchemaRegistry) {
+        this.innerSchemaRegistry = innerSchemaRegistry;
+    }
+
+    /**
+     * Returns the map of inner schemas discovered during mapping.
+     * <p>
+     * This is a convenience method that returns the contents of the registry.
+     * For new code, prefer using {@link #getInnerSchemaRegistry()}.
+     *
+     * @return map: schema name → schema definition
      */
     public Map<String, Object> getInnerSchemas() {
-        return innerSchemas;
+        return innerSchemaRegistry.getAll();
     }
 
     /**
      * Sets the map of inner schemas.
+     * <p>
+     * This is a convenience method that replaces the registry with a new one containing the given map.
+     * For new code, prefer using {@link #setInnerSchemaRegistry(InnerSchemaRegistry)}.
      *
      * @param innerSchemas map of inner schemas
      */
     public void setInnerSchemas(Map<String, Object> innerSchemas) {
-        this.innerSchemas = innerSchemas;
+        this.innerSchemaRegistry = new InnerSchemaRegistry(innerSchemas);
     }
 }
