@@ -26,9 +26,6 @@ import static ru.yojo.codegen.constants.Dictionary.*;
  */
 @SuppressWarnings("all")
 public class MapperUtil {
-
-    private static final NamingStrategy NAMING_STRATEGY = new NamingStrategy();
-
     /**
      * Safely extracts a {@code Set<String>} value from a map for the given key, or returns an empty set.
      *
@@ -113,7 +110,7 @@ public class MapperUtil {
      * @return capitalized schema name
      */
     public static String refReplace(String ref) {
-        return NAMING_STRATEGY.refReplace(ref);
+        return ref.replaceAll(".+/", "");
     }
 
     /**
@@ -385,7 +382,56 @@ public class MapperUtil {
     public static void buildLombokAnnotations(LombokProperties lombokProperties,
                                               Set<String> requiredImports,
                                               StringBuilder lombokAnnotationBuilder) {
-        lombokProperties.buildLombokAnnotations(requiredImports, lombokAnnotationBuilder);
+        if (lombokProperties.noArgsConstructor()) {
+            lombokAnnotationBuilder
+                    .append(LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION)
+                    .append(lineSeparator());
+            requiredImports.add(LOMBOK_NO_ARGS_CONSTRUCTOR_IMPORT);
+        }
+        if (lombokProperties.getAccessors() != null && lombokProperties.getAccessors().isEnable()) {
+            String accessors = fetchAccessors(lombokProperties);
+            lombokAnnotationBuilder.append(accessors)
+                    .append(lineSeparator());
+            requiredImports.add(LOMBOK_ACCESSORS_IMPORT);
+        }
+        if (lombokProperties.allArgsConstructor()) {
+            lombokAnnotationBuilder.append(LOMBOK_ALL_ARGS_CONSTRUCTOR_ANNOTATION)
+                    .append(lineSeparator());
+            requiredImports.add(LOMBOK_ALL_ARGS_CONSTRUCTOR_IMPORT);
+        }
+        if (lombokProperties.getEqualsAndHashCode() != null && lombokProperties.getEqualsAndHashCode().isEnable()) {
+            requiredImports.add(LOMBOK_EQUALS_AND_HASH_CODE_IMPORT);
+            if (Boolean.TRUE.equals(lombokProperties.getEqualsAndHashCode().getCallSuper())) {
+                lombokAnnotationBuilder.append(EQUALS_AND_HASH_CODE_CALL_SUPER_TRUE_ANNOTATION)
+                        .append(lineSeparator());
+            } else if (Boolean.FALSE.equals(lombokProperties.getEqualsAndHashCode().getCallSuper())) {
+                lombokAnnotationBuilder.append(EQUALS_AND_HASH_CODE_CALL_SUPER_FALSE_ANNOTATION)
+                        .append(lineSeparator());
+            } else {
+                lombokAnnotationBuilder.append(EQUALS_AND_HASH_CODE_ANNOTATION)
+                        .append(lineSeparator());
+            }
+        }
+    }
+
+    /**
+     * Selects the appropriate {@code @Accessors(...)} annotation based on fluent/chain flags.
+     *
+     * @param lombokProperties Lombok config
+     * @return annotation string
+     */
+    private static String fetchAccessors(LombokProperties lombokProperties) {
+        boolean fluent = lombokProperties.getAccessors().isFluent();
+        boolean chain = lombokProperties.getAccessors().isChain();
+        
+        if (fluent && chain) {
+            return String.format(LOMBOK_ACCESSORS_ANNOTATION, "fluent = true, chain = true", "");
+        } else if (fluent) {
+            return String.format(LOMBOK_ACCESSORS_ANNOTATION, "fluent = true", "");
+        } else if (chain) {
+            return String.format(LOMBOK_ACCESSORS_ANNOTATION, "chain = true", "");
+        }
+        return LOMBOK_ACCESSORS_EMPTY_ANNOTATION;
     }
 
     /**
@@ -467,7 +513,13 @@ public class MapperUtil {
      * @return capitalized string
      */
     public static String capitalize(final String str) {
-        return NAMING_STRATEGY.capitalize(str);
+        final int strLen = length(str);
+        if (strLen == 0) {
+            return str;
+        }
+        final int firstCodepoint = str.codePointAt(0);
+        final int newCodePoint = Character.toTitleCase(firstCodepoint);
+        return checkPoints(firstCodepoint, newCodePoint, str, new int[strLen], strLen);
     }
 
     /**
@@ -477,7 +529,28 @@ public class MapperUtil {
      * @return uncapitalized string
      */
     public static String uncapitalize(final String str) {
-        return NAMING_STRATEGY.uncapitalize(str);
+        final int strLen = length(str);
+        if (strLen == 0) {
+            return str;
+        }
+        final int firstCodepoint = str.codePointAt(0);
+        final int newCodePoint = Character.toLowerCase(firstCodepoint);
+        return checkPoints(firstCodepoint, newCodePoint, str, new int[strLen], strLen);
+    }
+
+    private static String checkPoints(int firstCodepoint, int newCodePoint, String str, int[] strLen, int strLen1) {
+        if (firstCodepoint == newCodePoint) {
+            return str;
+        }
+        final int[] newCodePoints = strLen;
+        int outOffset = 0;
+        newCodePoints[outOffset++] = newCodePoint;
+        for (int inOffset = Character.charCount(firstCodepoint); inOffset < strLen1; ) {
+            final int codepoint = str.codePointAt(inOffset);
+            newCodePoints[outOffset++] = codepoint;
+            inOffset += Character.charCount(codepoint);
+        }
+        return new String(newCodePoints, 0, outOffset);
     }
 
     /**
@@ -633,7 +706,23 @@ public class MapperUtil {
      * @return safe camelCase name
      */
     public static String toValidJavaFieldName(String rawName) {
-        return NAMING_STRATEGY.toValidJavaFieldName(rawName);
+        if (rawName == null || rawName.isEmpty()) {
+            return rawName;
+        }
+        StringBuilder sb = new StringBuilder();
+        boolean upperNext = false;
+        for (int i = 0; i < rawName.length(); i++) {
+            char c = rawName.charAt(i);
+            if (c == '-' || c == '_' || c == ' ') {
+                upperNext = true;
+            } else if (upperNext) {
+                sb.append(Character.toUpperCase(c));
+                upperNext = false;
+            } else {
+                sb.append(c);
+            }
+        }
+        return safeFieldName(sb.toString());
     }
 
     /**

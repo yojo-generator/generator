@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static ru.yojo.codegen.constants.Dictionary.*;
+import static ru.yojo.codegen.util.LombokUtils.*;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 /**
@@ -276,7 +277,14 @@ public class MessageMapper extends AbstractMapper {
 
         if (payload.containsKey(LOMBOK)) {
             Map<String, Object> lombokProps = castObjectToMap(payload.get(LOMBOK));
-            lombokProperties.populateFromMap(lombokProps);
+            if (lombokProps.containsKey(ENABLE) &&
+                "false".equals(getStringValueIfExistOrElseNull(ENABLE, lombokProps))) {
+                lombokProperties.setEnableLombok(Boolean.valueOf(getStringValueIfExistOrElseNull(ENABLE, lombokProps)));
+            } else {
+                fillLombokAccessors(lombokProperties, lombokProps);
+                fillLombokEqualsAndHashCode(lombokProperties, lombokProps);
+                fillLombokConstructors(lombokProperties, lombokProps);
+            }
         }
 
         if (POLYMORPHS.stream().anyMatch(payload::containsKey)) {
