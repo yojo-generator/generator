@@ -31,13 +31,6 @@ import static ru.yojo.codegen.util.MapperUtil.*;
  */
 @SuppressWarnings("all")
 public class AbstractMapper {
-
-    private final PropertyTypeResolver propertyTypeResolver;
-
-    public AbstractMapper() {
-        this.propertyTypeResolver = new PropertyTypeResolver(this);
-    }
-
     /**
      * Populates a {@link VariableProperties} instance from a raw YAML property definition.
      * <p>
@@ -127,62 +120,97 @@ public class AbstractMapper {
      * @param innerSchemas       accumulator for inner schemas
      */
     public void fillVariableProperties(String schemaName,
-                                        VariableProperties variableProperties,
-                                        Map<String, Object> currentSchema,
-                                        Map<String, Object> schemas,
-                                        String propertyName,
-                                        Map<String, Object> propertiesMap,
-                                        ProcessContext processContext,
-                                        Map<String, Object> innerSchemas) {
+                                       VariableProperties variableProperties,
+                                       Map<String, Object> currentSchema,
+                                       Map<String, Object> schemas,
+                                       String propertyName,
+                                       Map<String, Object> propertiesMap,
+                                       ProcessContext processContext,
+                                       Map<String, Object> innerSchemas) {
+        String commonPackage = processContext.getCommonPackage();
         if (propertiesMap.isEmpty()) {
             variableProperties.setType(OBJECT_TYPE);
             variableProperties.setValid(false);
             return;
         }
-
         String type = getStringValueIfExistOrElseNull(TYPE, propertiesMap);
         String format = getStringValueIfExistOrElseNull(FORMAT, propertiesMap);
-
-        // Handle additionalProperties (maps) - check first as it's a distinct type
         if (getStringValueIfExistOrElseNull(ADDITIONAL_PROPERTIES, propertiesMap) != null) {
             fillMapProperties(variableProperties, currentSchema, schemas, propertiesMap, processContext);
-            addCollectionImports(variableProperties);
             return;
         }
-
-        // Handle object type with special format (e.g., format: uuid -> UUID)
         if (OBJECT_TYPE.equalsIgnoreCase(type) && format != null &&
             JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(format)) {
             variableProperties.setFormat(format);
             return;
         }
-
-        // Set the type (capitalize first letter)
         variableProperties.setType(capitalize(type != null ? type : OBJECT_TYPE));
-
-        // Use the Chain of Responsibility to resolve the property type
-        boolean handled = propertyTypeResolver.resolve(
-                schemaName, variableProperties, currentSchema, schemas,
-                propertyName, propertiesMap, processContext, innerSchemas
-        );
-
-        // If no handler could handle it, apply default logic
-        if (!handled) {
+        if (ARRAY.equals(uncapitalize(variableProperties.getType()))) {
+            fillArrayProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, processContext, innerSchemas);
+        } else if (getStringValueIfExistOrElseNull(REFERENCE, propertiesMap) != null && !ARRAY.equals(uncapitalize(variableProperties.getType()))) {
+            fillReferenceProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, processContext, innerSchemas);
+        } else if (OBJECT_TYPE.equals(variableProperties.getType()) &&
+                   getStringValueIfExistOrElseNull(PROPERTIES, propertiesMap) != null) {
+            fillObjectProperties(schemaName, variableProperties, schemas, propertyName, propertiesMap, processContext, innerSchemas);
+        } else if ((OBJECT_TYPE.equals(variableProperties.getType()) || STRING.equals(variableProperties.getType())) &&
+                   getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap) != null) {
+            fillEnumProperties(schemaName, variableProperties, propertyName, propertiesMap, processContext, innerSchemas);
+        } else if (OBJECT_TYPE.equals(variableProperties.getType()) &&
+                   variableProperties.getPackageOfExisingObject() != null &&
+                   variableProperties.getNameOfExisingObject() != null) {
+            fillExistingObjectProperties(variableProperties);
+        } else if (variableProperties.isPolymorph()) {
+            System.out.println("FOUND POLYMORPHISM INSIDE SCHEMA! Schema: " + variableProperties.getName());
+            List<Object> polymorphList = POLYMORPHS.stream()
+                    .map(p -> propertiesMap.get(p))
+                    .map(MapperUtil::castObjectToListObjects)
+                    .flatMap(objects -> objects.stream())
+                    .collect(Collectors.toList());
+            Map<String, Object> mergedProperties = polymorphList.stream()
+                    .flatMap(ref -> {
+                        String refStr = ref.toString();
+                        if (ref instanceof Map) {
+                            Map<?, ?> mapRef = (Map<?, ?>) ref;
+                            Object r = mapRef.get("$ref");
+                            if (r != null) refStr = r.toString();
+                        }
+                        return castObjectToMap(schemas.get(refReplace(refStr))).entrySet().stream();
+                    })
+                    .filter(en -> en.getKey().equals(PROPERTIES))
+                    .map(pr -> castObjectToMap(pr.getValue()))
+                    .flatMap(map -> map.entrySet().stream())
+                    .distinct()
+                    .collect(Collectors.toMap(
+                            Map.Entry::getKey,
+                            Map.Entry::getValue,
+                            (existing, replacement) -> existing
+                    ));
+            String className = capitalize(propertyName);
+            for (Object item : polymorphList) {
+                String refName;
+                if (item instanceof Map) {
+                    Map<?, ?> m = (Map<?, ?>) item;
+                    Object refObj = m.get("$ref");
+                    refName = refObj != null ? refReplace(refObj.toString()) : "Unknown";
+                } else {
+                    refName = refReplace(item.toString());
+                }
+                className += refName;
+            }
+            variableProperties.setType(className);
+            variableProperties.addRequiredImports(prepareImport(processContext, className));
+            Map<String, Object> preparedMergedPolymorphSchema = Map.of(
+                    className,
+                    Map.of(TYPE, OBJECT, PROPERTIES, mergedProperties)
+            );
+            innerSchemas.putAll(preparedMergedPolymorphSchema);
+        } else {
             if (OBJECT_TYPE.equals(variableProperties.getType())) {
                 variableProperties.setType(OBJECT_TYPE);
                 variableProperties.setValid(false);
             }
             variableProperties.setFormat(format);
         }
-
-        // Add required imports for collection types
-        addCollectionImports(variableProperties);
-    }
-
-    /**
-     * Adds required imports based on the final type (List, Set, Map).
-     */
-    private static void addCollectionImports(VariableProperties variableProperties) {
         String finalType = variableProperties.getType();
         if (finalType != null) {
             if (finalType.startsWith("List<")) {
@@ -202,7 +230,7 @@ public class AbstractMapper {
      * @param className     simple class name
      * @return full import, e.g., {@code "com.example.common.MyClass;"}
      */
-    String prepareImport(ProcessContext ctx, String className) {
+    protected String prepareImport(ProcessContext ctx, String className) {
         String effectivePackage = ctx.getEffectiveCommonPackage(); // ← новое
         return effectivePackage.replace(";", "." + className + ";");
     }
@@ -224,7 +252,7 @@ public class AbstractMapper {
      * @param propertiesMap      field definition (must contain {@code additionalProperties})
      * @param processContext     context
      */
-    void fillMapProperties(VariableProperties variableProperties,
+    protected void fillMapProperties(VariableProperties variableProperties,
                                    Map<String, Object> currentSchema,
                                    Map<String, Object> schemas,
                                    Map<String, Object> propertiesMap,
@@ -357,7 +385,7 @@ public class AbstractMapper {
      *
      * @param variableProperties field to configure
      */
-    static void fillExistingObjectProperties(VariableProperties variableProperties) {
+    protected static void fillExistingObjectProperties(VariableProperties variableProperties) {
         variableProperties.setType(capitalize(variableProperties.getNameOfExisingObject()));
         variableProperties.addRequiredImports(variableProperties.getPackageOfExisingObject()
                 .concat(".")
@@ -376,7 +404,7 @@ public class AbstractMapper {
      * @param processContext     context
      * @param innerSchemas       accumulator
      */
-    void fillEnumProperties(String schemaName,
+    protected void fillEnumProperties(String schemaName,
                                     VariableProperties variableProperties,
                                     String propertyName,
                                     Map<String, Object> propertiesMap,
@@ -412,7 +440,7 @@ public class AbstractMapper {
      * @param processContext     context
      * @param innerSchemas       accumulator
      */
-    void fillObjectProperties(String schemaName,
+    protected void fillObjectProperties(String schemaName,
                                       VariableProperties variableProperties,
                                       Map<String, Object> schemas,
                                       String propertyName,
@@ -438,7 +466,7 @@ public class AbstractMapper {
      * @param processContext     generation context
      * @param innerSchemas       accumulator
      */
-    void fillReferenceProperties(String schemaName,
+    protected void fillReferenceProperties(String schemaName,
                                          VariableProperties variableProperties,
                                          Map<String, Object> currentSchema,
                                          Map<String, Object> schemas,
@@ -502,7 +530,7 @@ public class AbstractMapper {
      * @param processContext     generation context
      * @param innerSchemas       accumulator
      */
-    void fillArrayProperties(String schemaName,
+    protected void fillArrayProperties(String schemaName,
                                      VariableProperties variableProperties,
                                      Map<String, Object> currentSchema,
                                      Map<String, Object> schemas,
@@ -594,7 +622,7 @@ public class AbstractMapper {
      * @param variableProperties field container
      * @param items              {@code items} map from YAML
      */
-    private static void fillCollectionWithExistingObject(VariableProperties variableProperties, Map<String, Object> items) {
+    protected static void fillCollectionWithExistingObject(VariableProperties variableProperties, Map<String, Object> items) {
         variableProperties.setItems(getStringValueIfExistOrElseNull(NAME, items));
         variableProperties.setPackageOfExisingObject(getStringValueIfExistOrElseNull(PACKAGE, items));
         variableProperties.setNameOfExisingObject(getStringValueIfExistOrElseNull(NAME, items));
@@ -616,7 +644,7 @@ public class AbstractMapper {
      * @param processContext     context
      * @param innerSchemas       accumulator
      */
-    private void fillInnerSchema(VariableProperties variableProperties,
+    protected void fillInnerSchema(VariableProperties variableProperties,
                                  String propertyName,
                                  Map<String, Object> propertiesMap,
                                  ProcessContext processContext,
@@ -774,7 +802,7 @@ public class AbstractMapper {
      *
      * @param variableProperties field container (must have {@code items} set)
      */
-    private static void fillCollectionType(VariableProperties variableProperties) {
+    protected static void fillCollectionType(VariableProperties variableProperties) {
         switch (variableProperties.getCollectionType()) {
             case "list":
                 variableProperties.setType(format(refReplace(LIST_TYPE), variableProperties.getItems()));
@@ -955,7 +983,7 @@ public class AbstractMapper {
      * @param propertiesMap raw enum definition
      * @param innerSchemas  accumulator
      */
-    private static void fillEnumSchema(String enumSchemaName,
+    protected static void fillEnumSchema(String enumSchemaName,
                                        Map<String, Object> propertiesMap,
                                        Map<String, Object> innerSchemas) {
         System.out.println(">>> ADDING ENUM TO INNER SCHEMAS: " + enumSchemaName);
