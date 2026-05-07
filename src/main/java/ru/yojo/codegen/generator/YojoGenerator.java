@@ -8,8 +8,6 @@ import ru.yojo.codegen.domain.message.Message;
 import ru.yojo.codegen.domain.schema.Schema;
 import ru.yojo.codegen.mapper.MessageMapper;
 import ru.yojo.codegen.mapper.SchemaMapper;
-import ru.yojo.codegen.parser.SpecificationModel;
-import ru.yojo.codegen.parser.SpecificationParser;
 import ru.yojo.codegen.util.MapperUtil;
 
 import java.io.File;
@@ -108,19 +106,34 @@ public class YojoGenerator {
     private void processSpecification(SpecificationProperties spec, YojoContext yojoContext) throws IOException {
         SchemaMapper schemaMapper = new SchemaMapper();
         MessageMapper messageMapper = new MessageMapper(schemaMapper);
+        Path inputDir = Paths.get(spec.getInputDirectory()).toAbsolutePath().normalize();
+        String specFileName = spec.getSpecName().trim();
+        Path specFilePath = inputDir.resolve(specFileName);
+        if (!Files.exists(specFilePath)) {
+            throw new IllegalArgumentException("Spec file not found: " + specFilePath);
+        }
 
-        // Parse specification using SpecificationParser (Facade pattern)
-        SpecificationParser parser = new SpecificationParser(
-                spec.getSpecName(),
-                Paths.get(spec.getInputDirectory()),
-                spec.getPackageLocation()
-        );
-        SpecificationModel model = parser.parse();
+        // Load root spec
+        String rootContent = Files.readString(specFilePath, StandardCharsets.UTF_8);
+        Map<String, Object> rootDoc = new Yaml().load(rootContent);
+        String firstLine = rootContent.lines().findFirst().orElse("");
+        if (!firstLine.startsWith("asyncapi:") && !firstLine.startsWith("openapi:")) {
+            throw new IllegalArgumentException("Not a root spec: " + specFilePath);
+        }
+
+        // Collect all schemas/messages from root + $ref files (recursively)
+        Map<String, Object> globalSchemas = new LinkedHashMap<>();
+        Map<String, Object> globalMessages = new LinkedHashMap<>();
+        Set<String> visitedRefs = new HashSet<>();
+        collectSchemasAndMessages(rootDoc, globalSchemas, globalMessages);
+        collectExternalRefs(rootDoc, inputDir, globalSchemas, globalMessages, visitedRefs);
+
+        // Inject 'name' and 'package' for $ref resolution
+        rootContent = getContent(rootContent, spec.getPackageLocation());
 
         // Prepare generation context
-        ProcessContext ctx = new ProcessContext(model.getRootDoc());
-        String specFilePath = Paths.get(spec.getInputDirectory(), spec.getSpecName()).toAbsolutePath().normalize().toString();
-        ctx.setFilePath(specFilePath);
+        ProcessContext ctx = new ProcessContext(new Yaml().load(rootContent));
+        ctx.setFilePath(specFilePath.toString());
         ctx.setPackageLocation(spec.getPackageLocation());
         ctx.setLombokProperties(yojoContext.getLombokProperties());
         ctx.setSpringBootVersion(yojoContext.getSpringBootVersion());
@@ -139,12 +152,91 @@ public class YojoGenerator {
             ctx.setMessagePackage(unified);
             ctx.setCommonPackage(unified);
         }
-        ctx.setSchemasMap(model.getSchemas());
-        ctx.setMessagesMap(model.getMessages());
+        ctx.setSchemasMap(globalSchemas);
+        ctx.setMessagesMap(globalMessages);
 
         ctx.setExperimental(yojoContext.isExperimental());
 
         process(ctx, schemaMapper, messageMapper);
+    }
+
+    // ————————————————————————————————————————
+    // Helper methods for $ref collection
+    // ————————————————————————————————————————
+
+    /**
+     * Extracts schemas and messages from the {@code components} section of a spec document.
+     *
+     * @param doc      source document
+     * @param schemas  target map for schemas
+     * @param messages target map for messages
+     */
+    private void collectSchemasAndMessages(Map<String, Object> doc,
+                                           Map<String, Object> schemas,
+                                           Map<String, Object> messages) {
+        if (doc == null) return;
+        Map<String, Object> components = castObjectToMap(doc.get("components"));
+        if (components != null) {
+            Map<String, Object> compsSchemas = castObjectToMap(components.get("schemas"));
+            Map<String, Object> compsMessages = castObjectToMap(components.get("messages"));
+            if (compsSchemas != null) schemas.putAll(compsSchemas);
+            if (compsMessages != null) messages.putAll(compsMessages);
+        }
+    }
+
+    /**
+     * Recursively walks the YAML AST and collects schemas/messages from external {@code $ref} files.
+     *
+     * @param node     current AST node
+     * @param baseDir  base directory for relative path resolution
+     * @param schemas  target schema map
+     * @param messages target message map
+     * @param visited  set of already visited file paths (to prevent cycles)
+     */
+    private void collectExternalRefs(Object node,
+                                     Path baseDir,
+                                     Map<String, Object> schemas,
+                                     Map<String, Object> messages,
+                                     Set<String> visited) {
+        if (node instanceof Map) {
+            @SuppressWarnings("unchecked")
+            Map<String, Object> map = (Map<String, Object>) node;
+            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                if ("$ref".equals(key) && value instanceof String) {
+                    String ref = (String) value;
+                    if (ref.startsWith("./") || ref.startsWith("../")) {
+                        int hash = ref.indexOf('#');
+                        if (hash > 0) {
+                            String filePath = ref.substring(0, hash);
+                            if (visited.add(filePath)) {
+                                try {
+                                    Path absPath = baseDir.resolve(filePath).normalize();
+                                    if (absPath.startsWith(baseDir) && Files.exists(absPath)) {
+                                        Map<String, Object> externalDoc = new Yaml().load(
+                                                Files.readString(absPath, StandardCharsets.UTF_8));
+                                        collectSchemasAndMessages(externalDoc, schemas, messages);
+                                        collectExternalRefs(externalDoc, baseDir, schemas, messages, visited);
+                                    }
+                                } catch (Exception e) {
+                                    System.err.println("⚠️ Skip $ref: " + ref + " → " + e.getMessage());
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    collectExternalRefs(value, baseDir, schemas, messages, visited);
+                }
+            }
+        } else if (node instanceof List) {
+            @SuppressWarnings("unchecked")
+            List<Object> list = (List<Object>) node;
+            for (Object item : list) {
+                collectExternalRefs(item, baseDir, schemas, messages, visited);
+            }
+        }
+        // else: ignore
     }
 
     // ————————————————————————————————————————
@@ -387,7 +479,7 @@ public class YojoGenerator {
         }
 
         new File(targetDir).mkdirs();
-        try (PrintWriter pw = new PrintWriter(new File(targetDir, fileName + ".java"), StandardCharsets.UTF_8.name())) {
+        try (PrintWriter pw = new PrintWriter(new File(targetDir, fileName + ".java"), StandardCharsets.UTF_8)) {
             pw.write(content);
             System.out.println(" Written: " + fileName + ".java → " + targetDir);
         } catch (IOException ex) {
@@ -406,12 +498,43 @@ public class YojoGenerator {
     private static void writeFile(String dirPath, String fileName, String content) {
         new File(dirPath).mkdirs();
         File file = new File(dirPath + fileName + ".java");
-        try (PrintWriter pw = new PrintWriter(file, StandardCharsets.UTF_8.name())) {
+        try (PrintWriter pw = new PrintWriter(file, StandardCharsets.UTF_8)) {
             pw.write(content);
             pw.flush();
             System.out.println(" Written: " + fileName + ".java → " + dirPath);
         } catch (IOException ex) {
             throw new RuntimeException("Failed to write: " + file, ex);
         }
+    }
+
+    /**
+     * Preprocesses YAML content to inject {@code name} and {@code package} for external {@code $ref} resolution.
+     * @param content         raw YAML
+     * @param packageLocation base package (e.g., {@code com.example})
+     * @return preprocessed YAML
+     */
+    private static String getContent(String content, String packageLocation) {
+        String regex = "\\s*\\$ref:\\s*['\"](\\./[^'\"]*\\.yaml)(?:#/(.*))?['\"]";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(content);
+        StringBuilder modified = new StringBuilder();
+        int lastEnd = 0;
+        while (matcher.find()) {
+            modified.append(content, lastEnd, matcher.start());
+            String className = matcher.group(2);
+            if (className != null) {
+                className = className.substring(className.lastIndexOf('/') + 1);
+            }
+            // ALWAYS: packageLocation + ".common"
+            String effectivePackage = packageLocation + ".common";
+            String originalLine = matcher.group(0);
+            String indent = originalLine.substring(0, originalLine.indexOf("$ref:"));
+            String replaceName = String.format("%sname: %s", indent, className);
+            String replacePackage = String.format("%spackage: %s", indent, effectivePackage);
+            modified.append(replaceName).append("\n").append(replacePackage).append("\n");
+            lastEnd = matcher.end();
+        }
+        modified.append(content.substring(lastEnd));
+        return modified.toString();
     }
 }

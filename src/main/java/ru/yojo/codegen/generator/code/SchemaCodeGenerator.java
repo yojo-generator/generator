@@ -217,8 +217,6 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
                 for (int i = 0; i < schema.getSubtypes().size(); i++) {
                     String subtype = schema.getSubtypes().get(i);
                     String discriminatorValue = schema.getSubtypeDiscriminatorValue(subtype);
-                    System.out.println("SCHEMA GEN: Generating @JsonSubTypes for " + subtype + 
-                            " with discriminator value: " + discriminatorValue);
                     subtypesBuilder.append(String.format("    @JsonSubTypes.Type(value = %s.class, name = \"%s\")", subtype, discriminatorValue));
                     if (i < schema.getSubtypes().size() - 1) {
                         subtypesBuilder.append(",").append(lineSeparator());
