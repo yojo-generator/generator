@@ -12,7 +12,6 @@ import ru.yojo.codegen.util.MapperUtil;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -478,33 +477,8 @@ public class YojoGenerator {
             targetDir = baseOutput;
         }
 
-        new File(targetDir).mkdirs();
-        try (PrintWriter pw = new PrintWriter(new File(targetDir, fileName + ".java"), StandardCharsets.UTF_8)) {
-            pw.write(content);
-            System.out.println(" Written: " + fileName + ".java → " + targetDir);
-        } catch (IOException ex) {
-            throw new RuntimeException("Failed to write: " + fileName, ex);
-        }
-    }
-
-    /**
-     * Writes generated Java source code to a file.
-     *
-     * @param dirPath  directory path
-     * @param fileName class name (without {@code .java} suffix)
-     * @param content  full Java source
-     * @throws RuntimeException if I/O error occurs
-     */
-    private static void writeFile(String dirPath, String fileName, String content) {
-        new File(dirPath).mkdirs();
-        File file = new File(dirPath + fileName + ".java");
-        try (PrintWriter pw = new PrintWriter(file, StandardCharsets.UTF_8)) {
-            pw.write(content);
-            pw.flush();
-            System.out.println(" Written: " + fileName + ".java → " + dirPath);
-        } catch (IOException ex) {
-            throw new RuntimeException("Failed to write: " + file, ex);
-        }
+        JavaFileWriter writer = new JavaFileWriter();
+        writer.writeFile(targetDir, fileName, content);
     }
 
     /**
