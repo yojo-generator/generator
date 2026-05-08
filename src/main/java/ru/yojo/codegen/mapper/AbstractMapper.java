@@ -33,6 +33,14 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 @SuppressWarnings("all")
 public class AbstractMapper {
     private static final Logger LOG = new Logger(AbstractMapper.class);
+    private PropertyTypeResolver propertyTypeResolver;
+    
+    private PropertyTypeResolver getPropertyTypeResolver() {
+        if (propertyTypeResolver == null) {
+            propertyTypeResolver = new PropertyTypeResolver(this);
+        }
+        return propertyTypeResolver;
+    }
     /**
      * Populates a {@link VariableProperties} instance from a raw YAML property definition.
      * <p>
@@ -122,13 +130,23 @@ public class AbstractMapper {
      * @param innerSchemas       accumulator for inner schemas
      */
     public void fillVariableProperties(String schemaName,
-                                       VariableProperties variableProperties,
-                                       Map<String, Object> currentSchema,
-                                       Map<String, Object> schemas,
-                                       String propertyName,
-                                       Map<String, Object> propertiesMap,
-                                       ProcessContext processContext,
-                                       Map<String, Object> innerSchemas) {
+                                        VariableProperties variableProperties,
+                                        Map<String, Object> currentSchema,
+                                        Map<String, Object> schemas,
+                                        String propertyName,
+                                        Map<String, Object> propertiesMap,
+                                        ProcessContext processContext,
+                                        Map<String, Object> innerSchemas) {
+        // Try Strategy pattern first (Chain of Responsibility)
+        if (getPropertyTypeResolver().resolve(schemaName, variableProperties, currentSchema, 
+                schemas, propertyName, propertiesMap, processContext, innerSchemas)) {
+            // Handler found and executed successfully
+            // Still need to add collection imports if needed
+            addCollectionImports(variableProperties);
+            return;
+        }
+        
+        // Fallback to original logic if no handler matched
         String commonPackage = processContext.getCommonPackage();
         if (propertiesMap.isEmpty()) {
             variableProperties.setType(OBJECT_TYPE);
@@ -213,6 +231,10 @@ public class AbstractMapper {
             }
             variableProperties.setFormat(format);
         }
+        addCollectionImports(variableProperties);
+    }
+
+    private void addCollectionImports(VariableProperties variableProperties) {
         String finalType = variableProperties.getType();
         if (finalType != null) {
             if (finalType.startsWith("List<")) {
