@@ -6,6 +6,7 @@ import ru.yojo.codegen.context.YojoContext;
 import ru.yojo.codegen.domain.lombok.Accessors;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.generator.YojoGenerator;
+import ru.yojo.codegen.util.Logger;
 
 import java.io.File;
 
@@ -15,6 +16,7 @@ import java.io.File;
  */
 public class GenerateExpectedFilesTest {
 
+    private static final Logger LOG = new Logger(GenerateExpectedFilesTest.class);
     private YojoGenerator yojoGenerator = new YojoGenerator();
 
     @Test
@@ -51,7 +53,7 @@ public class GenerateExpectedFilesTest {
         
         String outputDir = "src/test/resources/example/expected/" + lombokDir + "/" + expectedDir;
         
-        System.out.println("Generating " + specName + " (Lombok: " + useLombok + ") -> " + outputDir);
+        LOG.info("Generating " + specName + " (Lombok: " + useLombok + ") -> " + outputDir);
         
         SpecificationProperties spec = new SpecificationProperties();
         spec.setSpecName(specName);
@@ -69,7 +71,7 @@ public class GenerateExpectedFilesTest {
 
         yojoGenerator.generateAll(context);
         
-        System.out.println("Generated files in: " + outputDir);
+        LOG.info("Generated files in: " + outputDir);
         listGeneratedFiles(new File(outputDir));
     }
     
@@ -81,7 +83,7 @@ public class GenerateExpectedFilesTest {
             if (f.isDirectory()) {
                 listGeneratedFiles(f);
             } else if (f.getName().endsWith(".java")) {
-                System.out.println("  - " + f.getAbsolutePath());
+                LOG.info("  - " + f.getAbsolutePath());
             }
         }
     }
