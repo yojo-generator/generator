@@ -23,6 +23,8 @@ import java.util.regex.Pattern;
 import static ru.yojo.codegen.constants.Dictionary.*;
 import static ru.yojo.codegen.mapper.AbstractMapper.fillMessageFromChannel;
 import static ru.yojo.codegen.util.LogUtils.*;
+import ru.yojo.codegen.util.Logger;
+
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 /**
@@ -47,6 +49,7 @@ import static ru.yojo.codegen.util.MapperUtil.*;
  * @author Vladimir Morozkin (TG @vmorozkin)
  */
 public class YojoGenerator {
+    private static final Logger LOG = new Logger(YojoGenerator.class);
 
     /**
      * Initializes and prints startup banner.
@@ -219,7 +222,7 @@ public class YojoGenerator {
                                         collectExternalRefs(externalDoc, baseDir, schemas, messages, visited);
                                     }
                                 } catch (Exception e) {
-                                    System.err.println("⚠️ Skip $ref: " + ref + " → " + e.getMessage());
+                                    LOG.error("⚠️ Skip $ref: " + ref + " → " + e.getMessage(), e);
                                 }
                             }
                         }
@@ -281,7 +284,7 @@ public class YojoGenerator {
         ctx.setSchemasMap(schemasMap);
         processMessages(ctx, messageMapper);
         processSchemas(ctx, schemaMapper);
-        System.out.println(LOG_FINISH);
+        LOG.info(LOG_FINISH);
     }
 
     /**
@@ -332,7 +335,7 @@ public class YojoGenerator {
                     Map<String, Object> channelMsgs = castObjectToMap(channel.get("messages"));
                     Map<String, Object> msgDef = castObjectToMap(channelMsgs.get(msgKey));
                     if (msgDef == null) {
-                        System.err.println("⚠️ Channel message not found: " + refStr);
+                        LOG.error("⚠️ Channel message not found: " + refStr);
                         continue;
                     }
 
@@ -343,7 +346,7 @@ public class YojoGenerator {
                             String compName = compRef.substring("#/components/messages/".length());
                             msgDef = castObjectToMap(compMessages.get(compName));
                             if (msgDef == null) {
-                                System.err.println("⚠️ Component message not found: " + compName);
+                                LOG.error("⚠️ Component message not found: " + compName);
                                 continue;
                             }
                         }
@@ -351,7 +354,7 @@ public class YojoGenerator {
 
                     Object payload = msgDef.get("payload");
                     if (payload == null) {
-                        System.err.println("⚠️ Payload not found in message: " + msgKey);
+                        LOG.error("⚠️ Payload not found in message: " + msgKey);
                         continue;
                     }
 
@@ -408,16 +411,13 @@ public class YojoGenerator {
      * @param schemaMapper mapper
      */
     private void processSchemas(ProcessContext ctx, SchemaMapper schemaMapper) {
-        System.out.println(LOG_DELIMETER);
+        LOG.info(LOG_DELIMETER);
         List<Schema> schemaList = schemaMapper.mapSchemasToObjects(ctx);
         if (!schemaList.isEmpty()) {
-            System.out.println();
-            System.out.println("START WRITING JAVA CLASS FROM SCHEMAS:");
-            schemaList.forEach(schema -> System.out.println(schema.getSchemaName()));
-            System.out.println();
+            LOG.info("START WRITING JAVA CLASS FROM SCHEMAS:");
+            schemaList.forEach(schema -> LOG.info(schema.getSchemaName()));
             writeSchemas(ctx, schemaMapper);
-            System.out.println(LOG_DELIMETER + ANSI_RESET);
-            System.out.println();
+            LOG.info(LOG_DELIMETER + ANSI_RESET);
         }
     }
 
@@ -428,15 +428,12 @@ public class YojoGenerator {
      * @param messageMapper mapper
      */
     private void processMessages(ProcessContext ctx, MessageMapper messageMapper) {
-        System.out.println(ANSI_CYAN + LOG_DELIMETER);
+        LOG.info(ANSI_CYAN + LOG_DELIMETER);
         List<Message> messageList = messageMapper.mapMessagesToObjects(ctx);
-        System.out.println();
-        System.out.println("START WRITING JAVA CLASS FROM MESSAGES:");
-        messageList.forEach(message -> System.out.println(message.getMessageName()));
-        System.out.println();
+        LOG.info("START WRITING JAVA CLASS FROM MESSAGES:");
+        messageList.forEach(message -> LOG.info(message.getMessageName()));
         writeMessages(ctx, messageMapper);
-        System.out.println(LOG_DELIMETER);
-        System.out.println();
+        LOG.info(LOG_DELIMETER);
     }
 
     private void writeMessages(ProcessContext ctx, MessageMapper messageMapper) {

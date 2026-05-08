@@ -7,6 +7,7 @@ import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.schema.Schema;
 import ru.yojo.codegen.exception.SchemaFillException;
 import ru.yojo.codegen.util.LombokUtils;
+import ru.yojo.codegen.util.Logger;
 import ru.yojo.codegen.util.MapperUtil;
 
 import java.util.*;
@@ -34,6 +35,8 @@ import static ru.yojo.codegen.util.MapperUtil.*;
  */
 @SuppressWarnings("all")
 public class SchemaMapper extends AbstractMapper {
+
+    private static final Logger LOG = new Logger(SchemaMapper.class);
 
     // ⚡ PRE-SCAN: Set of discriminator base schema names
     private Set<String> discriminatorBases = new HashSet<>();
@@ -75,7 +78,7 @@ public class SchemaMapper extends AbstractMapper {
          
          processContext.getSchemasMap().forEach((schemaName, schemaValues) -> {
             LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(processContext.getLombokProperties());
-            System.out.println("START MAPPING OF SCHEMA: " + schemaName);
+            LOG.info("START MAPPING OF SCHEMA: " + schemaName);
             Map<String, Object> schemaMap = castObjectToMap(schemaValues);
             String schemaType = getStringValueIfExistOrElseNull(TYPE, schemaMap);
             String format = getStringValueIfExistOrElseNull(FORMAT, schemaMap);
@@ -118,7 +121,7 @@ public class SchemaMapper extends AbstractMapper {
                         Map<String, Object> extendsMap = castObjectToMap(sv);
                         String fromClass = getStringValueIfExistOrElseNull(FROM_CLASS, extendsMap);
                         String fromPackage = getStringValueIfExistOrElseNull(FROM_PACKAGE, extendsMap);
-                        System.out.println("SHOULD EXTENDS FROM: " + fromClass);
+                        LOG.info("SHOULD EXTENDS FROM: " + fromClass);
                         schema.setExtendsFrom(fromClass);
                         if (fromPackage != null) {
                             schema.getImportSet().add(fromPackage + "." + fromClass + ";");
@@ -134,7 +137,7 @@ public class SchemaMapper extends AbstractMapper {
                     if (sk.equals(IMPLEMENTS)) {
                         Map<String, Object> implementsMap = castObjectToMap(sv);
                         List<String> fromInterfaceList = castObjectToList(implementsMap.get(FROM_INTERFACE));
-                        System.out.println("SHOULD IMPLEMENTS FROM: " + fromInterfaceList);
+                        LOG.info("SHOULD IMPLEMENTS FROM: " + fromInterfaceList);
                         fromInterfaceList.forEach(ifc -> {
                             String[] split = ifc.split("[.]");
                             schema.getImplementsFrom().add(split[split.length - 1]);
@@ -166,7 +169,7 @@ public class SchemaMapper extends AbstractMapper {
                 }
                 schemaList.add(schema);
             } else if (schemaType != null && JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
-                System.out.println("SKIP SCHEMA BECAUSE TYPE IS: " + schemaType);
+                LOG.info("SKIP SCHEMA BECAUSE TYPE IS: " + schemaType);
             } else {
                 throw new SchemaFillException("NOT DEFINED TYPE OF SCHEMA! Schema: " + schemaName);
             }
@@ -175,7 +178,7 @@ public class SchemaMapper extends AbstractMapper {
         if (!processContext.getHelper().getInnerSchemas().isEmpty()) {
             processContext.getHelper().getInnerSchemas().forEach((schemaName, schemaValues) -> {
                 LombokProperties finalLombokProperties = LombokProperties.newLombokProperties(processContext.getLombokProperties());
-                System.out.println("START MAPPING OF INNER SCHEMA: " + schemaName);
+                LOG.info("START MAPPING OF INNER SCHEMA: " + schemaName);
                 Map<String, Object> schemaMap = castObjectToMap(schemaValues);
 
                 // ⬇️ infer type: object
@@ -187,7 +190,7 @@ public class SchemaMapper extends AbstractMapper {
                         POLYMORPHS.stream().anyMatch(schemaMap::containsKey)) {
                         schemaType = OBJECT;
                         schemaMap.put(TYPE, OBJECT);
-                        System.out.println("  → inferred missing 'type' as 'object'");
+                        LOG.info("  → inferred missing 'type' as 'object'");
                     }
                 }
 
@@ -209,9 +212,9 @@ public class SchemaMapper extends AbstractMapper {
                     );
                     schemaList.add(schema);
                 } else if (schemaType != null && JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
-                    System.out.println("SKIP INNER SCHEMA (primitive): " + schemaName + ", type=" + schemaType);
+                    LOG.info("SKIP INNER SCHEMA (primitive): " + schemaName + ", type=" + schemaType);
                 } else {
-                    System.out.println("SKIP INNER SCHEMA (no type + no props/enum/ref): " + schemaName);
+                    LOG.info("SKIP INNER SCHEMA (no type + no props/enum/ref): " + schemaName);
                 }
             });
         }
@@ -261,7 +264,7 @@ public class SchemaMapper extends AbstractMapper {
                     // Mark the discriminator field in VariableProperties (for @JsonTypeId)
                     markDiscriminatorFieldInSchema(schema, disc);
                     
-                    System.out.println("DISCRIMINATOR: Base schema " + schema.getSchemaName() + 
+                    LOG.info("DISCRIMINATOR: Base schema " + schema.getSchemaName() + 
                             " has discriminator field: " + disc);
                 }
             }
@@ -301,7 +304,7 @@ public class SchemaMapper extends AbstractMapper {
                             // Set extendsFrom for discriminator-based inheritance
                             schema.setExtendsFrom(baseName);
                             
-                            System.out.println("DISCRIMINATOR: Setting extendsFrom=\"" + baseName + 
+                            LOG.info("DISCRIMINATOR: Setting extendsFrom=\"" + baseName + 
                                     "\" for subtype: " + schemaName + 
                                     " (discriminator value: " + discriminatorValue + ")");
                         }
@@ -407,7 +410,7 @@ public class SchemaMapper extends AbstractMapper {
             Map<String, Object> discProperty = castObjectToMap(properties.get(discriminatorField));
             if (discProperty != null && discProperty.containsKey(CONST)) {
                 Object constValue = discProperty.get(CONST);
-                System.out.println("DISCRIMINATOR: Found const value '" + constValue + "' for field '" + discriminatorField + "'");
+                LOG.info("DISCRIMINATOR: Found const value '" + constValue + "' for field '" + discriminatorField + "'");
                 return constValue.toString();
             }
         }
@@ -424,7 +427,7 @@ public class SchemaMapper extends AbstractMapper {
                             Map<String, Object> discProperty = castObjectToMap(inlineProps.get(discriminatorField));
                             if (discProperty != null && discProperty.containsKey(CONST)) {
                                 Object constValue = discProperty.get(CONST);
-                                System.out.println("DISCRIMINATOR: Found const value '" + constValue + "' in " + polyKey + " for field '" + discriminatorField + "'");
+                                LOG.info("DISCRIMINATOR: Found const value '" + constValue + "' in " + polyKey + " for field '" + discriminatorField + "'");
                                 return constValue.toString();
                             }
                         }
@@ -442,16 +445,16 @@ public class SchemaMapper extends AbstractMapper {
      */
     private void markDiscriminatorFieldInSchema(Schema schema, String discriminatorFieldName) {
         if (schema.getFillParameters() == null) {
-            System.out.println("DISCRIMINATOR WARNING: FillParameters is NULL for schema: " + schema.getSchemaName());
+            LOG.info("DISCRIMINATOR WARNING: FillParameters is NULL for schema: " + schema.getSchemaName());
             return;
         }
         
         if (schema.getFillParameters().getVariableProperties().isEmpty()) {
-            System.out.println("DISCRIMINATOR WARNING: VariableProperties is EMPTY for schema: " + schema.getSchemaName());
+            LOG.info("DISCRIMINATOR WARNING: VariableProperties is EMPTY for schema: " + schema.getSchemaName());
             return;
         }
         
-        System.out.println("DISCRIMINATOR: Looking for field '" + discriminatorFieldName + 
+        LOG.info("DISCRIMINATOR: Looking for field '" + discriminatorFieldName + 
                 "' in schema: " + schema.getSchemaName() + 
                 ", available fields: " + schema.getFillParameters().getVariableProperties().stream()
                     .map(VariableProperties::getName)
@@ -460,7 +463,7 @@ public class SchemaMapper extends AbstractMapper {
         for (VariableProperties vp : schema.getFillParameters().getVariableProperties()) {
             if (vp.getName() != null && vp.getName().equals(discriminatorFieldName)) {
                 vp.setDiscriminatorField(true);
-                System.out.println("DISCRIMINATOR: SUCCESS - Marked field '" + discriminatorFieldName + 
+                LOG.info("DISCRIMINATOR: SUCCESS - Marked field '" + discriminatorFieldName + 
                         "' as discriminator field in schema: " + schema.getSchemaName() + 
                         " (isDiscriminatorField=" + vp.isDiscriminatorField() + ")");
                 break;
@@ -571,10 +574,10 @@ public class SchemaMapper extends AbstractMapper {
 
         // 🔹 ШАГ 2: Обрабатываем allOf/oneOf/anyOf — и мержим в variableProperties (избегая дублей)
         if (POLYMORPHS.stream().anyMatch(p -> currentSchema.containsKey(p))) {
-            System.out.println("POLYMORPH: " + schemaName);
-            System.out.println("POLYMORPH: " + currentSchema);
+            LOG.info("POLYMORPH: " + schemaName);
+            LOG.info("POLYMORPH: " + currentSchema);
             List<String> polymorphSchemasNames = getPolymorphSchemasNames(currentSchema, schemas);
-            System.out.println(polymorphSchemasNames);
+            LOG.info("POLYMORPH schemas: " + String.join(", ", polymorphSchemasNames));
             
             Map<String, Object> mergedProperties = mergeProperties(polymorphSchemasNames, currentSchema, schemas);
             registerNestedSchemas(schemaName, mergedProperties, schemas, processContext.getHelper().getInnerSchemas());
@@ -584,7 +587,7 @@ public class SchemaMapper extends AbstractMapper {
                     // ⚡ SKIP discriminator field with const in subtypes
                     // If this is a discriminator field with const value, skip it - it's inherited from base
                     if (isDiscriminatorFieldWithConst(currentSchema, propertyName)) {
-                        System.out.println("SKIPPING discriminator field with const: " + propertyName + " in schema: " + schemaName);
+                        LOG.info("SKIPPING discriminator field with const: " + propertyName + " in schema: " + schemaName);
                         return;
                     }
                     
@@ -667,13 +670,13 @@ public class SchemaMapper extends AbstractMapper {
                                                    Map<String, Object> schemas) {
         Map<String, Object> merged = new LinkedHashMap<>();
         
-        System.out.println("MERGE: Starting merge for schema with keys: " + currentSchema.keySet());
-        System.out.println("MERGE: Discriminator bases: " + discriminatorBases);
+        LOG.info("MERGE: Starting merge for schema with keys: " + currentSchema.keySet());
+        LOG.info("MERGE: Discriminator bases: " + discriminatorBases);
         
         // 1. Сначала обрабатываем allOf/oneOf/anyOf: добавляем свойства из $ref и inline-объектов
         for (String polyKey : POLYMORPHS) {
             if (currentSchema.containsKey(polyKey)) {
-                System.out.println("MERGE: Processing " + polyKey + " for schema");
+                LOG.info("MERGE: Processing " + polyKey + " for schema");
                 List<Object> items = castObjectToListObjects(currentSchema.get(polyKey));
                 for (Object item : items) {
                     if (item instanceof Map) {
@@ -684,31 +687,31 @@ public class SchemaMapper extends AbstractMapper {
                         String ref = getStringValueIfExistOrElseNull(REFERENCE, itemMap);
                         if (ref != null) {
                             String schemaName = refReplace(ref);
-                            System.out.println("MERGE: Found $ref: " + schemaName);
+                            LOG.info("MERGE: Found $ref: " + schemaName);
                             
                             // ⚡ CRITICAL: Skip if this is a discriminator base schema
                             if (discriminatorBases.contains(schemaName)) {
-                                System.out.println("MERGE: SKIPPING " + schemaName + " - it's a discriminator base, fields will be inherited via 'extends'");
+                                LOG.info("MERGE: SKIPPING " + schemaName + " - it's a discriminator base, fields will be inherited via 'extends'");
                             } else {
                                 Map<String, Object> target = castObjectToMap(schemas.get(schemaName));
                                 if (target != null) {
                                     Map<String, Object> props = castObjectToMap(target.get(PROPERTIES));
                                     if (props != null) {
                                         merged.putAll(props);
-                                        System.out.println("MERGE: Added properties from " + schemaName + ": " + props.keySet());
+                                        LOG.info("MERGE: Added properties from " + schemaName + ": " + props.keySet());
                                     } else {
-                                        System.out.println("MERGE: WARNING - No properties found in " + schemaName);
+                                        LOG.info("MERGE: WARNING - No properties found in " + schemaName);
                                     }
                                 }
                             }
                         }
                         // Случай 2: inline объект с properties
                         else if (OBJECT.equals(getStringValueIfExistOrElseNull(TYPE, itemMap))) {
-                            System.out.println("MERGE: Found inline object");
+                            LOG.info("MERGE: Found inline object");
                             Map<String, Object> props = castObjectToMap(itemMap.get(PROPERTIES));
                             if (props != null) {
                                 merged.putAll(props);
-                                System.out.println("MERGE: Added inline properties: " + props.keySet());
+                                LOG.info("MERGE: Added inline properties: " + props.keySet());
                             }
                         }
                     }
@@ -716,16 +719,16 @@ public class SchemaMapper extends AbstractMapper {
             }
         }
         
-        System.out.println("MERGE: After processing allOf/oneOf/anyOf, merged keys: " + merged.keySet());
+        LOG.info("MERGE: After processing allOf/oneOf/anyOf, merged keys: " + merged.keySet());
         
         // 2. Если есть корневые properties — мержим их поверх (приоритет highest)
         Map<String, Object> rootProps = castObjectToMap(currentSchema.get(PROPERTIES));
         if (rootProps != null && !rootProps.isEmpty()) {
             merged.putAll(rootProps);
-            System.out.println("MERGE: Added root properties: " + rootProps.keySet());
+            LOG.info("MERGE: Added root properties: " + rootProps.keySet());
         }
         
-        System.out.println("MERGE: Final merged keys: " + merged.keySet());
+        LOG.info("MERGE: Final merged keys: " + merged.keySet());
         return merged;
     }
 

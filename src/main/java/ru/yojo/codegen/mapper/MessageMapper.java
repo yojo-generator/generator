@@ -5,6 +5,7 @@ import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.message.Message;
+import ru.yojo.codegen.util.Logger;
 import ru.yojo.codegen.util.MapperUtil;
 
 import java.util.*;
@@ -37,6 +38,8 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 @SuppressWarnings("all")
 public class MessageMapper extends AbstractMapper {
 
+    private static final Logger LOG = new Logger(MessageMapper.class);
+
     private final SchemaMapper schemaMapper;
     private boolean filledByRef = false;
 
@@ -68,7 +71,7 @@ public class MessageMapper extends AbstractMapper {
         List<Message> messageList = new ArrayList<>();
         processContext.getMessagesMap().forEach((messageName, messageValues) -> {
             filledByRef = false;
-            System.out.println("START MAPPING OF MESSAGE: " + messageName);
+            LOG.info("START MAPPING OF MESSAGE: " + messageName);
             Map<String, Object> messageMap = castObjectToMap(messageValues);
             Message message = new Message();
             message.setMessageName(capitalize(messageName));
@@ -106,7 +109,7 @@ public class MessageMapper extends AbstractMapper {
                                     message.getLombokProperties()));
                     if (!propertiesMap.isEmpty()) {
                         payloadMap.put(PROPERTIES, propertiesMap);
-                        System.out.println("Properties Mapping from message");
+                        LOG.info("Properties Mapping from message");
                         List<VariableProperties> variableProperties = new LinkedList<>();
                         propertiesMap.forEach((propertyName, propertyValue) -> {
                             VariableProperties mvp = new VariableProperties();
@@ -160,7 +163,7 @@ public class MessageMapper extends AbstractMapper {
         if (!processContext.getHelper().getExcludeRemoveSchemas().isEmpty()) {
             processContext.getHelper().getExcludeRemoveSchemas().forEach(processContext.getHelper().getRemoveSchemas()::remove);
         }
-        System.out.println("FINISH MAPPING OF MESSAGES! CLEAN UP SCHEMAS: " + processContext.getHelper().getRemoveSchemas());
+        LOG.info("FINISH MAPPING OF MESSAGES! CLEAN UP SCHEMAS: " + processContext.getHelper().getRemoveSchemas());
         processContext.getHelper().getRemoveSchemas().forEach(processContext.getSchemasMap()::remove);
         return messageList;
     }
@@ -174,7 +177,7 @@ public class MessageMapper extends AbstractMapper {
     private static void prepareImplementsMessage(Message message, Object mv) {
         Map<String, Object> implementsMap = castObjectToMap(mv);
         List<String> fromInterfaceList = castObjectToList(implementsMap.get(FROM_INTERFACE));
-        System.out.println("SHOULD IMPLEMENTS FROM: " + fromInterfaceList);
+        LOG.info("SHOULD IMPLEMENTS FROM: " + fromInterfaceList);
         fromInterfaceList.forEach(ifc -> {
             String[] split = ifc.split("[.]");
             message.getImplementsFrom().add(split[split.length - 1]);
@@ -194,7 +197,7 @@ public class MessageMapper extends AbstractMapper {
         Map<String, Object> extendsMap = castObjectToMap(mv);
         String fromClass = getStringValueIfExistOrElseNull(FROM_CLASS, extendsMap);
         String fromPackage = getStringValueIfExistOrElseNull(FROM_PACKAGE, extendsMap);
-        System.out.println("SHOULD EXTENDS FROM: " + fromClass);
+        LOG.info("SHOULD EXTENDS FROM: " + fromClass);
         if (fromClass != null && processContext.getSchemasMap().containsKey(fromClass)) {
             fromPackage = null;
         }
@@ -288,7 +291,7 @@ public class MessageMapper extends AbstractMapper {
         }
 
         if (POLYMORPHS.stream().anyMatch(payload::containsKey)) {
-            System.out.println("POLYMORPHIC MESSAGE DETECTED: " + messageName);
+            LOG.info("POLYMORPHIC MESSAGE DETECTED: " + messageName);
 
             // 🔧 FIX: resolve polymorphic payload into flat properties and generate fields
             Map<String, Object> resolvedPayload = new LinkedHashMap<>(payload);
@@ -304,12 +307,12 @@ public class MessageMapper extends AbstractMapper {
                 resolvedPayload.remove("allOf");
                 resolvedPayload.remove("oneOf");
                 resolvedPayload.remove("anyOf");
-                System.out.println(" → flattened polymorphic payload for message: " + messageName);
+                LOG.info(" → flattened polymorphic payload for message: " + messageName);
             }
 
             // 2. Proceed as if it's a normal properties-based message
             if (resolvedPayload.containsKey("properties")) {
-                System.out.println("Properties Mapping from flattened polymorphic message");
+                LOG.info("Properties Mapping from flattened polymorphic message");
                 Map<String, Object> propertiesMap = castObjectToMap(resolvedPayload.get("properties"));
                 List<VariableProperties> variableProperties = new LinkedList<>();
                 propertiesMap.forEach((propertyName, propertyValue) -> {
@@ -357,7 +360,7 @@ public class MessageMapper extends AbstractMapper {
         }
 
         if (isLeafScalarOrArray(payload)) {
-            System.out.println("LEAF SCALAR/ARRAY DETECTED: generating wrapper DTO");
+            LOG.info("LEAF SCALAR/ARRAY DETECTED: generating wrapper DTO");
             VariableProperties vp = new VariableProperties();
             vp.setName("payload");
             vp.setSpringBootVersion(processContext.getSpringBootVersion());
@@ -382,7 +385,7 @@ public class MessageMapper extends AbstractMapper {
         }
 
         if (getStringValueIfExistOrElseNull(PROPERTIES, payload) != null) {
-            System.out.println("Properties Mapping from message");
+            LOG.info("Properties Mapping from message");
             Map<String, Object> propertiesMap = castObjectToMap(payload.get(PROPERTIES));
             List<VariableProperties> variableProperties = new LinkedList<>();
             propertiesMap.forEach((propertyName, propertyValue) -> {
@@ -399,10 +402,10 @@ public class MessageMapper extends AbstractMapper {
 
         if (getStringValueIfExistOrElseNull(REFERENCE, payload) != null && !filledByRef) {
             filledByRef = true;
-            System.out.println("Starting schema-like mapping");
+            LOG.info("Starting schema-like mapping");
             String schemaName = getStringValueIfExistOrElseNull(REFERENCE, payload).replaceAll(".+/", "");
             Map<String, Object> schema = castObjectToMap(processContext.getSchemasMap().get(schemaName));
-            System.out.println("SCHEMA: " + schemaName);
+            LOG.info("SCHEMA: " + schemaName);
             Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
             parameters = schemaMapper.getSchemaVariableProperties(
                     schemaName,
@@ -424,7 +427,7 @@ public class MessageMapper extends AbstractMapper {
         }
 
         if (payload.containsKey(ADDITIONAL_PROPERTIES)) {
-            System.out.println("PAYLOAD-LEVEL ADDITIONAL PROPERTIES DETECTED");
+            LOG.info("PAYLOAD-LEVEL ADDITIONAL PROPERTIES DETECTED");
             VariableProperties vp = new VariableProperties();
             vp.setName("payload");
             vp.setSpringBootVersion(processContext.getSpringBootVersion());
@@ -447,7 +450,7 @@ public class MessageMapper extends AbstractMapper {
             !payload.containsKey(REFERENCE) &&
             !payload.containsKey(ENUMERATION) &&
             !POLYMORPHS.stream().anyMatch(payload::containsKey)) {
-            System.out.println("BARE OBJECT DETECTED: generating simple Object field");
+            LOG.info("BARE OBJECT DETECTED: generating simple Object field");
             VariableProperties vp = new VariableProperties();
             vp.setName("payload");
             vp.setSpringBootVersion(processContext.getSpringBootVersion());
@@ -498,7 +501,7 @@ public class MessageMapper extends AbstractMapper {
 
         schemasMap.put(schemaName, synthetic);
         innerSchemas.put(schemaName, synthetic);
-        System.out.println(" → registered synthetic schema: " + schemaName);
+        LOG.info(" → registered synthetic schema: " + schemaName);
     }
 
     /**

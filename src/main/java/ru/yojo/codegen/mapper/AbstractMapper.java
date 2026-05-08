@@ -3,6 +3,7 @@ package ru.yojo.codegen.mapper;
 import ru.yojo.codegen.context.ProcessContext;
 import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.exception.SchemaFillException;
+import ru.yojo.codegen.util.Logger;
 import ru.yojo.codegen.util.MapperUtil;
 
 import java.util.*;
@@ -31,6 +32,7 @@ import static ru.yojo.codegen.util.MapperUtil.*;
  */
 @SuppressWarnings("all")
 public class AbstractMapper {
+    private static final Logger LOG = new Logger(AbstractMapper.class);
     /**
      * Populates a {@link VariableProperties} instance from a raw YAML property definition.
      * <p>
@@ -160,7 +162,7 @@ public class AbstractMapper {
                    variableProperties.getNameOfExisingObject() != null) {
             fillExistingObjectProperties(variableProperties);
         } else if (variableProperties.isPolymorph()) {
-            System.out.println("FOUND POLYMORPHISM INSIDE SCHEMA! Schema: " + variableProperties.getName());
+            LOG.debug("FOUND POLYMORPHISM INSIDE SCHEMA! Schema: " + variableProperties.getName());
             List<Object> polymorphList = POLYMORPHS.stream()
                     .map(p -> propertiesMap.get(p))
                     .map(MapperUtil::castObjectToListObjects)
@@ -256,9 +258,8 @@ public class AbstractMapper {
                                    Map<String, Object> currentSchema,
                                    Map<String, Object> schemas,
                                    Map<String, Object> propertiesMap,
-                                   ProcessContext processContext) {
-        System.out.println();
-        System.out.println("ADDITIONAL PROPERTIES");
+                                    ProcessContext processContext) {
+        LOG.debug("ADDITIONAL PROPERTIES");
         Map<String, Object> additionalPropertiesMap = castObjectToMap(propertiesMap.get(ADDITIONAL_PROPERTIES));
         String type = getStringValueIfExistOrElseNull(TYPE, additionalPropertiesMap);
         String format = variableProperties.getFormat();
@@ -267,7 +268,7 @@ public class AbstractMapper {
         variableProperties.setRealisation(getStringValueIfExistOrElseNull(REALIZATION, propertiesMap));
         variableProperties.setValid(false);
         if (type != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(type)) {
-            System.out.println("CORRECT TYPE!");
+            LOG.debug("CORRECT TYPE!");
             if (format != null) {
                 variableProperties.setType(format(MAP_CUSTOM_TYPE,
                         JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(format),
@@ -303,7 +304,7 @@ public class AbstractMapper {
             }
         } else if (referencedObject != null && (schemas.containsKey(refReplace(referencedObject)) || currentSchema == schemas)) {
             String refObjectName = refReplace(referencedObject);
-            System.out.println("FOUND CUSTOM OBJECT! " + refObjectName);
+            LOG.debug("FOUND CUSTOM OBJECT! " + refObjectName);
             if (ARRAY.equals(type)) {
                 String collectionType = getStringValueIfExistOrElseNull(FORMAT, additionalPropertiesMap);
                 if (collectionType != null) {
@@ -376,7 +377,6 @@ public class AbstractMapper {
                 variableProperties.setType(format(MAP_TYPE, format(variableProperties.getType())));
             }
         }
-        System.out.println();
     }
 
     /**
@@ -409,8 +409,8 @@ public class AbstractMapper {
                                     String propertyName,
                                     Map<String, Object> propertiesMap,
                                     ProcessContext processContext,
-                                    Map<String, Object> innerSchemas) {
-        System.out.println("ENUMERATION FOUND: " + propertyName + " in " + schemaName);
+                                     Map<String, Object> innerSchemas) {
+        LOG.debug("ENUMERATION FOUND: " + propertyName + " in " + schemaName);
         String enumClassName;
         if (schemaName.equalsIgnoreCase(propertyName)) {
             enumClassName = capitalize(propertyName);
@@ -478,9 +478,7 @@ public class AbstractMapper {
         Map<String, Object> stringObjectMap = castObjectToMap(schemas.get(referenceObject.replaceAll(".+/", "")));
         String objectType = getStringValueIfExistOrElseNull(TYPE, stringObjectMap);
         if (objectType != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(objectType)) {
-            System.out.println();
-            System.out.println("Start Recursive fillProperties " + propertyName);
-            System.out.println();
+            LOG.debug("Start Recursive fillProperties " + propertyName);
             fillProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, stringObjectMap, processContext, innerSchemas);
         }
 
@@ -491,7 +489,7 @@ public class AbstractMapper {
             if (getStringValueIfExistOrElseNull(schemaKey, schemas) != null
                 && castObjectToMap(schemas.get(schemaKey)).entrySet().stream()
                         .anyMatch(p -> POLYMORPHS.contains(p.getKey()))) {
-                System.out.println("SKIP INHERITANCE POLYMORPH INSIDE SCHEMA! " + className);
+                LOG.debug("SKIP INHERITANCE POLYMORPH INSIDE SCHEMA! " + className);
                 variableProperties.setType(className);
                 variableProperties.addRequiredImports(prepareImport(processContext, className));
             } else {
@@ -649,7 +647,7 @@ public class AbstractMapper {
                                  Map<String, Object> propertiesMap,
                                  ProcessContext processContext,
                                  Map<String, Object> innerSchemas) {
-        System.out.println("FOUND INNER SCHEMA!!! " + propertyName);
+        LOG.debug("FOUND INNER SCHEMA!!! " + propertyName);
         variableProperties.setType(capitalize(propertyName));
         variableProperties.addRequiredImports(prepareImport(processContext, capitalize(propertyName)));
         Map<String, Object> innerSchema = new LinkedHashMap<>(propertiesMap);
@@ -713,7 +711,7 @@ public class AbstractMapper {
                         String messageName = capitalize(channelName)
                                 .concat(capitalize(channelType))
                                 .concat("Message");
-                        System.out.println(messageName);
+                        LOG.debug(messageName);
                         List<Object> polymorphList = POLYMORPHS.stream()
                                 .map(p -> messageValues.get(p))
                                 .map(MapperUtil::castObjectToListObjects)
@@ -726,7 +724,7 @@ public class AbstractMapper {
                                 .flatMap(map -> map.entrySet().stream())
                                 .filter(en -> POLYMORPHS.contains(en.getKey()))
                                 .collect(Collectors.toList()).isEmpty()) {
-                            System.out.println("FOUND POLYMORPHISM INSIDE SCHEMA!");
+                            LOG.debug("FOUND POLYMORPHISM INSIDE SCHEMA!");
                             List<Object> filteredReferences = polymorphList.stream()
                                     .flatMap(refPair -> castObjectToMap(refPair).entrySet().stream())
                                     .map(en -> {
@@ -985,8 +983,8 @@ public class AbstractMapper {
      */
     protected static void fillEnumSchema(String enumSchemaName,
                                        Map<String, Object> propertiesMap,
-                                       Map<String, Object> innerSchemas) {
-        System.out.println(">>> ADDING ENUM TO INNER SCHEMAS: " + enumSchemaName);
+                                        Map<String, Object> innerSchemas) {
+        LOG.debug(">>> ADDING ENUM TO INNER SCHEMAS: " + enumSchemaName);
         if (getStringValueIfExistOrElseNull(X_ENUM_NAMES, propertiesMap) != null) {
             Map<String, Object> enumerationMap = castObjectToMap(propertiesMap.get(X_ENUM_NAMES));
             Map<String, Object> enums = new LinkedHashMap<>();

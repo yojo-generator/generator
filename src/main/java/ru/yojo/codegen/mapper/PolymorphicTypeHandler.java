@@ -2,6 +2,7 @@ package ru.yojo.codegen.mapper;
 
 import ru.yojo.codegen.context.ProcessContext;
 import ru.yojo.codegen.domain.VariableProperties;
+import ru.yojo.codegen.util.Logger;
 
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,8 @@ import static ru.yojo.codegen.util.MapperUtil.refReplace;
  * @author Vladimir Morozkin (TG @vmorozkin)
  */
 public class PolymorphicTypeHandler implements PropertyTypeHandler {
+
+    private static final Logger LOG = new Logger(PolymorphicTypeHandler.class);
 
     private final AbstractMapper abstractMapper;
 
@@ -49,10 +52,10 @@ public class PolymorphicTypeHandler implements PropertyTypeHandler {
                        Map<String, Object> schemas,
                        String propertyName,
                        Map<String, Object> propertiesMap,
-                       ProcessContext processContext,
-                       Map<String, Object> innerSchemas) {
+                        ProcessContext processContext,
+                        Map<String, Object> innerSchemas) {
 
-        System.out.println("FOUND POLYMORPHISM INSIDE SCHEMA! Schema: " + variableProperties.getName());
+        LOG.info("FOUND POLYMORPHISM INSIDE SCHEMA! Schema: " + variableProperties.getName());
 
         List<Object> polymorphList = POLYMORPHS.stream()
                 .map(p -> propertiesMap.get(p))

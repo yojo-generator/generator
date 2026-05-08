@@ -7,6 +7,8 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
+import ru.yojo.codegen.util.Logger;
+
 /**
  * Isolates file system operations for writing generated Java source code.
  * <p>
@@ -23,6 +25,7 @@ import java.nio.file.Path;
  */
 public class JavaFileWriter {
 
+    private static final Logger LOG = new Logger(JavaFileWriter.class);
     private final boolean dryRun;
 
     /**
@@ -51,7 +54,7 @@ public class JavaFileWriter {
      */
     public void writeFile(String dirPath, String fileName, String content) {
         if (dryRun) {
-            System.out.println("DRY-RUN: Would write " + fileName + ".java → " + dirPath);
+            LOG.info("DRY-RUN: Would write " + fileName + ".java → " + dirPath);
             return;
         }
 
@@ -65,7 +68,7 @@ public class JavaFileWriter {
                 new FileOutputStream(file), StandardCharsets.UTF_8)) {
             writer.write(content);
             writer.flush();
-            System.out.println(" Written: " + fileName + ".java → " + dirPath);
+            LOG.info(" Written: " + fileName + ".java → " + dirPath);
         } catch (IOException ex) {
             throw new RuntimeException("Failed to write: " + file, ex);
         }
