@@ -46,11 +46,7 @@ public class PolymorphicTypeHandler implements PropertyTypeHandler {
 
         LOG.info("FOUND POLYMORPHISM INSIDE SCHEMA! Schema: " + variableProperties.getName());
 
-        List<Object> polymorphList = POLYMORPHS.stream()
-                .map(p -> propertiesMap.get(p))
-                .map(p -> castObjectToListObjects(p))
-                .flatMap(objects -> ((List<Object>) objects).stream())
-                .collect(Collectors.toList());
+        List<Object> polymorphList = AbstractMapper.collectPolymorphRefs(propertiesMap);
 
         Map<String, Object> mergedProperties = polymorphList.stream()
                 .flatMap(ref -> {

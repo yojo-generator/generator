@@ -68,6 +68,22 @@ public class AbstractMapper {
     private PropertyTypeResolver getPropertyTypeResolver() {
         return propertyTypeResolver;
     }
+
+    /**
+     * Collects all polymorphic references (oneOf, allOf, anyOf) from a properties map.
+     * <p>
+     * This pattern is repeated in multiple places; extracting it here avoids duplication.
+     *
+     * @param propertiesMap the raw property definition map
+     * @return flat list of all polymorphic reference objects
+     */
+    public static List<Object> collectPolymorphRefs(Map<String, Object> propertiesMap) {
+        return POLYMORPHS.stream()
+                .map(propertiesMap::get)
+                .map(MapperUtil::castObjectToListObjects)
+                .flatMap(objects -> objects.stream())
+                .collect(Collectors.toList());
+    }
     /**
      * Populates a {@link VariableProperties} instance from a raw YAML property definition.
      * <p>
@@ -119,11 +135,7 @@ public class AbstractMapper {
         variableProperties.setOriginalEnumName(propertyName);
         variableProperties.setNullableAnnotation(processContext.getNullableAnnotation());
         variableProperties.setPolymorph(
-                !POLYMORPHS.stream()
-                        .map(p -> propertiesMap.get(p))
-                        .map(MapperUtil::castObjectToListObjects)
-                        .flatMap(objects -> objects.stream())
-                        .collect(Collectors.toList()).isEmpty());
+                !collectPolymorphRefs(propertiesMap).isEmpty());
         // Process x-field-annotation
         Set<String> fieldAnnotations = getSetValueIfExistsOrElseEmptySet(X_FIELD_ANNOTATION, propertiesMap);
         if (!fieldAnnotations.isEmpty()) {
@@ -209,11 +221,7 @@ public class AbstractMapper {
             fillExistingObjectProperties(variableProperties);
         } else if (variableProperties.isPolymorph()) {
             LOG.debug("FOUND POLYMORPHISM INSIDE SCHEMA! Schema: " + variableProperties.getName());
-            List<Object> polymorphList = POLYMORPHS.stream()
-                    .map(p -> propertiesMap.get(p))
-                    .map(MapperUtil::castObjectToListObjects)
-                    .flatMap(objects -> objects.stream())
-                    .collect(Collectors.toList());
+            List<Object> polymorphList = collectPolymorphRefs(propertiesMap);
             Map<String, Object> mergedProperties = polymorphList.stream()
                     .flatMap(ref -> {
                         String refStr = ref.toString();
@@ -762,11 +770,7 @@ public class AbstractMapper {
                                 .concat(capitalize(channelType))
                                 .concat("Message");
                         LOG.debug(messageName);
-                        List<Object> polymorphList = POLYMORPHS.stream()
-                                .map(p -> messageValues.get(p))
-                                .map(MapperUtil::castObjectToListObjects)
-                                .flatMap(objects -> objects.stream())
-                                .collect(Collectors.toList());
+                        List<Object> polymorphList = collectPolymorphRefs(messageValues);
                         if (!polymorphList.stream()
                                 .flatMap(refPair -> castObjectToMap(refPair).entrySet().stream())
                                 .map(en -> refReplace(en.getValue().toString()))
