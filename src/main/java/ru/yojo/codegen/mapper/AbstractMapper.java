@@ -156,8 +156,9 @@ public class AbstractMapper {
                                         ProcessContext processContext,
                                         Map<String, Object> innerSchemas) {
         // Try Strategy pattern first (Chain of Responsibility)
-        if (getPropertyTypeResolver().resolve(schemaName, variableProperties, currentSchema, 
-                schemas, propertyName, propertiesMap, processContext, innerSchemas)) {
+        var ctx = new PropertyResolutionContext(schemaName, variableProperties, currentSchema,
+                schemas, propertyName, propertiesMap, processContext, innerSchemas);
+        if (getPropertyTypeResolver().resolve(ctx)) {
             // Handler found and executed successfully
             // Still need to add collection imports if needed
             addCollectionImports(variableProperties);

@@ -1,7 +1,5 @@
 package ru.yojo.codegen.mapper;
 
-import ru.yojo.codegen.context.ProcessContext;
-import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.util.Logger;
 
 import java.util.List;
@@ -34,26 +32,17 @@ public class PolymorphicTypeHandler implements PropertyTypeHandler {
     }
 
     @Override
-    public boolean canHandle(String schemaName,
-                            VariableProperties variableProperties,
-                            Map<String, Object> currentSchema,
-                            Map<String, Object> schemas,
-                            String propertyName,
-                            Map<String, Object> propertiesMap,
-                            ProcessContext processContext,
-                            Map<String, Object> innerSchemas) {
-        return variableProperties.isPolymorph();
+    public boolean canHandle(PropertyResolutionContext ctx) {
+        return ctx.variableProperties().isPolymorph();
     }
 
     @Override
-    public void handle(String schemaName,
-                       VariableProperties variableProperties,
-                       Map<String, Object> currentSchema,
-                       Map<String, Object> schemas,
-                       String propertyName,
-                       Map<String, Object> propertiesMap,
-                        ProcessContext processContext,
-                        Map<String, Object> innerSchemas) {
+    public void handle(PropertyResolutionContext ctx) {
+        var variableProperties = ctx.variableProperties();
+        var propertiesMap = ctx.propertiesMap();
+        var schemas = ctx.schemas();
+        var processContext = ctx.processContext();
+        var innerSchemas = ctx.innerSchemas();
 
         LOG.info("FOUND POLYMORPHISM INSIDE SCHEMA! Schema: " + variableProperties.getName());
 
@@ -83,7 +72,7 @@ public class PolymorphicTypeHandler implements PropertyTypeHandler {
                         (existing, replacement) -> existing
                 ));
 
-        String className = capitalize(propertyName);
+        String className = capitalize(ctx.propertyName());
         for (Object item : polymorphList) {
             String refName;
             if (item instanceof Map) {

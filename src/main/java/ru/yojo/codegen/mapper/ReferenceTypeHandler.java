@@ -1,10 +1,5 @@
 package ru.yojo.codegen.mapper;
 
-import ru.yojo.codegen.context.ProcessContext;
-import ru.yojo.codegen.domain.VariableProperties;
-
-import java.util.Map;
-
 import static ru.yojo.codegen.constants.Dictionary.ARRAY;
 import static ru.yojo.codegen.constants.Dictionary.REFERENCE;
 import static ru.yojo.codegen.util.MapperUtil.getStringValueIfExistOrElseNull;
@@ -25,27 +20,22 @@ public class ReferenceTypeHandler implements PropertyTypeHandler {
     }
 
     @Override
-    public boolean canHandle(String schemaName,
-                            VariableProperties variableProperties,
-                            Map<String, Object> currentSchema,
-                            Map<String, Object> schemas,
-                            String propertyName,
-                            Map<String, Object> propertiesMap,
-                            ProcessContext processContext,
-                            Map<String, Object> innerSchemas) {
-        return getStringValueIfExistOrElseNull(REFERENCE, propertiesMap) != null &&
-               !ARRAY.equals(uncapitalize(variableProperties.getType()));
+    public boolean canHandle(PropertyResolutionContext ctx) {
+        return getStringValueIfExistOrElseNull(REFERENCE, ctx.propertiesMap()) != null &&
+               !ARRAY.equals(uncapitalize(ctx.variableProperties().getType()));
     }
 
     @Override
-    public void handle(String schemaName,
-                       VariableProperties variableProperties,
-                       Map<String, Object> currentSchema,
-                       Map<String, Object> schemas,
-                       String propertyName,
-                       Map<String, Object> propertiesMap,
-                       ProcessContext processContext,
-                       Map<String, Object> innerSchemas) {
-        abstractMapper.fillReferenceProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, processContext, innerSchemas);
+    public void handle(PropertyResolutionContext ctx) {
+        abstractMapper.fillReferenceProperties(
+                ctx.schemaName(),
+                ctx.variableProperties(),
+                ctx.currentSchema(),
+                ctx.schemas(),
+                ctx.propertyName(),
+                ctx.propertiesMap(),
+                ctx.processContext(),
+                ctx.innerSchemas()
+        );
     }
 }

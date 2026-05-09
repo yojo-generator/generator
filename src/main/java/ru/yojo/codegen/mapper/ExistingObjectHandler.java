@@ -1,10 +1,5 @@
 package ru.yojo.codegen.mapper;
 
-import ru.yojo.codegen.context.ProcessContext;
-import ru.yojo.codegen.domain.VariableProperties;
-
-import java.util.Map;
-
 import static ru.yojo.codegen.constants.Dictionary.OBJECT_TYPE;
 
 /**
@@ -16,28 +11,14 @@ import static ru.yojo.codegen.constants.Dictionary.OBJECT_TYPE;
 public class ExistingObjectHandler implements PropertyTypeHandler {
 
     @Override
-    public boolean canHandle(String schemaName,
-                            VariableProperties variableProperties,
-                            Map<String, Object> currentSchema,
-                            Map<String, Object> schemas,
-                            String propertyName,
-                            Map<String, Object> propertiesMap,
-                            ProcessContext processContext,
-                            Map<String, Object> innerSchemas) {
-        return OBJECT_TYPE.equals(variableProperties.getType()) &&
-               variableProperties.getPackageOfExisingObject() != null &&
-               variableProperties.getNameOfExisingObject() != null;
+    public boolean canHandle(PropertyResolutionContext ctx) {
+        return OBJECT_TYPE.equals(ctx.variableProperties().getType()) &&
+               ctx.variableProperties().getPackageOfExisingObject() != null &&
+               ctx.variableProperties().getNameOfExisingObject() != null;
     }
 
     @Override
-    public void handle(String schemaName,
-                       VariableProperties variableProperties,
-                       Map<String, Object> currentSchema,
-                       Map<String, Object> schemas,
-                       String propertyName,
-                       Map<String, Object> propertiesMap,
-                       ProcessContext processContext,
-                       Map<String, Object> innerSchemas) {
-        AbstractMapper.fillExistingObjectProperties(variableProperties);
+    public void handle(PropertyResolutionContext ctx) {
+        AbstractMapper.fillExistingObjectProperties(ctx.variableProperties());
     }
 }

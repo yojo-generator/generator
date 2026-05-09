@@ -40,30 +40,14 @@ public class PropertyTypeResolver {
     /**
      * Resolves and handles the property by finding the appropriate handler.
      *
-     * @param schemaName         name of the containing schema
-     * @param variableProperties target field container
-     * @param currentSchema      full schema map
-     * @param schemas            global schemas map
-     * @param propertyName       field name
-     * @param propertiesMap      raw property definition
-     * @param processContext     generation context
-     * @param innerSchemas       accumulator for inner schemas
+     * @param ctx bundled context with all parameters
      * @return true if a handler was found and executed, false otherwise
      */
-    public boolean resolve(String schemaName,
-                          VariableProperties variableProperties,
-                          Map<String, Object> currentSchema,
-                          Map<String, Object> schemas,
-                          String propertyName,
-                          Map<String, Object> propertiesMap,
-                          ProcessContext processContext,
-                          Map<String, Object> innerSchemas) {
+    public boolean resolve(PropertyResolutionContext ctx) {
 
         for (PropertyTypeHandler handler : handlers) {
-            if (handler.canHandle(schemaName, variableProperties, currentSchema, schemas,
-                    propertyName, propertiesMap, processContext, innerSchemas)) {
-                handler.handle(schemaName, variableProperties, currentSchema, schemas,
-                        propertyName, propertiesMap, processContext, innerSchemas);
+            if (handler.canHandle(ctx)) {
+                handler.handle(ctx);
                 return true;
             }
         }
