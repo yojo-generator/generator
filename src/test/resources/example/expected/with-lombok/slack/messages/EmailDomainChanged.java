@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import slack.common.EmailDomainChangedType;
 
-@Generated("Yojo")
 /**
 * The workspace email domain has changed.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

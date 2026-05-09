@@ -6,10 +6,10 @@ import javax.validation.constraints.NotNull;
 import oneMore.common.RequestCommonFieldsContext;
 import oneMore.common.RequestCommonFieldsRequestData;
 
-@Generated("Yojo")
 /**
 * Common meta-tags
 */
+@Generated("Yojo")
 public class RequestCommonFields {
 
 

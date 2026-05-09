@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import slack.common.GroupCloseType;
 
-@Generated("Yojo")
 /**
 * You closed a private channel.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

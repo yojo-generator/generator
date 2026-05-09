@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import slack.common.ChannelHistoryChangedType;
 
-@Generated("Yojo")
 /**
 * Bulk updates were made to a channel's history.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

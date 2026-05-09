@@ -5,10 +5,10 @@ import javax.annotation.processing.Generated;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
-@Generated("Yojo")
 /**
 * Command a particular streetlight to dim the lights.
 */
+@Generated("Yojo")
 public class DimLight {
 
 

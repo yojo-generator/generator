@@ -8,10 +8,10 @@ import lombok.experimental.Accessors;
 import slack.common.MemberLeftChannelChannelType;
 import slack.common.MemberLeftChannelType;
 
-@Generated("Yojo")
 /**
 * A user left a public or private channel.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

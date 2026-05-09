@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.ImMarkedType;
 
-@Generated("Yojo")
 /**
 * A direct message read marker was updated.
 */
+@Generated("Yojo")
 public class ImMarked {
 
 

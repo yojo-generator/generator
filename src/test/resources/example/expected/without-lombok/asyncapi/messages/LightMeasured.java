@@ -4,10 +4,10 @@ import java.time.OffsetDateTime;
 import javax.annotation.processing.Generated;
 import javax.validation.constraints.Min;
 
-@Generated("Yojo")
 /**
 * Inform about environmental lighting conditions of a particular streetlight.
 */
+@Generated("Yojo")
 public class LightMeasured {
 
 

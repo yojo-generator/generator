@@ -10,10 +10,10 @@ import lombok.experimental.Accessors;
 import oneMore.common.RequestCommonFieldsContext;
 import oneMore.common.RequestCommonFieldsRequestData;
 
-@Generated("Yojo")
 /**
 * Common meta-tags
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

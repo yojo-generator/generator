@@ -5,10 +5,10 @@ import javax.annotation.processing.Generated;
 import slack.common.EmojiRemovedSubtype;
 import slack.common.EmojiRemovedType;
 
-@Generated("Yojo")
 /**
 * A custom emoji has been removed.
 */
+@Generated("Yojo")
 public class EmojiRemoved {
 
 

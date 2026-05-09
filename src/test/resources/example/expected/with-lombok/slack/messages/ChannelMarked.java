@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import slack.common.ChannelMarkedType;
 
-@Generated("Yojo")
 /**
 * Your channel read marker was updated.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

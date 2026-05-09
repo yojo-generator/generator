@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import slack.common.ManualPresenceChangeType;
 
-@Generated("Yojo")
 /**
 * You manually updated your presence.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

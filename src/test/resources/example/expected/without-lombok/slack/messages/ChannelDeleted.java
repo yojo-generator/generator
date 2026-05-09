@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.ChannelDeletedType;
 
-@Generated("Yojo")
 /**
 * A channel was deleted.
 */
+@Generated("Yojo")
 public class ChannelDeleted {
 
 

@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.EmailDomainChangedType;
 
-@Generated("Yojo")
 /**
 * The workspace email domain has changed.
 */
+@Generated("Yojo")
 public class EmailDomainChanged {
 
 

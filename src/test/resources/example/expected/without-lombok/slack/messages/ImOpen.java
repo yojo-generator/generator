@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.ImOpenType;
 
-@Generated("Yojo")
 /**
 * You opened a DM.
 */
+@Generated("Yojo")
 public class ImOpen {
 
 

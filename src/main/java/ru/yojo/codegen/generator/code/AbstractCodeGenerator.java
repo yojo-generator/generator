@@ -51,13 +51,13 @@ abstract class AbstractCodeGenerator {
         
         result.append(lineSeparator());
         
-        // Add @Generated annotation (on class, not package)
-        result.append(GENERATED_ANNOTATION).append(lineSeparator());
-        
-        // Class-level JavaDoc
+        // Class-level JavaDoc first (before annotations)
         if (description != null && !description.trim().isEmpty()) {
             generateClassJavaDoc(result, description);
         }
+        
+        // @Generated annotation (between JavaDoc and other annotations)
+        result.append(GENERATED_ANNOTATION).append(lineSeparator());
         
         result.append(content);
         result.append(lineSeparator()).append("}");

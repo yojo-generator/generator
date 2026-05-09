@@ -4,10 +4,10 @@ import javax.annotation.processing.Generated;
 import slack.common.MemberLeftChannelChannelType;
 import slack.common.MemberLeftChannelType;
 
-@Generated("Yojo")
 /**
 * A user left a public or private channel.
 */
+@Generated("Yojo")
 public class MemberLeftChannel {
 
 

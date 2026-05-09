@@ -8,10 +8,10 @@ import java.util.UUID;
 import javax.annotation.processing.Generated;
 import javax.validation.constraints.NotNull;
 
-@Generated("Yojo")
 /**
 * Here was located supported object types
 */
+@Generated("Yojo")
 public class ObjectTypes {
 
 

@@ -5,10 +5,10 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
-@Generated("Yojo")
 /**
 * Request parameters object
 */
+@Generated("Yojo")
 public class RequestCommonFieldsRequestData {
 
 

@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.ChannelHistoryChangedType;
 
-@Generated("Yojo")
 /**
 * Bulk updates were made to a channel's history.
 */
+@Generated("Yojo")
 public class ChannelHistoryChanged {
 
 

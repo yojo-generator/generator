@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.AccountsChangedType;
 
-@Generated("Yojo")
 /**
 * The list of accounts a user is signed into has changed.
 */
+@Generated("Yojo")
 public class AccountsChanged {
 
 

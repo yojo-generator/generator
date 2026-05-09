@@ -5,10 +5,10 @@ import javax.validation.Valid;
 import slack.common.GroupJoinedChannel;
 import slack.common.GroupJoinedType;
 
-@Generated("Yojo")
 /**
 * You joined a private channel.
 */
+@Generated("Yojo")
 public class GroupJoined {
 
 

@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.GroupCloseType;
 
-@Generated("Yojo")
 /**
 * You closed a private channel.
 */
+@Generated("Yojo")
 public class GroupClose {
 
 

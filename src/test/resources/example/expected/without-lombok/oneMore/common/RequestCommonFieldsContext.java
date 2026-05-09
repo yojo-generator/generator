@@ -5,10 +5,10 @@ import javax.annotation.processing.Generated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-@Generated("Yojo")
 /**
 * Context
 */
+@Generated("Yojo")
 public class RequestCommonFieldsContext {
 
 

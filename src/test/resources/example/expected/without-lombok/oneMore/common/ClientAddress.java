@@ -4,10 +4,10 @@ import javax.annotation.processing.Generated;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-@Generated("Yojo")
 /**
 * Address
 */
+@Generated("Yojo")
 public class ClientAddress {
 
 

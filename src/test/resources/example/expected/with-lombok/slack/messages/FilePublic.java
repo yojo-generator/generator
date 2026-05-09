@@ -9,10 +9,10 @@ import lombok.experimental.Accessors;
 import slack.common.FilePublicFile;
 import slack.common.FilePublicType;
 
-@Generated("Yojo")
 /**
 * A file was made public.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

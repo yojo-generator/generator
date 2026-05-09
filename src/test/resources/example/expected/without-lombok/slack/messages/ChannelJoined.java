@@ -5,10 +5,10 @@ import javax.validation.Valid;
 import slack.common.ChannelJoinedChannel;
 import slack.common.ChannelJoinedType;
 
-@Generated("Yojo")
 /**
 * You joined a channel.
 */
+@Generated("Yojo")
 public class ChannelJoined {
 
 

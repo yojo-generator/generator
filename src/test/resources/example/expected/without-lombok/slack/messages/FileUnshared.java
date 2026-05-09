@@ -5,10 +5,10 @@ import javax.validation.Valid;
 import slack.common.FileUnsharedFile;
 import slack.common.FileUnsharedType;
 
-@Generated("Yojo")
 /**
 * A file was unshared.
 */
+@Generated("Yojo")
 public class FileUnshared {
 
 

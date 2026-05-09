@@ -5,10 +5,10 @@ import javax.validation.Valid;
 import slack.common.BotChangedBot;
 import slack.common.BotChangedType;
 
-@Generated("Yojo")
 /**
 * A bot user was changed.
 */
+@Generated("Yojo")
 public class BotChanged {
 
 

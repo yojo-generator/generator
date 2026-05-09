@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import java.net.URI;
 import javax.annotation.processing.Generated;
 
-@Generated("Yojo")
 /**
 * User that sent the message.
 */
+@Generated("Yojo")
 public class ChatMessageFromUser {
 
 

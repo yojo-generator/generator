@@ -6,10 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
-@Generated("Yojo")
 /**
 * This Class just fo Example of extends after generate
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(chain = true)

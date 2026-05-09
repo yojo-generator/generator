@@ -9,10 +9,10 @@ import lombok.experimental.Accessors;
 import slack.common.ImCreatedChannel;
 import slack.common.ImCreatedType;
 
-@Generated("Yojo")
 /**
 * A DM was created.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

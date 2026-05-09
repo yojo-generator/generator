@@ -9,10 +9,10 @@ import lombok.experimental.Accessors;
 import slack.common.FileUnsharedFile;
 import slack.common.FileUnsharedType;
 
-@Generated("Yojo")
 /**
 * A file was unshared.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

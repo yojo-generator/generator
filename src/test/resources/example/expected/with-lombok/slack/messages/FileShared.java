@@ -9,10 +9,10 @@ import lombok.experimental.Accessors;
 import slack.common.FileSharedFile;
 import slack.common.FileSharedType;
 
-@Generated("Yojo")
 /**
 * A file was shared.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

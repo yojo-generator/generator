@@ -5,10 +5,10 @@ import javax.validation.Valid;
 import slack.common.FileCreatedFile;
 import slack.common.FileCreatedType;
 
-@Generated("Yojo")
 /**
 * A file was created.
 */
+@Generated("Yojo")
 public class FileCreated {
 
 

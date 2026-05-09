@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.GroupArchiveType;
 
-@Generated("Yojo")
 /**
 * A private channel was archived.
 */
+@Generated("Yojo")
 public class GroupArchive {
 
 

@@ -10,10 +10,10 @@ import lombok.experimental.Accessors;
 import oneMore.common.ApproveV1Context;
 import oneMore.common.ApproveV1RequestData;
 
-@Generated("Yojo")
 /**
 * Approval message schema
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

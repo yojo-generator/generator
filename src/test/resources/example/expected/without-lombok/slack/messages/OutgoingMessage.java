@@ -4,10 +4,10 @@ import java.math.BigDecimal;
 import javax.annotation.processing.Generated;
 import slack.common.OutgoingMessageType;
 
-@Generated("Yojo")
 /**
 * A message was sent to a channel.
 */
+@Generated("Yojo")
 public class OutgoingMessage {
 
 

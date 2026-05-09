@@ -5,10 +5,10 @@ import javax.validation.Valid;
 import slack.common.FileCommentDeletedFile;
 import slack.common.FileCommentDeletedType;
 
-@Generated("Yojo")
 /**
 * A file comment was deleted.
 */
+@Generated("Yojo")
 public class FileCommentDeleted {
 
 

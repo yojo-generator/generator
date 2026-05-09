@@ -5,10 +5,10 @@ import javax.validation.Valid;
 import slack.common.FileChangeFile;
 import slack.common.FileChangeType;
 
-@Generated("Yojo")
 /**
 * A file was changed.
 */
+@Generated("Yojo")
 public class FileChange {
 
 

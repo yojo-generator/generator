@@ -9,10 +9,10 @@ import lombok.experimental.Accessors;
 import slack.common.GroupRenameChannel;
 import slack.common.GroupRenameType;
 
-@Generated("Yojo")
 /**
 * A private channel was renamed.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

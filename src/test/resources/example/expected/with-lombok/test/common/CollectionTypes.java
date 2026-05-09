@@ -20,10 +20,10 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import testGenerate.ClassForExtending;
 
-@Generated("Yojo")
 /**
 * Here was located all supported collections
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true)

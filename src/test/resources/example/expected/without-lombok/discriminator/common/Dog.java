@@ -3,10 +3,10 @@ package discriminator.common;
 import javax.annotation.processing.Generated;
 import javax.validation.constraints.Min;
 
-@Generated("Yojo")
 /**
 * A representation of a dog
 */
+@Generated("Yojo")
 public class Dog extends Pet {
 
 

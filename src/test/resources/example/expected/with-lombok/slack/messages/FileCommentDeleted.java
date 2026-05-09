@@ -9,10 +9,10 @@ import lombok.experimental.Accessors;
 import slack.common.FileCommentDeletedFile;
 import slack.common.FileCommentDeletedType;
 
-@Generated("Yojo")
 /**
 * A file comment was deleted.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.GroupOpenType;
 
-@Generated("Yojo")
 /**
 * You opened a private channel.
 */
+@Generated("Yojo")
 public class GroupOpen {
 
 

@@ -5,10 +5,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
-@Generated("Yojo")
 /**
 * Here was located all supported strings values
 */
+@Generated("Yojo")
 public class StringValues {
 
 

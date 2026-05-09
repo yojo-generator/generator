@@ -9,10 +9,10 @@ import lombok.experimental.Accessors;
 import slack.common.ConnectionErrorError;
 import slack.common.ConnectionErrorType;
 
-@Generated("Yojo")
 /**
 * Event received when a connection error happens.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

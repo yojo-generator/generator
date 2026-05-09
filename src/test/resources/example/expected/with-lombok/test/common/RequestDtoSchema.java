@@ -31,10 +31,10 @@ import testGenerate.ExistingClass;
 import testGenerate.InterfaceForImpl2;
 import testGenerate.InterfaceForImpl;
 
-@Generated("Yojo")
 /**
 * RequestExample
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

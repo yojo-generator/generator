@@ -5,10 +5,10 @@ import javax.validation.Valid;
 import slack.common.ChannelRenameChannel;
 import slack.common.ChannelRenameType;
 
-@Generated("Yojo")
 /**
 * A channel was renamed.
 */
+@Generated("Yojo")
 public class ChannelRename {
 
 

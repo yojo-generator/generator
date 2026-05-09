@@ -7,10 +7,10 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import specFromIssue.common.StatusSchema;
 
-@Generated("Yojo")
 /**
 * ответ с payload = array of objects (items только с examples)
 */
+@Generated("Yojo")
 public class GenerateTemplatesFromTrafficResponseMessage {
 
 

@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.ImCloseType;
 
-@Generated("Yojo")
 /**
 * You closed a DM.
 */
+@Generated("Yojo")
 public class ImClose {
 
 

@@ -8,10 +8,10 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
-@Generated("Yojo")
 /**
 * Here was located all supported numeric values
 */
+@Generated("Yojo")
 public class NumericsValues {
 
 

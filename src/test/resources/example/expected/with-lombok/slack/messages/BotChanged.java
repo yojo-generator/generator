@@ -9,10 +9,10 @@ import lombok.experimental.Accessors;
 import slack.common.BotChangedBot;
 import slack.common.BotChangedType;
 
-@Generated("Yojo")
 /**
 * A bot user was changed.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

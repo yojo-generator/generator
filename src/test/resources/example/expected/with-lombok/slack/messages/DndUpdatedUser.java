@@ -9,10 +9,10 @@ import lombok.experimental.Accessors;
 import slack.common.DndUpdatedUserDndStatus;
 import slack.common.DndUpdatedUserType;
 
-@Generated("Yojo")
 /**
 * Do not Disturb settings changed for a member.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

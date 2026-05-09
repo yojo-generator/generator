@@ -5,10 +5,10 @@ import javax.validation.Valid;
 import slack.common.DndUpdatedUserDndStatus;
 import slack.common.DndUpdatedUserType;
 
-@Generated("Yojo")
 /**
 * Do not Disturb settings changed for a member.
 */
+@Generated("Yojo")
 public class DndUpdatedUser {
 
 

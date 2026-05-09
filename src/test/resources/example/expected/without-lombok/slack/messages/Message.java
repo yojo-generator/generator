@@ -7,10 +7,10 @@ import slack.common.Attachment;
 import slack.common.MessageEdited;
 import slack.common.MessageType;
 
-@Generated("Yojo")
 /**
 * A message was sent to a channel.
 */
+@Generated("Yojo")
 public class Message {
 
 

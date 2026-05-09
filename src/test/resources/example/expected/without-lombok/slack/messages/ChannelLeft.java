@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.ChannelLeftType;
 
-@Generated("Yojo")
 /**
 * You left a channel.
 */
+@Generated("Yojo")
 public class ChannelLeft {
 
 

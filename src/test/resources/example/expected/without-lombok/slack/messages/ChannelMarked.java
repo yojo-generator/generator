@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.ChannelMarkedType;
 
-@Generated("Yojo")
 /**
 * Your channel read marker was updated.
 */
+@Generated("Yojo")
 public class ChannelMarked {
 
 

@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.ManualPresenceChangeType;
 
-@Generated("Yojo")
 /**
 * You manually updated your presence.
 */
+@Generated("Yojo")
 public class ManualPresenceChange {
 
 

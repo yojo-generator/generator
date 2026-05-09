@@ -10,10 +10,10 @@ import java.util.List;
 import javax.annotation.processing.Generated;
 import javax.validation.Valid;
 
-@Generated("Yojo")
 /**
 * A message represents an individual chat message sent to a room. They are a sub-resource of a room.
 */
+@Generated("Yojo")
 public class ChatMessage {
 
 

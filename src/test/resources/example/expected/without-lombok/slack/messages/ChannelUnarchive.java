@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.ChannelUnarchiveType;
 
-@Generated("Yojo")
 /**
 * A channel was unarchived.
 */
+@Generated("Yojo")
 public class ChannelUnarchive {
 
 

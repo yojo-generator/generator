@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.GoodbyeType;
 
-@Generated("Yojo")
 /**
 * The server intends to close the connection soon.
 */
+@Generated("Yojo")
 public class Goodbye {
 
 

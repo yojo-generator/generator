@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.CommandsChangedType;
 
-@Generated("Yojo")
 /**
 * A slash command has been added or changed.
 */
+@Generated("Yojo")
 public class CommandsChanged {
 
 

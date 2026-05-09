@@ -5,10 +5,10 @@ import javax.annotation.processing.Generated;
 import slack.common.EmojiAddedSubtype;
 import slack.common.EmojiAddedType;
 
-@Generated("Yojo")
 /**
 * A custom emoji has been added.
 */
+@Generated("Yojo")
 public class EmojiAdded {
 
 

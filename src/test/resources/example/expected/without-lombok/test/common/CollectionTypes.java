@@ -16,10 +16,10 @@ import javax.annotation.processing.Generated;
 import javax.validation.Valid;
 import testGenerate.ClassForExtending;
 
-@Generated("Yojo")
 /**
 * Here was located all supported collections
 */
+@Generated("Yojo")
 public class CollectionTypes {
 
 

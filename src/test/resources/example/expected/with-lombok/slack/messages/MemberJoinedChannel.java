@@ -8,10 +8,10 @@ import lombok.experimental.Accessors;
 import slack.common.MemberJoinedChannelChannelType;
 import slack.common.MemberJoinedChannelType;
 
-@Generated("Yojo")
 /**
 * A user joined a public or private channel.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

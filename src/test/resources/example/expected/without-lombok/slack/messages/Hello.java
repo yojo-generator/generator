@@ -3,10 +3,10 @@ package slack.messages;
 import javax.annotation.processing.Generated;
 import slack.common.HelloType;
 
-@Generated("Yojo")
 /**
 * First event received upon connection.
 */
+@Generated("Yojo")
 public class Hello {
 
 

@@ -5,10 +5,10 @@ import javax.validation.Valid;
 import slack.common.FileCommentEditedFile;
 import slack.common.FileCommentEditedType;
 
-@Generated("Yojo")
 /**
 * A file comment was edited.
 */
+@Generated("Yojo")
 public class FileCommentEdited {
 
 

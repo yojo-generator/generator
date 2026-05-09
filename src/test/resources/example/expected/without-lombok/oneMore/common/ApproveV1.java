@@ -6,10 +6,10 @@ import javax.validation.constraints.NotNull;
 import oneMore.common.ApproveV1Context;
 import oneMore.common.ApproveV1RequestData;
 
-@Generated("Yojo")
 /**
 * Approval message schema
 */
+@Generated("Yojo")
 public class ApproveV1 {
 
 

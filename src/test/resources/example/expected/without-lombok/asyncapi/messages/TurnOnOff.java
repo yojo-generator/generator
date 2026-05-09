@@ -4,10 +4,10 @@ import asyncapi.common.TurnOnOffPayloadCommand;
 import java.time.OffsetDateTime;
 import javax.annotation.processing.Generated;
 
-@Generated("Yojo")
 /**
 * Command a particular streetlight to turn the lights on or off.
 */
+@Generated("Yojo")
 public class TurnOnOff {
 
 

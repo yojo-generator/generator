@@ -9,10 +9,10 @@ import lombok.experimental.Accessors;
 import slack.common.EmojiAddedSubtype;
 import slack.common.EmojiAddedType;
 
-@Generated("Yojo")
 /**
 * A custom emoji has been added.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

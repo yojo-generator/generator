@@ -9,10 +9,10 @@ import lombok.experimental.Accessors;
 import slack.common.FileCreatedFile;
 import slack.common.FileCreatedType;
 
-@Generated("Yojo")
 /**
 * A file was created.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

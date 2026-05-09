@@ -9,10 +9,10 @@ import lombok.experimental.Accessors;
 import slack.common.FileCommentAddedFile;
 import slack.common.FileCommentAddedType;
 
-@Generated("Yojo")
 /**
 * A file comment was added.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

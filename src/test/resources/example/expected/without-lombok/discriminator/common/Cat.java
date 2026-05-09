@@ -3,10 +3,10 @@ package discriminator.common;
 import discriminator.common.CatHuntingSkill;
 import javax.annotation.processing.Generated;
 
-@Generated("Yojo")
 /**
 * A representation of a cat
 */
+@Generated("Yojo")
 public class Cat extends Pet {
 
 

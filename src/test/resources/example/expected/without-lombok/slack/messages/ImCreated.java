@@ -5,10 +5,10 @@ import javax.validation.Valid;
 import slack.common.ImCreatedChannel;
 import slack.common.ImCreatedType;
 
-@Generated("Yojo")
 /**
 * A DM was created.
 */
+@Generated("Yojo")
 public class ImCreated {
 
 

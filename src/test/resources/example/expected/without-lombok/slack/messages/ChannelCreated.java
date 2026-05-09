@@ -5,10 +5,10 @@ import javax.validation.Valid;
 import slack.common.ChannelCreatedChannel;
 import slack.common.ChannelCreatedType;
 
-@Generated("Yojo")
 /**
 * A channel was created.
 */
+@Generated("Yojo")
 public class ChannelCreated {
 
 

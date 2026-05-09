@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import specFromIssue.common.StatusSchema;
 
-@Generated("Yojo")
 /**
 * ответ с payload = array of objects (items только с examples)
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

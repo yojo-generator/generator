@@ -9,10 +9,10 @@ import lombok.experimental.Accessors;
 import slack.common.EmojiRemovedSubtype;
 import slack.common.EmojiRemovedType;
 
-@Generated("Yojo")
 /**
 * A custom emoji has been removed.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)

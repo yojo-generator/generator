@@ -9,10 +9,10 @@ import lombok.experimental.Accessors;
 import slack.common.ChannelJoinedChannel;
 import slack.common.ChannelJoinedType;
 
-@Generated("Yojo")
 /**
 * You joined a channel.
 */
+@Generated("Yojo")
 @Data
 @NoArgsConstructor
 @Accessors(fluent = true, chain = true)
