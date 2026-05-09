@@ -22,19 +22,23 @@ public class PropertyTypeResolver {
 
     /**
      * Creates a resolver with the default handler chain.
-     * The order of handlers is important - more specific handlers should come first.
+     * The order of handlers is important — more specific handlers should come first.
      *
      * @param abstractMapper the mapper instance used by handlers
      */
     public PropertyTypeResolver(AbstractMapper abstractMapper) {
-        // Order matters! More specific checks should come first
+        // Order matters! More specific checks should come first,
+        // with DefaultTypeHandler always last as catch-all.
+        handlers.add(new EmptyPropertiesHandler());
         handlers.add(new MapTypeHandler(abstractMapper));
+        handlers.add(new FormatObjectHandler());
         handlers.add(new ArrayTypeHandler(abstractMapper));
         handlers.add(new ReferenceTypeHandler(abstractMapper));
         handlers.add(new ObjectTypeHandler(abstractMapper));
         handlers.add(new EnumTypeHandler(abstractMapper));
         handlers.add(new ExistingObjectHandler());
         handlers.add(new PolymorphicTypeHandler(abstractMapper));
+        handlers.add(new DefaultTypeHandler());
     }
 
     /**

@@ -176,97 +176,10 @@ public class AbstractMapper {
                                         Map<String, Object> propertiesMap,
                                         ProcessContext processContext,
                                         Map<String, Object> innerSchemas) {
-        // Try Strategy pattern first (Chain of Responsibility)
+        // Delegate to Chain of Responsibility (Strategy pattern)
         var ctx = new PropertyResolutionContext(schemaName, variableProperties, currentSchema,
                 schemas, propertyName, propertiesMap, processContext, innerSchemas);
-        if (getPropertyTypeResolver().resolve(ctx)) {
-            // Handler found and executed successfully
-            // Still need to add collection imports if needed
-            addCollectionImports(variableProperties);
-            return;
-        }
-        
-        // Fallback to original logic if no handler matched
-        String commonPackage = processContext.getCommonPackage();
-        if (propertiesMap.isEmpty()) {
-            variableProperties.setType(OBJECT_TYPE);
-            variableProperties.setValid(false);
-            return;
-        }
-        String type = getStringValueIfExistOrElseNull(TYPE, propertiesMap);
-        String format = getStringValueIfExistOrElseNull(FORMAT, propertiesMap);
-        if (getStringValueIfExistOrElseNull(ADDITIONAL_PROPERTIES, propertiesMap) != null) {
-            fillMapProperties(variableProperties, currentSchema, schemas, propertiesMap, processContext);
-            return;
-        }
-        if (OBJECT_TYPE.equalsIgnoreCase(type) && format != null &&
-            JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(format)) {
-            variableProperties.setFormat(format);
-            return;
-        }
-        variableProperties.setType(capitalize(type != null ? type : OBJECT_TYPE));
-        if (ARRAY.equals(uncapitalize(variableProperties.getType()))) {
-            fillArrayProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, processContext, innerSchemas);
-        } else if (getStringValueIfExistOrElseNull(REFERENCE, propertiesMap) != null && !ARRAY.equals(uncapitalize(variableProperties.getType()))) {
-            fillReferenceProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, processContext, innerSchemas);
-        } else if (OBJECT_TYPE.equals(variableProperties.getType()) &&
-                   getStringValueIfExistOrElseNull(PROPERTIES, propertiesMap) != null) {
-            fillObjectProperties(schemaName, variableProperties, schemas, propertyName, propertiesMap, processContext, innerSchemas);
-        } else if ((OBJECT_TYPE.equals(variableProperties.getType()) || STRING.equals(variableProperties.getType())) &&
-                   getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap) != null) {
-            fillEnumProperties(schemaName, variableProperties, propertyName, propertiesMap, processContext, innerSchemas);
-        } else if (OBJECT_TYPE.equals(variableProperties.getType()) &&
-                   variableProperties.getPackageOfExisingObject() != null &&
-                   variableProperties.getNameOfExisingObject() != null) {
-            fillExistingObjectProperties(variableProperties);
-        } else if (variableProperties.isPolymorph()) {
-            LOG.debug("FOUND POLYMORPHISM INSIDE SCHEMA! Schema: " + variableProperties.getName());
-            List<Object> polymorphList = collectPolymorphRefs(propertiesMap);
-            Map<String, Object> mergedProperties = polymorphList.stream()
-                    .flatMap(ref -> {
-                        String refStr = ref.toString();
-                        if (ref instanceof Map) {
-                            Map<?, ?> mapRef = (Map<?, ?>) ref;
-                            Object r = mapRef.get("$ref");
-                            if (r != null) refStr = r.toString();
-                        }
-                        return castObjectToMap(schemas.get(refReplace(refStr))).entrySet().stream();
-                    })
-                    .filter(en -> en.getKey().equals(PROPERTIES))
-                    .map(pr -> castObjectToMap(pr.getValue()))
-                    .flatMap(map -> map.entrySet().stream())
-                    .distinct()
-                    .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            Map.Entry::getValue,
-                            (existing, replacement) -> existing
-                    ));
-            String className = capitalize(propertyName);
-            for (Object item : polymorphList) {
-                String refName;
-                if (item instanceof Map) {
-                    Map<?, ?> m = (Map<?, ?>) item;
-                    Object refObj = m.get("$ref");
-                    refName = refObj != null ? refReplace(refObj.toString()) : "Unknown";
-                } else {
-                    refName = refReplace(item.toString());
-                }
-                className += refName;
-            }
-            variableProperties.setType(className);
-            variableProperties.addRequiredImports(prepareImport(processContext, className));
-            Map<String, Object> preparedMergedPolymorphSchema = Map.of(
-                    className,
-                    Map.of(TYPE, OBJECT, PROPERTIES, mergedProperties)
-            );
-            innerSchemas.putAll(preparedMergedPolymorphSchema);
-        } else {
-            if (OBJECT_TYPE.equals(variableProperties.getType())) {
-                variableProperties.setType(OBJECT_TYPE);
-                variableProperties.setValid(false);
-            }
-            variableProperties.setFormat(format);
-        }
+        getPropertyTypeResolver().resolve(ctx);
         addCollectionImports(variableProperties);
     }
 
