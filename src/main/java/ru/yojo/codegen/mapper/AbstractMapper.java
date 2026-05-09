@@ -35,28 +35,37 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 public class AbstractMapper {
     private static final Logger LOG = new Logger(AbstractMapper.class);
     protected final NamingStrategy namingStrategy;
-    private PropertyTypeResolver propertyTypeResolver;
+    private final PropertyTypeResolver propertyTypeResolver;
 
     /**
-     * Creates an AbstractMapper with a specific naming strategy (for testing/injection).
+     * Creates an AbstractMapper with injected dependencies.
+     *
+     * @param namingStrategy          the naming strategy to use
+     * @param propertyTypeResolver    the property type resolver (Chain of Responsibility)
+     */
+    protected AbstractMapper(NamingStrategy namingStrategy, PropertyTypeResolver propertyTypeResolver) {
+        this.namingStrategy = namingStrategy;
+        this.propertyTypeResolver = propertyTypeResolver;
+    }
+
+    /**
+     * Creates an AbstractMapper with a specific naming strategy and a default resolver.
      *
      * @param namingStrategy the naming strategy to use
      */
     protected AbstractMapper(NamingStrategy namingStrategy) {
         this.namingStrategy = namingStrategy;
+        this.propertyTypeResolver = new PropertyTypeResolver(this);
     }
 
     /**
-     * Creates an AbstractMapper with a default naming strategy.
+     * Creates an AbstractMapper with default dependencies.
      */
     protected AbstractMapper() {
         this(new NamingStrategy());
     }
 
     private PropertyTypeResolver getPropertyTypeResolver() {
-        if (propertyTypeResolver == null) {
-            propertyTypeResolver = new PropertyTypeResolver(this);
-        }
         return propertyTypeResolver;
     }
     /**
