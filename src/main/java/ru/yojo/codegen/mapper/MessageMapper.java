@@ -5,6 +5,7 @@ import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.message.Message;
+import ru.yojo.codegen.exception.SchemaFillException;
 import ru.yojo.codegen.util.Logger;
 import ru.yojo.codegen.util.MapperUtil;
 
@@ -471,7 +472,7 @@ public class MessageMapper extends AbstractMapper {
             return new FillParameters();
         }
 
-        throw new RuntimeException("Not correct filled block messages! Payload: " + payload);
+        throw new SchemaFillException("Not correct filled block messages! Payload: " + payload);
     }
 
     /**
