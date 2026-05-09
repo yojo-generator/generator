@@ -5,6 +5,7 @@ import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.exception.SchemaFillException;
 import ru.yojo.codegen.util.Logger;
 import ru.yojo.codegen.util.MapperUtil;
+import ru.yojo.codegen.util.NamingStrategy;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -33,8 +34,25 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 @SuppressWarnings("all")
 public class AbstractMapper {
     private static final Logger LOG = new Logger(AbstractMapper.class);
+    protected final NamingStrategy namingStrategy;
     private PropertyTypeResolver propertyTypeResolver;
-    
+
+    /**
+     * Creates an AbstractMapper with a specific naming strategy (for testing/injection).
+     *
+     * @param namingStrategy the naming strategy to use
+     */
+    protected AbstractMapper(NamingStrategy namingStrategy) {
+        this.namingStrategy = namingStrategy;
+    }
+
+    /**
+     * Creates an AbstractMapper with a default naming strategy.
+     */
+    protected AbstractMapper() {
+        this(new NamingStrategy());
+    }
+
     private PropertyTypeResolver getPropertyTypeResolver() {
         if (propertyTypeResolver == null) {
             propertyTypeResolver = new PropertyTypeResolver(this);
