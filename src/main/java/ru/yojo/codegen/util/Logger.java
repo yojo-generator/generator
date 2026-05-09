@@ -31,6 +31,15 @@ public class Logger {
     }
 
     /**
+     * Sets the minimum log level. Messages below this level will be suppressed.
+     *
+     * @param level the minimum level to log
+     */
+    public void setMinimumLevel(Level level) {
+        this.minimumLevel = level;
+    }
+
+    /**
      * Logs a debug message.
      *
      * @param message the message
@@ -80,8 +89,13 @@ public class Logger {
      * @param message the message
      * @param e the exception
      */
+    /**
+     * Logs an error message with exception details.
+     *
+     * @param message the message
+     * @param e the exception
+     */
     public void error(String message, Throwable e) {
-        error(message);
-        e.printStackTrace(System.err);
+        error(message + " - " + e.getClass().getSimpleName() + ": " + e.getMessage());
     }
 }
