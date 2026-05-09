@@ -1,10 +1,9 @@
 package ru.yojo.codegen.generator;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import ru.yojo.codegen.util.Logger;
@@ -45,7 +44,33 @@ public class JavaFileWriter {
     }
 
     /**
-     * Writes Java source code to a file.
+     * Validates that a file name does not contain path traversal sequences.
+     *
+     * @param fileName the file name to validate (without extension)
+     * @throws IllegalArgumentException if the file name contains path traversal
+     */
+    static void validateFileName(String fileName) {
+        if (fileName == null || fileName.isEmpty()) {
+            throw new IllegalArgumentException("File name must not be null or empty");
+        }
+        if (fileName.contains("..")) {
+            throw new IllegalArgumentException(
+                    "File name must not contain path traversal sequences: " + fileName);
+        }
+        if (fileName.contains("/") || fileName.contains("\\")) {
+            throw new IllegalArgumentException(
+                    "File name must not contain path separators: " + fileName);
+        }
+        // Reject names that would resolve to only a separator or dot
+        Path resolved = Path.of(fileName);
+        if (resolved.getNameCount() == 0) {
+            throw new IllegalArgumentException(
+                    "File name does not resolve to a valid name: " + fileName);
+        }
+    }
+
+    /**
+     * Writes Java source code to a file with path traversal protection.
      *
      * @param dirPath  target directory path
      * @param fileName file name (without extension)
@@ -57,25 +82,11 @@ public class JavaFileWriter {
             LOG.info("DRY-RUN: Would write " + fileName + ".java → " + dirPath);
             return;
         }
-
-        File dir = new File(dirPath);
-        if (!dir.exists() && !dir.mkdirs()) {
-            throw new RuntimeException("Failed to create directory: " + dirPath);
-        }
-
-        File file = new File(dir, fileName + ".java");
-        try (OutputStreamWriter writer = new OutputStreamWriter(
-                new FileOutputStream(file), StandardCharsets.UTF_8)) {
-            writer.write(content);
-            writer.flush();
-            LOG.info(" Written: " + fileName + ".java → " + dirPath);
-        } catch (IOException ex) {
-            throw new RuntimeException("Failed to write: " + file, ex);
-        }
+        writeFile(Path.of(dirPath), fileName, content);
     }
 
     /**
-     * Writes Java source code to a file using Path API.
+     * Writes Java source code to a file using Path API with path traversal protection.
      *
      * @param targetDir target directory
      * @param fileName  file name (without extension)
@@ -83,6 +94,35 @@ public class JavaFileWriter {
      * @throws RuntimeException if writing fails
      */
     public void writeFile(Path targetDir, String fileName, String content) {
-        writeFile(targetDir.toAbsolutePath().toString(), fileName, content);
+        if (dryRun) {
+            LOG.info("DRY-RUN: Would write " + fileName + ".java → " + targetDir);
+            return;
+        }
+
+        validateFileName(fileName);
+
+        Path absoluteDir = targetDir.toAbsolutePath().normalize();
+        Path targetFile = absoluteDir.resolve(fileName + ".java").normalize();
+
+        // Path traversal prevention: ensure the resolved file is still within the intended directory
+        if (!targetFile.startsWith(absoluteDir)) {
+            throw new SecurityException(
+                    "Path traversal detected: " + fileName + " escapes directory " + targetDir);
+        }
+
+        try {
+            Files.createDirectories(absoluteDir);
+        } catch (IOException ex) {
+            throw new RuntimeException("Failed to create directory: " + absoluteDir, ex);
+        }
+
+        try (OutputStreamWriter writer = new OutputStreamWriter(
+                Files.newOutputStream(targetFile), StandardCharsets.UTF_8)) {
+            writer.write(content);
+            writer.flush();
+            LOG.info(" Written: " + fileName + ".java → " + absoluteDir);
+        } catch (IOException ex) {
+            throw new RuntimeException("Failed to write: " + targetFile, ex);
+        }
     }
 }
