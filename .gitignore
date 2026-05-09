@@ -4,6 +4,7 @@ out/
 
 # Gradle
 .gradle/
+*.lock
 gradle-app.setting
 
 # IDE
