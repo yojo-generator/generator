@@ -6,6 +6,8 @@ import ru.yojo.codegen.context.SpecificationProperties;
 import ru.yojo.codegen.context.YojoContext;
 import ru.yojo.codegen.domain.message.Message;
 import ru.yojo.codegen.domain.schema.Schema;
+import ru.yojo.codegen.generator.code.MessageCodeGenerator;
+import ru.yojo.codegen.generator.code.SchemaCodeGenerator;
 import ru.yojo.codegen.mapper.MessageMapper;
 import ru.yojo.codegen.mapper.SchemaMapper;
 import ru.yojo.codegen.util.MapperUtil;
@@ -443,10 +445,10 @@ public class YojoGenerator {
             if (customPath != null) {
                 String fullPackage = ctx.getPackageLocation() + "." + customPath;
                 message.setMessagePackageName(fullPackage + ";");
-                writeFileUnified(ctx, message.getMessageName(), message.toWrite(), true, customPath);
+                writeFileUnified(ctx, message.getMessageName(), new MessageCodeGenerator(message).generate(), true, customPath);
             } else {
                 message.setMessagePackageName(ctx.getMessagePackage());
-                writeFileUnified(ctx, message.getMessageName(), message.toWrite(), true, null);
+                writeFileUnified(ctx, message.getMessageName(), new MessageCodeGenerator(message).generate(), true, null);
             }
         }
     }
@@ -454,7 +456,7 @@ public class YojoGenerator {
     private void writeSchemas(ProcessContext ctx, SchemaMapper schemaMapper) {
         List<Schema> schemaList = schemaMapper.mapSchemasToObjects(ctx);
         for (Schema schema : schemaList) {
-            writeFileUnified(ctx, schema.getSchemaName(), schema.toWrite(), false, null);
+            writeFileUnified(ctx, schema.getSchemaName(), new SchemaCodeGenerator(schema).generate(), false, null);
         }
     }
 

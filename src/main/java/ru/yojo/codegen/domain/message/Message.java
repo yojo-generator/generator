@@ -2,7 +2,6 @@ package ru.yojo.codegen.domain.message;
 
 import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
-import ru.yojo.codegen.generator.code.MessageCodeGenerator;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -255,18 +254,6 @@ public class Message {
      */
     public void setClassAnnotations(Set<String> classAnnotations) {
         this.classAnnotations = classAnnotations;
-    }
-
-    /**
-     * Generates the full Java source code for the message DTO.
-     * <p>
-     * Delegates to {@link MessageCodeGenerator}.
-     *
-     * @return complete Java source for the message class
-     */
-    public String toWrite() {
-        MessageCodeGenerator generator = new MessageCodeGenerator(this);
-        return generator.generate();
     }
 
     public FillParameters getFillParameters() {

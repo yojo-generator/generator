@@ -2,7 +2,6 @@ package ru.yojo.codegen.domain.schema;
 
 import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
-import ru.yojo.codegen.generator.code.SchemaCodeGenerator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -410,15 +409,4 @@ public class Schema {
         this.methods = methods;
     }
 
-    /**
-     * Generates the full Java source code for this schema.
-     * <p>
-     * Delegates to {@link SchemaCodeGenerator}.
-     *
-     * @return complete Java source code
-     */
-    public String toWrite() {
-        SchemaCodeGenerator generator = new SchemaCodeGenerator(this);
-        return generator.generate();
-    }
 }
