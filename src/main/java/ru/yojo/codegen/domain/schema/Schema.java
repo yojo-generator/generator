@@ -153,6 +153,15 @@ public class Schema {
         subtypeDiscriminatorValues.clear();
     }
 
+    /**
+     * Returns a new {@link SchemaBuilder} for fluent construction.
+     *
+     * @return a new builder
+     */
+    public static SchemaBuilder builder() {
+        return new SchemaBuilder();
+    }
+
     // —— Getters & Setters —— //
 
     /**

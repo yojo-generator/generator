@@ -5,6 +5,7 @@ import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.message.Message;
+import ru.yojo.codegen.domain.message.MessageBuilder;
 import ru.yojo.codegen.exception.SchemaFillException;
 import ru.yojo.codegen.util.Logger;
 import ru.yojo.codegen.util.MapperUtil;
@@ -74,15 +75,25 @@ public class MessageMapper extends AbstractMapper {
             filledByRef = false;
             LOG.info("START MAPPING OF MESSAGE: " + messageName);
             Map<String, Object> messageMap = castObjectToMap(messageValues);
-            Message message = new Message();
-            message.setMessageName(capitalize(messageName));
-            message.setLombokProperties(LombokProperties.newLombokProperties(processContext.getLombokProperties()));
             Map<String, Object> payloadMap = castObjectToMap(messageMap.get(PAYLOAD));
             String refObject = getStringValueIfExistOrElseNull(REFERENCE, payloadMap);
-            message.setPathForGenerateMessage(getStringValueIfExistOrElseNull("pathForGenerateMessage", payloadMap));
+            LombokProperties msgLombok = LombokProperties.newLombokProperties(processContext.getLombokProperties());
+
+            String customPath = getStringValueIfExistOrElseNull("pathForGenerateMessage", payloadMap);
+            MessageBuilder builder = Message.builder()
+                    .name(capitalize(messageName))
+                    .lombokProperties(msgLombok)
+                    .pathForGenerateMessage(customPath);
+
+            // Effective message package: custom path overrides default
+            if (customPath != null) {
+                builder.messagePackageName(processContext.getPackageLocation() + "." + customPath + ";");
+            } else {
+                builder.messagePackageName(processContext.getMessagePackage());
+            }
 
             AtomicBoolean needToFill = new AtomicBoolean(true);
-            extendsAndImplFilling(processContext.getHelper().getExcludeInheritanceSchemas(), message, payloadMap, refObject, needToFill, processContext);
+            extendsAndImplFilling(processContext.getHelper().getExcludeInheritanceSchemas(), builder, payloadMap, refObject, needToFill, processContext);
             if (needToFill.get()) {
                 filledByRef = false;
                 FillParameters fillParams = getFillParameters(
@@ -91,27 +102,32 @@ public class MessageMapper extends AbstractMapper {
                         processContext,
                         processContext.getHelper().getRemoveSchemas(),
                         processContext.getHelper().getExcludeRemoveSchemas(),
-                        message.getLombokProperties()
+                        msgLombok
                 );
-                message.setFillParameters(fillParams);
+                builder.fillParameters(fillParams);
+
                 if (refObject != null) {
                     Map<String, Object> propertiesMap = new LinkedHashMap<>();
                     if (payloadMap.containsKey(PROPERTIES)) {
                         propertiesMap = castObjectToMap(payloadMap.get(PROPERTIES));
                     }
                     payloadMap.remove(PROPERTIES);
-                    message.enrichFillParameters(
-                            getFillParameters(
-                                    messageName,
-                                    payloadMap,
-                                    processContext,
-                                    processContext.getHelper().getRemoveSchemas(),
-                                    processContext.getHelper().getExcludeRemoveSchemas(),
-                                    message.getLombokProperties()));
+                    FillParameters extraFillParams = getFillParameters(
+                            messageName,
+                            payloadMap,
+                            processContext,
+                            processContext.getHelper().getRemoveSchemas(),
+                            processContext.getHelper().getExcludeRemoveSchemas(),
+                            msgLombok);
+                    // Merge fill params (equivalent to enrichFillParameters)
+                    List<VariableProperties> combined = new ArrayList<>(fillParams.getVariableProperties());
+                    combined.addAll(extraFillParams.getVariableProperties());
+                    builder.fillParameters(new FillParameters(combined));
+
                     if (!propertiesMap.isEmpty()) {
                         payloadMap.put(PROPERTIES, propertiesMap);
                         LOG.info("Properties Mapping from message");
-                        List<VariableProperties> variableProperties = new LinkedList<>();
+                        List<VariableProperties> inlineVars = new LinkedList<>();
                         propertiesMap.forEach((propertyName, propertyValue) -> {
                             VariableProperties mvp = new VariableProperties();
                             String javaName = MapperUtil.toValidJavaFieldName(propertyName);
@@ -119,44 +135,44 @@ public class MessageMapper extends AbstractMapper {
                             if (mvp.getItems() != null && !JAVA_DEFAULT_TYPES.contains(mvp.getItems())) {
                                 processContext.getHelper().getExcludeRemoveSchemas().add(mvp.getItems());
                             }
-                            variableProperties.add(mvp);
+                            inlineVars.add(mvp);
                         });
-                        List<VariableProperties> baseProps = message.getFillParameters().getVariableProperties();
-                        Set<String> existingNames = baseProps.stream()
+                        Set<String> existingNames = combined.stream()
                                 .map(VariableProperties::getName)
                                 .collect(Collectors.toSet());
-                        variableProperties.stream()
+                        inlineVars.stream()
                                 .filter(vp -> !existingNames.contains(vp.getName()))
-                                .forEach(baseProps::add);
+                                .forEach(combined::add);
+                        builder.fillParameters(new FillParameters(combined));
                     }
                 }
-                if (message.getImplementsFrom().isEmpty() && isBlank(message.getExtendsFrom())) {
+                if (builder.getImplementsFrom().isEmpty() && isBlank(builder.getExtendsFrom())) {
                     if (refObject != null) {
                         Map<String, Object> refMap = castObjectToMap(processContext.getSchemasMap().get(refReplace(refObject)));
                         refMap.forEach((mk, mv) -> {
                             if (mk.equals(EXTENDS)) {
-                                String fromClass = prepareExtendsMessage(message, mv, processContext);
+                                String fromClass = prepareExtendsMessage(builder, mv, processContext);
                                 if (refObject != null && refReplace(refObject).equals(fromClass)) {
                                     needToFill.set(false);
                                 }
                             }
                             if (mk.equals(IMPLEMENTS)) {
-                                prepareImplementsMessage(message, mv);
+                                prepareImplementsMessage(builder, mv);
                             }
                         });
                     }
                 }
             } else {
-                message.setFillParameters(new FillParameters(new ArrayList<>()));
+                builder.fillParameters(new FillParameters(new ArrayList<>()));
             }
             // Process x-class-annotation for messages
             Set<String> classAnnotations = getSetValueIfExistsOrElseEmptySet(X_CLASS_ANNOTATION, payloadMap);
-            if (!classAnnotations.isEmpty()) {
-                message.getClassAnnotations().addAll(classAnnotations);
-            }
-            message.setSummary(getStringValueIfExistOrElseNull(SUMMARY, messageMap));
-            message.setMessagePackageName(processContext.getMessagePackage());
-            message.setCommonPackageName(processContext.getCommonPackage());
+            classAnnotations.forEach(builder::addClassAnnotation);
+
+            Message message = builder
+                    .summary(getStringValueIfExistOrElseNull(SUMMARY, messageMap))
+                    .commonPackageName(processContext.getCommonPackage())
+                    .build();
             messageList.add(message);
         });
 
@@ -172,29 +188,29 @@ public class MessageMapper extends AbstractMapper {
     /**
      * Parses {@code implements} block and configures message to implement the specified interfaces.
      *
-     * @param message message instance to configure
+     * @param builder message builder to configure
      * @param mv      value of {@code implements} key (should be a map with {@code fromInterface} list)
      */
-    private static void prepareImplementsMessage(Message message, Object mv) {
+    private static void prepareImplementsMessage(MessageBuilder builder, Object mv) {
         Map<String, Object> implementsMap = castObjectToMap(mv);
         List<String> fromInterfaceList = castObjectToList(implementsMap.get(FROM_INTERFACE));
         LOG.info("SHOULD IMPLEMENTS FROM: " + fromInterfaceList);
         fromInterfaceList.forEach(ifc -> {
             String[] split = ifc.split("[.]");
-            message.getImplementsFrom().add(split[split.length - 1]);
-            message.getImportSet().add(ifc + ";");
+            builder.addImplementsFrom(split[split.length - 1]);
+            builder.addImport(ifc + ";");
         });
     }
 
     /**
      * Parses {@code extends} block and configures message to extend the specified class.
      *
-     * @param message             message instance to configure
-     * @param mv                  value of {@code extends} key (should be a map with {@code fromClass}, {@code fromPackage})
-     * @param processContext      context
+     * @param builder         message builder to configure
+     * @param mv              value of {@code extends} key (should be a map with {@code fromClass}, {@code fromPackage})
+     * @param processContext  context
      * @return resolved superclass simple name (e.g., {@code "BaseMessage"})
      */
-    private static String prepareExtendsMessage(Message message, Object mv, ProcessContext processContext) {
+    private static String prepareExtendsMessage(MessageBuilder builder, Object mv, ProcessContext processContext) {
         Map<String, Object> extendsMap = castObjectToMap(mv);
         String fromClass = getStringValueIfExistOrElseNull(FROM_CLASS, extendsMap);
         String fromPackage = getStringValueIfExistOrElseNull(FROM_PACKAGE, extendsMap);
@@ -204,13 +220,13 @@ public class MessageMapper extends AbstractMapper {
         }
 
         if (fromPackage != null) {
-            message.getImportSet().add(fromPackage + "." + fromClass + ";");
+            builder.addImport(fromPackage + "." + fromClass + ";");
         } else {
             String effectivePkg = processContext.getEffectiveCommonPackage().replace(";", "");
-            message.getImportSet().add(effectivePkg + "." + fromClass + ";");
+            builder.addImport(effectivePkg + "." + fromClass + ";");
         }
 
-        message.setExtendsFrom(fromClass);
+        builder.extendsFrom(fromClass);
         return fromClass;
     }
 
@@ -221,28 +237,28 @@ public class MessageMapper extends AbstractMapper {
      * and marks the schema for potential exclusion from inheritance filling.
      *
      * @param excludeInheritanceSchemas shared set to mark excluded schemas
-     * @param message                    message to configure
+     * @param builder                    message builder to configure
      * @param payloadMap                 message payload definition map
      * @param refObject                  value of {@code $ref}, if any
      * @param needToFill                 flag to disable field population
      * @param processContext             context
      */
     private static void extendsAndImplFilling(Set<String> excludeInheritanceSchemas,
-                                              Message message,
+                                              MessageBuilder builder,
                                               Map<String, Object> payloadMap,
                                               String refObject,
                                               AtomicBoolean needToFill,
                                               ProcessContext processContext) {
         payloadMap.forEach((mk, mv) -> {
             if (mk.equals(EXTENDS)) {
-                String fromClass = prepareExtendsMessage(message, mv, processContext);
+                String fromClass = prepareExtendsMessage(builder, mv, processContext);
                 if (refObject != null && refReplace(refObject).equals(fromClass)) {
                     needToFill.set(false);
                     excludeInheritanceSchemas.add(refReplace(refObject));
                 }
             }
             if (mk.equals(IMPLEMENTS)) {
-                prepareImplementsMessage(message, mv);
+                prepareImplementsMessage(builder, mv);
             }
         });
     }

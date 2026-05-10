@@ -197,14 +197,7 @@ public class YojoGenerator {
         List<Message> messageList = messageMapper.mapMessagesToObjects(ctx);
         for (Message message : messageList) {
             String customPath = message.getPathForGenerateMessage();
-            if (customPath != null) {
-                String fullPackage = ctx.getPackageLocation() + "." + customPath;
-                message.setMessagePackageName(fullPackage + ";");
-                writeFileUnified(ctx, message.getMessageName(), new MessageCodeGenerator(message).generate(), true, customPath);
-            } else {
-                message.setMessagePackageName(ctx.getMessagePackage());
-                writeFileUnified(ctx, message.getMessageName(), new MessageCodeGenerator(message).generate(), true, null);
-            }
+            writeFileUnified(ctx, message.getMessageName(), new MessageCodeGenerator(message).generate(), true, customPath);
         }
     }
 

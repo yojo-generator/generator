@@ -148,6 +148,15 @@ public class Message {
     }
 
     /**
+     * Returns the common schema package (used for imports of referenced DTOs/enums).
+     *
+     * @return common package with trailing semicolon (e.g., {@code "com.example.common;"})
+     */
+    public String getCommonPackageName() {
+        return commonPackageName;
+    }
+
+    /**
      * Returns the superclass name (or {@code null} if none).
      *
      * @return superclass name
@@ -258,5 +267,14 @@ public class Message {
 
     public FillParameters getFillParameters() {
         return fillParameters;
+    }
+
+    /**
+     * Returns a new {@link MessageBuilder} for fluent construction.
+     *
+     * @return a new builder
+     */
+    public static MessageBuilder builder() {
+        return new MessageBuilder();
     }
 }

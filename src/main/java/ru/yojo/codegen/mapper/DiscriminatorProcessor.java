@@ -1,6 +1,5 @@
 package ru.yojo.codegen.mapper;
 
-import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.schema.Schema;
 import ru.yojo.codegen.util.Logger;
 
@@ -86,13 +85,6 @@ public class DiscriminatorProcessor {
                     baseDiscriminator.put(schema.getSchemaName(), disc);
                     schemaByName.put(schema.getSchemaName(), schema);
 
-                    // Set discriminator field on schema
-                    schema.setDiscriminator(disc);
-                    schema.setDiscriminatorField(disc);
-
-                    // Mark the discriminator field in VariableProperties (for @JsonTypeId)
-                    markDiscriminatorFieldInSchema(schema, disc);
-
                     LOG.info("DISCRIMINATOR: Base schema " + schema.getSchemaName()
                             + " has discriminator field: " + disc);
                 }
@@ -126,11 +118,10 @@ public class DiscriminatorProcessor {
                             String discriminatorValue = findDiscriminatorValue(schemaMap, discriminatorField, schemaName);
 
                             baseSchema.addSubtype(schemaName, discriminatorValue);
-                            schema.setExtendsFrom(baseName);
 
-                            LOG.info("DISCRIMINATOR: Setting extendsFrom=\"" + baseName
-                                    + "\" for subtype: " + schemaName
-                                    + " (discriminator value: " + discriminatorValue + ")");
+                            LOG.info("DISCRIMINATOR: Registered subtype \"" + schemaName
+                                    + "\" with discriminator value: " + discriminatorValue
+                                    + " under base: " + baseName);
                         }
                     }
                 }
@@ -264,45 +255,6 @@ public class DiscriminatorProcessor {
         }
 
         return defaultDiscriminatorValue;
-    }
-
-    // ————————————————————————————————————————
-    // Field marking
-    // ————————————————————————————————————————
-
-    /**
-     * Marks the field with the given name as discriminator field in the schema's {@link VariableProperties}.
-     * This causes the field to be annotated with {@code @JsonTypeId} in the generated code.
-     *
-     * @param schema                 the schema containing the field
-     * @param discriminatorFieldName the discriminator field name
-     */
-    public static void markDiscriminatorFieldInSchema(Schema schema, String discriminatorFieldName) {
-        if (schema.getFillParameters() == null) {
-            LOG.info("DISCRIMINATOR WARNING: FillParameters is NULL for schema: " + schema.getSchemaName());
-            return;
-        }
-
-        if (schema.getFillParameters().getVariableProperties().isEmpty()) {
-            LOG.info("DISCRIMINATOR WARNING: VariableProperties is EMPTY for schema: " + schema.getSchemaName());
-            return;
-        }
-
-        LOG.info("DISCRIMINATOR: Looking for field '" + discriminatorFieldName
-                + "' in schema: " + schema.getSchemaName()
-                + ", available fields: " + schema.getFillParameters().getVariableProperties().stream()
-                .map(VariableProperties::getName)
-                .toList());
-
-        for (VariableProperties vp : schema.getFillParameters().getVariableProperties()) {
-            if (vp.getName() != null && vp.getName().equals(discriminatorFieldName)) {
-                vp.setDiscriminatorField(true);
-                LOG.info("DISCRIMINATOR: SUCCESS - Marked field '" + discriminatorFieldName
-                        + "' as discriminator field in schema: " + schema.getSchemaName()
-                        + " (isDiscriminatorField=" + vp.isDiscriminatorField() + ")");
-                break;
-            }
-        }
     }
 
     // ————————————————————————————————————————

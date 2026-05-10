@@ -5,6 +5,7 @@ import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.schema.Schema;
+import ru.yojo.codegen.domain.schema.SchemaBuilder;
 import ru.yojo.codegen.exception.SchemaFillException;
 import ru.yojo.codegen.util.LombokUtils;
 import ru.yojo.codegen.util.Logger;
@@ -69,14 +70,15 @@ public class SchemaMapper extends AbstractMapper {
             String format = getStringValueIfExistOrElseNull(FORMAT, schemaMap);
 
             if (format != null && format.equals(INTERFACE)) {
-                Schema schema = new Schema();
-                schema.setSchemaName(capitalize(schemaName));
-                schema.setPackageName(processContext.getCommonPackage());
-                schema.setFillParameters(new FillParameters(new ArrayList<>()));
-                schema.setInterface(true);
-                schema.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap));
-                schema.setMethods(castObjectToMap(schemaMap.get(METHODS)));
-                schema.setInterfaceImports(getSetValueIfExistsOrElseEmptySet(IMPORTS, schemaMap));
+                Schema schema = Schema.builder()
+                        .name(capitalize(schemaName))
+                        .packageName(processContext.getCommonPackage())
+                        .fillParameters(new FillParameters(new ArrayList<>()))
+                        .isInterface(true)
+                        .description(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap))
+                        .methods(castObjectToMap(schemaMap.get(METHODS)))
+                        .interfaceImports(getSetValueIfExistsOrElseEmptySet(IMPORTS, schemaMap))
+                        .build();
                 schemaList.add(schema);
                 return;
             }
@@ -94,11 +96,11 @@ public class SchemaMapper extends AbstractMapper {
             }
 
             if ((schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) || POLYMORPHS.stream().anyMatch(p -> schemaMap.containsKey(p))) {
-                Schema schema = new Schema();
-                schema.setSchemaName(capitalize(schemaName));
-                schema.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap));
-                schema.setLombokProperties(finalLombokProperties);
-                schema.setPackageName(processContext.getCommonPackage());
+                SchemaBuilder builder = Schema.builder()
+                        .name(capitalize(schemaName))
+                        .description(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap))
+                        .lombokProperties(finalLombokProperties)
+                        .packageName(processContext.getCommonPackage());
 
                 AtomicBoolean needToFill = new AtomicBoolean(true);
                 schemaMap.forEach((sk, sv) -> {
@@ -107,12 +109,12 @@ public class SchemaMapper extends AbstractMapper {
                         String fromClass = getStringValueIfExistOrElseNull(FROM_CLASS, extendsMap);
                         String fromPackage = getStringValueIfExistOrElseNull(FROM_PACKAGE, extendsMap);
                         LOG.info("SHOULD EXTENDS FROM: " + fromClass);
-                        schema.setExtendsFrom(fromClass);
+                        builder.extendsFrom(fromClass);
                         if (fromPackage != null) {
-                            schema.getImportSet().add(fromPackage + "." + fromClass + ";");
+                            builder.addImport(fromPackage + "." + fromClass + ";");
                         } else {
                             String effectivePkg = processContext.getEffectiveCommonPackage().replace(";", "");
-                            schema.getImportSet().add(effectivePkg + "." + fromClass + ";");
+                            builder.addImport(effectivePkg + "." + fromClass + ";");
                         }
                         String refObject = getStringValueIfExistOrElseNull(REFERENCE, schemaMap);
                         if (refObject != null && refReplace(refObject).equals(fromClass)) {
@@ -125,21 +127,52 @@ public class SchemaMapper extends AbstractMapper {
                         LOG.info("SHOULD IMPLEMENTS FROM: " + fromInterfaceList);
                         fromInterfaceList.forEach(ifc -> {
                             String[] split = ifc.split("[.]");
-                            schema.getImplementsFrom().add(split[split.length - 1]);
-                            schema.getImportSet().add(ifc + ";");
+                            builder.addImplementsFrom(split[split.length - 1]);
+                            builder.addImport(ifc + ";");
                         });
                     }
                     // Process x-class-annotation
                     if (sk.equals(X_CLASS_ANNOTATION)) {
                         Set<String> classAnnotations = getSetValueIfExistsOrElseEmptySet(X_CLASS_ANNOTATION, schemaMap);
-                        if (!classAnnotations.isEmpty()) {
-                            schema.getClassAnnotations().addAll(classAnnotations);
-                        }
+                        classAnnotations.forEach(builder::addClassAnnotation);
                     }
                 });
 
+                // ——— Discriminator: set discriminator field on base schemas ——— //
+                String schemaNameCap = capitalize(schemaName);
+                if (discriminatorProcessor.getDiscriminatorBases().contains(schemaNameCap)) {
+                    String discField = discriminatorProcessor.getDiscriminatorField(schemaNameCap);
+                    if (discField != null) {
+                        builder.discriminator(discField);
+                        builder.discriminatorField(discField);
+                        LOG.info("DISCRIMINATOR: Schema " + schemaName + " is a discriminator base (field: " + discField + ")");
+                    }
+                }
+
+                // ——— Discriminator: set extendsFrom on subtypes referencing a discriminator base ——— //
+                // (only if no explicit extends was defined in the YAML)
+                if (!schemaMap.containsKey(EXTENDS)) {
+                    for (String polyKey : POLYMORPHS) {
+                        if (schemaMap.containsKey(polyKey)) {
+                            List<Object> items = castObjectToListObjects(schemaMap.get(polyKey));
+                            for (Object item : items) {
+                                String ref = getStringValueIfExistOrElseNull(REFERENCE, castObjectToMap(item));
+                                if (ref != null) {
+                                    String baseName = refReplace(ref);
+                                    if (discriminatorProcessor.getDiscriminatorBases().contains(baseName)) {
+                                        builder.extendsFrom(baseName);
+                                        LOG.info("DISCRIMINATOR: Setting extendsFrom=\"" + baseName
+                                                 + "\" for schema: " + schemaName);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Schema schema;
                 if (needToFill.get()) {
-                    schema.setFillParameters(
+                    schema = builder.fillParameters(
                             getSchemaVariableProperties(
                                     schemaName,
                                     schemaMap,
@@ -148,9 +181,9 @@ public class SchemaMapper extends AbstractMapper {
                                     processContext,
                                     processContext.getHelper().getInnerSchemas()
                             )
-                    );
+                    ).build();
                 } else {
-                    schema.setFillParameters(new FillParameters(new ArrayList<>()));
+                    schema = builder.fillParameters(new FillParameters(new ArrayList<>())).build();
                 }
                 schemaList.add(schema);
             } else if (schemaType != null && JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
@@ -180,21 +213,22 @@ public class SchemaMapper extends AbstractMapper {
                 }
 
                 if (schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
-                    Schema schema = new Schema();
-                    schema.setSchemaName(capitalize(schemaName));
-                    schema.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap));
-                    schema.setLombokProperties(finalLombokProperties);
-                    schema.setPackageName(processContext.getCommonPackage());
-                    schema.setFillParameters(
-                            getSchemaVariableProperties(
-                                    schemaName,
-                                    schemaMap,
-                                    processContext.getHelper().getInnerSchemas(),
-                                    castObjectToMap(schemaMap.get(PROPERTIES)),
-                                    processContext,
-                                    processContext.getHelper().getInnerSchemas()
+                    Schema schema = Schema.builder()
+                            .name(capitalize(schemaName))
+                            .description(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap))
+                            .lombokProperties(finalLombokProperties)
+                            .packageName(processContext.getCommonPackage())
+                            .fillParameters(
+                                    getSchemaVariableProperties(
+                                            schemaName,
+                                            schemaMap,
+                                            processContext.getHelper().getInnerSchemas(),
+                                            castObjectToMap(schemaMap.get(PROPERTIES)),
+                                            processContext,
+                                            processContext.getHelper().getInnerSchemas()
+                                    )
                             )
-                    );
+                            .build();
                     schemaList.add(schema);
                 } else if (schemaType != null && JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
                     LOG.info("SKIP INNER SCHEMA (primitive): " + schemaName + ", type=" + schemaType);

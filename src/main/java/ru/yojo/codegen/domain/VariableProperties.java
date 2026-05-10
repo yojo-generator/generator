@@ -190,6 +190,14 @@ public class VariableProperties {
      */
     private String nullableAnnotation;
 
+    /**
+     * Returns a new {@link VariablePropertiesBuilder} for fluent construction.
+     *
+     * @return a new builder
+     */
+    public static VariablePropertiesBuilder builder() {
+        return new VariablePropertiesBuilder();
+    }
 
     // ——— Getters & Setters ——— //
 

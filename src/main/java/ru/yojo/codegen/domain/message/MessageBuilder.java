@@ -162,6 +162,42 @@ public class MessageBuilder {
     }
 
     /**
+     * Returns whether this builder has an {@code extends} value set.
+     *
+     * @return true if extendsFrom has been set
+     */
+    public boolean hasExtendsFrom() {
+        return extendsFrom != null && !extendsFrom.trim().isEmpty();
+    }
+
+    /**
+     * Returns the {@code extends} value, or {@code null} if not set.
+     *
+     * @return extendsFrom value
+     */
+    public String getExtendsFrom() {
+        return extendsFrom;
+    }
+
+    /**
+     * Returns whether this builder has any {@code implements} values.
+     *
+     * @return true if implementsFrom is not empty
+     */
+    public boolean hasImplementsFrom() {
+        return !implementsFrom.isEmpty();
+    }
+
+    /**
+     * Returns the set of interfaces to implement (mutable).
+     *
+     * @return implementsFrom set
+     */
+    public Set<String> getImplementsFrom() {
+        return implementsFrom;
+    }
+
+    /**
      * Builds the Message instance.
      *
      * @return a new Message with all configured properties
