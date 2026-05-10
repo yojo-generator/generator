@@ -199,8 +199,8 @@ public class AbstractMapper {
     /**
      * Prepares a full import string for a class in the common package.
      *
-     * @param commonPackage base common package (e.g., {@code "com.example.common;"})
-     * @param className     simple class name
+     * @param ctx       process context to resolve common package
+     * @param className simple class name
      * @return full import, e.g., {@code "com.example.common.MyClass;"}
      */
     protected String prepareImport(ProcessContext ctx, String className) {
@@ -944,13 +944,13 @@ public class AbstractMapper {
      * Delegates to {@link #fillByEnumWithDescription} or {@link #fillByEnum} depending on presence of
      * {@code x-enumNames}.
      *
-     * @param propertyName  enum field name
-     * @param propertiesMap raw enum definition
-     * @param innerSchemas  accumulator
+     * @param enumSchemaName enum schema name
+     * @param propertiesMap  raw enum definition
+     * @param innerSchemas   accumulator
      */
     protected static void fillEnumSchema(String enumSchemaName,
                                        Map<String, Object> propertiesMap,
-                                        Map<String, Object> innerSchemas) {
+                                         Map<String, Object> innerSchemas) {
         LOG.debug(">>> ADDING ENUM TO INNER SCHEMAS: " + enumSchemaName);
         if (getStringValueIfExistOrElseNull(X_ENUM_NAMES, propertiesMap) != null) {
             Map<String, Object> enumerationMap = castObjectToMap(propertiesMap.get(X_ENUM_NAMES));

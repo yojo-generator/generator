@@ -77,7 +77,7 @@ public class VariablePropertiesBuilder {
     /**
      * Sets the Java type (optional).
      *
-     * @param type Java type (e.g., "String", "List<LocalDate>")
+     * @param type Java type (e.g., "String", {@code List<LocalDate>})
      * @return this builder
      */
     public VariablePropertiesBuilder type(String type) {
