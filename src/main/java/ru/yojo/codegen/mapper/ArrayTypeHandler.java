@@ -15,6 +15,11 @@ public class ArrayTypeHandler implements PropertyTypeHandler {
 
     private final AbstractMapper abstractMapper;
 
+    /**
+     * Creates a handler for array-type properties.
+     *
+     * @param abstractMapper parent mapper for delegating type filling
+     */
     public ArrayTypeHandler(AbstractMapper abstractMapper) {
         this.abstractMapper = abstractMapper;
     }

@@ -21,11 +21,14 @@ import static ru.yojo.codegen.constants.Dictionary.*;
 abstract class AbstractCodeGenerator {
 
     /**
-     * Builds the package declaration line.
+     * Builds the final source code by wrapping content with package declaration, imports,
+     * class JavaDoc, annotations, and class declaration.
      *
+     * @param content     the class body content
+     * @param imports     set of import strings to include
      * @param packageName full package with trailing semicolon (e.g., {@code "com.example.common;"})
      * @param description optional JavaDoc description (may be {@code null})
-     * @return StringBuilder with package declaration and optional JavaDoc
+     * @return StringBuilder with fully assembled Java source code
      */
     protected StringBuilder finishBuild(StringBuilder content, Set<String> imports, String packageName, String description) {
         StringBuilder result = new StringBuilder();

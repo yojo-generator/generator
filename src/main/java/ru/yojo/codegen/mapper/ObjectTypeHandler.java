@@ -14,6 +14,11 @@ public class ObjectTypeHandler implements PropertyTypeHandler {
 
     private final AbstractMapper abstractMapper;
 
+    /**
+     * Creates a handler for object-type properties with nested properties.
+     *
+     * @param abstractMapper parent mapper for delegating type filling
+     */
     public ObjectTypeHandler(AbstractMapper abstractMapper) {
         this.abstractMapper = abstractMapper;
     }

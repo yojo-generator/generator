@@ -115,6 +115,8 @@ public class Schema {
 
     /**
      * Adds a subtype with default discriminator value (schema name).
+     *
+     * @param subtype schema name of the subtype
      */
     public void addSubtype(String subtype) {
         addSubtype(subtype, subtype);
@@ -328,6 +330,8 @@ public class Schema {
 
     /**
      * Returns the discriminator field name.
+     *
+     * @return discriminator property name
      */
     public String getDiscriminator() {
         return discriminator;
@@ -335,6 +339,8 @@ public class Schema {
 
     /**
      * Sets the discriminator field name.
+     *
+     * @param discriminator discriminator property name
      */
     public void setDiscriminator(String discriminator) {
         this.discriminator = discriminator;
@@ -342,6 +348,8 @@ public class Schema {
 
     /**
      * Returns the discriminator field name for subtypes (the field to annotate with @JsonTypeId).
+     *
+     * @return discriminator field property name
      */
     public String getDiscriminatorField() {
         return discriminatorField;
@@ -349,6 +357,8 @@ public class Schema {
 
     /**
      * Sets the discriminator field name for subtypes.
+     *
+     * @param discriminatorField discriminator field property name
      */
     public void setDiscriminatorField(String discriminatorField) {
         this.discriminatorField = discriminatorField;
@@ -356,6 +366,8 @@ public class Schema {
 
     /**
      * Returns list of subtypes.
+     *
+     * @return list of subtype schema names
      */
     public List<String> getSubtypes() {
         return subtypes;
@@ -363,6 +375,8 @@ public class Schema {
 
     /**
      * Returns set of unique subtypes.
+     *
+     * @return set of unique subtype schema names
      */
     public Set<String> getUniqueSubtypes() {
         return uniqueSubtypes;
@@ -370,6 +384,8 @@ public class Schema {
 
     /**
      * Returns map of subtype discriminator values.
+     *
+     * @return map: subtype schema name → discriminator value
      */
     public Map<String, String> getSubtypeDiscriminatorValues() {
         return subtypeDiscriminatorValues;

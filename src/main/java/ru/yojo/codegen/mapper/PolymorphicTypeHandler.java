@@ -25,6 +25,11 @@ public class PolymorphicTypeHandler implements PropertyTypeHandler {
 
     private final AbstractMapper abstractMapper;
 
+    /**
+     * Creates a handler for polymorphic types (oneOf, allOf, anyOf).
+     *
+     * @param abstractMapper parent mapper for delegating type filling
+     */
     public PolymorphicTypeHandler(AbstractMapper abstractMapper) {
         this.abstractMapper = abstractMapper;
     }

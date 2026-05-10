@@ -15,6 +15,11 @@ public class ReferenceTypeHandler implements PropertyTypeHandler {
 
     private final AbstractMapper abstractMapper;
 
+    /**
+     * Creates a handler for reference-type properties ($ref).
+     *
+     * @param abstractMapper parent mapper for delegating type filling
+     */
     public ReferenceTypeHandler(AbstractMapper abstractMapper) {
         this.abstractMapper = abstractMapper;
     }

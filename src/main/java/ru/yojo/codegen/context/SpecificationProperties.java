@@ -111,10 +111,20 @@ public class SpecificationProperties {
         this.packageLocation = packageLocation;
     }
 
+    /**
+     * Returns whether split-model mode is enabled.
+     *
+     * @return true if DTOs should be split into a separate common package
+     */
     public boolean isSplitModels() {
         return splitModels;
     }
 
+    /**
+     * Enables or disables split-model mode.
+     *
+     * @param splitModels split mode flag
+     */
     public void setSplitModels(boolean splitModels) {
         this.splitModels = splitModels;
     }

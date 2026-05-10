@@ -114,13 +114,34 @@ public class ProcessContext {
         this.nullableAnnotation = nullableAnnotation;
     }
 
+    /**
+     * Returns whether experimental features are enabled.
+     *
+     * @return true if experimental mode is active
+     */
     public boolean isExperimental() { return experimental; }
+
+    /**
+     * Enables or disables experimental features.
+     *
+     * @param experimental experimental mode flag
+     */
     public void setExperimental(boolean experimental) { this.experimental = experimental; }
 
+    /**
+     * Returns whether split-model mode is enabled (separate common package).
+     *
+     * @return true if DTOs are split into common package
+     */
     public boolean isSplitModels() {
         return splitModels;
     }
 
+    /**
+     * Enables or disables split-model mode.
+     *
+     * @param splitModels split mode flag
+     */
     public void setSplitModels(boolean splitModels) {
         this.splitModels = splitModels;
     }
@@ -339,9 +360,11 @@ public class ProcessContext {
     }
 
     /**
-     * Return package, which real generates all DTOs.
+     * Returns the package used for generating all DTOs.
      * if splitModels == true → return commonPackage.
      * if splitModels == false → return unified package.
+     *
+     * @return effective package string (with trailing semicolon)
      */
     public String getEffectiveCommonPackage() {
         if (isSplitModels()) {

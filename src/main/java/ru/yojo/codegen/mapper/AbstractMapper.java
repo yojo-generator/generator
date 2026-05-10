@@ -34,7 +34,10 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 @SuppressWarnings("all")
 public class AbstractMapper {
     private static final Logger LOG = new Logger(AbstractMapper.class);
+
+    /** Naming strategy for field/method name transformations. */
     protected final NamingStrategy namingStrategy;
+
     private final PropertyTypeResolver propertyTypeResolver;
 
     /**
@@ -369,6 +372,7 @@ public class AbstractMapper {
      * <p>
      * If {@code x-enumNames} is present, generates an enum with description field; otherwise, a plain enum.
      *
+     * @param schemaName        name of the parent schema
      * @param variableProperties field container
      * @param propertyName       YAML key
      * @param propertiesMap      raw enum definition
@@ -405,8 +409,10 @@ public class AbstractMapper {
      * Generates a unique name (e.g., {@code ParentSchemaPropertyName}) and stores the synthetic schema
      * in {@code innerSchemas}.
      *
+     * @param schemaName        name of the parent schema
      * @param variableProperties field container
-     * @param propertyName       YAML key
+     * @param schemas           full schema map for reference resolution
+     * @param propertyName       proposed inner schema name
      * @param propertiesMap      raw object definition
      * @param processContext     context
      * @param innerSchemas       accumulator

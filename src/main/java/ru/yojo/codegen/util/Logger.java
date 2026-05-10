@@ -12,9 +12,13 @@ public class Logger {
      * Log levels.
      */
     public enum Level {
+        /** Debug level (verbose diagnostics). */
         DEBUG,
+        /** Info level (normal operational messages). */
         INFO,
+        /** Warning level (potential issues). */
         WARN,
+        /** Error level (failures requiring attention). */
         ERROR
     }
 

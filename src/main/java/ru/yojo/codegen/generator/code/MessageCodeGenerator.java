@@ -29,6 +29,11 @@ public class MessageCodeGenerator extends AbstractCodeGenerator {
 
     private final Message message;
 
+    /**
+     * Creates a generator for the given message definition.
+     *
+     * @param message the message to generate Java source for
+     */
     public MessageCodeGenerator(Message message) {
         this.message = message;
     }

@@ -29,6 +29,11 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
 
     private final Schema schema;
 
+    /**
+     * Creates a generator for the given schema definition.
+     *
+     * @param schema the schema to generate Java source for
+     */
     public SchemaCodeGenerator(Schema schema) {
         this.schema = schema;
     }

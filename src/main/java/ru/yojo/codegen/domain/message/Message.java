@@ -255,6 +255,11 @@ public class Message {
         this.classAnnotations = classAnnotations;
     }
 
+    /**
+     * Returns the field parameters container for this message.
+     *
+     * @return fill parameters with field definitions
+     */
     public FillParameters getFillParameters() {
         return fillParameters;
     }

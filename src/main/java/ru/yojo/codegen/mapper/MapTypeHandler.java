@@ -13,6 +13,11 @@ public class MapTypeHandler implements PropertyTypeHandler {
 
     private final AbstractMapper abstractMapper;
 
+    /**
+     * Creates a handler for map-type properties (additionalProperties).
+     *
+     * @param abstractMapper parent mapper for delegating type filling
+     */
     public MapTypeHandler(AbstractMapper abstractMapper) {
         this.abstractMapper = abstractMapper;
     }

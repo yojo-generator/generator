@@ -15,6 +15,11 @@ public class EnumTypeHandler implements PropertyTypeHandler {
 
     private final AbstractMapper abstractMapper;
 
+    /**
+     * Creates a handler for enum-type properties.
+     *
+     * @param abstractMapper parent mapper for delegating type filling
+     */
     public EnumTypeHandler(AbstractMapper abstractMapper) {
         this.abstractMapper = abstractMapper;
     }
