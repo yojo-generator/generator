@@ -56,15 +56,6 @@ public class FillParameters {
     }
 
     /**
-     * Sets the Lombok configuration.
-     *
-     * @param lombokProperties Lombok config
-     */
-    public void setLombokProperties(LombokProperties lombokProperties) {
-        this.lombokProperties = lombokProperties;
-    }
-
-    /**
      * Returns the list of validation group class names (e.g., {@code "Create.class"}).
      *
      * @return set of group identifiers
@@ -119,15 +110,6 @@ public class FillParameters {
     }
 
     /**
-     * Sets the list of field definitions.
-     *
-     * @param schemaVariableProperties fields to use
-     */
-    public void setVariableProperties(List<VariableProperties> schemaVariableProperties) {
-        this.variableProperties = schemaVariableProperties;
-    }
-
-    /**
      * Generates Java source code for all fields in this container.
      * <p>
      * Handles two modes:
@@ -160,8 +142,7 @@ public class FillParameters {
                     stringBuilder.append(lineSeparator())
                             .append(TABULATION)
                             .append(vp.getType())
-                            .append(i == variableProperties.size() - 2 ? ";" : ",")
-                            .append(i == variableProperties.size() - 2 ? lineSeparator() : "");
+                            .append(i == variableProperties.size() - 1 ? ";" : ",");
                 } else {
                     // Plain enum: CONSTANT
                     String constName = vp.getEnumeration() != null

@@ -3,8 +3,6 @@ package ru.yojo.codegen.domain;
 import java.util.HashSet;
 import java.util.Set;
 
-import static ru.yojo.codegen.constants.Dictionary.*;
-
 /**
  * Builder for {@link VariableProperties} objects.
  * Provides fluent API to construct VariableProperties instances with required validation.

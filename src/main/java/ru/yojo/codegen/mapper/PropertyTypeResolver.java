@@ -1,11 +1,7 @@
 package ru.yojo.codegen.mapper;
 
-import ru.yojo.codegen.context.ProcessContext;
-import ru.yojo.codegen.domain.VariableProperties;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Resolver that uses Chain of Responsibility pattern to find the appropriate

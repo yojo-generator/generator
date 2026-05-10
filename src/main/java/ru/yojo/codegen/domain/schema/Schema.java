@@ -327,15 +327,6 @@ public class Schema {
     }
 
     /**
-     * Sets class-level annotations.
-     *
-     * @param classAnnotations set of fully qualified annotation names
-     */
-    public void setClassAnnotations(Set<String> classAnnotations) {
-        this.classAnnotations = classAnnotations;
-    }
-
-    /**
      * Returns the discriminator field name.
      */
     public String getDiscriminator() {

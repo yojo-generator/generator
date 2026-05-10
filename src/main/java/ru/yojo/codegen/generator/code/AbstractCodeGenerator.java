@@ -7,13 +7,10 @@ import ru.yojo.codegen.domain.lombok.LombokProperties;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static java.lang.System.lineSeparator;
 import static ru.yojo.codegen.constants.Dictionary.*;
-import static ru.yojo.codegen.util.MapperUtil.castObjectToMap;
-import static ru.yojo.codegen.util.MapperUtil.getStringValueIfExistOrElseNull;
 
 /**
  * Abstract base class for Java source code generators.

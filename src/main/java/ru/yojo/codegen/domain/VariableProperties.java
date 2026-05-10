@@ -418,24 +418,6 @@ public class VariableProperties {
     }
 
     /**
-     * Sets the annotation set (e.g., {@code @NotNull}, {@code @Size}).
-     *
-     * @param annotationSet annotations
-     */
-    public void setAnnotationSet(Set<String> annotationSet) {
-        this.annotationSet = annotationSet;
-    }
-
-    /**
-     * Sets the required imports (e.g., {@code java.time.LocalDate}).
-     *
-     * @param requiredImports import strings
-     */
-    public void setRequiredImports(Set<String> requiredImports) {
-        this.requiredImports = requiredImports;
-    }
-
-    /**
      * Returns the {@code @Digits} parameters.
      *
      * @return digits config (e.g., {@code "integer = 2, fraction = 2"}) or {@code null}
@@ -541,15 +523,6 @@ public class VariableProperties {
      */
     public Set<String> getFieldAnnotations() {
         return fieldAnnotations;
-    }
-
-    /**
-     * Sets field-level annotations.
-     *
-     * @param fieldAnnotations set of fully qualified annotation names with optional parameters
-     */
-    public void setFieldAnnotations(Set<String> fieldAnnotations) {
-        this.fieldAnnotations = fieldAnnotations;
     }
 
     /**

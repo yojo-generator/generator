@@ -23,16 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Helper {
 
     /**
-     * {@code true} if current mapping phase originates from message processing.
-     */
-    private Boolean isMappedFromMessages = false;
-
-    /**
-     * {@code true} if current mapping phase originates from schema processing.
-     */
-    private Boolean isMappedFromSchemas = false;
-
-    /**
      * Set of schema names to be *removed* after mapping (e.g., when {@code removeSchema: true} is specified).
      */
     private Set<String> removeSchemas = new HashSet<>();
@@ -53,42 +43,6 @@ public class Helper {
      * Key: schema name, Value: schema definition map.
      */
     private Map<String, Object> innerSchemas = new ConcurrentHashMap<>();
-
-    /**
-     * Returns whether the current context is mapping from messages.
-     *
-     * @return {@code true} if mapping originates from message processing
-     */
-    public Boolean isMappedFromMessages() {
-        return isMappedFromMessages;
-    }
-
-    /**
-     * Sets the flag indicating mapping originates from messages.
-     *
-     * @param isMappedFromMessages flag value
-     */
-    public void setIsMappedFromMessages(Boolean isMappedFromMessages) {
-        this.isMappedFromMessages = isMappedFromMessages;
-    }
-
-    /**
-     * Returns whether the current context is mapping from schemas.
-     *
-     * @return {@code true} if mapping originates from schema processing
-     */
-    public Boolean isMappedFromSchemas() {
-        return isMappedFromSchemas;
-    }
-
-    /**
-     * Sets the flag indicating mapping originates from schemas.
-     *
-     * @param isMappedFromSchemas flag value
-     */
-    public void setIsMappedFromSchemas(Boolean isMappedFromSchemas) {
-        this.isMappedFromSchemas = isMappedFromSchemas;
-    }
 
     /**
      * Returns the set of schema names marked for removal after processing.

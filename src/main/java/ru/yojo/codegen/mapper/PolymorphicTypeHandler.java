@@ -7,12 +7,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static ru.yojo.codegen.constants.Dictionary.OBJECT_TYPE;
-import static ru.yojo.codegen.constants.Dictionary.POLYMORPHS;
 import static ru.yojo.codegen.constants.Dictionary.PROPERTIES;
 import static ru.yojo.codegen.constants.Dictionary.TYPE;
 import static ru.yojo.codegen.util.MapperUtil.capitalize;
 import static ru.yojo.codegen.util.MapperUtil.castObjectToMap;
-import static ru.yojo.codegen.util.MapperUtil.castObjectToListObjects;
 import static ru.yojo.codegen.util.MapperUtil.refReplace;
 
 /**

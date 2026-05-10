@@ -76,11 +76,6 @@ public class ProcessContext {
     private String commonPackage;
 
     /**
-     * Whether {@code @JsonPropertyDescription} should be generated.
-     */
-    private boolean jsonPropertyDescription;
-
-    /**
      * Map of all message definitions from {@code components.messages}.
      */
     private Map<String, Object> messagesMap;
@@ -136,15 +131,6 @@ public class ProcessContext {
      */
     public Helper getHelper() {
         return helper;
-    }
-
-    /**
-     * Sets the shared helper instance.
-     *
-     * @param helper helper to use (must not be null)
-     */
-    public void setHelper(Helper helper) {
-        this.helper = helper;
     }
 
     /**
@@ -314,24 +300,6 @@ public class ProcessContext {
      */
     public void setCommonPackage(String commonPackage) {
         this.commonPackage = commonPackage;
-    }
-
-    /**
-     * Enables or disables {@code @JsonPropertyDescription} generation.
-     *
-     * @param jsonPropertyDescription {@code true} to generate annotation
-     */
-    public void setJsonPropertyDescription(boolean jsonPropertyDescription) {
-        this.jsonPropertyDescription = jsonPropertyDescription;
-    }
-
-    /**
-     * Returns whether {@code @JsonPropertyDescription} should be generated.
-     *
-     * @return {@code true} if enabled
-     */
-    public boolean isJsonPropertyDescription() {
-        return jsonPropertyDescription;
     }
 
     /**

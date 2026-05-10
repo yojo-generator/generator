@@ -101,8 +101,7 @@ public class YojoCLI {
             yojoGenerator.generateAll(context);
             LOG.info(" Generation completed successfully.");
         } catch (Exception e) {
-            LOG.error("  Generation failed: " + e.getMessage());
-            e.printStackTrace();
+            LOG.error("  Generation failed: " + e.getMessage(), e);
             System.exit(1);
         }
     }
