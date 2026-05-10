@@ -7,7 +7,6 @@ import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.schema.Schema;
 import ru.yojo.codegen.domain.schema.SchemaBuilder;
 import ru.yojo.codegen.exception.SchemaFillException;
-import ru.yojo.codegen.util.LombokUtils;
 import ru.yojo.codegen.util.Logger;
 import ru.yojo.codegen.util.MapperUtil;
 

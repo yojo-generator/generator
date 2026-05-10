@@ -6,7 +6,6 @@ import ru.yojo.codegen.domain.lombok.LombokProperties;
 
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,9 +44,6 @@ public class SchemaBuilder {
     private Set<String> classAnnotations = new HashSet<>();
     private String discriminator;
     private String discriminatorField;
-    private List<String> subtypes;
-    private Set<String> uniqueSubtypes;
-    private Map<String, String> subtypeDiscriminatorValues;
 
     /**
      * Sets the schema name (required).
@@ -252,10 +248,6 @@ public class SchemaBuilder {
                 }
             }
         }
-        if (subtypes != null) schema.getSubtypes().addAll(subtypes);
-        if (uniqueSubtypes != null) schema.getUniqueSubtypes().addAll(uniqueSubtypes);
-        if (subtypeDiscriminatorValues != null) schema.getSubtypeDiscriminatorValues().putAll(subtypeDiscriminatorValues);
-
         return schema;
     }
 

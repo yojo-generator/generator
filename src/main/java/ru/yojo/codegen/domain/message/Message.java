@@ -193,16 +193,6 @@ public class Message {
     }
 
     /**
-     * Merges fields from another {@link FillParameters} into this one.
-     * Used when message combines {@code $ref} and inline {@code properties}.
-     *
-     * @param fillParameters source parameters to merge
-     */
-    public void enrichFillParameters(FillParameters fillParameters) {
-        this.fillParameters.getVariableProperties().addAll(fillParameters.getVariableProperties());
-    }
-
-    /**
      * Sets the payload field definitions and metadata.
      *
      * @param fillParameters field container

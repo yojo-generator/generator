@@ -318,15 +318,6 @@ public class Schema {
     }
 
     /**
-     * Sets interface-level imports.
-     *
-     * @param interfaceImports imports for interface methods
-     */
-    public void setInterfaceImports(Set<String> interfaceImports) {
-        this.interfaceImports = interfaceImports;
-    }
-
-    /**
      * Returns class-level annotations.
      *
      * @return class annotations (e.g., "com.example.MyAnnotation")
@@ -380,13 +371,6 @@ public class Schema {
     }
 
     /**
-     * Sets list of subtypes.
-     */
-    public void setSubtypes(List<String> subtypes) {
-        this.subtypes = subtypes;
-    }
-
-    /**
      * Returns set of unique subtypes.
      */
     public Set<String> getUniqueSubtypes() {
@@ -407,15 +391,6 @@ public class Schema {
      */
     public Map<String, Object> getMethods() {
         return methods;
-    }
-
-    /**
-     * Sets method definitions.
-     *
-     * @param methods method map
-     */
-    public void setMethods(Map<String, Object> methods) {
-        this.methods = methods;
     }
 
 }
