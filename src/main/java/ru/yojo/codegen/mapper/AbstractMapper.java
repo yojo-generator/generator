@@ -518,7 +518,7 @@ public class AbstractMapper {
         String refValue = getStringValueIfExistOrElseNull(REFERENCE, items);
         String collectionFormat = getStringValueIfExistOrElseNull(FORMAT, propertiesMap);
         boolean javaType = false;
-        Set<String> structuralKeys = Set.of(FORMAT, REFERENCE, PROPERTIES, ENUMERATION, ITEMS);
+        Set<String> structuralKeys = Set.of(FORMAT, REFERENCE, PROPERTIES, ENUMERATION, ITEMS, TYPE);
         boolean isStructurallyEmpty = items.entrySet().stream()
                 .noneMatch(e -> structuralKeys.contains(e.getKey()));
         if (isStructurallyEmpty) {
