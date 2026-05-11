@@ -8,8 +8,8 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class ClassForExtends {
 
-    private String someAnotherString;
 
+    private String someAnotherString;
     public void setSomeAnotherString(String someAnotherString) {
         this.someAnotherString = someAnotherString;
     }

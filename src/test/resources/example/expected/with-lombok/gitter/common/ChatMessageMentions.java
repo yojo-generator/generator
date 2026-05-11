@@ -1,11 +1,11 @@
 package gitter.common;
 
 import java.util.List;
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Generated("Yojo")
 @Data
@@ -14,10 +14,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChatMessageMentions {
 
+
     private String screenName;
 
     private String userId;
 
-    private List<Object> userIds;
-
+    private List<String> userIds;
 }

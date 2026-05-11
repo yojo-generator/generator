@@ -1,7 +1,7 @@
 package slack.messages;
 
-import javax.annotation.processing.Generated;
 import java.math.BigDecimal;
+import javax.annotation.processing.Generated;
 import slack.common.OutgoingMessageType;
 
 /**
@@ -10,6 +10,7 @@ import slack.common.OutgoingMessageType;
 @Generated("Yojo")
 public class OutgoingMessage {
 
+
     private BigDecimal id;
 
     private OutgoingMessageType type;
@@ -17,12 +18,17 @@ public class OutgoingMessage {
     private String channel;
 
     private String text;
-
     public void setId(BigDecimal id) {
         this.id = id;
     }
     public BigDecimal getId() {
         return id;
+    }
+    public void setType(OutgoingMessageType type) {
+        this.type = type;
+    }
+    public OutgoingMessageType getType() {
+        return type;
     }
     public void setChannel(String channel) {
         this.channel = channel;

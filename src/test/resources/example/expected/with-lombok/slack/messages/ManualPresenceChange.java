@@ -1,11 +1,11 @@
 package slack.messages;
 
-import slack.common.ManualPresenceChangeType;
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.ManualPresenceChangeType;
 
 /**
 * You manually updated your presence.
@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ManualPresenceChange {
 
+
     private ManualPresenceChangeType type;
 
     private String presence;
-
 }

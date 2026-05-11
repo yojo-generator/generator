@@ -1,11 +1,11 @@
 package slack.common;
 
 import java.util.Map;
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Generated("Yojo")
 @Data
@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BotChangedBot {
 
+
     private String id;
 
     private String appId;
@@ -21,5 +22,4 @@ public class BotChangedBot {
     private String name;
 
     private Map<String, String> icons;
-
 }

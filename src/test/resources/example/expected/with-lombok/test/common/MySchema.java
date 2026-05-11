@@ -1,12 +1,12 @@
 package example.testGenerate.test.common;
 
-import lombok.NonNull;
-import lombok.Builder;
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.experimental.Accessors;
 
 @Generated("Yojo")
 @Data
@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class MySchema {
 
+
     @NonNull
     private String myField;
-
 }

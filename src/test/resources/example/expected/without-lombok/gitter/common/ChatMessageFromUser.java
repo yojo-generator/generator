@@ -1,14 +1,15 @@
 package gitter.common;
 
-import javax.annotation.processing.Generated;
-import java.net.URI;
 import java.math.BigDecimal;
+import java.net.URI;
+import javax.annotation.processing.Generated;
 
 /**
 * User that sent the message.
 */
 @Generated("Yojo")
 public class ChatMessageFromUser {
+
 
     /**
      * Gitter User ID.
@@ -54,7 +55,6 @@ public class ChatMessageFromUser {
      * Stands for "Gravatar version" and is used for cache busting.
      */
     private String gv;
-
     public void setId(String id) {
         this.id = id;
     }

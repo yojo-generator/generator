@@ -1,10 +1,11 @@
 package example.testGenerate.test.messages;
 
-import javax.validation.constraints.Email;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.Email;
 
 @Generated("Yojo")
 public class UserSignedUp {
+
 
     /**
      * Name of the user
@@ -16,7 +17,6 @@ public class UserSignedUp {
      */
     @Email
     private String email;
-
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }

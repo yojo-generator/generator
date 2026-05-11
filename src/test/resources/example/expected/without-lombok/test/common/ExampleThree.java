@@ -5,6 +5,7 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class ExampleThree {
 
+
     private Boolean oneMoreField;
 
     private String status;
@@ -12,7 +13,6 @@ public class ExampleThree {
     private Integer someField;
 
     private Boolean fromFour;
-
     public void setOneMoreField(Boolean oneMoreField) {
         this.oneMoreField = oneMoreField;
     }

@@ -1,9 +1,9 @@
 package slack.messages;
 
-import slack.common.FilePublicType;
+import javax.annotation.processing.Generated;
 import javax.validation.Valid;
 import slack.common.FilePublicFile;
-import javax.annotation.processing.Generated;
+import slack.common.FilePublicType;
 
 /**
 * A file was made public.
@@ -11,13 +11,19 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class FilePublic {
 
+
     private FilePublicType type;
 
     private String fileId;
 
     @Valid
     private FilePublicFile file;
-
+    public void setType(FilePublicType type) {
+        this.type = type;
+    }
+    public FilePublicType getType() {
+        return type;
+    }
     public void setFileId(String fileId) {
         this.fileId = fileId;
     }

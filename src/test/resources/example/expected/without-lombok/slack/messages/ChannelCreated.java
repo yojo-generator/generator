@@ -1,9 +1,9 @@
 package slack.messages;
 
-import javax.validation.Valid;
-import slack.common.ChannelCreatedType;
-import slack.common.ChannelCreatedChannel;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import slack.common.ChannelCreatedChannel;
+import slack.common.ChannelCreatedType;
 
 /**
 * A channel was created.
@@ -11,11 +11,17 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class ChannelCreated {
 
+
     private ChannelCreatedType type;
 
     @Valid
     private ChannelCreatedChannel channel;
-
+    public void setType(ChannelCreatedType type) {
+        this.type = type;
+    }
+    public ChannelCreatedType getType() {
+        return type;
+    }
     public void setChannel(ChannelCreatedChannel channel) {
         this.channel = channel;
     }

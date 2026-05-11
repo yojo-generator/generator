@@ -1,14 +1,15 @@
 package slack.common;
 
-import java.util.List;
-import slack.common.AttachmentFields;
-import javax.validation.Valid;
-import javax.annotation.processing.Generated;
-import java.net.URI;
 import java.math.BigDecimal;
+import java.net.URI;
+import java.util.List;
+import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import slack.common.AttachmentFields;
 
 @Generated("Yojo")
 public class Attachment {
+
 
     private String fallback;
 
@@ -40,7 +41,6 @@ public class Attachment {
     private URI footerIcon;
 
     private BigDecimal ts;
-
     public void setFallback(String fallback) {
         this.fallback = fallback;
     }

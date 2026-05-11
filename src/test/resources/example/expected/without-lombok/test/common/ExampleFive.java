@@ -1,30 +1,31 @@
 package example.testGenerate.test.common;
 
-import example.testGenerate.test.common.PolymorphExampleThree;
-import example.testGenerate.test.common.SomeObject;
-import java.util.List;
-import example.testGenerate.test.common.ExampleFiveInnerEnumWithoutDescriptionSmall;
+import example.testGenerate.test.common.CollectionTypes;
 import example.testGenerate.test.common.EnumResultWithDescription;
+import example.testGenerate.test.common.EnumResultWithoutDescription;
+import example.testGenerate.test.common.ExampleFiveInnerEnumWithDescription;
+import example.testGenerate.test.common.ExampleFiveInnerEnumWithoutDescription;
+import example.testGenerate.test.common.ExampleFiveInnerEnumWithoutDescriptionSmall;
+import example.testGenerate.test.common.ExampleFiveInnerSchema;
 import example.testGenerate.test.common.NumericsValues;
+import example.testGenerate.test.common.ObjectTypes;
+import example.testGenerate.test.common.PolymorphExampleThree;
+import example.testGenerate.test.common.PolymorphPolymorphExampleOnePolymorphExampleTwo;
+import example.testGenerate.test.common.SomeObject;
 import example.testGenerate.test.common.StringValues;
 import java.util.HashMap;
-import example.testGenerate.test.common.ExampleFiveInnerEnumWithoutDescription;
-import java.util.Map;
-import example.testGenerate.test.common.EnumResultWithoutDescription;
-import java.util.UUID;
-import example.testGenerate.test.common.ExampleFiveInnerEnumWithDescription;
-import java.util.Set;
-import javax.validation.Valid;
-import example.testGenerate.test.common.CollectionTypes;
-import example.testGenerate.test.common.ExampleFiveInnerSchema;
-import testGenerate.ExistingClass;
 import java.util.LinkedHashMap;
-import example.testGenerate.test.common.PolymorphPolymorphExampleOnePolymorphExampleTwo;
-import example.testGenerate.test.common.ObjectTypes;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import testGenerate.ExistingClass;
 
 @Generated("Yojo")
 public class ExampleFive {
+
 
     private Boolean oneMoreField;
 
@@ -196,7 +197,6 @@ public class ExampleFive {
 
     @Valid
     private SomeObject someObject;
-
     public void setOneMoreField(Boolean oneMoreField) {
         this.oneMoreField = oneMoreField;
     }

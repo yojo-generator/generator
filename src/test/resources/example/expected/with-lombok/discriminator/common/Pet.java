@@ -1,14 +1,14 @@
 package discriminator.common;
 
-import javax.validation.constraints.NotBlank;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeId;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Generated("Yojo")
 @Data
@@ -23,11 +23,11 @@ import lombok.NoArgsConstructor;
 })
 public class Pet {
 
+
     @NotBlank
     private String name;
 
     @JsonTypeId
     @NotBlank
     private String petType;
-
 }

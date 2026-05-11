@@ -8,6 +8,7 @@ import javax.validation.constraints.Min;
 @Generated("Yojo")
 public class DimLightPayload {
 
+
     /**
      * Percentage to which the light should be dimmed to.
      */
@@ -19,7 +20,6 @@ public class DimLightPayload {
      * Date and time when the message was sent.
      */
     private OffsetDateTime sentAt;
-
     public void setPercentage(Integer percentage) {
         this.percentage = percentage;
     }

@@ -1,16 +1,16 @@
 package example.testGenerate.test.common;
 
-import lombok.NonNull;
-import lombok.Builder;
 import javax.annotation.processing.Generated;
+import lombok.Builder;
+import lombok.NonNull;
 
 @Generated("Yojo")
 @Builder
 public class MySchema {
 
+
     @NonNull
     private String myField;
-
     public void setMyField(String myField) {
         this.myField = myField;
     }

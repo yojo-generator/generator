@@ -1,13 +1,13 @@
 package oneMore.common;
 
-import oneMore.common.ApproveV1Context;
-import javax.validation.constraints.NotNull;
-import javax.validation.Valid;
-import lombok.Data;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import oneMore.common.ApproveV1Context;
 import oneMore.common.ApproveV1RequestData;
 
 /**
@@ -19,6 +19,7 @@ import oneMore.common.ApproveV1RequestData;
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class ApproveV1 {
+
 
     /**
      * Integration context data
@@ -33,5 +34,4 @@ public class ApproveV1 {
     @Valid
     @NotNull
     private ApproveV1RequestData requestData;
-
 }

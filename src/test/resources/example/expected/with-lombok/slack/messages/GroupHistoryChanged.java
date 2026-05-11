@@ -1,11 +1,11 @@
 package slack.messages;
 
-import slack.common.GroupHistoryChangedType;
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.GroupHistoryChangedType;
 
 /**
 * Bulk updates were made to a private channel's history.
@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GroupHistoryChanged {
 
+
     private GroupHistoryChangedType type;
 
     private String latest;
@@ -24,5 +25,4 @@ public class GroupHistoryChanged {
     private String ts;
 
     private String eventTs;
-
 }

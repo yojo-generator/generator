@@ -1,15 +1,15 @@
 package slack.common;
 
-import java.util.List;
-import slack.common.AttachmentFields;
-import javax.validation.Valid;
-import lombok.Data;
-import javax.annotation.processing.Generated;
-import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
-import lombok.NoArgsConstructor;
-import java.net.URI;
 import java.math.BigDecimal;
+import java.net.URI;
+import java.util.List;
+import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.AttachmentFields;
 
 @Generated("Yojo")
 @Data
@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class Attachment {
+
 
     private String fallback;
 
@@ -48,5 +49,4 @@ public class Attachment {
     private URI footerIcon;
 
     private BigDecimal ts;
-
 }

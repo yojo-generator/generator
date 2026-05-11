@@ -1,9 +1,9 @@
 package oneMore.common;
 
-import oneMore.common.ApproveV1Context;
-import javax.validation.constraints.NotNull;
-import javax.validation.Valid;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import oneMore.common.ApproveV1Context;
 import oneMore.common.ApproveV1RequestData;
 
 /**
@@ -11,6 +11,7 @@ import oneMore.common.ApproveV1RequestData;
 */
 @Generated("Yojo")
 public class ApproveV1 {
+
 
     /**
      * Integration context data
@@ -25,7 +26,6 @@ public class ApproveV1 {
     @Valid
     @NotNull
     private ApproveV1RequestData requestData;
-
     public void setContext(ApproveV1Context context) {
         this.context = context;
     }

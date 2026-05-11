@@ -1,11 +1,11 @@
 package slack.common;
 
-import lombok.Data;
+import java.math.BigDecimal;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.math.BigDecimal;
+import lombok.experimental.Accessors;
 
 @Generated("Yojo")
 @Data
@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class DndUpdatedDndStatus {
+
 
     private Boolean dndEnabled;
 
@@ -23,5 +24,4 @@ public class DndUpdatedDndStatus {
     private Boolean snoozeEnabled;
 
     private BigDecimal snoozeEndtime;
-
 }

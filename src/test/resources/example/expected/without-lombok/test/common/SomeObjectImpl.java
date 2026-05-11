@@ -1,13 +1,13 @@
 package example.testGenerate.test.common;
 
-import testGenerate.InterfaceForImpl;
 import javax.annotation.processing.Generated;
+import testGenerate.InterfaceForImpl;
 
 @Generated("Yojo")
 public class SomeObjectImpl implements InterfaceForImpl {
 
-    private Integer someInteger;
 
+    private Integer someInteger;
     public void setSomeInteger(Integer someInteger) {
         this.someInteger = someInteger;
     }

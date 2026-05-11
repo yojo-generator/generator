@@ -1,13 +1,13 @@
 package slack.messages;
 
-import slack.common.FileCommentEditedType;
-import javax.validation.Valid;
-import slack.common.FileCommentEditedFile;
-import lombok.Data;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.FileCommentEditedFile;
+import slack.common.FileCommentEditedType;
 
 /**
 * A file comment was edited.
@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class FileCommentEdited {
 
+
     private FileCommentEditedType type;
 
     private Object comment;
@@ -27,5 +28,4 @@ public class FileCommentEdited {
 
     @Valid
     private FileCommentEditedFile file;
-
 }

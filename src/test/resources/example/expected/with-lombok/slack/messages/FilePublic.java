@@ -1,13 +1,13 @@
 package slack.messages;
 
-import slack.common.FilePublicType;
-import javax.validation.Valid;
-import lombok.Data;
-import slack.common.FilePublicFile;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.FilePublicFile;
+import slack.common.FilePublicType;
 
 /**
 * A file was made public.
@@ -19,11 +19,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class FilePublic {
 
+
     private FilePublicType type;
 
     private String fileId;
 
     @Valid
     private FilePublicFile file;
-
 }

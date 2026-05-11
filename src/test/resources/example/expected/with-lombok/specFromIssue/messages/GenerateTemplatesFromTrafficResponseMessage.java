@@ -1,15 +1,15 @@
 package specFromIssue.messages;
 
 import java.util.List;
-import specFromIssue.common.StatusSchema;
+import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.Valid;
-import lombok.Data;
-import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import specFromIssue.common.StatusSchema;
 
 /**
 * ответ с payload = array of objects (items только с examples)
@@ -21,11 +21,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GenerateTemplatesFromTrafficResponseMessage {
 
+
     @NotEmpty
     private List<Object> payload;
 
     @Valid
     @NotNull
     private StatusSchema status;
-
 }

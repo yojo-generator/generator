@@ -1,17 +1,17 @@
 package slack.common;
 
-import javax.annotation.processing.Generated;
 import java.math.BigDecimal;
+import javax.annotation.processing.Generated;
 
 @Generated("Yojo")
 public class DndUpdatedUserDndStatus {
+
 
     private Boolean dndEnabled;
 
     private BigDecimal nextDndStartTs;
 
     private BigDecimal nextDndEndTs;
-
     public void setDndEnabled(Boolean dndEnabled) {
         this.dndEnabled = dndEnabled;
     }

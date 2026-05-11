@@ -5,12 +5,12 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class ExampleFour {
 
+
     private Boolean fromFour;
 
     private Boolean oneMoreField;
 
     private String fromFive;
-
     public void setFromFour(Boolean fromFour) {
         this.fromFour = fromFour;
     }

@@ -1,26 +1,27 @@
 package example.testGenerate.test.common;
 
-import java.util.List;
-import java.util.HashSet;
+import example.testGenerate.test.common.CollectionTypesInnerSchema;
+import example.testGenerate.test.common.CollectionTypesListWithInnerSchemaAndExistingObject;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.URI;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import example.testGenerate.test.common.CollectionTypesListWithInnerSchemaAndExistingObject;
-import testGenerate.ClassForExtending;
-import example.testGenerate.test.common.CollectionTypesInnerSchema;
-import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.time.LocalDate;
-import javax.validation.Valid;
 import javax.annotation.processing.Generated;
-import java.net.URI;
-import java.math.BigDecimal;
+import javax.validation.Valid;
+import testGenerate.ClassForExtending;
 
 /**
 * Here was located all supported collections
 */
 @Generated("Yojo")
 public class CollectionTypes {
+
 
     private List<LocalDate> listOfDate;
 
@@ -83,7 +84,6 @@ public class CollectionTypes {
     private Set<BigDecimal> setOfBigDecimal;
 
     private Set<Long> setOfLongsWithRealization = new HashSet<>();
-
     public void setListOfDate(List<LocalDate> listOfDate) {
         this.listOfDate = listOfDate;
     }

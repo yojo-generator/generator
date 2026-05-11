@@ -76,11 +76,6 @@ public class ProcessContext {
     private String commonPackage;
 
     /**
-     * Whether {@code @JsonPropertyDescription} should be generated.
-     */
-    private boolean jsonPropertyDescription;
-
-    /**
      * Map of all message definitions from {@code components.messages}.
      */
     private Map<String, Object> messagesMap;
@@ -119,13 +114,34 @@ public class ProcessContext {
         this.nullableAnnotation = nullableAnnotation;
     }
 
+    /**
+     * Returns whether experimental features are enabled.
+     *
+     * @return true if experimental mode is active
+     */
     public boolean isExperimental() { return experimental; }
+
+    /**
+     * Enables or disables experimental features.
+     *
+     * @param experimental experimental mode flag
+     */
     public void setExperimental(boolean experimental) { this.experimental = experimental; }
 
+    /**
+     * Returns whether split-model mode is enabled (separate common package).
+     *
+     * @return true if DTOs are split into common package
+     */
     public boolean isSplitModels() {
         return splitModels;
     }
 
+    /**
+     * Enables or disables split-model mode.
+     *
+     * @param splitModels split mode flag
+     */
     public void setSplitModels(boolean splitModels) {
         this.splitModels = splitModels;
     }
@@ -136,15 +152,6 @@ public class ProcessContext {
      */
     public Helper getHelper() {
         return helper;
-    }
-
-    /**
-     * Sets the shared helper instance.
-     *
-     * @param helper helper to use (must not be null)
-     */
-    public void setHelper(Helper helper) {
-        this.helper = helper;
     }
 
     /**
@@ -317,24 +324,6 @@ public class ProcessContext {
     }
 
     /**
-     * Enables or disables {@code @JsonPropertyDescription} generation.
-     *
-     * @param jsonPropertyDescription {@code true} to generate annotation
-     */
-    public void setJsonPropertyDescription(boolean jsonPropertyDescription) {
-        this.jsonPropertyDescription = jsonPropertyDescription;
-    }
-
-    /**
-     * Returns whether {@code @JsonPropertyDescription} should be generated.
-     *
-     * @return {@code true} if enabled
-     */
-    public boolean isJsonPropertyDescription() {
-        return jsonPropertyDescription;
-    }
-
-    /**
      * Returns the map of all message definitions (from {@code components.messages}).
      *
      * @return messages map (schema name → definition)
@@ -371,9 +360,11 @@ public class ProcessContext {
     }
 
     /**
-     * Return package, which real generates all DTOs.
+     * Returns the package used for generating all DTOs.
      * if splitModels == true → return commonPackage.
      * if splitModels == false → return unified package.
+     *
+     * @return effective package string (with trailing semicolon)
      */
     public String getEffectiveCommonPackage() {
         if (isSplitModels()) {

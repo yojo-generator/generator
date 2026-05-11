@@ -1,13 +1,13 @@
 package slack.messages;
 
-import slack.common.BotChangedType;
-import javax.validation.Valid;
-import lombok.Data;
-import slack.common.BotChangedBot;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.BotChangedBot;
+import slack.common.BotChangedType;
 
 /**
 * A bot user was changed.
@@ -19,9 +19,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BotChanged {
 
+
     private BotChangedType type;
 
     @Valid
     private BotChangedBot bot;
-
 }

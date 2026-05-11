@@ -4,6 +4,7 @@ out/
 
 # Gradle
 .gradle/
+*.lock
 gradle-app.setting
 
 # IDE
@@ -37,3 +38,7 @@ dependency-reduced-pom.xml
 # Test output
 **/expected/**/*.java
 !**/expected/**/discriminator/**/*.java
+
+# Temporary test run files
+test_*.txt
+test_*.md

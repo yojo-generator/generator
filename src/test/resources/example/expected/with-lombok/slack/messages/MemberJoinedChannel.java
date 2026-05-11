@@ -1,11 +1,11 @@
 package slack.messages;
 
-import slack.common.MemberJoinedChannelChannelType;
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.MemberJoinedChannelChannelType;
 import slack.common.MemberJoinedChannelType;
 
 /**
@@ -18,6 +18,7 @@ import slack.common.MemberJoinedChannelType;
 @AllArgsConstructor
 public class MemberJoinedChannel {
 
+
     private MemberJoinedChannelType type;
 
     private String user;
@@ -29,5 +30,4 @@ public class MemberJoinedChannel {
     private String team;
 
     private String inviter;
-
 }

@@ -1,17 +1,17 @@
 package slack.common;
 
-import javax.annotation.processing.Generated;
 import java.math.BigDecimal;
+import javax.annotation.processing.Generated;
 
 @Generated("Yojo")
 public class GroupRenameChannel {
+
 
     private String id;
 
     private String name;
 
     private BigDecimal created;
-
     public void setId(String id) {
         this.id = id;
     }

@@ -1,18 +1,19 @@
 package example.testGenerate.test.common;
 
-import java.util.UUID;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.Date;
+import java.util.UUID;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.NotNull;
 
 /**
 * Here was located supported object types
 */
 @Generated("Yojo")
 public class ObjectTypes {
+
 
     private UUID uuidValue;
 
@@ -40,7 +41,6 @@ public class ObjectTypes {
 
     @NotNull
     private OffsetDateTime offsetDateTimeValueWithRequired;
-
     public void setUuidValue(UUID uuidValue) {
         this.uuidValue = uuidValue;
     }

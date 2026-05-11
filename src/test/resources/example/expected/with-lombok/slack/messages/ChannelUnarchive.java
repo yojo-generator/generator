@@ -1,11 +1,11 @@
 package slack.messages;
 
-import slack.common.ChannelUnarchiveType;
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.ChannelUnarchiveType;
 
 /**
 * A channel was unarchived.
@@ -17,10 +17,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChannelUnarchive {
 
+
     private ChannelUnarchiveType type;
 
     private String channel;
 
     private String user;
-
 }

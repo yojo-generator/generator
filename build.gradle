@@ -16,7 +16,7 @@ java {
 
 group 'io.github.yojo-generator'
 //archivesBaseName = "generator"
-version '3.2.1'
+version '4.0.0'
 
 publishing {
     repositories {
@@ -162,4 +162,20 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    // Prevent accidental overwrite of expected files
+    exclude '**/GenerateExpectedFilesTest.class'
+}
+
+/**
+ * Regenerates expected test output files.
+ *
+ * Run this manually when contract specs change:
+ *   ./gradlew generateExpectedFiles
+ *
+ * WARNING: This overwrites src/test/resources/example/expected/
+ */
+tasks.register('generateExpectedFiles', Test) {
+    useJUnitPlatform()
+    include '**/GenerateExpectedFilesTest.class'
+    outputs.upToDateWhen { false }  // always run when requested
 }

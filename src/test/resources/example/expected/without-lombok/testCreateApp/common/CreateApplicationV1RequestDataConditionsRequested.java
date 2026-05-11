@@ -1,13 +1,14 @@
 package testCreateApp.common;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import javax.annotation.processing.Generated;
-import java.math.BigDecimal;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Generated("Yojo")
 public class CreateApplicationV1RequestDataConditionsRequested {
+
 
     @NotBlank
     private String purchaseNumber;
@@ -20,7 +21,6 @@ public class CreateApplicationV1RequestDataConditionsRequested {
 
     @NotNull
     private OffsetDateTime endDate;
-
     public void setPurchaseNumber(String purchaseNumber) {
         this.purchaseNumber = purchaseNumber;
     }

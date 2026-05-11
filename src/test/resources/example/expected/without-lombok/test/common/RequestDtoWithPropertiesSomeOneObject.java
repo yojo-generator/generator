@@ -8,11 +8,11 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class RequestDtoWithPropertiesSomeOneObject {
 
+
     /**
      * someField description
      */
     private String someField;
-
     public void setSomeField(String someField) {
         this.someField = someField;
     }

@@ -5,8 +5,8 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class ExampleOne {
 
-    private String status;
 
+    private String status;
     public void setStatus(String status) {
         this.status = status;
     }

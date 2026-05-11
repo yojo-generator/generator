@@ -1,10 +1,10 @@
 package example.testGenerate.test.common;
 
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
 * This Class just fo Example of extends after generate
@@ -16,6 +16,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ClassForExtends {
 
-    private String someAnotherString;
 
+    private String someAnotherString;
 }

@@ -1,102 +1,102 @@
-# Тестирование генерации кода
+# Code Generation Testing
 
-## Обзор
+## Overview
 
-Проект содержит тесты для сравнения сгенерированного Java кода с ожидаемым. Тесты покрывают два сценария:
-- Генерация без Lombok (`without-lombok`)
-- Генерация с Lombok (`with-lombok`)
+The project contains tests that compare generated Java code against expected output. The tests cover two scenarios:
+- Generation without Lombok (`without-lombok`)
+- Generation with Lombok (`with-lombok`)
 
-## Структура тестов
+## Test Structure
 
-### Основные классы
+### Main Classes
 
-1. **`GenerationComparisonTestBase`** - базовый класс для сравнения сгенерированного кода с ожидаемым
-   - Расположен: `src/test/java/ru/yojo/codegen/generator/base/`
-   - Предоставляет методы для генерации и сравнения файлов
+1. **`GenerationComparisonTestBase`** — base class for comparing generated code against expected output
+   - Located at: `src/test/java/ru/yojo/codegen/generator/base/`
+   - Provides methods for file generation and comparison
 
-2. **Тестовые классы для каждого контракта:**
-   - `TestContractWithoutLombokTest` / `TestContractWithLombokTest` - для `test.yaml`
-   - `AsyncApiV3WithoutLombokTest` / `AsyncApiV3WithLombokTest` - для `async-api-official-v3.0.yaml`
-   - `GitterWithoutLombokTest` / `GitterWithLombokTest` - для `gitter-streaming-async-api-v3.0.yaml`
-   - `SlackWithoutLombokTest` / `SlackWithLombokTest` - для `slack-real-time-async-api-v3.0.yaml`
-   - `SpecFromIssueWithoutLombokTest` / `SpecFromIssueWithLombokTest` - для `spec-from-issue.yaml`
-   - `OneMoreWithoutLombokTest` / `OneMoreWithLombokTest` - для `one-more.yaml`
-   - `DiscriminatorWithoutLombokTest` / `DiscriminatorWithLombokTest` - для `discriminator.yaml`
-   - `TestCreateAppWithoutLombokTest` / `TestCreateAppWithLombokTest` - для `test-create-app.yaml`
+2. **Test classes for each contract:**
+   - `TestContractWithoutLombokTest` / `TestContractWithLombokTest` — for `test.yaml`
+   - `AsyncApiV3WithoutLombokTest` / `AsyncApiV3WithLombokTest` — for `async-api-official-v3.0.yaml`
+   - `GitterWithoutLombokTest` / `GitterWithLombokTest` — for `gitter-streaming-async-api-v3.0.yaml`
+   - `SlackWithoutLombokTest` / `SlackWithLombokTest` — for `slack-real-time-async-api-v3.0.yaml`
+   - `SpecFromIssueWithoutLombokTest` / `SpecFromIssueWithLombokTest` — for `spec-from-issue.yaml`
+   - `OneMoreWithoutLombokTest` / `OneMoreWithLombokTest` — for `one-more.yaml`
+   - `DiscriminatorWithoutLombokTest` / `DiscriminatorWithLombokTest` — for `discriminator.yaml`
+   - `TestCreateAppWithoutLombokTest` / `TestCreateAppWithLombokTest` — for `test-create-app.yaml`
 
-### Ожидаемые файлы
+### Expected Files
 
-Ожидаемые файлы расположены в:
-- `src/test/resources/example/expected/without-lombok/` - для генерации без Lombok
-- `src/test/resources/example/expected/with-lombok/` - для генерации с Lombok
+Expected files are located at:
+- `src/test/resources/example/expected/without-lombok/` — for generation without Lombok
+- `src/test/resources/example/expected/with-lombok/` — for generation with Lombok
 
-Структура внутри этих директорий соответствует package location:
-- `test/` - для контракта test.yaml (package: `example.testGenerate.test`)
-- `asyncapi/` - для AsyncAPI v3 контрактов
-- `gitter/` - для Gitter контрактов
-- `slack/` - для Slack контрактов
-- `specFromIssue/` - для spec-from-issue
-- `oneMore/` - для one-more.yaml
-- `discriminator/` - для discriminator.yaml
-- `testCreateApp/` - для test-create-app.yaml
+The structure inside these directories follows the package location:
+- `test/` — for `test.yaml` contract (package: `example.testGenerate.test`)
+- `asyncapi/` — for AsyncAPI v3 contracts
+- `gitter/` — for Gitter contracts
+- `slack/` — for Slack contracts
+- `specFromIssue/` — for `spec-from-issue`
+- `oneMore/` — for `one-more.yaml`
+- `discriminator/` — for `discriminator.yaml`
+- `testCreateApp/` — for `test-create-app.yaml`
 
-## Запуск тестов
+## Running Tests
 
-### Запуск всех тестов
+### Run All Tests
 ```bash
 ./gradlew test
 ```
 
-### Запуск тестов для конкретного контракта
+### Run Tests for a Specific Contract
 ```bash
-# Без Lombok
+# Without Lombok
 ./gradlew test --tests "ru.yojo.codegen.generator.TestContractWithoutLombokTest"
 
-# С Lombok
+# With Lombok
 ./gradlew test --tests "ru.yojo.codegen.generator.TestContractWithLombokTest"
 ```
 
-### Запуск всех тестов без Lombok
+### Run All Tests Without Lombok
 ```bash
 ./gradlew test --tests "ru.yojo.codegen.generator.*WithoutLombokTest"
 ```
 
-### Запуск всех тестов с Lombok
+### Run All Tests With Lombok
 ```bash
 ./gradlew test --tests "ru.yojo.codegen.generator.*WithLombokTest"
 ```
 
-## Обновление ожидаемых файлов
+## Updating Expected Files
 
-Если структура генерируемого кода изменилась, нужно обновить ожидаемые файлы:
+If the generated code structure changes, the expected files must be updated:
 
-### Автоматическое обновление
+### Automatic Update
 
-1. Запустите тест `GenerateExpectedFilesTest`:
+1. Run the `GenerateExpectedFilesTest`:
    ```bash
-   # Обновить файлы без Lombok
+   # Update files without Lombok
    ./gradlew test --tests "ru.yojo.codegen.generator.GenerateExpectedFilesTest.generateWithoutLombok"
    
-   # Обновить файлы с Lombok
+   # Update files with Lombok
    ./gradlew test --tests "ru.yojo.codegen.generator.GenerateExpectedFilesTest.generateWithLombok"
    ```
 
-2. Тест сгенерирует файлы в директории `src/test/resources/example/expected/`
+2. The test generates files in the `src/test/resources/example/expected/` directory
 
-### Ручное обновление
+### Manual Update
 
-Если нужно обновить только конкретный контракт:
+If you need to update only a specific contract:
 
-1. Измените `packageLocation` и `specName` в методе `generateForSpec()` класса `GenerateExpectedFilesTest`
-2. Запустите тест
-3. Проверьте сгенерированные файлы
+1. Change `packageLocation` and `specName` in the `generateForSpec()` method of the `GenerateExpectedFilesTest` class
+2. Run the test
+3. Verify the generated files
 
-## Добавление новых тестов
+## Adding New Tests
 
-Для добавления тестов для нового контракта:
+To add tests for a new contract:
 
-1. Создайте новый YAML файл в `src/test/resources/example/contract/`
-2. Создайте два тестовых класса (без Lombok и с Lombok):
+1. Create a new YAML file in `src/test/resources/example/contract/`
+2. Create two test classes (without Lombok and with Lombok):
    ```java
    public class NewContractWithoutLombokTest extends GenerationComparisonTestBase {
        @Override
@@ -114,35 +114,35 @@
        }
    }
    ```
-3. Сгенерируйте ожидаемые файлы с помощью `GenerateExpectedFilesTest`
-4. Запустите тесты для проверки
+3. Generate expected files using `GenerateExpectedFilesTest`
+4. Run the tests to verify
 
-## Особенности реализации
+## Implementation Details
 
-### Базовый класс `GenerationComparisonTestBase`
+### Base Class `GenerationComparisonTestBase`
 
-- Использует JUnit 5 `@TempDir` для создания временной директории
-- Сравнивает содержимое файлов, а не только их наличие
-- Нормализует содержимое (убирает лишние пробелы, приводит переносы строк к единому виду)
-- Если ожидаемая директория не существует, просто проверяет, что генерация проходит успешно
+- Uses JUnit 5 `@TempDir` to create a temporary directory
+- Compares file content, not just file existence
+- Normalizes content (removes extra whitespace, normalizes line endings)
+- If the expected directory does not exist, it simply verifies that generation succeeds
 
-### Обработка ошибок
+### Error Handling
 
-- Тесты падают с подробным сообщением о различиях между ожидаемым и сгенерированным кодом
-- В сообщении об ошибке выводятся как ожидаемое, так и фактическое содержимое файлов
+- Tests fail with a detailed message about differences between expected and generated code
+- The error message displays both the expected and actual file contents
 
-## Тесты для separated контрактов
+## Tests for Separated Contracts
 
-Для контрактов, разделенных на несколько файлов (в директории `contract/separated/`), созданы отдельные тесты:
+For contracts split across multiple files (in the `contract/separated/` directory), separate tests have been created:
 - `SeparatedCollectionTypesTest`
 - `SeparatedNumericValuesTest`
 - `SeparatedObjectTypesTest`
 - `SeparatedStringValuesTest`
 
-Эти тесты пока только проверяют, что генерация проходит успешно, без сравнения с ожидаемым.
+These tests currently only verify that generation succeeds, without comparing against expected output.
 
-## Полезные советы
+## Tips
 
-1. **Проверка сгенерированного кода**: Если тест падает, посмотрите на различия в отчете: `build/reports/tests/test/index.html`
-2. **Отладка**: Включите подробный вывод: `./gradlew test --info`
-3. **Очистка**: Для очистки сгенерированных файлов: `./gradlew clean`
+1. **Checking generated code**: If a test fails, review the differences in the report: `build/reports/tests/test/index.html`
+2. **Debugging**: Enable verbose output: `./gradlew test --info`
+3. **Cleanup**: To clean generated files: `./gradlew clean`

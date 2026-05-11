@@ -1,13 +1,13 @@
 package slack.messages;
 
-import slack.common.FileChangeFile;
-import javax.validation.Valid;
-import slack.common.FileChangeType;
-import lombok.Data;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.FileChangeFile;
+import slack.common.FileChangeType;
 
 /**
 * A file was changed.
@@ -19,11 +19,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class FileChange {
 
+
     private FileChangeType type;
 
     private String fileId;
 
     @Valid
     private FileChangeFile file;
-
 }

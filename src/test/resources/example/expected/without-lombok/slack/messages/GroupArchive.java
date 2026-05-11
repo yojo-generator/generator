@@ -1,7 +1,7 @@
 package slack.messages;
 
-import slack.common.GroupArchiveType;
 import javax.annotation.processing.Generated;
+import slack.common.GroupArchiveType;
 
 /**
 * A private channel was archived.
@@ -9,10 +9,16 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class GroupArchive {
 
+
     private GroupArchiveType type;
 
     private String channel;
-
+    public void setType(GroupArchiveType type) {
+        this.type = type;
+    }
+    public GroupArchiveType getType() {
+        return type;
+    }
     public void setChannel(String channel) {
         this.channel = channel;
     }

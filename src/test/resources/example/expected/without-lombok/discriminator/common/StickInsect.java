@@ -8,8 +8,8 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class StickInsect extends Pet {
 
-    private String color;
 
+    private String color;
     public void setColor(String color) {
         this.color = color;
     }

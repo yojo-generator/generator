@@ -1,15 +1,16 @@
 package oneMore.common;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
 * Request parameters object
 */
 @Generated("Yojo")
 public class ApproveV1RequestData {
+
 
     /**
      * Application status
@@ -30,7 +31,6 @@ public class ApproveV1RequestData {
      */
     @NotNull
     private OffsetDateTime updatedAt;
-
     public void setStatus(String status) {
         this.status = status;
     }

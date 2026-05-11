@@ -1,15 +1,16 @@
 package oneMore.common;
 
-import javax.validation.constraints.NotBlank;
 import java.util.UUID;
-import javax.validation.constraints.NotNull;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
 * Context
 */
 @Generated("Yojo")
 public class RequestCommonFieldsContext {
+
 
     /**
      * Method name
@@ -36,7 +37,6 @@ public class RequestCommonFieldsContext {
      */
     @NotNull
     private UUID requestId;
-
     public void setMethodName(String methodName) {
         this.methodName = methodName;
     }

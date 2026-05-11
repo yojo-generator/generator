@@ -1,24 +1,24 @@
 package example.testGenerate.test.common;
 
-import java.util.List;
-import java.util.HashSet;
+import example.testGenerate.test.common.CollectionTypesInnerSchema;
+import example.testGenerate.test.common.CollectionTypesListWithInnerSchemaAndExistingObject;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.URI;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import lombok.Data;
-import lombok.AllArgsConstructor;
-import example.testGenerate.test.common.CollectionTypesListWithInnerSchemaAndExistingObject;
-import lombok.experimental.Accessors;
-import lombok.NoArgsConstructor;
-import testGenerate.ClassForExtending;
-import example.testGenerate.test.common.CollectionTypesInnerSchema;
-import java.math.BigInteger;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.time.LocalDate;
-import javax.validation.Valid;
 import javax.annotation.processing.Generated;
-import java.net.URI;
-import java.math.BigDecimal;
+import javax.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import testGenerate.ClassForExtending;
 
 /**
 * Here was located all supported collections
@@ -29,6 +29,7 @@ import java.math.BigDecimal;
 @Accessors(fluent = true)
 @AllArgsConstructor
 public class CollectionTypes {
+
 
     private List<LocalDate> listOfDate;
 
@@ -91,5 +92,4 @@ public class CollectionTypes {
     private Set<BigDecimal> setOfBigDecimal;
 
     private Set<Long> setOfLongsWithRealization = new HashSet<>();
-
 }

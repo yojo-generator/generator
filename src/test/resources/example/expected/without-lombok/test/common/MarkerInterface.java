@@ -7,5 +7,4 @@ import javax.annotation.processing.Generated;
 */
 @Generated("Yojo")
 public interface MarkerInterface {
-
 }

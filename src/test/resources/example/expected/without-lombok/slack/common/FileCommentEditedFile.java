@@ -5,8 +5,8 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class FileCommentEditedFile {
 
-    private String id;
 
+    private String id;
     public void setId(String id) {
         this.id = id;
     }

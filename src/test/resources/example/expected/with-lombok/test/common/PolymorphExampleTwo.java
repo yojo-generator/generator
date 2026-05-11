@@ -1,10 +1,10 @@
 package example.testGenerate.test.common;
 
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 @Generated("Yojo")
 @Data
@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PolymorphExampleTwo {
 
+
     private String status;
 
     private Integer someField;
-
 }

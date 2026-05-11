@@ -1,7 +1,7 @@
 package slack.messages;
 
-import slack.common.FileDeletedType;
 import javax.annotation.processing.Generated;
+import slack.common.FileDeletedType;
 
 /**
 * A file was deleted.
@@ -9,12 +9,18 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class FileDeleted {
 
+
     private FileDeletedType type;
 
     private String fileId;
 
     private String eventTs;
-
+    public void setType(FileDeletedType type) {
+        this.type = type;
+    }
+    public FileDeletedType getType() {
+        return type;
+    }
     public void setFileId(String fileId) {
         this.fileId = fileId;
     }

@@ -1,13 +1,13 @@
 package slack.messages;
 
-import slack.common.ChannelJoinedType;
-import slack.common.ChannelJoinedChannel;
-import javax.validation.Valid;
-import lombok.Data;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.ChannelJoinedChannel;
+import slack.common.ChannelJoinedType;
 
 /**
 * You joined a channel.
@@ -19,9 +19,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChannelJoined {
 
+
     private ChannelJoinedType type;
 
     @Valid
     private ChannelJoinedChannel channel;
-
 }

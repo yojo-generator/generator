@@ -1,13 +1,13 @@
 package slack.messages;
 
-import slack.common.GroupRenameChannel;
-import javax.validation.Valid;
-import slack.common.GroupRenameType;
-import lombok.Data;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.GroupRenameChannel;
+import slack.common.GroupRenameType;
 
 /**
 * A private channel was renamed.
@@ -19,9 +19,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GroupRename {
 
+
     private GroupRenameType type;
 
     @Valid
     private GroupRenameChannel channel;
-
 }

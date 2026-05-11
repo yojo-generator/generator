@@ -5,6 +5,7 @@ import ru.yojo.codegen.context.YojoContext;
 import ru.yojo.codegen.domain.lombok.Accessors;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.generator.YojoGenerator;
+import ru.yojo.codegen.util.Logger;
 
 import java.util.Collections;
 
@@ -42,6 +43,8 @@ import static ru.yojo.codegen.util.MapperUtil.isTrue;
 @SuppressWarnings("all")
 public class YojoCLI {
 
+    private static final Logger LOG = new Logger(YojoCLI.class);
+
     /**
      * Entry point for command-line execution.
      *
@@ -49,7 +52,7 @@ public class YojoCLI {
      */
     public static void main(String[] args) {
         if (args.length < 3) {
-            System.err.println("Usage: java -cp ... YojoCLI <inputFileOrDir> <outputDir> <packageLocation> [lombokEnabled=false] [allArgs=false] [accessors=false]");
+            LOG.error("Usage: java -cp ... YojoCLI <inputFileOrDir> <outputDir> <packageLocation> [lombokEnabled=false] [allArgs=false] [accessors=false]");
             System.exit(1);
         }
 
@@ -96,10 +99,9 @@ public class YojoCLI {
         try {
             YojoGenerator yojoGenerator = new YojoGenerator();
             yojoGenerator.generateAll(context);
-            System.out.println(" Generation completed successfully.");
+            LOG.info(" Generation completed successfully.");
         } catch (Exception e) {
-            System.err.println("  Generation failed: " + e.getMessage());
-            e.printStackTrace();
+            LOG.error("  Generation failed: " + e.getMessage(), e);
             System.exit(1);
         }
     }

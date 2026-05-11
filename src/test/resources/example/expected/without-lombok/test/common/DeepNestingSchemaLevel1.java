@@ -1,15 +1,15 @@
 package example.testGenerate.test.common;
 
-import javax.validation.Valid;
-import javax.annotation.processing.Generated;
 import example.testGenerate.test.common.DeepNestingSchemaLevel1Level2;
+import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 
 @Generated("Yojo")
 public class DeepNestingSchemaLevel1 {
 
+
     @Valid
     private DeepNestingSchemaLevel1Level2 level2;
-
     public void setLevel2(DeepNestingSchemaLevel1Level2 level2) {
         this.level2 = level2;
     }

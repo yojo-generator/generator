@@ -1,11 +1,11 @@
 package slack.messages;
 
-import slack.common.GoodbyeType;
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.GoodbyeType;
 
 /**
 * The server intends to close the connection soon.
@@ -17,6 +17,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Goodbye {
 
-    private GoodbyeType type;
 
+    private GoodbyeType type;
 }

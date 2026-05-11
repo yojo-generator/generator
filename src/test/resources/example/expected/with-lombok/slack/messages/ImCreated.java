@@ -1,13 +1,13 @@
 package slack.messages;
 
-import slack.common.ImCreatedType;
-import javax.validation.Valid;
-import slack.common.ImCreatedChannel;
-import lombok.Data;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.ImCreatedChannel;
+import slack.common.ImCreatedType;
 
 /**
 * A DM was created.
@@ -19,11 +19,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ImCreated {
 
+
     private ImCreatedType type;
 
     @Valid
     private ImCreatedChannel channel;
 
     private String user;
-
 }

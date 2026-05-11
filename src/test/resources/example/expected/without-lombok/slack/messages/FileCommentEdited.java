@@ -1,15 +1,16 @@
 package slack.messages;
 
-import slack.common.FileCommentEditedType;
+import javax.annotation.processing.Generated;
 import javax.validation.Valid;
 import slack.common.FileCommentEditedFile;
-import javax.annotation.processing.Generated;
+import slack.common.FileCommentEditedType;
 
 /**
 * A file comment was edited.
 */
 @Generated("Yojo")
 public class FileCommentEdited {
+
 
     private FileCommentEditedType type;
 
@@ -19,7 +20,12 @@ public class FileCommentEdited {
 
     @Valid
     private FileCommentEditedFile file;
-
+    public void setType(FileCommentEditedType type) {
+        this.type = type;
+    }
+    public FileCommentEditedType getType() {
+        return type;
+    }
     public void setComment(Object comment) {
         this.comment = comment;
     }

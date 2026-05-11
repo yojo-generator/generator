@@ -1,13 +1,13 @@
 package asyncapi.messages;
 
 import java.time.OffsetDateTime;
-import lombok.Data;
 import javax.annotation.processing.Generated;
-import lombok.AllArgsConstructor;
 import javax.validation.constraints.Max;
-import lombok.experimental.Accessors;
-import lombok.NoArgsConstructor;
 import javax.validation.constraints.Min;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
 * Command a particular streetlight to dim the lights.
@@ -18,6 +18,7 @@ import javax.validation.constraints.Min;
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class DimLight {
+
 
     /**
      * Percentage to which the light should be dimmed to.
@@ -30,5 +31,4 @@ public class DimLight {
      * Date and time when the message was sent.
      */
     private OffsetDateTime sentAt;
-
 }

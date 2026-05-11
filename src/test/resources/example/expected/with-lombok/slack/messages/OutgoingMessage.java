@@ -1,11 +1,11 @@
 package slack.messages;
 
-import lombok.Data;
+import java.math.BigDecimal;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.math.BigDecimal;
+import lombok.experimental.Accessors;
 import slack.common.OutgoingMessageType;
 
 /**
@@ -18,6 +18,7 @@ import slack.common.OutgoingMessageType;
 @AllArgsConstructor
 public class OutgoingMessage {
 
+
     private BigDecimal id;
 
     private OutgoingMessageType type;
@@ -25,5 +26,4 @@ public class OutgoingMessage {
     private String channel;
 
     private String text;
-
 }

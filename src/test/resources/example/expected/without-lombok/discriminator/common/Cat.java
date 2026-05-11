@@ -9,11 +9,11 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class Cat extends Pet {
 
+
     /**
      * The measured skill for hunting
      */
     private CatHuntingSkill huntingSkill;
-
     public void setHuntingSkill(CatHuntingSkill huntingSkill) {
         this.huntingSkill = huntingSkill;
     }

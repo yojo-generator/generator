@@ -7,6 +7,7 @@ import javax.validation.constraints.Min;
 @Generated("Yojo")
 public class LightMeasuredPayload {
 
+
     /**
      * Light intensity measured in lumens.
      */
@@ -17,7 +18,6 @@ public class LightMeasuredPayload {
      * Date and time when the message was sent.
      */
     private OffsetDateTime sentAt;
-
     public void setLumens(Integer lumens) {
         this.lumens = lumens;
     }

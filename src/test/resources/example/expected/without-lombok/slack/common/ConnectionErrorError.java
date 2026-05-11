@@ -1,15 +1,15 @@
 package slack.common;
 
-import javax.annotation.processing.Generated;
 import java.math.BigDecimal;
+import javax.annotation.processing.Generated;
 
 @Generated("Yojo")
 public class ConnectionErrorError {
 
+
     private BigDecimal code;
 
     private String msg;
-
     public void setCode(BigDecimal code) {
         this.code = code;
     }

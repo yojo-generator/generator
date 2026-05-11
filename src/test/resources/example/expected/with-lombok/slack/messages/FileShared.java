@@ -1,13 +1,13 @@
 package slack.messages;
 
-import slack.common.FileSharedFile;
-import javax.validation.Valid;
-import lombok.Data;
-import slack.common.FileSharedType;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.FileSharedFile;
+import slack.common.FileSharedType;
 
 /**
 * A file was shared.
@@ -19,11 +19,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class FileShared {
 
+
     private FileSharedType type;
 
     private String fileId;
 
     @Valid
     private FileSharedFile file;
-
 }

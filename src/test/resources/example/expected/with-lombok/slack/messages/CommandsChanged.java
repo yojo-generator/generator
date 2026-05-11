@@ -1,11 +1,11 @@
 package slack.messages;
 
-import slack.common.CommandsChangedType;
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.CommandsChangedType;
 
 /**
 * A slash command has been added or changed.
@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CommandsChanged {
 
+
     private CommandsChangedType type;
 
     private String eventTs;
-
 }

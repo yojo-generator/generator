@@ -1,14 +1,14 @@
 package oneMore.common;
 
-import oneMore.common.RequestCommonFieldsContext;
-import javax.validation.constraints.NotNull;
-import javax.validation.Valid;
-import lombok.Data;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import oneMore.common.RequestCommonFieldsRequestData;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import oneMore.common.RequestCommonFieldsContext;
+import oneMore.common.RequestCommonFieldsRequestData;
 
 /**
 * Common meta-tags
@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class RequestCommonFields {
+
 
     /**
      * Context
@@ -33,5 +34,4 @@ public class RequestCommonFields {
     @Valid
     @NotNull
     private RequestCommonFieldsRequestData requestData;
-
 }

@@ -1,17 +1,17 @@
 package specFromIssue.common;
 
-import javax.validation.constraints.NotBlank;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.NotBlank;
 
 @Generated("Yojo")
 public class StatusSchema {
+
 
     @NotBlank
     private String code;
 
     @NotBlank
     private String description;
-
     public void setCode(String code) {
         this.code = code;
     }

@@ -9,12 +9,18 @@ import slack.common.ImCloseType;
 @Generated("Yojo")
 public class ImClose {
 
+
     private ImCloseType type;
 
     private String channel;
 
     private String user;
-
+    public void setType(ImCloseType type) {
+        this.type = type;
+    }
+    public ImCloseType getType() {
+        return type;
+    }
     public void setChannel(String channel) {
         this.channel = channel;
     }

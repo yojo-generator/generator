@@ -1,9 +1,9 @@
 package slack.messages;
 
-import slack.common.FileUnsharedType;
-import slack.common.FileUnsharedFile;
-import javax.validation.Valid;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import slack.common.FileUnsharedFile;
+import slack.common.FileUnsharedType;
 
 /**
 * A file was unshared.
@@ -11,13 +11,19 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class FileUnshared {
 
+
     private FileUnsharedType type;
 
     private String fileId;
 
     @Valid
     private FileUnsharedFile file;
-
+    public void setType(FileUnsharedType type) {
+        this.type = type;
+    }
+    public FileUnsharedType getType() {
+        return type;
+    }
     public void setFileId(String fileId) {
         this.fileId = fileId;
     }

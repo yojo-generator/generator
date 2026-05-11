@@ -1,11 +1,11 @@
 package example.testGenerate.test.common;
 
-import testGenerate.InterfaceForImpl;
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import testGenerate.InterfaceForImpl;
 
 @Generated("Yojo")
 @Data
@@ -14,6 +14,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SomeObjectImpl implements InterfaceForImpl {
 
-    private Integer someInteger;
 
+    private Integer someInteger;
 }

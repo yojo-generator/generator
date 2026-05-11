@@ -1,31 +1,31 @@
 package example.testGenerate.test.common;
 
-import example.testGenerate.test.common.PolymorphExampleThree;
-import java.util.List;
-import example.testGenerate.test.common.ExampleFiveInnerEnumWithoutDescriptionSmall;
-import lombok.AllArgsConstructor;
-import example.testGenerate.test.common.ExampleFiveInnerEnumWithoutDescription;
-import lombok.experimental.Accessors;
-import lombok.NoArgsConstructor;
-import java.util.UUID;
-import javax.validation.Valid;
-import java.util.LinkedHashMap;
-import example.testGenerate.test.common.PolymorphPolymorphExampleOnePolymorphExampleTwo;
-import javax.annotation.processing.Generated;
-import example.testGenerate.test.common.SomeObject;
+import example.testGenerate.test.common.CollectionTypes;
 import example.testGenerate.test.common.EnumResultWithDescription;
-import example.testGenerate.test.common.NumericsValues;
-import example.testGenerate.test.common.StringValues;
-import lombok.Data;
-import java.util.HashMap;
-import java.util.Map;
 import example.testGenerate.test.common.EnumResultWithoutDescription;
 import example.testGenerate.test.common.ExampleFiveInnerEnumWithDescription;
-import java.util.Set;
-import example.testGenerate.test.common.CollectionTypes;
+import example.testGenerate.test.common.ExampleFiveInnerEnumWithoutDescription;
+import example.testGenerate.test.common.ExampleFiveInnerEnumWithoutDescriptionSmall;
 import example.testGenerate.test.common.ExampleFiveInnerSchema;
-import testGenerate.ExistingClass;
+import example.testGenerate.test.common.NumericsValues;
 import example.testGenerate.test.common.ObjectTypes;
+import example.testGenerate.test.common.PolymorphExampleThree;
+import example.testGenerate.test.common.PolymorphPolymorphExampleOnePolymorphExampleTwo;
+import example.testGenerate.test.common.SomeObject;
+import example.testGenerate.test.common.StringValues;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import testGenerate.ExistingClass;
 
 @Generated("Yojo")
 @Data
@@ -33,6 +33,7 @@ import example.testGenerate.test.common.ObjectTypes;
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class ExampleFive {
+
 
     private Boolean oneMoreField;
 
@@ -204,5 +205,4 @@ public class ExampleFive {
 
     @Valid
     private SomeObject someObject;
-
 }

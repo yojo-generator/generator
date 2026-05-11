@@ -1,16 +1,16 @@
 package example.testGenerate.test.common;
 
-import java.util.UUID;
-import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import lombok.Data;
+import java.util.Date;
+import java.util.UUID;
 import javax.annotation.processing.Generated;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
 * Here was located supported object types
@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class ObjectTypes {
+
 
     private UUID uuidValue;
 
@@ -48,5 +49,4 @@ public class ObjectTypes {
 
     @NotNull
     private OffsetDateTime offsetDateTimeValueWithRequired;
-
 }

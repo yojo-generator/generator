@@ -5,12 +5,12 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class AttachmentFields {
 
+
     private String title;
 
     private String value;
 
     private Boolean shortField;
-
     public void setTitle(String title) {
         this.title = title;
     }

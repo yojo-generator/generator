@@ -1,13 +1,13 @@
 package slack.messages;
 
-import slack.common.FileCommentDeletedFile;
-import javax.validation.Valid;
-import slack.common.FileCommentDeletedType;
-import lombok.Data;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.FileCommentDeletedFile;
+import slack.common.FileCommentDeletedType;
 
 /**
 * A file comment was deleted.
@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class FileCommentDeleted {
 
+
     private FileCommentDeletedType type;
 
     private String comment;
@@ -27,5 +28,4 @@ public class FileCommentDeleted {
 
     @Valid
     private FileCommentDeletedFile file;
-
 }

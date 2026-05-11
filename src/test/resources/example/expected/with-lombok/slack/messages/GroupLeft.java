@@ -1,11 +1,11 @@
 package slack.messages;
 
-import slack.common.GroupLeftType;
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+import slack.common.GroupLeftType;
 
 /**
 * You left a private channel.
@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class GroupLeft {
 
+
     private GroupLeftType type;
 
     private String channel;
-
 }

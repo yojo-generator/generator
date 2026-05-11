@@ -1,9 +1,9 @@
 package oneMore.common;
 
-import oneMore.common.RequestCommonFieldsContext;
-import javax.validation.constraints.NotNull;
-import javax.validation.Valid;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import oneMore.common.RequestCommonFieldsContext;
 import oneMore.common.RequestCommonFieldsRequestData;
 
 /**
@@ -11,6 +11,7 @@ import oneMore.common.RequestCommonFieldsRequestData;
 */
 @Generated("Yojo")
 public class RequestCommonFields {
+
 
     /**
      * Context
@@ -25,7 +26,6 @@ public class RequestCommonFields {
     @Valid
     @NotNull
     private RequestCommonFieldsRequestData requestData;
-
     public void setContext(RequestCommonFieldsContext context) {
         this.context = context;
     }

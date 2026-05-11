@@ -388,7 +388,7 @@ public class MapperUtil {
                     .append(lineSeparator());
             requiredImports.add(LOMBOK_NO_ARGS_CONSTRUCTOR_IMPORT);
         }
-        if (lombokProperties.getAccessors().isEnable()) {
+        if (lombokProperties.getAccessors() != null && lombokProperties.getAccessors().isEnable()) {
             String accessors = fetchAccessors(lombokProperties);
             lombokAnnotationBuilder.append(accessors)
                     .append(lineSeparator());
@@ -421,14 +421,15 @@ public class MapperUtil {
      * @return annotation string
      */
     private static String fetchAccessors(LombokProperties lombokProperties) {
-        if (lombokProperties.getAccessors().isChain() && lombokProperties.getAccessors().isFluent()) {
-            return LOMBOK_ACCESSORS_ANNOTATION;
-        }
-        if (lombokProperties.getAccessors().isChain()) {
-            return LOMBOK_ACCESSORS_CHAIN_ANNOTATION;
-        }
-        if (lombokProperties.getAccessors().isFluent()) {
-            return LOMBOK_ACCESSORS_FLUENT_ANNOTATION;
+        boolean fluent = lombokProperties.getAccessors().isFluent();
+        boolean chain = lombokProperties.getAccessors().isChain();
+        
+        if (fluent && chain) {
+            return String.format(LOMBOK_ACCESSORS_ANNOTATION, "fluent = true, chain = true", "");
+        } else if (fluent) {
+            return String.format(LOMBOK_ACCESSORS_ANNOTATION, "fluent = true", "");
+        } else if (chain) {
+            return String.format(LOMBOK_ACCESSORS_ANNOTATION, "chain = true", "");
         }
         return LOMBOK_ACCESSORS_EMPTY_ANNOTATION;
     }
@@ -444,20 +445,20 @@ public class MapperUtil {
      */
     public static String finishBuild(StringBuilder sb, Set<String> requiredImports, String packageName, String javaDoc) {
         StringBuilder importBuilder = new StringBuilder();
-
+        
         requiredImports.add(JAVAX_GENERATED_IMPORT);
-
+        
         requiredImports.forEach(imp -> {
             importBuilder
                     .append(IMPORT)
                     .append(imp)
                     .append(lineSeparator());
         });
-
+        
         sb.insert(0, GENERATED_ANNOTATION + lineSeparator());
-
+        
         generateClassJavaDoc(sb, javaDoc);
-
+        
         sb.insert(0, importBuilder.append(lineSeparator()));
         sb.insert(0, new StringBuilder("package ")
                 .append(packageName)
@@ -465,7 +466,7 @@ public class MapperUtil {
                 .append(lineSeparator()));
         return sb
                 .append(lineSeparator())
-                .append("}")
+                .append("}")  // Add closing brace
                 .toString();
     }
 

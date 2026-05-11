@@ -1,12 +1,12 @@
 package asyncapi.messages;
 
+import asyncapi.common.TurnOnOffPayloadCommand;
 import java.time.OffsetDateTime;
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
-import asyncapi.common.TurnOnOffPayloadCommand;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
 * Command a particular streetlight to turn the lights on or off.
@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TurnOnOff {
 
+
     /**
      * Whether to turn on or off the light.
      */
@@ -27,5 +28,4 @@ public class TurnOnOff {
      * Date and time when the message was sent.
      */
     private OffsetDateTime sentAt;
-
 }

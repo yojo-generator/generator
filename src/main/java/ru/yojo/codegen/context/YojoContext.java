@@ -66,8 +66,18 @@ public class YojoContext {
         this.nullableAnnotation = nullableAnnotation;
     }
 
+    /**
+     * Returns whether experimental features are enabled.
+     *
+     * @return true if experimental mode is active
+     */
     public boolean isExperimental() { return experimental; }
 
+    /**
+     * Enables or disables experimental features.
+     *
+     * @param experimental experimental mode flag
+     */
     public void setExperimental(boolean experimental) { this.experimental = experimental; }
 
     /**

@@ -1,9 +1,9 @@
 package slack.messages;
 
-import slack.common.FileChangeFile;
-import javax.validation.Valid;
-import slack.common.FileChangeType;
 import javax.annotation.processing.Generated;
+import javax.validation.Valid;
+import slack.common.FileChangeFile;
+import slack.common.FileChangeType;
 
 /**
 * A file was changed.
@@ -11,13 +11,19 @@ import javax.annotation.processing.Generated;
 @Generated("Yojo")
 public class FileChange {
 
+
     private FileChangeType type;
 
     private String fileId;
 
     @Valid
     private FileChangeFile file;
-
+    public void setType(FileChangeType type) {
+        this.type = type;
+    }
+    public FileChangeType getType() {
+        return type;
+    }
     public void setFileId(String fileId) {
         this.fileId = fileId;
     }

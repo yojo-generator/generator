@@ -1,10 +1,10 @@
 package discriminator.common;
 
-import lombok.Data;
 import javax.annotation.processing.Generated;
 import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
+import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
 * A representation of an Australian walking stick
@@ -16,6 +16,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StickInsect extends Pet {
 
-    private String color;
 
+    private String color;
 }

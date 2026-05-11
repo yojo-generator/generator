@@ -1,12 +1,12 @@
 package asyncapi.messages;
 
 import java.time.OffsetDateTime;
-import lombok.Data;
 import javax.annotation.processing.Generated;
-import lombok.AllArgsConstructor;
-import lombok.experimental.Accessors;
-import lombok.NoArgsConstructor;
 import javax.validation.constraints.Min;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 
 /**
 * Inform about environmental lighting conditions of a particular streetlight.
@@ -18,6 +18,7 @@ import javax.validation.constraints.Min;
 @AllArgsConstructor
 public class LightMeasured {
 
+
     /**
      * Light intensity measured in lumens.
      */
@@ -28,5 +29,4 @@ public class LightMeasured {
      * Date and time when the message was sent.
      */
     private OffsetDateTime sentAt;
-
 }
