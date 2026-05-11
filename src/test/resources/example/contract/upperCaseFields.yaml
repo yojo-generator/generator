@@ -1,0 +1,30 @@
+asyncapi: 2.0.0
+info:
+  title: UpperCase Fields Test
+  version: 1.0.0
+  description: Contract to test uppercase field name handling
+channels:
+  TestMessage:
+    subscribe:
+      message:
+        payload:
+          $ref: '#/components/schemas/UpperCaseSchema'
+components:
+  schemas:
+    UpperCaseSchema:
+      type: object
+      properties:
+        IIN:
+          type: string
+        IPAddress:
+          type: string
+        KPP:
+          type: string
+        StatusCode:
+          type: integer
+        URL:
+          type: string
+        firstName:
+          type: string
+        user-name:
+          type: string
