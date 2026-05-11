@@ -111,6 +111,7 @@ public class AbstractMapper {
                                ProcessContext processContext,
                                Map<String, Object> innerSchemas) {
         variableProperties.setSpringBootVersion(processContext.getSpringBootVersion());
+        variableProperties.setValidationApi(processContext.getValidationApi());
         // Keep original case from contract: "FirstName" stays "FirstName", "firstName" stays "firstName"
         variableProperties.setName(safeFieldName(propertyName));
         // ⬇️ const → defaultProperty
@@ -875,7 +876,7 @@ public class AbstractMapper {
         requiredAttributes.forEach(requiredAttribute -> {
             if (requiredAttribute.equals(propertyName)) {
                 if (variableProperties.getItems() != null) {
-                    if (variableProperties.getSpringBootVersion() != null && variableProperties.getSpringBootVersion().startsWith("3")) {
+                    if (variableProperties.isJakarta()) {
                         importSet.add(JAKARTA_JAVA_TYPES_REQUIRED_IMPORTS.get(NOT_EMPTY_ANNOTATION));
                     } else {
                         importSet.add(JAVAX_JAVA_TYPES_REQUIRED_IMPORTS.get(NOT_EMPTY_ANNOTATION));
@@ -896,7 +897,7 @@ public class AbstractMapper {
                         annotation = JAVA_TYPES_REQUIRED_ANNOTATIONS.get(OBJECT_TYPE);
                     }
                     if (validationFields.contains(propertyName) && finalGroups != null) {
-                        if (variableProperties.getSpringBootVersion() != null && variableProperties.getSpringBootVersion().startsWith("3")) {
+                        if (variableProperties.isJakarta()) {
                             importSet.add(JAKARTA_JAVA_TYPES_REQUIRED_IMPORTS.get(annotation));
                         } else {
                             importSet.add(JAVAX_JAVA_TYPES_REQUIRED_IMPORTS.get(annotation));
@@ -905,7 +906,7 @@ public class AbstractMapper {
                         annotationSet.add(annotation);
                         importSet.addAll(validationGroupsImports.stream().map(vi -> vi.concat(";")).collect(Collectors.toSet()));
                     } else {
-                        if (variableProperties.getSpringBootVersion() != null && variableProperties.getSpringBootVersion().startsWith("3")) {
+                        if (variableProperties.isJakarta()) {
                             importSet.add(JAKARTA_JAVA_TYPES_REQUIRED_IMPORTS.get(annotation));
                         } else {
                             importSet.add(JAVAX_JAVA_TYPES_REQUIRED_IMPORTS.get(annotation));
@@ -935,7 +936,7 @@ public class AbstractMapper {
             variableProperties.getType() != null &&
             !JAVA_DEFAULT_TYPES.contains(variableProperties.getType()) &&
             variableProperties.isValid()) {
-            if (variableProperties.getSpringBootVersion() != null && variableProperties.getSpringBootVersion().startsWith("3")) {
+            if (variableProperties.isJakarta()) {
                 importSet.add(JAKARTA_JAVA_TYPES_REQUIRED_IMPORTS.get(VALID_ANNOTATION));
             } else {
                 importSet.add(JAVAX_JAVA_TYPES_REQUIRED_IMPORTS.get(VALID_ANNOTATION));

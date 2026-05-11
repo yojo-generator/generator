@@ -1,12 +1,13 @@
 package ru.yojo.codegen.context;
 
+import ru.yojo.codegen.domain.ValidationApi;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 
 import java.util.List;
 
 /**
  * Top-level context for multi-specification code generation runs.
- * Holds shared configuration (e.g., Lombok, Spring Boot version) and a list of individual specs to process.
+ * Holds shared configuration (e.g., Lombok, validation API) and a list of individual specs to process.
  *
  * @author Vladimir Morozkin (TG @vmorozkin)
  */
@@ -33,8 +34,19 @@ public class YojoContext {
     private LombokProperties lombokProperties;
 
     /**
-     * Spring Boot version (e.g., {@code "3.x.x"}) used to select jakarta vs javax validation imports.
+     * Validation API namespace to use for generated annotations.
+     * When set, takes precedence over the legacy {@link #springBootVersion} heuristic.
+     * If {@code null}, falls back to {@link #springBootVersion} detection.
      */
+    private ValidationApi validationApi;
+
+    /**
+     * Spring Boot version (e.g., {@code "3.x.x"}) used to select jakarta vs javax validation imports.
+     *
+     * @deprecated Use {@link #validationApi} instead. This field is kept for backward compatibility.
+     * If {@link #validationApi} is set, this value is ignored.
+     */
+    @Deprecated
     private String springBootVersion;
 
     /**
@@ -165,10 +177,32 @@ public class YojoContext {
     }
 
     /**
+     * Returns the validation API namespace to use for generated annotations.
+     *
+     * @return validation API (JAVAX or JAKARTA) or {@code null} if not configured
+     */
+    public ValidationApi getValidationApi() {
+        return validationApi;
+    }
+
+    /**
+     * Sets the validation API namespace to use for generated annotations.
+     * <p>
+     * When set, this takes precedence over the legacy {@link #springBootVersion} field.
+     *
+     * @param validationApi JAVAX or JAKARTA
+     */
+    public void setValidationApi(ValidationApi validationApi) {
+        this.validationApi = validationApi;
+    }
+
+    /**
      * Returns the Spring Boot version string.
      *
      * @return version (e.g., {@code "2.7.0"} or {@code "3.x.x"})
+     * @deprecated Use {@link #getValidationApi()} instead.
      */
+    @Deprecated
     public String getSpringBootVersion() {
         return springBootVersion;
     }
@@ -177,7 +211,9 @@ public class YojoContext {
      * Sets the Spring Boot version (used to resolve validation annotation imports).
      *
      * @param springBootVersion version string
+     * @deprecated Use {@link #setValidationApi(ValidationApi)} instead.
      */
+    @Deprecated
     public void setSpringBootVersion(String springBootVersion) {
         this.springBootVersion = springBootVersion;
     }

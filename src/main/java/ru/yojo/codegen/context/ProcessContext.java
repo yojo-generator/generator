@@ -1,5 +1,6 @@
 package ru.yojo.codegen.context;
 
+import ru.yojo.codegen.domain.ValidationApi;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.mapper.Helper;
 
@@ -25,6 +26,18 @@ public class ProcessContext {
         this.content = content;
     }
 
+    /**
+     * Validation API namespace to use for generated annotations.
+     * When set, takes precedence over the legacy {@link #springBootVersion} heuristic.
+     */
+    private ValidationApi validationApi;
+
+    /**
+     * Spring Boot version string (e.g., {@code "3.x.x"}) used to select jakarta vs javax validation imports.
+     *
+     * @deprecated Use {@link #validationApi} instead.
+     */
+    @Deprecated
     private String springBootVersion;
 
     /**
@@ -155,11 +168,33 @@ public class ProcessContext {
     }
 
     /**
+     * Returns the validation API namespace to use for generated annotations.
+     *
+     * @return validation API (JAVAX or JAKARTA) or {@code null} if not configured
+     */
+    public ValidationApi getValidationApi() {
+        return validationApi;
+    }
+
+    /**
+     * Sets the validation API namespace to use for generated annotations.
+     * <p>
+     * When set, this takes precedence over the legacy {@link #springBootVersion} field.
+     *
+     * @param validationApi JAVAX or JAKARTA
+     */
+    public void setValidationApi(ValidationApi validationApi) {
+        this.validationApi = validationApi;
+    }
+
+    /**
      * Returns the Spring Boot version string (e.g., {@code "3.x.x"}).
      * Used to select correct validation annotation packages (jakarta vs javax).
      *
      * @return Spring Boot version or {@code null} if unspecified
+     * @deprecated Use {@link #getValidationApi()} instead.
      */
+    @Deprecated
     public String getSpringBootVersion() {
         return springBootVersion;
     }
@@ -168,7 +203,9 @@ public class ProcessContext {
      * Sets the Spring Boot version.
      *
      * @param springBootVersion version string (e.g., {@code "3.x.x"})
+     * @deprecated Use {@link #setValidationApi(ValidationApi)} instead.
      */
+    @Deprecated
     public void setSpringBootVersion(String springBootVersion) {
         this.springBootVersion = springBootVersion;
     }

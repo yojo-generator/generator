@@ -25,6 +25,7 @@ public class VariablePropertiesBuilder {
     private String name;
 
     // Optional fields
+    private ValidationApi validationApi;
     private String springBootVersion;
     private String type;
     private String minLength;
@@ -64,11 +65,25 @@ public class VariablePropertiesBuilder {
     }
 
     /**
+     * Sets the validation API namespace (optional).
+     * When set, takes precedence over {@link #springBootVersion}.
+     *
+     * @param validationApi JAVAX or JAKARTA
+     * @return this builder
+     */
+    public VariablePropertiesBuilder validationApi(ValidationApi validationApi) {
+        this.validationApi = validationApi;
+        return this;
+    }
+
+    /**
      * Sets the Spring Boot version (optional).
      *
      * @param springBootVersion version string (e.g., "3.2.0")
      * @return this builder
+     * @deprecated Use {@link #validationApi(ValidationApi)} instead.
      */
+    @Deprecated
     public VariablePropertiesBuilder springBootVersion(String springBootVersion) {
         this.springBootVersion = springBootVersion;
         return this;
@@ -328,6 +343,7 @@ public class VariablePropertiesBuilder {
         VariableProperties vp = new VariableProperties();
         vp.setName(name);
 
+        if (validationApi != null) vp.setValidationApi(validationApi);
         if (springBootVersion != null) vp.setSpringBootVersion(springBootVersion);
         if (type != null) vp.setType(type);
         if (minLength != null) vp.setMinLength(minLength);

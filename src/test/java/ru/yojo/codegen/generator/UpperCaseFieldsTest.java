@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import ru.yojo.codegen.context.SpecificationProperties;
 import ru.yojo.codegen.context.YojoContext;
+import ru.yojo.codegen.domain.ValidationApi;
 import ru.yojo.codegen.domain.lombok.Accessors;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 
@@ -44,7 +45,7 @@ class UpperCaseFieldsTest {
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
         ctx.setLombokProperties(new LombokProperties(false, false, new Accessors(false, false, false)));
-        ctx.setSpringBootVersion("3.2.0");
+        ctx.setValidationApi(ValidationApi.JAKARTA);
 
         new YojoGenerator().generateAll(ctx);
     }

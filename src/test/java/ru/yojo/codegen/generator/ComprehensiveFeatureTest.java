@@ -3,6 +3,7 @@ package ru.yojo.codegen.generator;
 import org.junit.jupiter.api.*;
 import ru.yojo.codegen.context.SpecificationProperties;
 import ru.yojo.codegen.context.YojoContext;
+import ru.yojo.codegen.domain.ValidationApi;
 import ru.yojo.codegen.domain.lombok.Accessors;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 
@@ -857,7 +858,7 @@ class ComprehensiveFeatureTest {
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
         ctx.setLombokProperties(new LombokProperties(false, false, new Accessors(false, false, false)));
-        ctx.setSpringBootVersion("3.2.0");
+        ctx.setValidationApi(ValidationApi.JAKARTA);
         ctx.setNullableAnnotation("org.jspecify.annotations.Nullable"); // ← ключевая настройка
 
         // when
@@ -989,7 +990,7 @@ class ComprehensiveFeatureTest {
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
         ctx.setLombokProperties(new LombokProperties(false, false, new Accessors(false, false, false)));
-        ctx.setSpringBootVersion("3.2.0");
+        ctx.setValidationApi(ValidationApi.JAKARTA);
 
         yojoGenerator.generateAll(ctx);
     }
@@ -1004,7 +1005,7 @@ class ComprehensiveFeatureTest {
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
         ctx.setLombokProperties(new LombokProperties(true, true, new Accessors(true, true, true)));
-        ctx.setSpringBootVersion("3.2.0");
+        ctx.setValidationApi(ValidationApi.JAKARTA);
 
         yojoGenerator.generateAll(ctx);
     }
@@ -1020,7 +1021,7 @@ class ComprehensiveFeatureTest {
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
         ctx.setLombokProperties(new LombokProperties(true, true, new Accessors(true, true, true)));
-        ctx.setSpringBootVersion("3.2.0");
+        ctx.setValidationApi(ValidationApi.JAKARTA);
 
         yojoGenerator.generateAll(ctx);
     }
