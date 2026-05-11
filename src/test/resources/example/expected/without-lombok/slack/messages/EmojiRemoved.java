@@ -16,7 +16,7 @@ public class EmojiRemoved {
 
     private EmojiRemovedSubtype subtype;
 
-    private List<Object> names;
+    private List<String> names;
 
     private String eventTs;
     public void setType(EmojiRemovedType type) {
@@ -31,10 +31,10 @@ public class EmojiRemoved {
     public EmojiRemovedSubtype getSubtype() {
         return subtype;
     }
-    public void setNames(List<Object> names) {
+    public void setNames(List<String> names) {
         this.names = names;
     }
-    public List<Object> getNames() {
+    public List<String> getNames() {
         return names;
     }
     public void setEventTs(String eventTs) {

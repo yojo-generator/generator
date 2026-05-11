@@ -24,7 +24,7 @@ public class EmojiRemoved {
 
     private EmojiRemovedSubtype subtype;
 
-    private List<Object> names;
+    private List<String> names;
 
     private String eventTs;
 }
