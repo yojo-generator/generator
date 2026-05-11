@@ -11,7 +11,7 @@ public class ChatMessageMentions {
 
     private String userId;
 
-    private List<Object> userIds;
+    private List<String> userIds;
     public void setScreenName(String screenName) {
         this.screenName = screenName;
     }
@@ -24,10 +24,10 @@ public class ChatMessageMentions {
     public String getUserId() {
         return userId;
     }
-    public void setUserIds(List<Object> userIds) {
+    public void setUserIds(List<String> userIds) {
         this.userIds = userIds;
     }
-    public List<Object> getUserIds() {
+    public List<String> getUserIds() {
         return userIds;
     }
 }

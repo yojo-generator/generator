@@ -19,5 +19,5 @@ public class ChatMessageMentions {
 
     private String userId;
 
-    private List<Object> userIds;
+    private List<String> userIds;
 }
