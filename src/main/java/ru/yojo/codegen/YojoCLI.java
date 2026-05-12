@@ -2,6 +2,7 @@ package ru.yojo.codegen;
 
 import ru.yojo.codegen.context.SpecificationProperties;
 import ru.yojo.codegen.context.YojoContext;
+import ru.yojo.codegen.domain.ValidationApi;
 import ru.yojo.codegen.domain.lombok.Accessors;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.generator.YojoGenerator;
@@ -88,7 +89,7 @@ public class YojoCLI {
         spec.setPackageLocation(packageLocation);
 
         context.setSpecificationProperties(Collections.singletonList(spec));
-        context.setSpringBootVersion("3.x.x"); // fixed default; could be made configurable
+        context.setValidationApi(ValidationApi.JAKARTA);
         context.setLombokProperties(new LombokProperties(
                 lombokEnabled,
                 allArgs,

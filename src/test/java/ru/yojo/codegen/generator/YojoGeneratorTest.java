@@ -3,6 +3,7 @@ package ru.yojo.codegen.generator;
 import org.junit.jupiter.api.*;
 import ru.yojo.codegen.context.SpecificationProperties;
 import ru.yojo.codegen.context.YojoContext;
+import ru.yojo.codegen.domain.ValidationApi;
 import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.lombok.Accessors;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
@@ -91,7 +92,7 @@ class YojoGeneratorTest {
 
     @Test
     @Order(1)
-    void generateAllWithSingleSpecificationAndSpringBootVersionLombok() throws IOException {
+    void generateAllWithSingleSpecificationAndValidationApiLombok() throws IOException {
         SpecificationProperties spec = new SpecificationProperties();
         spec.setSpecName("test.yaml");
         spec.setInputDirectory("src/test/resources/example/contract");
@@ -99,7 +100,7 @@ class YojoGeneratorTest {
         spec.setPackageLocation("example.testGenerate");
 
         YojoContext yojoContext = new YojoContext();
-        yojoContext.setSpringBootVersion("2.7.0");
+        yojoContext.setValidationApi(ValidationApi.JAVAX);
         yojoContext.setSpecificationProperties(Collections.singletonList(spec));
         yojoContext.setLombokProperties(new LombokProperties(true, false, new Accessors(false, false, false)));
 
@@ -311,7 +312,7 @@ class YojoGeneratorTest {
     @Order(9)
     void testPatternEscaping() {
         VariableProperties vp = new VariableProperties();
-        vp.setSpringBootVersion("3.2.0");
+        vp.setValidationApi(ValidationApi.JAKARTA);
         vp.setPattern("^\\d+\\.\\d{2}$");  // ← исходный паттерн с одним \ (как в YAML)
 
         Set<String> annotations = vp.getAnnotationSet();

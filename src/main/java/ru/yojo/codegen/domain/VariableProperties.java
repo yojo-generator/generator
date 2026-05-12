@@ -28,8 +28,17 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 public class VariableProperties {
 
     /**
-     * Spring Boot version string (e.g., {@code "3.x.x"}) used to select jakarta vs javax validation imports.
+     * Validation API namespace to use for generated annotations.
+     * When set, takes precedence over the legacy {@link #springBootVersion} heuristic.
      */
+    private ValidationApi validationApi;
+
+    /**
+     * Spring Boot version string (e.g., {@code "3.x.x"}) used to select jakarta vs javax validation imports.
+     *
+     * @deprecated Use {@link #validationApi} instead.
+     */
+    @Deprecated
     private String springBootVersion;
 
     /**
@@ -128,6 +137,12 @@ public class VariableProperties {
      * Human-readable description for enum constant (from {@code x-enumNames}).
      */
     private String enumNames;
+
+    /**
+     * Wire/serialized value for enum constant (from {@code x-enumValues}).
+     * Used together with {@code @JsonValue}/{@code @JsonCreator} for custom enum serialization.
+     */
+    private String enumValues;
 
     /**
      * {@code true} if this property is an enum reference (not a regular field).
@@ -373,6 +388,24 @@ public class VariableProperties {
     }
 
     /**
+     * Returns the wire/serialized value for enum constant (from {@code x-enumValues}).
+     *
+     * @return wire value or {@code null}
+     */
+    public String getEnumValues() {
+        return enumValues;
+    }
+
+    /**
+     * Sets the wire/serialized value for enum constant.
+     *
+     * @param enumValues wire value
+     */
+    public void setEnumValues(String enumValues) {
+        this.enumValues = enumValues;
+    }
+
+    /**
      * Returns the example value (used in JavaDoc).
      *
      * @return example or {@code null}
@@ -556,6 +589,25 @@ public class VariableProperties {
     }
 
     /**
+     * Resolves whether Jakarta validation namespace should be used.
+     * <p>
+     * Resolution order:
+     * <ol>
+     *   <li>{@link #validationApi} if set</li>
+     *   <li>{@link #springBootVersion} starts with {@code "3"} (legacy fallback)</li>
+     *   <li>{@code false} (default to JAVAX)</li>
+     * </ol>
+     *
+     * @return {@code true} if Jakarta imports should be used, {@code false} for Javax
+     */
+    public boolean isJakarta() {
+        if (validationApi != null) {
+            return validationApi == ValidationApi.JAKARTA;
+        }
+        return springBootVersion != null && springBootVersion.startsWith("3");
+    }
+
+    /**
      * Returns the {@code @Min} value.
      *
      * @return minimum or {@code null}
@@ -573,7 +625,7 @@ public class VariableProperties {
         this.minimum = minimum;
         if (isNotBlank(minimum) && multipleOf == null) {
             annotationSet.add(generateMinAnnotation(minimum));
-            if (springBootVersion != null && springBootVersion.startsWith("3")) {
+            if (isJakarta()) {
                 requiredImports.add(JAKARTA_MIN_IMPORT);
             } else {
                 requiredImports.add(JAVAX_MIN_IMPORT);
@@ -599,7 +651,7 @@ public class VariableProperties {
         this.maximum = maximum;
         if (isNotBlank(maximum) && multipleOf == null) {
             annotationSet.add(generateMaxAnnotation(maximum));
-            if (springBootVersion != null && springBootVersion.startsWith("3")) {
+            if (isJakarta()) {
                 requiredImports.add(JAKARTA_MAX_IMPORT);
             } else {
                 requiredImports.add(JAVAX_MAX_IMPORT);
@@ -713,7 +765,7 @@ public class VariableProperties {
                         this.valid = false;
                     }
                     if (digits != null) {
-                        if (springBootVersion != null && springBootVersion.startsWith("3")) {
+                        if (isJakarta()) {
                             requiredImports.add(JAKARTA_DIGITS_IMPORT);
                         } else {
                             requiredImports.add(JAVAX_DIGITS_IMPORT);
@@ -734,7 +786,7 @@ public class VariableProperties {
                         this.valid = false;
                     }
                     if (digits != null) {
-                        if (springBootVersion != null && springBootVersion.startsWith("3")) {
+                        if (isJakarta()) {
                             requiredImports.add(JAKARTA_DIGITS_IMPORT);
                         } else {
                             requiredImports.add(JAVAX_DIGITS_IMPORT);
@@ -754,7 +806,7 @@ public class VariableProperties {
                         this.valid = false;
                     }
                     if (digits != null) {
-                        if (springBootVersion != null && springBootVersion.startsWith("3")) {
+                        if (isJakarta()) {
                             requiredImports.add(JAKARTA_DIGITS_IMPORT);
                         } else {
                             requiredImports.add(JAVAX_DIGITS_IMPORT);
@@ -825,7 +877,7 @@ public class VariableProperties {
                         this.valid = false;
                     }
                     if (digits != null) {
-                        if (springBootVersion != null && springBootVersion.startsWith("3")) {
+                        if (isJakarta()) {
                             requiredImports.add(JAKARTA_DIGITS_IMPORT);
                         } else {
                             requiredImports.add(JAVAX_DIGITS_IMPORT);
@@ -846,7 +898,7 @@ public class VariableProperties {
                         this.valid = false;
                     }
                     if (digits != null) {
-                        if (springBootVersion != null && springBootVersion.startsWith("3")) {
+                        if (isJakarta()) {
                             requiredImports.add(JAKARTA_DIGITS_IMPORT);
                         } else {
                             requiredImports.add(JAVAX_DIGITS_IMPORT);
@@ -856,9 +908,7 @@ public class VariableProperties {
                     break;
                 case "email":
                     this.type = STRING;
-                    requiredImports.add(springBootVersion != null && springBootVersion.startsWith("3")
-                            ? JAKARTA_EMAIL_IMPORT
-                            : JAVAX_EMAIL_IMPORT);
+                    requiredImports.add(isJakarta() ? JAKARTA_EMAIL_IMPORT : JAVAX_EMAIL_IMPORT);
                     annotationSet.add(EMAIL_ANNOTATION);
                     if (items != null) {
                         String collectionPattern = LIST_TYPE;
@@ -884,7 +934,7 @@ public class VariableProperties {
         if (pattern != null) {
             String escapedPattern = pattern.replace("\\", "\\\\");
             annotationSet.add(format(PATTERN_ANNOTATION, escapedPattern));
-            if (springBootVersion != null && springBootVersion.startsWith("3")) {
+            if (isJakarta()) {
                 requiredImports.add(JAKARTA_JAVA_TYPES_REQUIRED_IMPORTS.get(substringBefore(PATTERN_ANNOTATION, "(")));
             } else {
                 requiredImports.add(JAVAX_JAVA_TYPES_REQUIRED_IMPORTS.get(substringBefore(PATTERN_ANNOTATION, "(")));
@@ -944,7 +994,7 @@ public class VariableProperties {
     public void setMinMaxLength(String min, String max) {
         if (isNoneEmpty(min) || isNoneEmpty(max)) {
             annotationSet.add(generateSizeAnnotation(min, max));
-            if (springBootVersion != null && springBootVersion.startsWith("3")) {
+            if (isJakarta()) {
                 requiredImports.add(
                         JAKARTA_JAVA_TYPES_REQUIRED_IMPORTS.get(substringBefore(
                                 SIZE_MIN_MAX_ANNOTATION, "(")));
@@ -1187,10 +1237,31 @@ public class VariableProperties {
     }
 
     /**
+     * Returns the validation API namespace.
+     *
+     * @return validation API (JAVAX or JAKARTA) or {@code null}
+     */
+    public ValidationApi getValidationApi() {
+        return validationApi;
+    }
+
+    /**
+     * Sets the validation API namespace.
+     * When set, takes precedence over the legacy {@link #springBootVersion} field.
+     *
+     * @param validationApi JAVAX or JAKARTA
+     */
+    public void setValidationApi(ValidationApi validationApi) {
+        this.validationApi = validationApi;
+    }
+
+    /**
      * Returns the Spring Boot version string.
      *
      * @return version (e.g., {@code "2.7.0"} or {@code "3.x.x"})
+     * @deprecated Use {@link #getValidationApi()} instead.
      */
+    @Deprecated
     public String getSpringBootVersion() {
         return springBootVersion;
     }
@@ -1199,7 +1270,9 @@ public class VariableProperties {
      * Sets the Spring Boot version string.
      *
      * @param springBootVersion version string
+     * @deprecated Use {@link #setValidationApi(ValidationApi)} instead.
      */
+    @Deprecated
     public void setSpringBootVersion(String springBootVersion) {
         this.springBootVersion = springBootVersion;
     }

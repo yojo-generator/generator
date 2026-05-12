@@ -381,6 +381,7 @@ public class MessageMapper extends AbstractMapper {
             VariableProperties vp = new VariableProperties();
             vp.setName("payload");
             vp.setSpringBootVersion(processContext.getSpringBootVersion());
+            vp.setValidationApi(processContext.getValidationApi());
             Map<String, Object> fakeProp = new LinkedHashMap<>(payload);
             fillProperties(
                     messageName,
@@ -448,6 +449,7 @@ public class MessageMapper extends AbstractMapper {
             VariableProperties vp = new VariableProperties();
             vp.setName("payload");
             vp.setSpringBootVersion(processContext.getSpringBootVersion());
+            vp.setValidationApi(processContext.getValidationApi());
             fillVariableProperties(
                     messageName,
                     vp,
@@ -471,6 +473,7 @@ public class MessageMapper extends AbstractMapper {
             VariableProperties vp = new VariableProperties();
             vp.setName("payload");
             vp.setSpringBootVersion(processContext.getSpringBootVersion());
+            vp.setValidationApi(processContext.getValidationApi());
             fillVariableProperties(
                     messageName,
                     vp,

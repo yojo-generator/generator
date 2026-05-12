@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yojo.codegen.context.SpecificationProperties;
 import ru.yojo.codegen.context.YojoContext;
+import ru.yojo.codegen.domain.ValidationApi;
 import ru.yojo.codegen.domain.lombok.Accessors;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 
@@ -84,7 +85,7 @@ public class EmailFormatTest {
         }
     }
 
-    private void generateSpec(String specContent, String outputSubDir, String packageLocation, String springBootVersion) throws IOException {
+    private void generateSpec(String specContent, String outputSubDir, String packageLocation, ValidationApi validationApi) throws IOException {
         Path inputDir = Paths.get("src/test/resources/email_test_input/");
         Files.createDirectories(inputDir);
         Path specPath = inputDir.resolve("email_test_spec.yaml");
@@ -99,7 +100,7 @@ public class EmailFormatTest {
         YojoContext context = new YojoContext();
         context.setSpecificationProperties(Collections.singletonList(spec));
         context.setLombokProperties(new LombokProperties(false, false, new Accessors(false, false, false)));
-        context.setSpringBootVersion(springBootVersion);
+        context.setValidationApi(validationApi);
 
         generator.generateAll(context);
     }
@@ -180,7 +181,7 @@ public class EmailFormatTest {
                       format: email
             """;
 
-        generateSpec(spec, "simple", "email.test.simple", "3.0.0");
+        generateSpec(spec, "simple", "email.test.simple", ValidationApi.JAKARTA);
 
         String dtoClass = readFile("simple/messages/TestMessage.java");
         assertTrue(dtoClass.contains("@Email"), "Should contain @Email annotation");
@@ -214,7 +215,7 @@ public class EmailFormatTest {
                       format: email
             """;
 
-        generateSpec(spec, "sb2", "email.test.sb2", "2.7.0");
+        generateSpec(spec, "sb2", "email.test.sb2", ValidationApi.JAVAX);
 
         String dtoClass = readFile("sb2/messages/TestMessage.java");
         assertTrue(dtoClass.contains("@Email"), "Should contain @Email annotation");
@@ -249,7 +250,7 @@ public class EmailFormatTest {
                       format: email
             """;
 
-        generateSpec(spec, "required", "email.test.required", "3.0.0");
+        generateSpec(spec, "required", "email.test.required", ValidationApi.JAKARTA);
 
         String dtoClass = readFile("required/messages/TestMessage.java");
         assertTrue(dtoClass.contains("@NotBlank"), "Required email should have @NotBlank");
@@ -282,7 +283,7 @@ public class EmailFormatTest {
                       format: email
             """;
 
-        generateSpec(spec, "optional", "email.test.optional", "3.0.0");
+        generateSpec(spec, "optional", "email.test.optional", ValidationApi.JAKARTA);
 
         String dtoClass = readFile("optional/messages/TestMessage.java");
         assertTrue(dtoClass.contains("@Email"), "Optional email should still have @Email");
@@ -320,7 +321,7 @@ public class EmailFormatTest {
                       format: email
             """;
 
-        generateSpec(spec, "compilation", "email.test.compilation", "3.2.0");
+        generateSpec(spec, "compilation", "email.test.compilation", ValidationApi.JAKARTA);
 
         compileGeneratedCode();
     }

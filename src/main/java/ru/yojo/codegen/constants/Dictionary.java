@@ -73,6 +73,16 @@ public final class Dictionary {
      */
     public static final String X_ENUM_NAMES = "x-enumNames";
     /**
+     * Custom YAML property name for enumeration wire values (for {@code @JsonValue} support).
+     * Maps enum constant names to their serialized string values.
+     */
+    public static final String X_ENUM_VALUES = "x-enumValues";
+    /**
+     * Custom YAML property name for enabling UNKNOWN_DEFAULT_YOJO fallback constant.
+     * When {@code true}, generates an additional enum constant for unmapped values.
+     */
+    public static final String X_ENUM_DEFAULT = "x-enumDefault";
+    /**
      * Custom YAML property name for class-level annotations
      */
     public static final String X_CLASS_ANNOTATION = "x-class-annotation";
@@ -537,6 +547,14 @@ public final class Dictionary {
      * Jackson @JsonSubTypes import
      */
     public static final String JSON_SUB_TYPES_IMPORT = "com.fasterxml.jackson.annotation.JsonSubTypes;";
+    /**
+     * Jackson @JsonValue import (for enum serialization)
+     */
+    public static final String JSON_VALUE_IMPORT = "com.fasterxml.jackson.annotation.JsonValue;";
+    /**
+     * Jackson @JsonCreator import (for enum deserialization)
+     */
+    public static final String JSON_CREATOR_IMPORT = "com.fasterxml.jackson.annotation.JsonCreator;";
 
     /**
      * Canonical Java class simple names (used in field types, etc.).

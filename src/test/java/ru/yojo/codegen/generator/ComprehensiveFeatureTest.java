@@ -3,6 +3,7 @@ package ru.yojo.codegen.generator;
 import org.junit.jupiter.api.*;
 import ru.yojo.codegen.context.SpecificationProperties;
 import ru.yojo.codegen.context.YojoContext;
+import ru.yojo.codegen.domain.ValidationApi;
 import ru.yojo.codegen.domain.lombok.Accessors;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 
@@ -621,10 +622,11 @@ class ComprehensiveFeatureTest {
         generate("gitter-streaming-async-api-v3.0.yaml", "gitter", "example.testGenerate.gitter");
         generate("slack-real-time-async-api-v3.0.yaml", "slack", "example.testGenerate.slack");
         generate("one-more.yaml", "oneMore", "example.testGenerate.oneMore");
+        generate("enum-values.yaml", "enumvalues", "example.testGenerate.enumvalues");
 
         // Collect all .java files
         List<Path> javaFiles = new ArrayList<>();
-        for (String sub : Arrays.asList("", "specFromIssue", "asyncapi", "gitter", "slack", "oneMore")) {
+        for (String sub : Arrays.asList("", "specFromIssue", "asyncapi", "gitter", "slack", "oneMore", "enumvalues")) {
             Path dir = Paths.get(BASE_DIR + sub);
             if (Files.exists(dir)) {
                 try (Stream<Path> walk = Files.walk(dir)) {
@@ -671,6 +673,7 @@ class ComprehensiveFeatureTest {
         generateWithLombok("spec-from-issue.yaml", "specFromIssue", "example.testGenerate.specFromIssue");
         generateWithLombok("test.yaml", "test", "example.testGenerate.test");
         generateWithLombok("test-create-app.yaml", "testCreateApp", "example.testGenerate.testCreateApp");
+        generateWithLombok("enum-values.yaml", "enumvalues", "example.testGenerate.enumvalues");
 
         // Collect all .java files
         List<Path> javaFiles = new ArrayList<>();
@@ -685,7 +688,7 @@ class ComprehensiveFeatureTest {
                 "RequestDtoWithDoubleInheritance.java"
         );
 
-        for (String sub : Arrays.asList("", "specFromIssue", "asyncapi", "gitter", "slack", "oneMore")) {
+        for (String sub : Arrays.asList("", "specFromIssue", "asyncapi", "gitter", "slack", "oneMore", "enumvalues")) {
             Path dir = Paths.get(BASE_DIR + sub);
             if (Files.exists(dir)) {
                 try (Stream<Path> walk = Files.walk(dir)) {
@@ -761,6 +764,7 @@ class ComprehensiveFeatureTest {
         generateSingle("gitter-streaming-async-api-v3.0.yaml", "gitter", "example.testGenerate.gitter");
         generateSingle("slack-real-time-async-api-v3.0.yaml", "slack", "example.testGenerate.slack");
         generateSingle("one-more.yaml", "oneMore", "example.testGenerate.oneMore");
+        generateSingle("enum-values.yaml", "enumvalues", "example.testGenerate.enumvalues");
 //        generateSingle("contract.yaml", "contract", "example.testGenerate.contract");
 
         // Collect all .java files
@@ -776,7 +780,7 @@ class ComprehensiveFeatureTest {
                 "RequestDtoWithDoubleInheritance.java"
         );
 
-        for (String sub : Arrays.asList("", "specFromIssue", "asyncapi", "gitter", "slack", "oneMore")) {
+        for (String sub : Arrays.asList("", "specFromIssue", "asyncapi", "gitter", "slack", "oneMore", "enumvalues")) {
             Path dir = Paths.get(BASE_DIR + sub);
             if (Files.exists(dir)) {
                 try (Stream<Path> walk = Files.walk(dir)) {
@@ -857,7 +861,7 @@ class ComprehensiveFeatureTest {
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
         ctx.setLombokProperties(new LombokProperties(false, false, new Accessors(false, false, false)));
-        ctx.setSpringBootVersion("3.2.0");
+        ctx.setValidationApi(ValidationApi.JAKARTA);
         ctx.setNullableAnnotation("org.jspecify.annotations.Nullable"); // ← ключевая настройка
 
         // when
@@ -989,7 +993,7 @@ class ComprehensiveFeatureTest {
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
         ctx.setLombokProperties(new LombokProperties(false, false, new Accessors(false, false, false)));
-        ctx.setSpringBootVersion("3.2.0");
+        ctx.setValidationApi(ValidationApi.JAKARTA);
 
         yojoGenerator.generateAll(ctx);
     }
@@ -1004,7 +1008,7 @@ class ComprehensiveFeatureTest {
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
         ctx.setLombokProperties(new LombokProperties(true, true, new Accessors(true, true, true)));
-        ctx.setSpringBootVersion("3.2.0");
+        ctx.setValidationApi(ValidationApi.JAKARTA);
 
         yojoGenerator.generateAll(ctx);
     }
@@ -1020,7 +1024,7 @@ class ComprehensiveFeatureTest {
         YojoContext ctx = new YojoContext();
         ctx.setSpecificationProperties(Collections.singletonList(spec));
         ctx.setLombokProperties(new LombokProperties(true, true, new Accessors(true, true, true)));
-        ctx.setSpringBootVersion("3.2.0");
+        ctx.setValidationApi(ValidationApi.JAKARTA);
 
         yojoGenerator.generateAll(ctx);
     }

@@ -212,11 +212,14 @@ public class SchemaMapper extends AbstractMapper {
                 }
 
                 if (schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) {
+                    boolean hasEnumDefault = "true".equalsIgnoreCase(
+                            getStringValueIfExistOrElseNull(X_ENUM_DEFAULT, schemaMap));
                     Schema schema = Schema.builder()
                             .name(capitalize(schemaName))
                             .description(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap))
                             .lombokProperties(finalLombokProperties)
                             .packageName(processContext.getCommonPackage())
+                            .enumDefault(hasEnumDefault)
                             .fillParameters(
                                     getSchemaVariableProperties(
                                             schemaName,

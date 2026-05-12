@@ -219,6 +219,90 @@ public enum Result {
 
 ---
 
+### Enums with wire values (`x-enumValues`)
+
+```yaml
+OrderStatus:
+  type: object
+  enum:
+    - PENDING
+    - CONFIRMED
+    - CANCELLED
+  x-enumValues:
+    PENDING: "P"
+    CONFIRMED: "C"
+    CANCELLED: "X"
+```
+
+```java
+public enum OrderStatus {
+    PENDING("P"),
+    CONFIRMED("C"),
+    CANCELLED("X");
+
+    private final String value;
+
+    OrderStatus(String value) {
+        this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+        return value;
+    }
+
+    @JsonCreator
+    public static OrderStatus fromValue(String value) {
+        for (OrderStatus v : OrderStatus.values()) {
+            if (v.value.equals(value)) {
+                return v;
+            }
+        }
+        throw new IllegalArgumentException("Unknown enum value: " + value);
+    }
+}
+```
+
+> Generates `@JsonValue` on the getter and `@JsonCreator` static factory for Jackson serialization/deserialization.
+
+### Enum default fallback (`x-enumDefault`)
+
+When combined with `x-enumValues`, setting `x-enumDefault: true` adds an `UNKNOWN_DEFAULT_YOJO` fallback constant. Instead of throwing `IllegalArgumentException`, the `fromValue()` method returns this sentinel for unmapped wire values:
+
+```yaml
+StatusWithDefault:
+  type: object
+  enum:
+    - STARTED
+    - STOPPED
+  x-enumValues:
+    STARTED: "S"
+    STOPPED: "T"
+  x-enumDefault: true
+```
+
+```java
+public enum StatusWithDefault {
+    STARTED("S"),
+    STOPPED("T"),
+    UNKNOWN_DEFAULT_YOJO("UNKNOWN");   // ← fallback
+
+    // ... @JsonValue, @JsonCreator as above ...
+
+    @JsonCreator
+    public static StatusWithDefault fromValue(String value) {
+        for (StatusWithDefault v : StatusWithDefault.values()) {
+            if (v.value.equals(value)) {
+                return v;
+            }
+        }
+        return UNKNOWN_DEFAULT_YOJO;   // ← no exception thrown
+    }
+}
+```
+
+---
+
 ### BigDecimal with `@Digits` (prefer `multipleOf`)
 
 ```yaml
@@ -387,6 +471,8 @@ public class StickInsect extends Pet {
 | `removeSchema` | `message.payload` | `boolean` | `true` | Skip DTO generation for `$ref` target |
 | `additionalFormat` | `additionalProperties` | `string` | `uuid` | Custom map key type |
 | `x-enumNames` | enum | `map` | `SUCCESS: "Ok"` | Enum with description field |
+| `x-enumValues` | enum | `map` | `ACTIVE: "A"` | Enum with wire values → `@JsonValue`/`@JsonCreator` |
+| `x-enumDefault` | enum predicate | `boolean` | `true` | Adds `UNKNOWN_DEFAULT_YOJO` fallback for unknown wire values (requires `x-enumValues`) |
 | `x-class-annotation` | schema, message | `list` | `[com.example.MyAnnotation]` | Class-level annotations |
 | `x-field-annotation` | field | `list` | `[com.example.MyAnnotation("v")]` | Field-level annotations |
 
@@ -418,7 +504,7 @@ If you discover a security issue, please contact the maintainer directly (email 
 | **Discriminator** | ✅ Done | `@JsonTypeInfo`, `@JsonSubTypes` for polymorphism |
 | **`@JsonTypeId` on fields** | ✅ Done | Discriminator field annotation in subtypes |
 | **Discriminator `const`** | ✅ Done | Override default discriminator value via `const` |
-| **Jackson annotations** | 🟡 Partial | `@JsonProperty`, `@JsonInclude` done |
+| **Jackson annotations** | 🟡 Partial | `@JsonProperty`, `@JsonInclude`, `@JsonValue`/`@JsonCreator` (via `x-enumValues`) done |
 | **AsyncAPI spec validation** | 🚧 Planned | Validate `$ref`, `type`, `format`, detect circular refs |
 | **Lombok extensions** | 🚧 Planned | `@Builder`, `@Singular`, `@SuperBuilder` |
 | **OpenAPI 3.1 support** | 🚧 Planned | After AsyncAPI 3.0 stabilizes |

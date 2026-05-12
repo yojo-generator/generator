@@ -38,7 +38,12 @@ dependency-reduced-pom.xml
 # Test output
 **/expected/**/*.java
 !**/expected/**/discriminator/**/*.java
+!**/expected/**/enumvalues/**/*.java
 
 # Temporary test run files
 test_*.txt
 test_*.md
+
+# Enum values test input/output (generated at runtime)
+**/enum_values_test_input/
+**/enum_values_test_output/
