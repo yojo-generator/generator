@@ -41,6 +41,15 @@ components:
           type: string
         stringValueWithRequired:
           type: string
+        stringFinalValue:
+          type: string
+          description: A final field with default value
+          default: "initial"
+          x-final: true
+        stringFinalWithoutDefault:
+          type: string
+          description: A final field that requires constructor init
+          x-final: true
         stringValueNotBlankSizeMinLength:
           type: string
           minLength: 1
