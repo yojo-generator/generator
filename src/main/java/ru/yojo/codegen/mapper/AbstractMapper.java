@@ -389,7 +389,10 @@ public class AbstractMapper {
                                      Map<String, Object> innerSchemas) {
         LOG.debug("ENUMERATION FOUND: " + propertyName + " in " + schemaName);
         String enumClassName;
-        if (schemaName.equalsIgnoreCase(propertyName)) {
+        String title = getStringValueIfExistOrElseNull(TITLE, propertiesMap);
+        if (title != null && !title.trim().isEmpty()) {
+            enumClassName = capitalize(title);
+        } else if (schemaName.equalsIgnoreCase(propertyName)) {
             enumClassName = capitalize(propertyName);
         } else {
             enumClassName = capitalize(schemaName) + capitalize(propertyName);
@@ -426,7 +429,13 @@ public class AbstractMapper {
                                       Map<String, Object> propertiesMap,
                                       ProcessContext processContext,
                                       Map<String, Object> innerSchemas) {
-        String propName = capitalize(schemaName) + capitalize(propertyName);
+        String title = getStringValueIfExistOrElseNull(TITLE, propertiesMap);
+        String propName;
+        if (title != null && !title.trim().isEmpty()) {
+            propName = capitalize(title);
+        } else {
+            propName = capitalize(schemaName) + capitalize(propertyName);
+        }
         fillInnerSchema(variableProperties, propName, propertiesMap, processContext, innerSchemas);
     }
 

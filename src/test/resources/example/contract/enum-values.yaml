@@ -37,6 +37,21 @@ components:
             STOPPED: "T"
           x-enumDefault: true
 
+        # 3. Enum with title — class name should use title, not derive from property name
+        error:
+          title: ErrorCode
+          type: string
+          enum:
+            - VALIDATION_ERROR
+            - WALLET_NOT_FOUND
+            - INTERNAL_ERROR
+            - RATE_LIMIT_EXCEEDED
+          x-enumValues:
+            VALIDATION_ERROR: "VALIDATION_ERROR"
+            WALLET_NOT_FOUND: "WALLET_NOT_FOUND"
+            INTERNAL_ERROR: "INTERNAL_ERROR"
+            RATE_LIMIT_EXCEEDED: "RATE_LIMIT_EXCEEDED"
+
       # 3. Top-level enum with x-enumValues
     OrderStatus:
       type: object
