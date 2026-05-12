@@ -91,6 +91,11 @@ public final class Dictionary {
      */
     public static final String X_FIELD_ANNOTATION = "x-field-annotation";
     /**
+     * Custom YAML property for marking a field as {@code final}.
+     * When {@code true}, generates {@code private final Type name;} instead of {@code private Type name;}.
+     */
+    public static final String X_FINAL = "x-final";
+    /**
      * YAML property name for minimum value constraint
      */
     public static final String MINIMUM = "minimum";
@@ -869,6 +874,20 @@ public final class Dictionary {
                                                   "    }";
 
     /**
+     * Constructor template for regular classes.
+     * Arguments: class name, parameters block, body block (assignment statements).
+     */
+    public static final String CONSTRUCTOR = "    public %s(%s) {" +
+                                             System.lineSeparator() +
+                                             "%s" +
+                                             "    }";
+
+    /**
+     * Constructor assignment statement: {@code this.field = field;}
+     */
+    public static final String CONSTRUCTOR_ASSIGNMENT = "        this.%s = %s;";
+
+    /**
      * Collection/map initialization expressions.
      */
     /**
@@ -903,6 +922,14 @@ public final class Dictionary {
      * Field declaration with default value template
      */
     public static final String FIELD_WITH_DEFAULT_VALUE = "    private %s %s = %s;";
+    /**
+     * Field declaration template for final fields
+     */
+    public static final String FIELD_FINAL = "    private final %s %s;";
+    /**
+     * Field declaration with default value template for final fields
+     */
+    public static final String FIELD_FINAL_WITH_DEFAULT_VALUE = "    private final %s %s = %s;";
     /**
      * Enum description field template
      */

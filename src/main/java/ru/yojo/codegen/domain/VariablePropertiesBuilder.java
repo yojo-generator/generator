@@ -51,6 +51,7 @@ public class VariablePropertiesBuilder {
     private Set<String> requiredImports = new HashSet<>();
     private Set<String> fieldAnnotations = new HashSet<>();
     private boolean valid = true;
+    private boolean isFinal = false;
     private boolean nullableAnnotation = false;
     private String collectionType;
 
@@ -333,6 +334,17 @@ public class VariablePropertiesBuilder {
     }
 
     /**
+     * Sets whether the field should be declared as {@code final} (optional).
+     *
+     * @param isFinal true if field should be final
+     * @return this builder
+     */
+    public VariablePropertiesBuilder isFinal(boolean isFinal) {
+        this.isFinal = isFinal;
+        return this;
+    }
+
+    /**
      * Sets the collection type (optional).
      *
      * @param collectionType collection type
@@ -382,6 +394,7 @@ public class VariablePropertiesBuilder {
         if (!fieldAnnotations.isEmpty()) vp.getFieldAnnotations().addAll(fieldAnnotations);
         vp.setValid(valid);
         vp.setNullableAnnotation(nullableAnnotation ? "org.springframework.lang.Nullable" : null);
+        vp.setFinal(isFinal);
         if (collectionType != null) vp.setCollectionType(collectionType);
 
         return vp;
