@@ -118,8 +118,108 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
 
                 boolean hasEnumWithDescription = schema.getFillParameters().getVariableProperties().stream()
                         .anyMatch(vp -> vp.getEnumNames() != null);
+                boolean hasEnumValues = schema.getFillParameters().getVariableProperties().stream()
+                        .anyMatch(vp -> vp.getEnumValues() != null);
 
-                if (hasEnumWithDescription) {
+                if (hasEnumValues) {
+                    // ─── Enum with x-enumValues: @JsonValue/@JsonCreator support ─── //
+                    // 1️⃣ Generate enum constants: ACTIVE("A"), ...
+                    StringBuilder constantsBuilder = new StringBuilder();
+                    for (int i = 0; i < schema.getFillParameters().getVariableProperties().size(); i++) {
+                        VariableProperties vp = schema.getFillParameters().getVariableProperties().get(i);
+                        if (vp.getEnumeration() != null) {
+                            String name = vp.getEnumeration();
+                            String wireValue = vp.getEnumValues() != null ? esc(vp.getEnumValues()) : "";
+                            constantsBuilder
+                                    .append(TABULATION)
+                                    .append(name)
+                                    .append("(\"")
+                                    .append(wireValue)
+                                    .append("\")");
+                            if (i < schema.getFillParameters().getVariableProperties().size() - 1) {
+                                constantsBuilder.append(",");
+                            }
+                            constantsBuilder.append(lineSeparator());
+                        }
+                    }
+
+                    // Trim trailing newline and append semicolon on same line
+                    String constants = constantsBuilder.toString();
+                    if (constants.endsWith(lineSeparator())) {
+                        constants = constants.substring(0, constants.length() - lineSeparator().length());
+                    }
+                    constants += ";";
+
+                    // 2️⃣ Build enum body
+                    stringBuilder
+                            .append(lineSeparator())
+                            .append(constants)
+                            .append(lineSeparator())
+                            .append(lineSeparator())
+                            .append("    private final String value;")
+                            .append(lineSeparator())
+                            .append(lineSeparator())
+                            .append("    ")
+                            .append(schema.getSchemaName())
+                            .append("(String value) {")
+                            .append(lineSeparator())
+                            .append("        this.value = value;")
+                            .append(lineSeparator())
+                            .append("    }")
+                            .append(lineSeparator());
+
+                    // 3️⃣ @JsonValue on getter
+                    stringBuilder
+                            .append(lineSeparator())
+                            .append("    @JsonValue")
+                            .append(lineSeparator())
+                            .append("    public String getValue() {")
+                            .append(lineSeparator())
+                            .append("        return value;")
+                            .append(lineSeparator())
+                            .append("    }")
+                            .append(lineSeparator());
+                    requiredImports.add(JSON_VALUE_IMPORT);
+
+                    // 4️⃣ @JsonCreator static fromValue method (with UNKNOWN_DEFAULT_YOJO fallback)
+                    stringBuilder
+                            .append(lineSeparator())
+                            .append("    @JsonCreator")
+                            .append(lineSeparator())
+                            .append("    public static ")
+                            .append(schema.getSchemaName())
+                            .append(" fromValue(String value) {")
+                            .append(lineSeparator())
+                            .append("        for (")
+                            .append(schema.getSchemaName())
+                            .append(" v : ")
+                            .append(schema.getSchemaName())
+                            .append(".values()) {")
+                            .append(lineSeparator())
+                            .append("            if (v.value.equals(value)) {")
+                            .append(lineSeparator())
+                            .append("                return v;")
+                            .append(lineSeparator())
+                            .append("            }")
+                            .append(lineSeparator())
+                            .append("        }");
+                    if (schema.isEnumDefault()) {
+                        stringBuilder
+                                .append(lineSeparator())
+                                .append("        return UNKNOWN_DEFAULT_YOJO;");
+                    } else {
+                        stringBuilder
+                                .append(lineSeparator())
+                                .append("        throw new IllegalArgumentException(\"Unknown enum value: \" + value);");
+                    }
+                    stringBuilder
+                            .append(lineSeparator())
+                            .append("    }")
+                            .append(lineSeparator());
+                    requiredImports.add(JSON_CREATOR_IMPORT);
+
+                } else if (hasEnumWithDescription) {
+                    // ─── Enum with x-enumNames: human-readable description ─── //
                     // 1️⃣ Generate enum constants: SUCCESS("Success value"), ...
                     StringBuilder constantsBuilder = new StringBuilder();
                     for (int i = 0; i < schema.getFillParameters().getVariableProperties().size(); i++) {
@@ -182,7 +282,7 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
                     }
 
                 } else {
-                    // Plain enum (no descriptions)
+                    // Plain enum (no descriptions, no wire values)
                     stringBuilder.append(schema.getFillParameters().toWrite()).append(lineSeparator());
                 }
 

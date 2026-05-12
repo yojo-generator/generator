@@ -139,6 +139,12 @@ public class VariableProperties {
     private String enumNames;
 
     /**
+     * Wire/serialized value for enum constant (from {@code x-enumValues}).
+     * Used together with {@code @JsonValue}/{@code @JsonCreator} for custom enum serialization.
+     */
+    private String enumValues;
+
+    /**
      * {@code true} if this property is an enum reference (not a regular field).
      */
     private boolean isEnum = false;
@@ -379,6 +385,24 @@ public class VariableProperties {
      */
     public void setEnumNames(String enumNames) {
         this.enumNames = enumNames;
+    }
+
+    /**
+     * Returns the wire/serialized value for enum constant (from {@code x-enumValues}).
+     *
+     * @return wire value or {@code null}
+     */
+    public String getEnumValues() {
+        return enumValues;
+    }
+
+    /**
+     * Sets the wire/serialized value for enum constant.
+     *
+     * @param enumValues wire value
+     */
+    public void setEnumValues(String enumValues) {
+        this.enumValues = enumValues;
     }
 
     /**

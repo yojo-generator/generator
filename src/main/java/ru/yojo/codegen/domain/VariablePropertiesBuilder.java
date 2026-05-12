@@ -34,6 +34,7 @@ public class VariablePropertiesBuilder {
     private String pattern;
     private String description;
     private String enumeration;
+    private String enumValues;
     private String example;
     private String items;
     private String reference;
@@ -130,6 +131,17 @@ public class VariablePropertiesBuilder {
      */
     public VariablePropertiesBuilder enumeration(String enumeration) {
         this.enumeration = enumeration;
+        return this;
+    }
+
+    /**
+     * Sets the wire/serialized enum value (optional). Used with {@code @JsonValue}/{@code @JsonCreator}.
+     *
+     * @param enumValues serialized value for this enum constant
+     * @return this builder
+     */
+    public VariablePropertiesBuilder enumValues(String enumValues) {
+        this.enumValues = enumValues;
         return this;
     }
 
@@ -352,6 +364,7 @@ public class VariablePropertiesBuilder {
         if (pattern != null) vp.setPattern(pattern);
         if (description != null) vp.setDescription(description);
         if (enumeration != null) vp.setEnumeration(enumeration);
+        if (enumValues != null) vp.setEnumValues(enumValues);
         if (example != null) vp.setExample(example);
         if (items != null) vp.setItems(items);
         if (reference != null) vp.setReference(reference);

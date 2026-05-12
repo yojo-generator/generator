@@ -1,0 +1,50 @@
+asyncapi: 2.6.0
+info:
+  title: Enum Values Test
+  version: 1.0.0
+channels:
+  test/channel:
+    publish:
+      message:
+        $ref: '#/components/messages/TestMessage'
+components:
+  messages:
+    TestMessage:
+      payload:
+        $ref: '#/components/schemas/Payload'
+  schemas:
+    Payload:
+      type: object
+      properties:
+        # 1. Basic x-enumValues — inner enum with wire values + @JsonValue/@JsonCreator
+        status:
+          type: object
+          enum:
+            - ACTIVE
+            - INACTIVE
+          x-enumValues:
+            ACTIVE: "A"
+            INACTIVE: "I"
+
+        # 2. x-enumValues + x-enumDefault: true — generates UNKNOWN_DEFAULT_YOJO fallback
+        statusWithDefault:
+          type: object
+          enum:
+            - STARTED
+            - STOPPED
+          x-enumValues:
+            STARTED: "S"
+            STOPPED: "T"
+          x-enumDefault: true
+
+      # 3. Top-level enum with x-enumValues
+    OrderStatus:
+      type: object
+      enum:
+        - PENDING
+        - CONFIRMED
+        - CANCELLED
+      x-enumValues:
+        PENDING: "P"
+        CONFIRMED: "C"
+        CANCELLED: "X"

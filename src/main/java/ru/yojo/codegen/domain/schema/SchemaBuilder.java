@@ -44,6 +44,7 @@ public class SchemaBuilder {
     private Set<String> classAnnotations = new HashSet<>();
     private String discriminator;
     private String discriminatorField;
+    private boolean enumDefault = false;
 
     /**
      * Sets the schema name (required).
@@ -168,6 +169,17 @@ public class SchemaBuilder {
     }
 
     /**
+     * Sets whether to generate UNKNOWN_DEFAULT_YOJO fallback constant in enum (optional).
+     *
+     * @param enumDefault {@code true} to enable fallback
+     * @return this builder
+     */
+    public SchemaBuilder enumDefault(boolean enumDefault) {
+        this.enumDefault = enumDefault;
+        return this;
+    }
+
+    /**
      * Sets method definitions for interfaces (optional).
      * Replaces any previously added methods.
      *
@@ -248,6 +260,7 @@ public class SchemaBuilder {
                 }
             }
         }
+        schema.setEnumDefault(enumDefault);
         return schema;
     }
 

@@ -134,6 +134,7 @@ public class AbstractMapper {
         variableProperties.setPattern(getStringValueIfExistOrElseNull(PATTERN, propertiesMap));
         variableProperties.setEnumeration(getStringValueIfExistOrElseNull(ENUMERATION, propertiesMap));
         variableProperties.setEnumNames(getStringValueIfExistOrElseNull(X_ENUM_NAMES, propertiesMap));
+        variableProperties.setEnumValues(getStringValueIfExistOrElseNull(X_ENUM_VALUES, propertiesMap));
         variableProperties.setPackageOfExisingObject(getStringValueIfExistOrElseNull(PACKAGE, propertiesMap));
         variableProperties.setNameOfExisingObject(getStringValueIfExistOrElseNull(NAME, propertiesMap));
         variableProperties.setOriginalEnumName(propertyName);
@@ -834,6 +835,40 @@ public class AbstractMapper {
     }
 
     /**
+     * Creates a synthetic schema map for an enum with wire values (from {@code x-enumValues}).
+     * <p>
+     * Generates constants with custom serialized values, e.g.:
+     * <pre>{@code
+     * @JsonValue
+     * public String getValue() { return value; }
+     *
+     * @JsonCreator
+     * public static EnumType fromValue(String value) { ... }
+     * }</pre>
+     *
+     * @param enums map: constant name → wire/serialized value
+     * @return synthetic schema map suitable for inner schema registration
+     */
+    private static Map<String, Object> fillByEnumWithValues(Map<String, Object> enums) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        Map<String, Object> vp = new LinkedHashMap<>();
+        Map<String, Object> type = new LinkedHashMap<>();
+        Map<String, Object> properties = new LinkedHashMap<>();
+        type.put(TYPE, OBJECT);
+        enums.forEach((enumName, enumValue) -> {
+            Map<String, Object> prop = new LinkedHashMap<>();
+            prop.put(TYPE, format(ENUM_TYPE, enumName, enumValue));
+            prop.put(X_ENUM_VALUES, enumValue);
+            prop.put(ENUMERATION, enumName);
+            vp.put(enumName, prop);
+        });
+        properties.put(PROPERTIES, vp);
+        result.putAll(type);
+        result.putAll(properties);
+        return result;
+    }
+
+    /**
      * Applies validation annotations and imports based on {@code required}, validation groups, and field type.
      * <p>
      * Generates:
@@ -956,10 +991,24 @@ public class AbstractMapper {
      * @param innerSchemas   accumulator
      */
     protected static void fillEnumSchema(String enumSchemaName,
-                                       Map<String, Object> propertiesMap,
-                                         Map<String, Object> innerSchemas) {
+                                        Map<String, Object> propertiesMap,
+                                          Map<String, Object> innerSchemas) {
         LOG.debug(">>> ADDING ENUM TO INNER SCHEMAS: " + enumSchemaName);
-        if (getStringValueIfExistOrElseNull(X_ENUM_NAMES, propertiesMap) != null) {
+        if (getStringValueIfExistOrElseNull(X_ENUM_VALUES, propertiesMap) != null) {
+            // x-enumValues present — generate Jackson-annotated enum with wire values
+            Map<String, Object> enumerationMap = castObjectToMap(propertiesMap.get(X_ENUM_VALUES));
+            // Handle x-enumDefault: add UNKNOWN_DEFAULT_YOJO fallback constant
+            boolean hasEnumDefault = "true".equalsIgnoreCase(
+                    getStringValueIfExistOrElseNull(X_ENUM_DEFAULT, propertiesMap));
+            if (hasEnumDefault) {
+                enumerationMap.put("UNKNOWN_DEFAULT_YOJO", "UNKNOWN");
+            }
+            Map<String, Object> enumWithValues = fillByEnumWithValues(enumerationMap);
+            if (hasEnumDefault) {
+                enumWithValues.put(X_ENUM_DEFAULT, "true");
+            }
+            innerSchemas.put(uncapitalize(enumSchemaName), enumWithValues);
+        } else if (getStringValueIfExistOrElseNull(X_ENUM_NAMES, propertiesMap) != null) {
             Map<String, Object> enumerationMap = castObjectToMap(propertiesMap.get(X_ENUM_NAMES));
             Map<String, Object> enums = new LinkedHashMap<>();
             Map<String, Object> enumWithDescription = fillByEnumWithDescription(enumerationMap);

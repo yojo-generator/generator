@@ -114,6 +114,30 @@ public class Schema {
     private Map<String, String> subtypeDiscriminatorValues = new LinkedHashMap<>();
 
     /**
+     * Whether to generate UNKNOWN_DEFAULT_YOJO fallback constant in enum (from {@code x-enumDefault}).
+     * When {@code true}, the {@code fromValue()} method returns this constant instead of throwing.
+     */
+    private boolean enumDefault = false;
+
+    /**
+     * Returns whether UNKNOWN_DEFAULT_YOJO fallback is enabled.
+     *
+     * @return {@code true} if default fallback constant should be generated
+     */
+    public boolean isEnumDefault() {
+        return enumDefault;
+    }
+
+    /**
+     * Sets whether to generate UNKNOWN_DEFAULT_YOJO fallback constant.
+     *
+     * @param enumDefault {@code true} to enable fallback
+     */
+    public void setEnumDefault(boolean enumDefault) {
+        this.enumDefault = enumDefault;
+    }
+
+    /**
      * Adds a subtype with default discriminator value (schema name).
      *
      * @param subtype schema name of the subtype
