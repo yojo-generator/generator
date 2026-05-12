@@ -1,6 +1,7 @@
 package ru.yojo.codegen.generator.code;
 
 import ru.yojo.codegen.domain.FillParameters;
+import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.lombok.Accessors;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 
@@ -94,6 +95,32 @@ abstract class AbstractCodeGenerator {
             sb.append(String.format(JAVA_DOC_EXAMPLE, example)).append(lineSeparator());
         }
         sb.append(JAVA_DOC_END).append(lineSeparator());
+    }
+
+    /**
+     * Generates an all-args constructor for a set of fields.
+     * Used for final fields without default values.
+     *
+     * @param className the class name
+     * @param fields    list of variable properties to include as constructor parameters
+     * @return constructor source code
+     */
+    protected String generateConstructor(String className, List<VariableProperties> fields) {
+        if (fields == null || fields.isEmpty()) return "";
+
+        StringBuilder params = new StringBuilder();
+        StringBuilder body = new StringBuilder();
+        for (int i = 0; i < fields.size(); i++) {
+            VariableProperties vp = fields.get(i);
+            if (i > 0) {
+                params.append(", ");
+            }
+            params.append(vp.getType()).append(" ").append(vp.getName());
+            body.append(String.format(CONSTRUCTOR_ASSIGNMENT, vp.getName(), vp.getName()));
+            body.append(System.lineSeparator());
+        }
+
+        return String.format(CONSTRUCTOR, className, params.toString(), body.toString());
     }
 
     /**

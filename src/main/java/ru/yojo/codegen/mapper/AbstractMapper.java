@@ -139,6 +139,8 @@ public class AbstractMapper {
         variableProperties.setNameOfExisingObject(getStringValueIfExistOrElseNull(NAME, propertiesMap));
         variableProperties.setOriginalEnumName(propertyName);
         variableProperties.setNullableAnnotation(processContext.getNullableAnnotation());
+        variableProperties.setFinal(
+                "true".equalsIgnoreCase(getStringValueIfExistOrElseNull(X_FINAL, propertiesMap)));
         variableProperties.setPolymorph(
                 !collectPolymorphRefs(propertiesMap).isEmpty());
         // Process x-field-annotation
