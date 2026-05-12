@@ -1,5 +1,6 @@
 package enumvalues.common;
 
+import enumvalues.common.ErrorCode;
 import enumvalues.common.PayloadStatus;
 import enumvalues.common.PayloadStatusWithDefault;
 import javax.annotation.processing.Generated;
@@ -11,6 +12,8 @@ public class Payload {
     private PayloadStatus status;
 
     private PayloadStatusWithDefault statusWithDefault;
+
+    private ErrorCode error;
     public void setStatus(PayloadStatus status) {
         this.status = status;
     }
@@ -22,5 +25,11 @@ public class Payload {
     }
     public PayloadStatusWithDefault getStatusWithDefault() {
         return statusWithDefault;
+    }
+    public void setError(ErrorCode error) {
+        this.error = error;
+    }
+    public ErrorCode getError() {
+        return error;
     }
 }

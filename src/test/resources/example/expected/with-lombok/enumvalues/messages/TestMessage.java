@@ -1,5 +1,6 @@
 package enumvalues.messages;
 
+import enumvalues.common.ErrorCode;
 import enumvalues.common.PayloadStatus;
 import enumvalues.common.PayloadStatusWithDefault;
 import javax.annotation.processing.Generated;
@@ -19,4 +20,6 @@ public class TestMessage {
     private PayloadStatus status;
 
     private PayloadStatusWithDefault statusWithDefault;
+
+    private ErrorCode error;
 }
