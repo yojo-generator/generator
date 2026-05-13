@@ -424,6 +424,50 @@ public class StickInsect extends Pet {
 
 ---
 
+### Final fields (`x-final`)
+
+```yaml
+ImmutableDto:
+  type: object
+  properties:
+    createdAt:
+      type: string
+      format: date-time
+      x-final: true
+    name:
+      type: string
+```
+
+```java
+@Generated("Yojo")
+public class ImmutableDto {
+
+    public ImmutableDto(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    private final OffsetDateTime createdAt;
+
+    private String name;
+
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+```
+
+> Fields marked with `x-final: true` are declared as `final` and must be initialized via constructor. A constructor is generated automatically for all final fields without default values. Lombok's `@NoArgsConstructor` is skipped when uninitialized final fields exist.
+
+---
+
 ## YAML ↔ Java Type Mapping
 
 ### Scalar types
