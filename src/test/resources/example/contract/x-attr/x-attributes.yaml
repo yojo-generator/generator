@@ -1,0 +1,91 @@
+asyncapi: 2.0.0
+info:
+  title: X-Attributes Test
+  version: 1.0.0
+  description: "Contract for testing x- prefixed attributes backward compatibility"
+channels: {}
+components:
+  schemas:
+    NumericValues:
+      type: object
+      properties:
+        price:
+          type: number
+          format: big-decimal
+          x-multiple-of: 0.01
+        quantity:
+          type: integer
+          format: int64
+          x-digits: "integer = 5, fraction = 0"
+      x-lombok:
+        enable: false
+
+    CollectionExample:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: integer
+            format: int64
+            x-realization: ArrayList
+        names:
+          type: array
+          format: set
+          items:
+            type: string
+            x-realization: HashSet
+
+    MapExample:
+      type: object
+      properties:
+        scores:
+          type: object
+          additionalProperties:
+            type: integer
+          x-realization: LinkedHashMap
+
+    RequestDtoSchema:
+      type: object
+      properties:
+        x-digits:
+          type: number
+          format: big-decimal
+        stringValueWithRequired:
+          type: string
+        integerValidationField:
+          type: integer
+      required:
+        - stringValueWithRequired
+        - integerValidationField
+      x-validation-groups:
+        - Create.class
+      x-validation-groups-imports:
+        - com.example.Validation
+      x-validate-by-groups:
+        - integerValidationField
+
+    BaseClass:
+      type: object
+      properties:
+        baseField:
+          type: string
+
+    DerivedClass:
+      type: object
+      properties:
+        derivedField:
+          type: string
+      x-extends:
+        x-from-class: BaseClass
+        x-from-package: example.testGenerate.xattr.common
+
+    InterfaceWithMethods:
+      type: object
+      format: interface
+      x-methods:
+        doSomething:
+          description: Do something
+          x-definition: "void doSomething(String input);"
+      x-imports:
+        - java.util.List

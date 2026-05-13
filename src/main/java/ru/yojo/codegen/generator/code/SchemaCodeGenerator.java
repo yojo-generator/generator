@@ -15,6 +15,7 @@ import static java.lang.System.lineSeparator;
 import static ru.yojo.codegen.constants.Dictionary.*;
 import static ru.yojo.codegen.util.MapperUtil.castObjectToMap;
 import static ru.yojo.codegen.util.MapperUtil.getStringValueIfExistOrElseNull;
+import static ru.yojo.codegen.util.MapperUtil.getXValueOrElseDeprecated;
 
 /**
  * Generates Java source code for a {@link Schema} object.
@@ -382,7 +383,7 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
             methods.values().forEach(method -> {
                 Map<String, Object> currentMethod = castObjectToMap(method);
                 String methodDescription = getStringValueIfExistOrElseNull(DESCRIPTION, currentMethod);
-                String methodDefinition = getStringValueIfExistOrElseNull(DEFINITION, currentMethod);
+                String methodDefinition = getXValueOrElseDeprecated(X_DEFINITION, DEFINITION, currentMethod, null);
                 if (methodDescription != null) {
                     generateClassJavaDoc(stringBuilder, methodDescription);
                 }
