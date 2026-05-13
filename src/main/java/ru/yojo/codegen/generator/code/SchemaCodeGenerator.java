@@ -5,7 +5,9 @@ import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.schema.Schema;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,6 +15,7 @@ import static java.lang.System.lineSeparator;
 import static ru.yojo.codegen.constants.Dictionary.*;
 import static ru.yojo.codegen.util.MapperUtil.castObjectToMap;
 import static ru.yojo.codegen.util.MapperUtil.getStringValueIfExistOrElseNull;
+import static ru.yojo.codegen.util.MapperUtil.getXValueOrElseDeprecated;
 
 /**
  * Generates Java source code for a {@link Schema} object.
@@ -66,6 +69,16 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
                 );
 
                 LombokProperties lombokProperties = schema.getLombokProperties();
+
+                // Identify final fields without default values — they need constructor initialization
+                List<VariableProperties> finalFieldsWithoutDefaults = new ArrayList<>();
+                for (VariableProperties vp : schema.getFillParameters().getVariableProperties()) {
+                    if (vp.isFinal() && vp.getDefaultProperty() == null && vp.getRealisation() == null) {
+                        finalFieldsWithoutDefaults.add(vp);
+                    }
+                }
+                boolean hasUninitializedFinalFields = !finalFieldsWithoutDefaults.isEmpty();
+
                 if (lombokProperties != null && lombokProperties.enableLombok()) {
                     if (schema.getSchemaName().equals("Data") ||
                             schema.getFillParameters().getVariableProperties().stream()
@@ -81,7 +94,14 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
                             requiredImports.add(LOMBOK_DATA_IMPORT);
                         }
                     }
-                    buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder);
+                    // @NoArgsConstructor fails with uninitialized final fields — skip it
+                    if (hasUninitializedFinalFields && lombokProperties.noArgsConstructor()) {
+                        LombokProperties modifiedLombok = LombokProperties.newLombokProperties(lombokProperties);
+                        modifiedLombok.setNoArgsConstructor(false);
+                        buildLombokAnnotations(modifiedLombok, requiredImports, lombokAnnotationBuilder);
+                    } else {
+                        buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder);
+                    }
                 }
 
                 // Add field declarations
@@ -91,15 +111,27 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
                 }
 
                 StringBuilder finalStringBuilder = stringBuilder;
+
+                // For without-Lombok: generate constructor for uninitialized final fields
+                if (!finalFieldsWithoutDefaults.isEmpty() && (lombokProperties == null || !lombokProperties.enableLombok())) {
+                    finalStringBuilder
+                            .append(lineSeparator())
+                            .append(generateConstructor(schema.getSchemaName(), finalFieldsWithoutDefaults))
+                            .append(lineSeparator());
+                }
+
                 schema.getFillParameters().getVariableProperties().stream()
                         .flatMap(variableProperties -> {
                             Set<String> i = variableProperties.getRequiredImports();
                             if (lombokProperties == null || !lombokProperties.enableLombok()) {
                                 if (variableProperties.getEnumeration() == null) {
+                                    if (!variableProperties.isFinal()) {
+                                        finalStringBuilder
+                                                .append(lineSeparator())
+                                                .append(generateSetter(variableProperties.getType(), variableProperties.getName()))
+                                                .append(lineSeparator());
+                                    }
                                     finalStringBuilder
-                                            .append(lineSeparator())
-                                            .append(generateSetter(variableProperties.getType(), variableProperties.getName()))
-                                            .append(lineSeparator())
                                             .append(generateGetter(variableProperties.getType(), variableProperties.getName()));
                                 }
                             }
@@ -351,7 +383,7 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
             methods.values().forEach(method -> {
                 Map<String, Object> currentMethod = castObjectToMap(method);
                 String methodDescription = getStringValueIfExistOrElseNull(DESCRIPTION, currentMethod);
-                String methodDefinition = getStringValueIfExistOrElseNull(DEFINITION, currentMethod);
+                String methodDefinition = getXValueOrElseDeprecated(X_DEFINITION, DEFINITION, currentMethod, null);
                 if (methodDescription != null) {
                     generateClassJavaDoc(stringBuilder, methodDescription);
                 }

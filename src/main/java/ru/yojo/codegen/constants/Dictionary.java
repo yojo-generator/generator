@@ -91,6 +91,173 @@ public final class Dictionary {
      */
     public static final String X_FIELD_ANNOTATION = "x-field-annotation";
     /**
+     * Custom YAML property for marking a field as {@code final}.
+     * When {@code true}, generates {@code private final Type name;} instead of {@code private Type name;}.
+     */
+    public static final String X_FINAL = "x-final";
+
+    // ============================================================
+    // Extension attributes migrated to x- prefix (Groups 1-3)
+    // Old names are @Deprecated for backward compatibility
+    // ============================================================
+
+    /**
+     * Custom attribute for specifying collection implementation.
+     * @deprecated Use {@link #X_REALIZATION} instead.
+     */
+    @Deprecated
+    public static final String REALIZATION = "realization";
+    /** Custom attribute for specifying collection implementation (x- prefix). */
+    public static final String X_REALIZATION = "x-realization";
+
+    /**
+     * Custom attribute for validation groups.
+     * @deprecated Use {@link #X_VALIDATION_GROUPS} instead.
+     */
+    @Deprecated
+    public static final String VALIDATION_GROUPS = "validationGroups";
+    /** Custom attribute for validation groups (x- prefix). */
+    public static final String X_VALIDATION_GROUPS = "x-validation-groups";
+
+    /**
+     * Custom attribute for validation groups imports.
+     * @deprecated Use {@link #X_VALIDATION_GROUPS_IMPORTS} instead.
+     */
+    @Deprecated
+    public static final String VALIDATION_GROUPS_IMPORTS = "validationGroupsImports";
+    /** Custom attribute for validation groups imports (x- prefix). */
+    public static final String X_VALIDATION_GROUPS_IMPORTS = "x-validation-groups-imports";
+
+    /**
+     * Custom attribute for enabling validation by groups.
+     * @deprecated Use {@link #X_VALIDATE_BY_GROUPS} instead.
+     */
+    @Deprecated
+    public static final String VALIDATE_BY_GROUPS = "validateByGroups";
+    /** Custom attribute for enabling validation by groups (x- prefix). */
+    public static final String X_VALIDATE_BY_GROUPS = "x-validate-by-groups";
+
+    /**
+     * Custom attribute for specifying superclass.
+     * @deprecated Use {@link #X_EXTENDS} instead.
+     */
+    @Deprecated
+    public static final String EXTENDS = "extends";
+    /** Custom attribute for specifying superclass (x- prefix). */
+    public static final String X_EXTENDS = "x-extends";
+
+    /**
+     * Custom attribute for specifying implemented interfaces.
+     * @deprecated Use {@link #X_IMPLEMENTS} instead.
+     */
+    @Deprecated
+    public static final String IMPLEMENTS = "implements";
+    /** Custom attribute for specifying implemented interfaces (x- prefix). */
+    public static final String X_IMPLEMENTS = "x-implements";
+
+    /**
+     * Custom attribute for external class reference.
+     * @deprecated Use {@link #X_FROM_CLASS} instead.
+     */
+    @Deprecated
+    public static final String FROM_CLASS = "fromClass";
+    /** Custom attribute for external class reference (x- prefix). */
+    public static final String X_FROM_CLASS = "x-from-class";
+
+    /**
+     * Custom attribute for external class package.
+     * @deprecated Use {@link #X_FROM_PACKAGE} instead.
+     */
+    @Deprecated
+    public static final String FROM_PACKAGE = "fromPackage";
+    /** Custom attribute for external class package (x- prefix). */
+    public static final String X_FROM_PACKAGE = "x-from-package";
+
+    /**
+     * Custom attribute for external interface reference.
+     * @deprecated Use {@link #X_FROM_INTERFACE} instead.
+     */
+    @Deprecated
+    public static final String FROM_INTERFACE = "fromInterface";
+    /** Custom attribute for external interface reference (x- prefix). */
+    public static final String X_FROM_INTERFACE = "x-from-interface";
+
+    /**
+     * Custom attribute for method definition.
+     * @deprecated Use {@link #X_DEFINITION} instead.
+     */
+    @Deprecated
+    public static final String DEFINITION = "definition";
+    /** Custom attribute for method definition (x- prefix). */
+    public static final String X_DEFINITION = "x-definition";
+
+    /**
+     * Custom attribute for schema removal flag.
+     * @deprecated Use {@link #X_REMOVE_SCHEMA} instead.
+     */
+    @Deprecated
+    public static final String REMOVE_SCHEMA = "removeSchema";
+    /** Custom attribute for schema removal flag (x- prefix). */
+    public static final String X_REMOVE_SCHEMA = "x-remove-schema";
+
+    /**
+     * Custom attribute for digits validation.
+     * @deprecated Use {@link #X_DIGITS} instead.
+     */
+    @Deprecated
+    public static final String DIGITS = "digits";
+    /** Custom attribute for digits validation (x- prefix). */
+    public static final String X_DIGITS = "x-digits";
+
+    /**
+     * Custom attribute for additional format specification.
+     * @deprecated Use {@link #X_ADDITIONAL_FORMAT} instead.
+     */
+    @Deprecated
+    public static final String ADDITIONAL_FORMAT = "additionalFormat";
+    /** Custom attribute for additional format specification (x- prefix). */
+    public static final String X_ADDITIONAL_FORMAT = "x-additional-format";
+
+    /**
+     * Custom attribute for method definition in interfaces.
+     * @deprecated Use {@link #X_METHODS} instead.
+     */
+    @Deprecated
+    public static final String METHODS = "methods";
+    /** Custom attribute for method definition in interfaces (x- prefix). */
+    public static final String X_METHODS = "x-methods";
+
+    /**
+     * Custom attribute for imports in interfaces.
+     * @deprecated Use {@link #X_IMPORTS} instead.
+     */
+    @Deprecated
+    public static final String IMPORTS = "imports";
+    /** Custom attribute for imports in interfaces (x- prefix). */
+    public static final String X_IMPORTS = "x-imports";
+
+    /**
+     * Custom attribute for message generation path.
+     * @deprecated Use {@link #X_PATH_FOR_GENERATE_MESSAGE} instead.
+     */
+    @Deprecated
+    public static final String PATH_FOR_GENERATE_MESSAGE = "pathForGenerateMessage";
+    /** Custom attribute for message generation path (x- prefix). */
+    public static final String X_PATH_FOR_GENERATE_MESSAGE = "x-path-for-generate-message";
+
+    // ============================================================
+    // Lombok config keys — Group 3
+    // ============================================================
+
+    /**
+     * Lombok configuration root key.
+     * @deprecated Use {@link #X_LOMBOK} instead.
+     */
+    @Deprecated
+    public static final String LOMBOK = "lombok";
+    /** Lombok configuration root key (x- prefix). */
+    public static final String X_LOMBOK = "x-lombok";
+    /**
      * YAML property name for minimum value constraint
      */
     public static final String MINIMUM = "minimum";
@@ -147,10 +314,6 @@ public final class Dictionary {
      */
     public static final String ADDITIONAL_PROPERTIES = "additionalProperties";
     /**
-     * Custom YAML property name for additional format specification
-     */
-    public static final String ADDITIONAL_FORMAT = "additionalFormat";
-    /**
      * YAML property name for default value
      */
     public static final String DEFAULT = "default";
@@ -176,70 +339,19 @@ public final class Dictionary {
     public static final List<String> POLYMORPHS = List.of(ALL_OF, ONE_OF, ANY_OF);
 
     /**
-     * Custom YAML extension attributes supported by Yojo generator.
-     */
-    /**
-     * Custom attribute for specifying collection implementation
-     */
-    public static final String REALIZATION = "realization";
-    /**
-     * Custom attribute for validation groups
-     */
-    public static final String VALIDATION_GROUPS = "validationGroups";
-    /**
-     * Custom attribute for validation groups imports
-     */
-    public static final String VALIDATION_GROUPS_IMPORTS = "validationGroupsImports";
-    /**
-     * Custom attribute for enabling validation by groups
-     */
-    public static final String VALIDATE_BY_GROUPS = "validateByGroups";
-    /**
-     * Custom attribute for specifying superclass
-     */
-    public static final String EXTENDS = "extends";
-    /**
-     * Custom attribute for specifying implemented interfaces
-     */
-    public static final String IMPLEMENTS = "implements";
-    /**
-     * Custom attribute for external class reference
-     */
-    public static final String FROM_CLASS = "fromClass";
-    /**
-     * Custom attribute for external class package
-     */
-    public static final String FROM_PACKAGE = "fromPackage";
-    /**
-     * Custom attribute for external interface reference
-     */
-    public static final String FROM_INTERFACE = "fromInterface";
-    /**
-     * Custom attribute for package specification
+     * Custom attribute for package specification (used in format: existing / $ref items)
      */
     public static final String PACKAGE = "package";
     /**
-     * Custom attribute for existing type reference
+     * Custom attribute for existing type reference (format value: existing)
      */
     public static final String EXISTING = "existing";
     /**
-     * Custom attribute for interface type
+     * Custom attribute for interface type (format value: interface)
      */
     public static final String INTERFACE = "interface";
     /**
-     * Custom attribute for method definition
-     */
-    public static final String DEFINITION = "definition";
-    /**
-     * Custom attribute for schema removal flag
-     */
-    public static final String REMOVE_SCHEMA = "removeSchema";
-    /**
-     * Custom attribute for digits validation
-     */
-    public static final String DIGITS = "digits";
-    /**
-     * Custom attribute for multiple of validation
+     * Custom attribute for multiple of validation (standard JSON Schema, no x- prefix needed)
      */
     public static final String MULTIPLE_OF = "multipleOf";
     /**
@@ -256,41 +368,41 @@ public final class Dictionary {
 
     /**
      * Lombok configuration keys (manual override section).
+     *
+     * <p>The parent key {@code lombok} is deprecated in favour of {@link #X_LOMBOK}.
+     * Nested keys within the block are unchanged.</p>
      */
+    // LOMBOK / X_LOMBOK declared above in the extension attributes section (§Groups 1-3)
     /**
-     * Lombok configuration root key
-     */
-    public static final String LOMBOK = "lombok";
-    /**
-     * Enable Lombok flag
+     * Enable Lombok flag (nested inside {@code lombok} / {@code x-lombok})
      */
     public static final String ENABLE = "enable";
     /**
-     * Lombok accessors configuration
+     * Lombok accessors configuration (nested inside {@code lombok} / {@code x-lombok})
      */
     public static final String ACCESSORS = "accessors";
     /**
-     * Lombok fluent accessors flag
+     * Lombok fluent accessors flag (nested inside {@code lombok} / {@code x-lombok})
      */
     public static final String FLUENT = "fluent";
     /**
-     * Lombok chain accessors flag
+     * Lombok chain accessors flag (nested inside {@code lombok} / {@code x-lombok})
      */
     public static final String CHAIN = "chain";
     /**
-     * Lombok equals and hashCode flag
+     * Lombok equals and hashCode flag (nested inside {@code lombok} / {@code x-lombok})
      */
     public static final String EQUALS_AND_HASH_CODE = "equalsAndHashCode";
     /**
-     * Lombok callSuper flag for equals and hashCode
+     * Lombok callSuper flag for equals and hashCode (nested inside {@code lombok} / {@code x-lombok})
      */
     public static final String CALL_SUPER = "callSuper";
     /**
-     * Lombok all args constructor flag
+     * Lombok all args constructor flag (nested inside {@code lombok} / {@code x-lombok})
      */
     public static final String ALL_ARGS = "allArgsConstructor";
     /**
-     * Lombok no args constructor flag
+     * Lombok no args constructor flag (nested inside {@code lombok} / {@code x-lombok})
      */
     public static final String NO_ARGS = "noArgsConstructor";
 
@@ -869,6 +981,20 @@ public final class Dictionary {
                                                   "    }";
 
     /**
+     * Constructor template for regular classes.
+     * Arguments: class name, parameters block, body block (assignment statements).
+     */
+    public static final String CONSTRUCTOR = "    public %s(%s) {" +
+                                             System.lineSeparator() +
+                                             "%s" +
+                                             "    }";
+
+    /**
+     * Constructor assignment statement: {@code this.field = field;}
+     */
+    public static final String CONSTRUCTOR_ASSIGNMENT = "        this.%s = %s;";
+
+    /**
      * Collection/map initialization expressions.
      */
     /**
@@ -903,6 +1029,14 @@ public final class Dictionary {
      * Field declaration with default value template
      */
     public static final String FIELD_WITH_DEFAULT_VALUE = "    private %s %s = %s;";
+    /**
+     * Field declaration template for final fields
+     */
+    public static final String FIELD_FINAL = "    private final %s %s;";
+    /**
+     * Field declaration with default value template for final fields
+     */
+    public static final String FIELD_FINAL_WITH_DEFAULT_VALUE = "    private final %s %s = %s;";
     /**
      * Enum description field template
      */
@@ -967,15 +1101,6 @@ public final class Dictionary {
      * Public interface declaration
      */
     public static final String PUBLIC_INTERFACE = "public interface ";
-    /**
-     * Methods property name
-     */
-    public static final String METHODS = "methods";
-    /**
-     * Imports property name
-     */
-    public static final String IMPORTS = "imports";
-
     /**
      * Reserved Java keywords (used to avoid invalid field names).
      */

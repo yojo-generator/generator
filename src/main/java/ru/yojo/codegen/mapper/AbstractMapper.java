@@ -125,7 +125,7 @@ public class AbstractMapper {
         variableProperties.setDescription(getStringValueIfExistOrElseNull(DESCRIPTION, propertiesMap));
         variableProperties.setExample(getStringValueIfExistOrElseNull(EXAMPLE, propertiesMap));
         variableProperties.setTitle(getStringValueIfExistOrElseNull(TITLE, propertiesMap));
-        variableProperties.setDigits(getStringValueIfExistOrElseNull(DIGITS, propertiesMap));
+        variableProperties.setDigits(getXValueOrElseDeprecated(X_DIGITS, DIGITS, propertiesMap, LOG));
         variableProperties.setMultipleOf(getStringValueIfExistOrElseNull(MULTIPLE_OF, propertiesMap));
         variableProperties.setMinimum(getStringValueIfExistOrElseNull(MINIMUM, propertiesMap));
         variableProperties.setMaximum(getStringValueIfExistOrElseNull(MAXIMUM, propertiesMap));
@@ -139,6 +139,8 @@ public class AbstractMapper {
         variableProperties.setNameOfExisingObject(getStringValueIfExistOrElseNull(NAME, propertiesMap));
         variableProperties.setOriginalEnumName(propertyName);
         variableProperties.setNullableAnnotation(processContext.getNullableAnnotation());
+        variableProperties.setFinal(
+                "true".equalsIgnoreCase(getStringValueIfExistOrElseNull(X_FINAL, propertiesMap)));
         variableProperties.setPolymorph(
                 !collectPolymorphRefs(propertiesMap).isEmpty());
         // Process x-field-annotation
@@ -241,7 +243,7 @@ public class AbstractMapper {
         String format = variableProperties.getFormat();
         String referencedObject = getStringValueIfExistOrElseNull(REFERENCE, additionalPropertiesMap);
         variableProperties.addRequiredImports(MAP_IMPORT);
-        variableProperties.setRealisation(getStringValueIfExistOrElseNull(REALIZATION, propertiesMap));
+        variableProperties.setRealisation(getXValueOrElseDeprecated(X_REALIZATION, REALIZATION, propertiesMap, LOG));
         variableProperties.setValid(false);
         if (type != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(type)) {
             LOG.debug("CORRECT TYPE!");
@@ -286,7 +288,7 @@ public class AbstractMapper {
                 if (collectionType != null) {
                     variableProperties.setCollectionType(collectionType);
                 }
-                String javaType = getStringValueIfExistOrElseNull(ADDITIONAL_FORMAT, additionalPropertiesMap);
+                String javaType = getXValueOrElseDeprecated(X_ADDITIONAL_FORMAT, ADDITIONAL_FORMAT, additionalPropertiesMap, LOG);
                 if (javaType != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(javaType)) {
                     if (format != null) {
                         variableProperties.setItems(JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(javaType).toString());
@@ -325,12 +327,13 @@ public class AbstractMapper {
                     variableProperties.addRequiredImports(prepareImport(processContext, refObjectName));
                 }
             }
-        } else if (ARRAY.equals(type) && getStringValueIfExistOrElseNull(ADDITIONAL_FORMAT, additionalPropertiesMap) != null) {
+        } else if (ARRAY.equals(type) && getXValueOrElseDeprecated(X_ADDITIONAL_FORMAT, ADDITIONAL_FORMAT, additionalPropertiesMap, null) != null) {
             String collectionType = getStringValueIfExistOrElseNull(FORMAT, additionalPropertiesMap);
             if (collectionType != null) {
                 variableProperties.setCollectionType(collectionType);
             }
-            variableProperties.setItems(JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(getStringValueIfExistOrElseNull(ADDITIONAL_FORMAT, additionalPropertiesMap)).toString());
+            String additionalFormatValue = getXValueOrElseDeprecated(X_ADDITIONAL_FORMAT, ADDITIONAL_FORMAT, additionalPropertiesMap, LOG);
+            variableProperties.setItems(JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(additionalFormatValue).toString());
             fillCollectionType(variableProperties);
             if (format != null) {
                 variableProperties.setType(format(MAP_CUSTOM_TYPE,
@@ -525,7 +528,12 @@ public class AbstractMapper {
                                      ProcessContext processContext,
                                      Map<String, Object> innerSchemas) {
         Map<String, Object> items = castObjectToMap(propertiesMap.get(ITEMS));
-        variableProperties.setRealisation(getStringValueIfExistOrElseNull(REALIZATION, items));
+        String realizationValue = getXValueOrElseDeprecated(X_REALIZATION, REALIZATION, items, LOG);
+        if (realizationValue == null) {
+            // Also check top-level propertiesMap for realization (used with maps)
+            realizationValue = getXValueOrElseDeprecated(X_REALIZATION, REALIZATION, propertiesMap, null);
+        }
+        variableProperties.setRealisation(realizationValue);
         String refValue = getStringValueIfExistOrElseNull(REFERENCE, items);
         String collectionFormat = getStringValueIfExistOrElseNull(FORMAT, propertiesMap);
         boolean javaType = false;
@@ -652,8 +660,9 @@ public class AbstractMapper {
                       key.equals(EXAMPLE) || key.equals(DEFAULT) || key.equals(PATTERN) ||
                       key.equals(MIN_LENGTH) || key.equals(MAX_LENGTH) ||
                       key.equals(MINIMUM) || key.equals(MAXIMUM) ||
-                      key.equals(DIGITS) ||
-                      key.equals(REALIZATION) || key.equals(NAME) || key.equals(PACKAGE))) {
+                      key.equals(DIGITS) || key.equals(X_DIGITS) ||
+                      key.equals(REALIZATION) || key.equals(X_REALIZATION) ||
+                      key.equals(NAME) || key.equals(PACKAGE))) {
                     actualProps.put(key, entry.getValue());
                     it.remove();
                 }
@@ -897,9 +906,9 @@ public class AbstractMapper {
         Set<String> annotationSet = new HashSet<>();
         Set<String> importSet = new HashSet<>();
         Set<String> requiredAttributes = getSetValueIfExistsOrElseEmptySet(REQUIRED, currentSchema);
-        Set<String> validationGroups = getSetValueIfExistsOrElseEmptySet(VALIDATION_GROUPS, currentSchema);
-        Set<String> validationGroupsImports = getSetValueIfExistsOrElseEmptySet(VALIDATION_GROUPS_IMPORTS, currentSchema);
-        Set<String> validationFields = getSetValueIfExistsOrElseEmptySet(VALIDATE_BY_GROUPS, currentSchema);
+        Set<String> validationGroups = getXSetValueOrElseDeprecated(X_VALIDATION_GROUPS, VALIDATION_GROUPS, currentSchema, LOG);
+        Set<String> validationGroupsImports = getXSetValueOrElseDeprecated(X_VALIDATION_GROUPS_IMPORTS, VALIDATION_GROUPS_IMPORTS, currentSchema, LOG);
+        Set<String> validationFields = getXSetValueOrElseDeprecated(X_VALIDATE_BY_GROUPS, VALIDATE_BY_GROUPS, currentSchema, LOG);
         String groups = null;
         if (!validationGroups.isEmpty()) {
             if (validationGroupsImports.isEmpty() || validationFields.isEmpty()) {

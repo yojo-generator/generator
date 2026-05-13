@@ -33,8 +33,8 @@ public class UpdateExpectedFiles {
             new TestConfig("discriminator.yaml", "discriminator", false, "without-lombok/discriminator"),
             
             // Test (main contract) tests
-            new TestConfig("test.yaml", "test", true, "with-lombok/test"),
-            new TestConfig("test.yaml", "test", false, "without-lombok/test"),
+            new TestConfig("test.yaml", "example.testGenerate.test", true, "with-lombok/test"),
+            new TestConfig("test.yaml", "example.testGenerate.test", false, "without-lombok/test"),
             
             // Gitter tests
             new TestConfig("gitter-streaming-async-api-v3.0.yaml", "gitter", true, "with-lombok/gitter"),

@@ -200,6 +200,12 @@ public class VariableProperties {
     private Set<String> fieldAnnotations = new HashSet<>();
 
     /**
+     * {@code true} if this field should be declared as {@code final}.
+     * When set, generates {@code private final Type name;} instead of {@code private Type name;}.
+     */
+    private boolean isFinal = false;
+
+    /**
      * Fully qualified class name of the @Nullable annotation to apply when the field is not required.
      * Used only if the field is not annotated with @NotNull/@NotBlank/@NotEmpty.
      */
@@ -538,6 +544,24 @@ public class VariableProperties {
      */
     public void setNullableAnnotation(String nullableAnnotation) {
         this.nullableAnnotation = nullableAnnotation;
+    }
+
+    /**
+     * Returns whether this field should be declared as {@code final}.
+     *
+     * @return {@code true} if final modifier should be added
+     */
+    public boolean isFinal() {
+        return isFinal;
+    }
+
+    /**
+     * Sets whether this field should be declared as {@code final}.
+     *
+     * @param isFinal {@code true} to add final modifier
+     */
+    public void setFinal(boolean isFinal) {
+        this.isFinal = isFinal;
     }
 
     /**
@@ -1197,41 +1221,49 @@ public class VariableProperties {
                         break;
                 }
             }
+            String dvTemplate = isFinal() ? FIELD_FINAL_WITH_DEFAULT_VALUE : FIELD_WITH_DEFAULT_VALUE;
             stringBuilder.append(lineSeparator())
-                    .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), getDefaultProperty()));
+                    .append(format(dvTemplate, getType(), getName(), getDefaultProperty()));
             return stringBuilder.toString();
         }
 
         if (realisation != null) {
             if (type.startsWith("List")) {
+                String realTemplate = isFinal() ? FIELD_FINAL_WITH_DEFAULT_VALUE : FIELD_WITH_DEFAULT_VALUE;
                 switch (realisation) {
                     case "ArrayList":
                         return stringBuilder.append(lineSeparator())
-                                .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), ARRAY_LIST_REALISATION)).toString();
+                                .append(format(realTemplate, getType(), getName(), ARRAY_LIST_REALISATION)).toString();
                     case "LinkedList":
                         return stringBuilder.append(lineSeparator())
-                                .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), LINKED_LIST_REALISATION)).toString();
+                                .append(format(realTemplate, getType(), getName(), LINKED_LIST_REALISATION)).toString();
                 }
             }
             if (type.startsWith("Set")) {
+                String realTemplate = isFinal() ? FIELD_FINAL_WITH_DEFAULT_VALUE : FIELD_WITH_DEFAULT_VALUE;
                 switch (realisation) {
                     case "HashSet":
                         return stringBuilder.append(lineSeparator())
-                                .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), HASH_SET_REALISATION)).toString();
+                                .append(format(realTemplate, getType(), getName(), HASH_SET_REALISATION)).toString();
                 }
             }
             if (type.startsWith("Map")) {
+                String realTemplate = isFinal() ? FIELD_FINAL_WITH_DEFAULT_VALUE : FIELD_WITH_DEFAULT_VALUE;
                 switch (realisation) {
                     case "HashMap":
                         return stringBuilder.append(lineSeparator())
-                                .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), HASH_MAP_REALISATION)).toString();
+                                .append(format(realTemplate, getType(), getName(), HASH_MAP_REALISATION)).toString();
                     case "LinkedHashMap":
                         return stringBuilder.append(lineSeparator())
-                                .append(format(FIELD_WITH_DEFAULT_VALUE, getType(), getName(), LINKED_HASH_MAP_REALISATION)).toString();
+                                .append(format(realTemplate, getType(), getName(), LINKED_HASH_MAP_REALISATION)).toString();
                 }
             }
         }
 
+        if (isFinal()) {
+            return stringBuilder.append(lineSeparator())
+                    .append(format(FIELD_FINAL, getType(), getName())).toString();
+        }
         return stringBuilder.append(lineSeparator())
                 .append(format(FIELD, getType(), getName())).toString();
     }

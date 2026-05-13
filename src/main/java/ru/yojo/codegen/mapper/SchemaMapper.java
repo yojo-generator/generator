@@ -75,15 +75,23 @@ public class SchemaMapper extends AbstractMapper {
                         .fillParameters(new FillParameters(new ArrayList<>()))
                         .isInterface(true)
                         .description(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap))
-                        .methods(castObjectToMap(schemaMap.get(METHODS)))
-                        .interfaceImports(getSetValueIfExistsOrElseEmptySet(IMPORTS, schemaMap))
+                        .methods(castObjectToMap(schemaMap.getOrDefault(X_METHODS, schemaMap.get(METHODS))))
+                        .interfaceImports(getXSetValueOrElseDeprecated(X_IMPORTS, IMPORTS, schemaMap, LOG))
                         .build();
                 schemaList.add(schema);
                 return;
             }
 
-            if (schemaMap != null && schemaMap.containsKey(LOMBOK)) {
-                Map<String, Object> lombokProps = castObjectToMap(schemaMap.get(LOMBOK));
+            Map<String, Object> lombokProps;
+            if (schemaMap != null && schemaMap.containsKey(X_LOMBOK)) {
+                lombokProps = castObjectToMap(schemaMap.get(X_LOMBOK));
+            } else if (schemaMap != null && schemaMap.containsKey(LOMBOK)) {
+                LOG.warn("Attribute 'lombok' is deprecated, use 'x-lombok' instead");
+                lombokProps = castObjectToMap(schemaMap.get(LOMBOK));
+            } else {
+                lombokProps = new LinkedHashMap<>();
+            }
+            if (!lombokProps.isEmpty()) {
                 if (lombokProps.containsKey(ENABLE) &&
                     "false".equals(getStringValueIfExistOrElseNull(ENABLE, lombokProps))) {
                     finalLombokProperties.setEnableLombok(Boolean.valueOf(getStringValueIfExistOrElseNull(ENABLE, lombokProps)));
@@ -103,10 +111,10 @@ public class SchemaMapper extends AbstractMapper {
 
                 AtomicBoolean needToFill = new AtomicBoolean(true);
                 schemaMap.forEach((sk, sv) -> {
-                    if (sk.equals(EXTENDS)) {
+                    if (sk.equals(EXTENDS) || sk.equals(X_EXTENDS)) {
                         Map<String, Object> extendsMap = castObjectToMap(sv);
-                        String fromClass = getStringValueIfExistOrElseNull(FROM_CLASS, extendsMap);
-                        String fromPackage = getStringValueIfExistOrElseNull(FROM_PACKAGE, extendsMap);
+                        String fromClass = getXValueOrElseDeprecated(X_FROM_CLASS, FROM_CLASS, extendsMap, LOG);
+                        String fromPackage = getXValueOrElseDeprecated(X_FROM_PACKAGE, FROM_PACKAGE, extendsMap, LOG);
                         LOG.info("SHOULD EXTENDS FROM: " + fromClass);
                         builder.extendsFrom(fromClass);
                         if (fromPackage != null) {
@@ -120,9 +128,18 @@ public class SchemaMapper extends AbstractMapper {
                             needToFill.set(false);
                         }
                     }
-                    if (sk.equals(IMPLEMENTS)) {
+                    if (sk.equals(IMPLEMENTS) || sk.equals(X_IMPLEMENTS)) {
                         Map<String, Object> implementsMap = castObjectToMap(sv);
-                        List<String> fromInterfaceList = castObjectToList(implementsMap.get(FROM_INTERFACE));
+                        Object fromInterfaceObj;
+                        if (implementsMap.containsKey(X_FROM_INTERFACE)) {
+                            fromInterfaceObj = implementsMap.get(X_FROM_INTERFACE);
+                        } else {
+                            if (implementsMap.containsKey(FROM_INTERFACE)) {
+                                LOG.warn("Attribute 'fromInterface' is deprecated, use 'x-from-interface' instead");
+                            }
+                            fromInterfaceObj = implementsMap.get(FROM_INTERFACE);
+                        }
+                        List<String> fromInterfaceList = castObjectToList(fromInterfaceObj);
                         LOG.info("SHOULD IMPLEMENTS FROM: " + fromInterfaceList);
                         fromInterfaceList.forEach(ifc -> {
                             String[] split = ifc.split("[.]");
@@ -150,7 +167,7 @@ public class SchemaMapper extends AbstractMapper {
 
                 // ——— Discriminator: set extendsFrom on subtypes referencing a discriminator base ——— //
                 // (only if no explicit extends was defined in the YAML)
-                if (!schemaMap.containsKey(EXTENDS)) {
+                if (!schemaMap.containsKey(EXTENDS) && !schemaMap.containsKey(X_EXTENDS)) {
                     for (String polyKey : POLYMORPHS) {
                         if (schemaMap.containsKey(polyKey)) {
                             List<Object> items = castObjectToListObjects(schemaMap.get(polyKey));

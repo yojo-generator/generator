@@ -21,6 +21,16 @@ public class StringValues {
     @NotBlank
     private String stringValueWithRequired;
 
+    /**
+     * A final field with default value
+     */
+    private final String stringFinalValue = "initial";
+
+    /**
+     * A final field that requires constructor init
+     */
+    private final String stringFinalWithoutDefault;
+
     @NotBlank
     @Size(min = 1)
     private String stringValueNotBlankSizeMinLength;
@@ -39,6 +49,10 @@ public class StringValues {
     @Size(min = 1, max = 2)
     @Pattern(regexp = "^d{6}$")
     private String stringWithAllAnnotations;
+    public StringValues(String stringFinalWithoutDefault) {
+        this.stringFinalWithoutDefault = stringFinalWithoutDefault;
+    }
+
     public void setStringWithDefaultValue(String stringWithDefaultValue) {
         this.stringWithDefaultValue = stringWithDefaultValue;
     }
@@ -62,6 +76,10 @@ public class StringValues {
     }
     public String getStringValueWithRequired() {
         return stringValueWithRequired;
+    }    public String getStringFinalValue() {
+        return stringFinalValue;
+    }    public String getStringFinalWithoutDefault() {
+        return stringFinalWithoutDefault;
     }
     public void setStringValueNotBlankSizeMinLength(String stringValueNotBlankSizeMinLength) {
         this.stringValueNotBlankSizeMinLength = stringValueNotBlankSizeMinLength;

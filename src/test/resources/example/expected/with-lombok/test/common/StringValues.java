@@ -6,7 +6,6 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
 /**
@@ -14,7 +13,6 @@ import lombok.experimental.Accessors;
 */
 @Generated("Yojo")
 @Data
-@NoArgsConstructor
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
 public class StringValues {
@@ -28,6 +26,16 @@ public class StringValues {
 
     @NotBlank
     private String stringValueWithRequired;
+
+    /**
+     * A final field with default value
+     */
+    private final String stringFinalValue = "initial";
+
+    /**
+     * A final field that requires constructor init
+     */
+    private final String stringFinalWithoutDefault;
 
     @NotBlank
     @Size(min = 1)
