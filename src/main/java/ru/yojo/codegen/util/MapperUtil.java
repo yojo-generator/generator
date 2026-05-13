@@ -59,6 +59,58 @@ public class MapperUtil {
     }
 
     /**
+     * Backward-compatible attribute reader: try the new {@code x-} prefixed key first,
+     * fall back to the deprecated old key with a warning.
+     *
+     * @param xKey  the new key with {@code x-} prefix (e.g. {@code "x-realization"})
+     * @param oldKey the deprecated old key (e.g. {@code "realization"})
+     * @param map   source YAML map
+     * @param log   logger for deprecation warnings (may be {@code null})
+     * @return attribute string value, or {@code null} if neither key exists
+     */
+    public static String getXValueOrElseDeprecated(String xKey, String oldKey,
+                                                    Map<String, Object> map,
+                                                    Logger log) {
+        if (map.containsKey(xKey)) {
+            Object value = map.get(xKey);
+            return value != null ? value.toString() : null;
+        }
+        if (map.containsKey(oldKey)) {
+            if (log != null) {
+                log.warn("Attribute '" + oldKey + "' is deprecated, use '" + xKey + "' instead");
+            }
+            Object value = map.get(oldKey);
+            return value != null ? value.toString() : null;
+        }
+        return null;
+    }
+
+    /**
+     * Backward-compatible set reader: try the new {@code x-} prefixed key first,
+     * fall back to the deprecated old key with a warning.
+     *
+     * @param xKey  the new key with {@code x-} prefix (e.g. {@code "x-validationGroups"})
+     * @param oldKey the deprecated old key (e.g. {@code "validationGroups"})
+     * @param map   source YAML map
+     * @param log   logger for deprecation warnings (may be {@code null})
+     * @return non-null set of strings
+     */
+    public static Set<String> getXSetValueOrElseDeprecated(String xKey, String oldKey,
+                                                            Map<String, Object> map,
+                                                            Logger log) {
+        if (map.containsKey(xKey)) {
+            return new HashSet<>((ArrayList<String>) map.get(xKey));
+        }
+        if (map.containsKey(oldKey)) {
+            if (log != null) {
+                log.warn("Attribute '" + oldKey + "' is deprecated, use '" + xKey + "' instead");
+            }
+            return new HashSet<>((ArrayList<String>) map.get(oldKey));
+        }
+        return new HashSet<>();
+    }
+
+    /**
      * Casts an object to {@code Map<String, Object>}, returning an empty map if {@code null}.
      *
      * @param obj object to cast

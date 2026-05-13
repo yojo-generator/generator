@@ -150,13 +150,13 @@ public class MessageMapper extends AbstractMapper {
                     if (refObject != null) {
                         Map<String, Object> refMap = castObjectToMap(processContext.getSchemasMap().get(refReplace(refObject)));
                         refMap.forEach((mk, mv) -> {
-                            if (mk.equals(EXTENDS)) {
+                            if (mk.equals(EXTENDS) || mk.equals(X_EXTENDS)) {
                                 String fromClass = prepareExtendsMessage(builder, mv, processContext);
                                 if (refObject != null && refReplace(refObject).equals(fromClass)) {
                                     needToFill.set(false);
                                 }
                             }
-                            if (mk.equals(IMPLEMENTS)) {
+                            if (mk.equals(IMPLEMENTS) || mk.equals(X_IMPLEMENTS)) {
                                 prepareImplementsMessage(builder, mv);
                             }
                         });
@@ -193,7 +193,16 @@ public class MessageMapper extends AbstractMapper {
      */
     private static void prepareImplementsMessage(MessageBuilder builder, Object mv) {
         Map<String, Object> implementsMap = castObjectToMap(mv);
-        List<String> fromInterfaceList = castObjectToList(implementsMap.get(FROM_INTERFACE));
+        Object fromInterfaceObj;
+        if (implementsMap.containsKey(X_FROM_INTERFACE)) {
+            fromInterfaceObj = implementsMap.get(X_FROM_INTERFACE);
+        } else {
+            if (implementsMap.containsKey(FROM_INTERFACE)) {
+                LOG.warn("Attribute 'fromInterface' is deprecated, use 'x-from-interface' instead");
+            }
+            fromInterfaceObj = implementsMap.get(FROM_INTERFACE);
+        }
+        List<String> fromInterfaceList = castObjectToList(fromInterfaceObj);
         LOG.info("SHOULD IMPLEMENTS FROM: " + fromInterfaceList);
         fromInterfaceList.forEach(ifc -> {
             String[] split = ifc.split("[.]");
@@ -212,8 +221,8 @@ public class MessageMapper extends AbstractMapper {
      */
     private static String prepareExtendsMessage(MessageBuilder builder, Object mv, ProcessContext processContext) {
         Map<String, Object> extendsMap = castObjectToMap(mv);
-        String fromClass = getStringValueIfExistOrElseNull(FROM_CLASS, extendsMap);
-        String fromPackage = getStringValueIfExistOrElseNull(FROM_PACKAGE, extendsMap);
+        String fromClass = getXValueOrElseDeprecated(X_FROM_CLASS, FROM_CLASS, extendsMap, LOG);
+        String fromPackage = getXValueOrElseDeprecated(X_FROM_PACKAGE, FROM_PACKAGE, extendsMap, LOG);
         LOG.info("SHOULD EXTENDS FROM: " + fromClass);
         if (fromClass != null && processContext.getSchemasMap().containsKey(fromClass)) {
             fromPackage = null;
@@ -250,14 +259,14 @@ public class MessageMapper extends AbstractMapper {
                                               AtomicBoolean needToFill,
                                               ProcessContext processContext) {
         payloadMap.forEach((mk, mv) -> {
-            if (mk.equals(EXTENDS)) {
+            if (mk.equals(EXTENDS) || mk.equals(X_EXTENDS)) {
                 String fromClass = prepareExtendsMessage(builder, mv, processContext);
                 if (refObject != null && refReplace(refObject).equals(fromClass)) {
                     needToFill.set(false);
                     excludeInheritanceSchemas.add(refReplace(refObject));
                 }
             }
-            if (mk.equals(IMPLEMENTS)) {
+            if (mk.equals(IMPLEMENTS) || mk.equals(X_IMPLEMENTS)) {
                 prepareImplementsMessage(builder, mv);
             }
         });
@@ -295,8 +304,16 @@ public class MessageMapper extends AbstractMapper {
                                              LombokProperties lombokProperties) {
         FillParameters parameters = new FillParameters();
 
-        if (payload.containsKey(LOMBOK)) {
-            Map<String, Object> lombokProps = castObjectToMap(payload.get(LOMBOK));
+        Map<String, Object> lombokProps;
+        if (payload.containsKey(X_LOMBOK)) {
+            lombokProps = castObjectToMap(payload.get(X_LOMBOK));
+        } else if (payload.containsKey(LOMBOK)) {
+            LOG.warn("Attribute 'lombok' is deprecated, use 'x-lombok' instead");
+            lombokProps = castObjectToMap(payload.get(LOMBOK));
+        } else {
+            lombokProps = new LinkedHashMap<>();
+        }
+        if (!lombokProps.isEmpty()) {
             if (lombokProps.containsKey(ENABLE) &&
                 "false".equals(getStringValueIfExistOrElseNull(ENABLE, lombokProps))) {
                 lombokProperties.setEnableLombok(Boolean.valueOf(getStringValueIfExistOrElseNull(ENABLE, lombokProps)));
@@ -433,8 +450,8 @@ public class MessageMapper extends AbstractMapper {
                     processContext,
                     innerSchemas
             );
-            if (getStringValueIfExistOrElseNull(REMOVE_SCHEMA, payload) != null &&
-                getStringValueIfExistOrElseNull(REMOVE_SCHEMA, payload).equals("true")) {
+            String removeSchemaVal = getXValueOrElseDeprecated(X_REMOVE_SCHEMA, REMOVE_SCHEMA, payload, LOG);
+            if (removeSchemaVal != null && "true".equals(removeSchemaVal)) {
                 removeSchemas.add(schemaName);
             }
             if (!innerSchemas.isEmpty()) {
