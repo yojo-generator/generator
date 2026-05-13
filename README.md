@@ -155,20 +155,22 @@ listOfLongs:
   items:
     type: integer
     format: int64
-    realization: ArrayList
+    x-realization: ArrayList
 setOfDates:
   type: array
   format: set
   items:
     type: string
     format: date
-    realization: HashSet
+    x-realization: HashSet
 ```
 
 ```java
 private List<Long> listOfLongs = new ArrayList<>();
 private Set<LocalDate> setOfDates = new HashSet<>();
 ```
+
+> ⚠️ The old `realization` key is deprecated. Use `x-realization` instead.
 
 ---
 
@@ -324,7 +326,8 @@ private BigDecimal bigDecimalValue;
 private BigDecimal bigDecimalValue2;
 ```
 
-> ⚠️ `digits: "integer = 2, fraction = 2"` is legacy. Prefer `multipleOf` — it is standards-compliant.
+> ⚠️ `digits: "integer = 2, fraction = 2"` is legacy. Prefer `multipleOf` — it is standards-compliant.  
+> Use `x-digits` if you need the explicit form (see [Supported Attributes](#supported-attributes)).
 
 ---
 
@@ -452,29 +455,54 @@ public class StickInsect extends Pet {
 
 ## Supported Attributes
 
-| Attribute | Scope | Type | Example | Effect |
-|---|---|---|---|---|
-| `realization` | `items`, `additionalProperties` | `string` | `ArrayList` | `= new ArrayList<>()` |
-| `primitive` | field | `boolean` | `true` | `int`, `boolean`, `long` |
-| `multipleOf` | number | `number` | `0.01` | `@Digits(integer = 1, fraction = 2)` |
-| `digits` | number | `string` | `"integer=2, fraction=2"` | `@Digits(...)` (legacy) |
-| `const` | schema, field | `string` | `"StickBug"` | Override discriminator value |
-| `discriminator` | schema | `string` | `"petType"` | `@JsonTypeInfo` + `@JsonSubTypes` |
-| `validationGroups` | schema | `list` | `[Create.class]` | `@NotBlank(groups = {Create.class})` |
-| `validationGroupsImports` | schema | `list` | `[pkg.Validation]` | `import pkg.Validation;` |
-| `validateByGroups` | schema | `list` | `[name, email]` | Annotations only on listed fields |
-| `lombok.*` | schema/message | nested | *see Gradle config* | `@Data`, `@Accessors`, etc. |
-| `extends` / `implements` | schema/message | map | `fromClass`, `fromPackage` | `extends X implements Y` |
-| `format: interface` | schema | — | — | `interface X { ... }` |
-| `format: existing` | field | `name`, `package` | — | Import existing class |
-| `pathForGenerateMessage` | `message.payload` | `string` | `io.github.events` | Custom message package |
-| `removeSchema` | `message.payload` | `boolean` | `true` | Skip DTO generation for `$ref` target |
-| `additionalFormat` | `additionalProperties` | `string` | `uuid` | Custom map key type |
-| `x-enumNames` | enum | `map` | `SUCCESS: "Ok"` | Enum with description field |
-| `x-enumValues` | enum | `map` | `ACTIVE: "A"` | Enum with wire values → `@JsonValue`/`@JsonCreator` |
-| `x-enumDefault` | enum predicate | `boolean` | `true` | Adds `UNKNOWN_DEFAULT_YOJO` fallback for unknown wire values (requires `x-enumValues`) |
-| `x-class-annotation` | schema, message | `list` | `[com.example.MyAnnotation]` | Class-level annotations |
-| `x-field-annotation` | field | `list` | `[com.example.MyAnnotation("v")]` | Field-level annotations |
+All custom Yojo attributes now have `x-` prefixed equivalents. While the old names still work (backward compatibility), they are **deprecated** and will log a warning. New contracts should use the `x-` prefixed names.
+
+| Attribute (old, deprecated) | Attribute (new, preferred) | Scope | Type | Example | Effect |
+|---|---|---|---|---|---|
+| — | `x-realization` | `items`, `additionalProperties` | `string` | `ArrayList` | `= new ArrayList<>()` |
+| `realization` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
+| — | `x-digits` | number | `string` | `"integer=2, fraction=2"` | `@Digits(...)` |
+| `digits` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
+| — | `x-additional-format` | `additionalProperties` | `string` | `uuid` | Custom map key type |
+| `additionalFormat` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
+| — | `x-validation-groups` | schema | `list` | `[Create.class]` | `@NotBlank(groups = {Create.class})` |
+| `validationGroups` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
+| — | `x-validation-groups-imports` | schema | `list` | `[pkg.Validation]` | `import pkg.Validation;` |
+| `validationGroupsImports` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
+| — | `x-validate-by-groups` | schema | `list` | `[name, email]` | Annotations only on listed fields |
+| `validateByGroups` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
+| — | `x-lombok.*` | schema/message | nested | *see Gradle config* | `@Data`, `@Accessors`, etc. |
+| `lombok.*` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
+| — | `x-extends` / `x-implements` | schema/message | map | `x-from-class`, `x-from-package` | `extends X implements Y` |
+| `extends` / `implements` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
+| — | `x-from-class` | inside `x-extends` | `string` | `BaseClass` | Superclass name |
+| `fromClass` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
+| — | `x-from-package` | inside `x-extends` | `string` | `com.example` | Superclass package |
+| `fromPackage` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
+| — | `x-from-interface` | inside `x-implements` | `list` | `[com.example.Ifc]` | Interface FQN list |
+| `fromInterface` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
+| — | `x-remove-schema` | `message.payload` | `boolean` | `true` | Skip DTO generation for `$ref` target |
+| `removeSchema` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
+| — | `x-methods` | schema (interface) | map | *see [interface example](#custom-annotations-x-class-annotation-x-field-annotation)* | Interface method definitions |
+| `methods` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
+| — | `x-imports` | schema (interface) | `list` | `[java.util.List]` | Interface-level imports |
+| `imports` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
+| — | `x-definition` | inside method entry | `string` | `"void doWork();"` | Method signature in interfaces |
+| `definition` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
+| — | `x-path-for-generate-message` | `message.payload` | `string` | `io.github.events` | Custom message package |
+| `pathForGenerateMessage` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
+| `primitive` | — | field | `boolean` | `true` | `int`, `boolean`, `long` |
+| `multipleOf` | — | number | `number` | `0.01` | `@Digits(integer = 1, fraction = 2)` |
+| `const` | — | schema, field | `string` | `"StickBug"` | Override discriminator value |
+| `discriminator` | — | schema | `string` | `"petType"` | `@JsonTypeInfo` + `@JsonSubTypes` |
+| `format: interface` | — | schema | — | — | `interface X { ... }` |
+| `format: existing` | — | field | `name`, `package` | — | Import existing class |
+| `x-enumNames` | — | enum | `map` | `SUCCESS: "Ok"` | Enum with description field |
+| `x-enumValues` | — | enum | `map` | `ACTIVE: "A"` | Enum with wire values → `@JsonValue`/`@JsonCreator` |
+| `x-enumDefault` | — | enum predicate | `boolean` | `true` | Adds `UNKNOWN_DEFAULT_YOJO` fallback |
+| `x-class-annotation` | — | schema, message | `list` | `[com.example.MyAnnotation]` | Class-level annotations |
+| `x-field-annotation` | — | field | `list` | `[com.example.MyAnnotation("v")]` | Field-level annotations |
+| `x-final` | — | field | `boolean` | `true` | Generates `final` field declaration |
 
 ---
 
@@ -505,6 +533,7 @@ If you discover a security issue, please contact the maintainer directly (email 
 | **`@JsonTypeId` on fields** | ✅ Done | Discriminator field annotation in subtypes |
 | **Discriminator `const`** | ✅ Done | Override default discriminator value via `const` |
 | **Jackson annotations** | 🟡 Partial | `@JsonProperty`, `@JsonInclude`, `@JsonValue`/`@JsonCreator` (via `x-enumValues`) done |
+| **x- prefixed attributes** | ✅ Done (4.3.0) | All custom attributes deprecated in favour of `x-` equivalents |
 | **AsyncAPI spec validation** | 🚧 Planned | Validate `$ref`, `type`, `format`, detect circular refs |
 | **Lombok extensions** | 🚧 Planned | `@Builder`, `@Singular`, `@SuperBuilder` |
 | **OpenAPI 3.1 support** | 🚧 Planned | After AsyncAPI 3.0 stabilizes |
