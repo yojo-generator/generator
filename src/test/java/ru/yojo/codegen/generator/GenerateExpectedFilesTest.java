@@ -30,6 +30,7 @@ public class GenerateExpectedFilesTest {
         generateForSpec("discriminator.yaml", "discriminator", false);
         generateForSpec("test-create-app.yaml", "testCreateApp", false);
         generateForSpec("builder-test.yaml", "example.testGenerate.builder", false);
+        generateForSpec("builder-test.yaml", "nosplit", false, false);
     }
 
     @Test
@@ -43,9 +44,14 @@ public class GenerateExpectedFilesTest {
         generateForSpec("discriminator.yaml", "discriminator", true);
         generateForSpec("test-create-app.yaml", "testCreateApp", true);
         generateForSpec("builder-test.yaml", "example.testGenerate.builder", true);
+        generateForSpec("builder-test.yaml", "nosplit", true, false);
     }
 
     private void generateForSpec(String specName, String packageLocation, boolean useLombok) throws java.io.IOException {
+        generateForSpec(specName, packageLocation, useLombok, true);
+    }
+
+    private void generateForSpec(String specName, String packageLocation, boolean useLombok, boolean splitModels) throws java.io.IOException {
         String lombokDir = useLombok ? "with-lombok" : "without-lombok";
         
         // Extract expected directory name from package
@@ -55,13 +61,14 @@ public class GenerateExpectedFilesTest {
         
         String outputDir = "src/test/resources/example/expected/" + lombokDir + "/" + expectedDir;
         
-        LOG.info("Generating " + specName + " (Lombok: " + useLombok + ") -> " + outputDir);
+        LOG.info("Generating " + specName + " (Lombok: " + useLombok + ", splitModels: " + splitModels + ") -> " + outputDir);
         
         SpecificationProperties spec = new SpecificationProperties();
         spec.setSpecName(specName);
         spec.setInputDirectory("src/test/resources/example/contract");
         spec.setOutputDirectory(outputDir);
         spec.setPackageLocation(packageLocation);
+        spec.setSplitModels(splitModels);
 
         YojoContext context = new YojoContext();
         context.setSpecificationProperties(java.util.Collections.singletonList(spec));
