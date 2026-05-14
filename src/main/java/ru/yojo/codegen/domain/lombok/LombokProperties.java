@@ -37,6 +37,12 @@ public class LombokProperties {
     private EqualsAndHashCode equalsAndHashCode;
 
     /**
+     * Configuration for {@code @Builder} (and related annotations: {@code @Singular}, {@code @Builder.Default}).
+     * When Lombok is disabled but builder is enabled, a manual builder class is generated instead.
+     */
+    private BuilderProperties builder;
+
+    /**
      * Constructs an empty Lombok configuration (defaults apply).
      */
     public LombokProperties() {
@@ -47,20 +53,24 @@ public class LombokProperties {
      * <ul>
      *   <li>{@code enableLombok}</li>
      *   <li>{@code allArgsConstructor}</li>
+     *   <li>{@code noArgsConstructor}</li>
      *   <li>{@code accessors} (reference copy)</li>
+     *   <li>{@code equalsAndHashCode} (reference copy)</li>
      * </ul>
-     * Note: {@code equalsAndHashCode} and {@code noArgsConstructor} are NOT copied — use with caution.
      *
      * @param lombokProperties source configuration
-     * @return new instance with selected properties copied
+     * @return new instance with all properties copied
      */
     public static LombokProperties newLombokProperties(LombokProperties lombokProperties) {
-        return new LombokProperties(
+        LombokProperties copy = new LombokProperties(
                 lombokProperties.enableLombok,
                 lombokProperties.allArgsConstructor,
                 lombokProperties.noArgsConstructor,
                 lombokProperties.getAccessors()
         );
+        copy.equalsAndHashCode = lombokProperties.equalsAndHashCode;
+        copy.builder = lombokProperties.builder;
+        return copy;
     }
 
     /**
@@ -79,6 +89,24 @@ public class LombokProperties {
      */
     public void setEqualsAndHashCode(EqualsAndHashCode equalsAndHashCode) {
         this.equalsAndHashCode = equalsAndHashCode;
+    }
+
+    /**
+     * Returns the {@code @Builder} configuration.
+     *
+     * @return config or {@code null} if not set
+     */
+    public BuilderProperties getBuilder() {
+        return builder;
+    }
+
+    /**
+     * Sets the {@code @Builder} configuration.
+     *
+     * @param builder config (may be {@code null})
+     */
+    public void setBuilder(BuilderProperties builder) {
+        this.builder = builder;
     }
 
     /**
