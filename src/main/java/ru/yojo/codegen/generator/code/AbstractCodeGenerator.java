@@ -14,6 +14,12 @@ import static java.lang.System.lineSeparator;
 import static ru.yojo.codegen.constants.Dictionary.*;
 
 /**
+ * Helper record to hold intermediate builder generation data.
+ */
+record BuilderFieldInfo(String name, String type, String elementType, boolean isCollection, boolean hasDefault, String defaultValue) {
+}
+
+/**
  * Abstract base class for Java source code generators.
  * Provides common methods for building package declarations, imports, JavaDoc, and annotations.
  *
@@ -196,6 +202,18 @@ abstract class AbstractCodeGenerator {
             }
             imports.add(LOMBOK_EQUALS_AND_HASH_CODE_IMPORT);
         }
+
+        if (props.getBuilder() != null && props.getBuilder().isEnable()) {
+            sb.append(LOMBOK_BUILDER_ANNOTATION).append(lineSeparator());
+            imports.add(LOMBOK_BUILDER_IMPORT);
+
+            if (props.getBuilder().isBuilderDefault()) {
+                imports.add(LOMBOK_BUILDER_DEFAULT_IMPORT);
+            }
+            if (props.getBuilder().isSingular()) {
+                imports.add(LOMBOK_SINGULAR_IMPORT);
+            }
+        }
     }
 
     /**
@@ -267,5 +285,169 @@ abstract class AbstractCodeGenerator {
         StringBuilder sb = new StringBuilder();
         sb.append(PUBLIC_ENUM).append(enumName).append(" {");
         return sb;
+    }
+
+    /**
+     * Checks if the given type name represents a collection type (List or Set).
+     *
+     * @param type the Java type string (e.g., "List&lt;String&gt;", "Set&lt;Integer&gt;")
+     * @return {@code true} if the type starts with "List" or "Set"
+     */
+    protected static boolean isCollectionType(String type) {
+        return type != null && (type.startsWith("List") || type.startsWith("Set"));
+    }
+
+    /**
+     * Generates the manual builder parts when Lombok is disabled but builder is enabled.
+     * Produces:
+     * <ul>
+     *   <li>Private constructor accepting {@code Builder}</li>
+     *   <li>Static {@code builder()} factory method</li>
+     *   <li>Public static inner {@code Builder} class with fluent setters, singular adders, and {@code build()}</li>
+     * </ul>
+     *
+     * @param className     the outer class name
+     * @param fields        the field definitions
+     * @param imports       import set to populate with required imports (List, Set, ArrayList, HashSet)
+     * @param stringBuilder target StringBuilder to append to
+     */
+    protected void generateManualBuilder(String className, List<VariableProperties> fields, Set<String> imports, StringBuilder stringBuilder) {
+        if (fields == null || fields.isEmpty()) return;
+
+        // 1. Private constructor taking Builder
+        stringBuilder.append(lineSeparator());
+        stringBuilder.append(String.format("    private %s(Builder builder) {", className)).append(lineSeparator());
+        for (VariableProperties vp : fields) {
+            stringBuilder.append("        this.").append(vp.getName()).append(" = builder.").append(vp.getName()).append(";").append(lineSeparator());
+        }
+        stringBuilder.append("    }").append(lineSeparator());
+
+        // 2. Static builder() method
+        stringBuilder.append(lineSeparator());
+        stringBuilder.append("    public static Builder builder() {").append(lineSeparator());
+        stringBuilder.append("        return new Builder();").append(lineSeparator());
+        stringBuilder.append("    }").append(lineSeparator());
+
+        // 3. Builder inner class
+        stringBuilder.append(lineSeparator());
+        stringBuilder.append("    public static class Builder {").append(lineSeparator());
+
+        // 3a. Builder fields (same as outer, but without 'final', with initialization for collections)
+        for (VariableProperties vp : fields) {
+            String fieldLine;
+            if (isCollectionType(vp.getType())) {
+                String initExpr = getCollectionInitExpr(vp.getType());
+                if (initExpr != null) {
+                    fieldLine = "        private " + vp.getType() + " " + vp.getName() + " = " + initExpr + ";";
+                } else {
+                    fieldLine = "        private " + vp.getType() + " " + vp.getName() + ";";
+                }
+            } else if (vp.getDefaultProperty() != null) {
+                fieldLine = "        private " + vp.getType() + " " + vp.getName() + " = " + vp.getDefaultProperty() + ";";
+            } else {
+                fieldLine = "        private " + vp.getType() + " " + vp.getName() + ";";
+            }
+            stringBuilder.append(fieldLine).append(lineSeparator());
+        }
+
+        // 3b. Fluent setters
+        for (VariableProperties vp : fields) {
+            stringBuilder.append(lineSeparator());
+            stringBuilder.append(String.format("        public Builder %s(%s %s) {", vp.getName(), vp.getType(), vp.getName())).append(lineSeparator());
+            stringBuilder.append("            this.").append(vp.getName()).append(" = ").append(vp.getName()).append(";").append(lineSeparator());
+            stringBuilder.append("            return this;").append(lineSeparator());
+            stringBuilder.append("        }").append(lineSeparator());
+        }
+
+        // 3c. Singular adders for collection fields
+        for (VariableProperties vp : fields) {
+            if (isCollectionType(vp.getType())) {
+                String elementType = extractElementType(vp.getType());
+                String singularName = deriveSingularName(vp.getName());
+                stringBuilder.append(lineSeparator());
+                stringBuilder.append(String.format("        public Builder %s(%s %s) {", singularName, elementType, singularName)).append(lineSeparator());
+                stringBuilder.append("            this.").append(vp.getName()).append(".add(").append(singularName).append(");").append(lineSeparator());
+                stringBuilder.append("            return this;").append(lineSeparator());
+                stringBuilder.append("        }").append(lineSeparator());
+            }
+        }
+
+        // 3d. build() method
+        stringBuilder.append(lineSeparator());
+        stringBuilder.append(String.format("        public %s build() {", className)).append(lineSeparator());
+        stringBuilder.append("            return new ").append(className).append("(this);").append(lineSeparator());
+        stringBuilder.append("        }").append(lineSeparator());
+
+        stringBuilder.append("    }").append(lineSeparator());
+
+        // 4. Add required imports
+        boolean hasList = fields.stream().anyMatch(vp -> vp.getType().startsWith("List"));
+        boolean hasSet = fields.stream().anyMatch(vp -> vp.getType().startsWith("Set"));
+        if (hasList) imports.add(LIST_IMPORT);
+        if (hasSet) imports.add(SET_IMPORT);
+        if (hasList || hasSet) {
+            imports.add(ARRAY_LIST_IMPORT);
+            imports.add(HASH_SET_IMPORT);
+        }
+    }
+
+    /**
+     * Extracts the element type from a generic collection type string.
+     * <p>
+     * Examples:
+     * <ul>
+     *   <li>{@code "List&lt;String&gt;" → "String"}</li>
+     *   <li>{@code "Set&lt;Integer&gt;" → "Integer"}</li>
+     *   <li>{@code "List&lt;Map&lt;String, UUID&gt;&gt;" → "Map&lt;String, UUID&gt;"}</li>
+     * </ul>
+     *
+     * @param type the full generic type (e.g., "List&lt;String&gt;")
+     * @return the element type or the original type if parsing fails
+     */
+    private static String extractElementType(String type) {
+        if (type == null) return null;
+        int start = type.indexOf('<');
+        int end = type.lastIndexOf('>');
+        if (start >= 0 && end > start) {
+            return type.substring(start + 1, end);
+        }
+        return type;
+    }
+
+    /**
+     * Returns the collection initialization expression for the given collection type.
+     *
+     * @param type the collection type (e.g., "List&lt;String&gt;", "Set&lt;Integer&gt;")
+     * @return initialization expression like "new ArrayList&lt;&gt;()" or "new HashSet&lt;&gt;()"
+     */
+    private static String getCollectionInitExpr(String type) {
+        if (type == null) return null;
+        if (type.startsWith("List")) return "new ArrayList<>()";
+        if (type.startsWith("Set")) return "new HashSet<>()";
+        return null;
+    }
+
+    /**
+     * Derives the singular name for a field by removing a trailing 's' character.
+     * This matches Lombok's {@code @Singular} convention.
+     * <p>
+     * Examples:
+     * <ul>
+     *   <li>{@code "items" → "item"}</li>
+     *   <li>{@code "names" → "name"}</li>
+     *   <li>{@code "addresses" → "addresse"}</li>
+     *   <li>{@code "status" → "status"} (no trailing 's')</li>
+     *   <li>{@code "data" → "data"} (no trailing 's')</li>
+     * </ul>
+     *
+     * @param name the field name
+     * @return the singularized name
+     */
+    protected static String deriveSingularName(String name) {
+        if (name == null || name.isEmpty()) return name;
+        if (name.endsWith("s") && name.length() > 1) {
+            return name.substring(0, name.length() - 1);
+        }
+        return name;
     }
 }

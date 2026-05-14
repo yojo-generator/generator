@@ -2,10 +2,13 @@ package ru.yojo.codegen.generator.code;
 
 import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.VariableProperties;
+import ru.yojo.codegen.domain.lombok.BuilderProperties;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.message.Message;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static java.lang.System.lineSeparator;
@@ -57,6 +60,16 @@ public class MessageCodeGenerator extends AbstractCodeGenerator {
         );
 
         LombokProperties lombokProperties = message.getLombokProperties();
+
+        // Identify final fields without default values — they need constructor initialization
+        List<VariableProperties> finalFieldsWithoutDefaults = new ArrayList<>();
+        for (VariableProperties vp : message.getFillParameters().getVariableProperties()) {
+            if (vp.isFinal() && vp.getDefaultProperty() == null && vp.getRealisation() == null) {
+                finalFieldsWithoutDefaults.add(vp);
+            }
+        }
+        boolean hasUninitializedFinalFields = !finalFieldsWithoutDefaults.isEmpty();
+
         if (lombokProperties != null && lombokProperties.enableLombok()) {
             if (message.getFillParameters().getVariableProperties().stream()
                     .anyMatch(prop -> "Data".equals(prop.getType()))) {
@@ -80,7 +93,34 @@ public class MessageCodeGenerator extends AbstractCodeGenerator {
                     lombokProperties.setAccessors(message.getFillParameters().getLombokProperties().getAccessors());
                 }
             }
-            buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder);
+
+            // @NoArgsConstructor fails with uninitialized final fields — skip it
+            if (hasUninitializedFinalFields && lombokProperties.noArgsConstructor()) {
+                LombokProperties modifiedLombok = LombokProperties.newLombokProperties(lombokProperties);
+                modifiedLombok.setNoArgsConstructor(false);
+                buildLombokAnnotations(modifiedLombok, requiredImports, lombokAnnotationBuilder);
+            } else {
+                buildLombokAnnotations(lombokProperties, requiredImports, lombokAnnotationBuilder);
+            }
+        }
+
+        // Apply @Singular and @Builder.Default to fields before generating declarations
+        // NOTE: These Lombok annotations only apply when Lombok is enabled.
+        // When Lombok is disabled, the manual builder class handles the builder pattern.
+        BuilderProperties builderProps = lombokProperties != null ? lombokProperties.getBuilder() : null;
+        boolean lombokEnabled = lombokProperties != null && lombokProperties.enableLombok();
+        if (builderProps != null && builderProps.isEnable() && lombokEnabled) {
+            for (VariableProperties vp : message.getFillParameters().getVariableProperties()) {
+                // @Singular for collection fields (List, Set)
+                if (builderProps.isSingular() && isCollectionType(vp.getType())) {
+                    String singularName = deriveSingularName(vp.getName());
+                    vp.getAnnotationSet().add(String.format(LOMBOK_SINGULAR_ANNOTATION, singularName));
+                }
+                // @Builder.Default for fields with default values
+                if (builderProps.isBuilderDefault() && vp.getDefaultProperty() != null) {
+                    vp.getAnnotationSet().add(LOMBOK_BUILDER_DEFAULT_ANNOTATION);
+                }
+            }
         }
 
         // Add field declarations
@@ -89,22 +129,34 @@ public class MessageCodeGenerator extends AbstractCodeGenerator {
             stringBuilder.append(fields);
         }
 
+        // For without-Lombok: generate constructor for uninitialized final fields
+        if (!finalFieldsWithoutDefaults.isEmpty() && (lombokProperties == null || !lombokProperties.enableLombok())) {
+            stringBuilder
+                    .append(lineSeparator())
+                    .append(generateConstructor(message.getMessageName(), finalFieldsWithoutDefaults))
+                    .append(lineSeparator());
+        }
+
         if (lombokProperties == null || !lombokProperties.enableLombok()) {
             message.getFillParameters().getVariableProperties().forEach(vp -> {
                 String reference = vp.getReference();
                 if (reference != null && vp.getEnumeration() == null) {
-                    stringBuilder
-                            .append(lineSeparator())
-                            .append(generateSetter(reference, uncapitalize(reference)))
-                            .append(lineSeparator())
-                            .append(generateGetter(reference, uncapitalize(reference)));
+                    if (!vp.isFinal()) {
+                        stringBuilder
+                                .append(lineSeparator())
+                                .append(generateSetter(reference, uncapitalize(reference)))
+                                .append(lineSeparator());
+                    }
+                    stringBuilder.append(generateGetter(reference, uncapitalize(reference)));
                 } else if (vp.getEnumeration() == null) {
                     // Regular field (not enum, not reference)
-                    stringBuilder
-                            .append(lineSeparator())
-                            .append(generateSetter(vp.getType(), vp.getName()))
-                            .append(lineSeparator())
-                            .append(generateGetter(vp.getType(), vp.getName()));
+                    if (!vp.isFinal()) {
+                        stringBuilder
+                                .append(lineSeparator())
+                                .append(generateSetter(vp.getType(), vp.getName()))
+                                .append(lineSeparator());
+                    }
+                    stringBuilder.append(generateGetter(vp.getType(), vp.getName()));
                 } else {
                     message.getFillParameters().getVariableProperties().stream()
                             .filter(varProp -> vp.equals(varProp))
@@ -122,6 +174,13 @@ public class MessageCodeGenerator extends AbstractCodeGenerator {
                             .forEach(requiredImports::add);
                 }
             });
+
+            // Manual builder class (without-Lombok path)
+            if (builderProps != null && builderProps.isEnable()) {
+                generateManualBuilder(message.getMessageName(),
+                        message.getFillParameters().getVariableProperties(),
+                        requiredImports, stringBuilder);
+            }
         }
 
         // Add class-level annotations

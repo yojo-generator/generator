@@ -2,6 +2,7 @@ package ru.yojo.codegen.generator.code;
 
 import ru.yojo.codegen.domain.FillParameters;
 import ru.yojo.codegen.domain.VariableProperties;
+import ru.yojo.codegen.domain.lombok.BuilderProperties;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 import ru.yojo.codegen.domain.schema.Schema;
 
@@ -104,6 +105,25 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
                     }
                 }
 
+                // Apply @Singular and @Builder.Default to fields before generating declarations
+                // NOTE: These Lombok annotations only apply when Lombok is enabled.
+                // When Lombok is disabled, the manual builder class handles the builder pattern.
+                BuilderProperties builderProps = lombokProperties != null ? lombokProperties.getBuilder() : null;
+                boolean lombokEnabled = lombokProperties != null && lombokProperties.enableLombok();
+                if (builderProps != null && builderProps.isEnable() && lombokEnabled) {
+                    for (VariableProperties vp : schema.getFillParameters().getVariableProperties()) {
+                        // @Singular for collection fields (List, Set)
+                        if (builderProps.isSingular() && isCollectionType(vp.getType())) {
+                            String singularName = deriveSingularName(vp.getName());
+                            vp.getAnnotationSet().add(String.format(LOMBOK_SINGULAR_ANNOTATION, singularName));
+                        }
+                        // @Builder.Default for fields with default values
+                        if (builderProps.isBuilderDefault() && vp.getDefaultProperty() != null) {
+                            vp.getAnnotationSet().add(LOMBOK_BUILDER_DEFAULT_ANNOTATION);
+                        }
+                    }
+                }
+
                 // Add field declarations
                 String fields = schema.getFillParameters().toWrite();
                 if (fields != null && !fields.isEmpty()) {
@@ -138,6 +158,14 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
                             return i.stream();
                         })
                         .forEach(requiredImports::add);
+
+                // Manual builder class (without-Lombok path)
+                if (builderProps != null && builderProps.isEnable() &&
+                        (lombokProperties == null || !lombokProperties.enableLombok())) {
+                    generateManualBuilder(schema.getSchemaName(),
+                            schema.getFillParameters().getVariableProperties(),
+                            requiredImports, finalStringBuilder);
+                }
             } else {
                 // ENUM
                 stringBuilder = getEnumClassBuilder(schema.getSchemaName());
@@ -318,12 +346,14 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
                     stringBuilder.append(schema.getFillParameters().toWrite()).append(lineSeparator());
                 }
 
-                // 4️⃣ Lombok (exclude @NoArgsConstructor for enums with constructors)
+                // 4️⃣ Lombok (exclude constructors, equalsAndHashCode, and accessors for enums)
                 LombokProperties lombokProperties = schema.getLombokProperties();
                 if (lombokProperties != null && lombokProperties.enableLombok()) {
                     LombokProperties effectiveLombok = LombokProperties.newLombokProperties(lombokProperties);
                     effectiveLombok.setNoArgsConstructor(false);
                     effectiveLombok.setAllArgsConstructor(false);
+                    effectiveLombok.setEqualsAndHashCode(null);
+                    effectiveLombok.setAccessors(null);
                     buildLombokAnnotations(effectiveLombok, requiredImports, lombokAnnotationBuilder);
                 }
             }

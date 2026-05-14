@@ -29,6 +29,7 @@ public class GenerateExpectedFilesTest {
         generateForSpec("one-more.yaml", "oneMore", false);
         generateForSpec("discriminator.yaml", "discriminator", false);
         generateForSpec("test-create-app.yaml", "testCreateApp", false);
+        generateForSpec("builder-test.yaml", "example.testGenerate.builder", false);
     }
 
     @Test
@@ -41,6 +42,7 @@ public class GenerateExpectedFilesTest {
         generateForSpec("one-more.yaml", "oneMore", true);
         generateForSpec("discriminator.yaml", "discriminator", true);
         generateForSpec("test-create-app.yaml", "testCreateApp", true);
+        generateForSpec("builder-test.yaml", "example.testGenerate.builder", true);
     }
 
     private void generateForSpec(String specName, String packageLocation, boolean useLombok) throws java.io.IOException {
