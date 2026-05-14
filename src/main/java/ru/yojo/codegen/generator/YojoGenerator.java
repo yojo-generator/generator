@@ -119,7 +119,12 @@ public class YojoGenerator {
         ProcessContext ctx = new ProcessContext(new Yaml().load(result.processedContent()));
         ctx.setFilePath(specFilePath.toString());
         ctx.setPackageLocation(spec.getPackageLocation());
-        ctx.setLombokProperties(yojoContext.getLombokProperties());
+        // Per-spec Lombok fully overrides global when configured in build.gradle
+        if (spec.getLombokProperties() != null) {
+            ctx.setLombokProperties(spec.getLombokProperties());
+        } else {
+            ctx.setLombokProperties(yojoContext.getLombokProperties());
+        }
         ctx.setValidationApi(yojoContext.getValidationApi());
         ctx.setSpringBootVersion(yojoContext.getSpringBootVersion());
         ctx.setNullableAnnotation(yojoContext.getNullableAnnotation());
