@@ -99,6 +99,7 @@ public class SchemaMapper extends AbstractMapper {
                     fillLombokAccessors(finalLombokProperties, lombokProps);
                     fillLombokEqualsAndHashCode(finalLombokProperties, lombokProps);
                     fillLombokConstructors(finalLombokProperties, lombokProps);
+                    fillLombokBuilder(finalLombokProperties, lombokProps);
                 }
             }
 

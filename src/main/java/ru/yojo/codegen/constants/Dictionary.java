@@ -407,6 +407,19 @@ public final class Dictionary {
     public static final String NO_ARGS = "noArgsConstructor";
 
     /**
+     * Lombok builder flag (nested inside {@code lombok} / {@code x-lombok})
+     */
+    public static final String BUILDER = "builder";
+    /**
+     * Lombok builder singular flag (nested inside {@code builder})
+     */
+    public static final String SINGULAR = "singular";
+    /**
+     * Lombok builder default flag (nested inside {@code builder})
+     */
+    public static final String BUILDER_DEFAULT = "builderDefault";
+
+    /**
      * Schema format identifiers used to map YAML types to Java.
      */
     /**
@@ -599,7 +612,7 @@ public final class Dictionary {
      */
     public static final String LOMBOK_ACCESSORS_ANNOTATION = "@Accessors(%s%s)";
     /**
-     * Lombok Accessors empty annotation
+     * Lombok Empty annotation
      */
     public static final String LOMBOK_ACCESSORS_EMPTY_ANNOTATION = "@Accessors";
     /**
@@ -614,6 +627,45 @@ public final class Dictionary {
      * Lombok EqualsAndHashCode annotation
      */
     public static final String EQUALS_AND_HASH_CODE_ANNOTATION = "@EqualsAndHashCode";
+
+    // ============================================================
+    // Lombok Builder annotations
+    // ============================================================
+
+    /**
+     * Lombok @Builder annotation
+     */
+    public static final String LOMBOK_BUILDER_ANNOTATION = "@Builder";
+
+    /**
+     * Lombok @Builder.Default annotation
+     */
+    public static final String LOMBOK_BUILDER_DEFAULT_ANNOTATION = "@Builder.Default";
+
+    /**
+     * Lombok @Singular annotation template.
+     * Usage: String.format(LOMBOK_SINGULAR_ANNOTATION, singularName)
+     */
+    public static final String LOMBOK_SINGULAR_ANNOTATION = "@Singular(\"%s\")";
+
+    // ============================================================
+    // Lombok Builder imports
+    // ============================================================
+
+    /**
+     * Import for Lombok Builder
+     */
+    public static final String LOMBOK_BUILDER_IMPORT = "lombok.Builder;";
+
+    /**
+     * Import for Lombok Builder.Default
+     */
+    public static final String LOMBOK_BUILDER_DEFAULT_IMPORT = "lombok.Builder.Default;";
+
+    /**
+     * Import for Lombok Singular
+     */
+    public static final String LOMBOK_SINGULAR_IMPORT = "lombok.Singular;";
     /**
      * Lombok EqualsAndHashCode with callSuper=false annotation
      */
@@ -1070,6 +1122,14 @@ public final class Dictionary {
      */
     public static final String TABULATION = "    ";
     /**
+     * Double tabulation (for nested class members)
+     */
+    public static final String DOUBLE_TABULATION = "        ";
+    /**
+     * Triple tabulation
+     */
+    public static final String TRIPLE_TABULATION = "            ";
+    /**
      * Import statement prefix
      */
     public static final String IMPORT = "import ";
@@ -1101,6 +1161,63 @@ public final class Dictionary {
      * Public interface declaration
      */
     public static final String PUBLIC_INTERFACE = "public interface ";
+
+    // ============================================================
+    // Manual builder templates (without-lombok path)
+    // ============================================================
+
+    /**
+     * Static builder() method template.
+     */
+    public static final String BUILDER_METHOD = "    public static Builder builder() {" +
+            System.lineSeparator() +
+            "        return new Builder();" +
+            System.lineSeparator() +
+            "    }";
+
+    /**
+     * Builder class start template.
+     */
+    public static final String BUILDER_CLASS_START = "    public static class Builder {" + System.lineSeparator();
+
+    /**
+     * Builder class end.
+     */
+    public static final String BUILDER_CLASS_END = "    }";
+
+    /**
+     * Builder fluent setter template.
+     * Arguments: type, name, capitalized name.
+     */
+    public static final String BUILDER_SETTER = "        public Builder %s(%s %s) {" +
+            System.lineSeparator() +
+            "            this.%s = %s;" +
+            System.lineSeparator() +
+            "            return this;" +
+            System.lineSeparator() +
+            "        }";
+
+    /**
+     * Builder singular adder template for collection fields.
+     * Arguments: singular name, element type, singular name, field name.
+     */
+    public static final String BUILDER_SINGULAR_ADD = "        public Builder %s(%s %s) {" +
+            System.lineSeparator() +
+            "            this.%s.add(%s);" +
+            System.lineSeparator() +
+            "            return this;" +
+            System.lineSeparator() +
+            "        }";
+
+    /**
+     * Builder build() method template.
+     * Arguments: class name.
+     */
+    public static final String BUILDER_BUILD = "        public %s build() {" +
+            System.lineSeparator() +
+            "            return new %s(this);" +
+            System.lineSeparator() +
+            "        }";
     /**
      * Reserved Java keywords (used to avoid invalid field names).
      */

@@ -136,6 +136,11 @@ yojo {
                     enable(true)
                     callSuper(false)
                 }
+                builder {
+                    enable(true)
+                    singular(true)
+                    builderDefault(true)
+                }
             }
         }
     }
@@ -415,6 +420,125 @@ public class StickInsect extends Pet {
 
 ---
 
+### Builder pattern (`@Builder` / manual Builder)
+
+Yojo supports the builder pattern in two modes:
+
+**With Lombok** — generates `@Builder`, `@Singular`, and `@Builder.Default` annotations.
+**Without Lombok** — generates a full static inner `Builder` class with fluent setters, singular adders, and `build()` method.
+
+#### DSL configuration (build.gradle)
+
+```groovy
+lombok {
+    builder {
+        enable = true        // Generate @Builder or manual Builder class
+        singular = true      // Add @Singular/adder methods for List/Set fields
+        builderDefault = true // Apply @Builder.Default to fields with default values
+    }
+}
+```
+
+#### YAML schema-level override (`x-lombok`)
+
+```yaml
+MyDto:
+  type: object
+  x-lombok:
+    builder:
+      enable: true
+      singular: true
+      builderDefault: true
+  properties:
+    names:
+      type: array
+      items:
+        type: string
+      description: Gets @Singular("name")
+    scores:
+      type: array
+      format: set
+      items:
+        type: integer
+      description: Gets @Singular("score")
+    message:
+      type: string
+      default: Hello
+      description: Gets @Builder.Default
+    count:
+      type: integer
+      description: Regular field (no builder annotation)
+```
+
+#### Generated output (with Lombok)
+
+```java
+@Builder
+public class MyDto {
+
+    @Singular("name")
+    private List<String> names;
+
+    @Singular("score")
+    private Set<Integer> scores;
+
+    @Builder.Default
+    private String message = "Hello";
+
+    private Integer count;
+}
+```
+
+#### Generated output (without Lombok)
+
+```java
+public class MyDto {
+
+    private List<String> names;
+    private Set<Integer> scores;
+    private String message = "Hello";
+    private Integer count;
+
+    // getters/setters ...
+
+    private MyDto(Builder builder) {
+        this.names = builder.names;
+        this.scores = builder.scores;
+        this.message = builder.message;
+        this.count = builder.count;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private List<String> names = new ArrayList<>();
+        private Set<Integer> scores = new HashSet<>();
+        private String message = "Hello";
+        private Integer count;
+
+        public Builder names(List<String> names) { ... return this; }
+        public Builder name(String name) { this.names.add(name); return this; }  // singular
+        public Builder score(Integer score) { this.scores.add(score); return this; }
+        public MyDto build() { return new MyDto(this); }
+    }
+}
+```
+
+> 💡 The singular name is derived automatically by removing the trailing `s` from the field name
+> (e.g., `names` → `"name"`, `scores` → `"score"`). This matches Lombok's `@Singular` convention.
+
+#### Builder DSL reference
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `enable` | `boolean` | `false` | Generate `@Builder` (Lombok) or manual Builder class (no Lombok) |
+| `singular` | `boolean` | `true` | Add `@Singular` / singular adder methods for `List`/`Set` fields |
+| `builderDefault` | `boolean` | `true` | Apply `@Builder.Default` / propagate default values to Builder |
+
+---
+
 ### Custom annotations (`x-class-annotation`, `x-field-annotation`)
 
 | Attribute | YAML | → Java |
@@ -579,7 +703,7 @@ If you discover a security issue, please contact the maintainer directly (email 
 | **Jackson annotations** | 🟡 Partial | `@JsonProperty`, `@JsonInclude`, `@JsonValue`/`@JsonCreator` (via `x-enumValues`) done |
 | **x- prefixed attributes** | ✅ Done (4.3.0) | All custom attributes deprecated in favour of `x-` equivalents |
 | **AsyncAPI spec validation** | 🚧 Planned | Validate `$ref`, `type`, `format`, detect circular refs |
-| **Lombok extensions** | 🚧 Planned | `@Builder`, `@Singular`, `@SuperBuilder` |
+| **Lombok extensions** | ✅ Done (4.4.0) | `@Builder`, `@Singular`, `@Builder.Default` + manual Builder class |
 | **OpenAPI 3.1 support** | 🚧 Planned | After AsyncAPI 3.0 stabilizes |
 | **Freemarker templates** | 🚧 Planned | Customizable code generation for enterprises |
 

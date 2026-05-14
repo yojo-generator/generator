@@ -3,10 +3,8 @@ package enumvalues.common;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import javax.annotation.processing.Generated;
-import lombok.experimental.Accessors;
 
 @Generated("Yojo")
-@Accessors(fluent = true, chain = true)
 public enum PayloadStatus {
     ACTIVE("A"),
     INACTIVE("I");

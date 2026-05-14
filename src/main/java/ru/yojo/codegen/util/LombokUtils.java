@@ -1,6 +1,7 @@
 package ru.yojo.codegen.util;
 
 import ru.yojo.codegen.domain.lombok.Accessors;
+import ru.yojo.codegen.domain.lombok.BuilderProperties;
 import ru.yojo.codegen.domain.lombok.EqualsAndHashCode;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 
@@ -94,6 +95,38 @@ public class LombokUtils {
             }
             if (noArgs != null) {
                 lombokProperties.setNoArgsConstructor(Boolean.valueOf(noArgs));
+            }
+        }
+    }
+
+    /**
+     * Populates {@link BuilderProperties} configuration from the {@code builder} section.
+     * <p>
+     * Supports:
+     * <ul>
+     *   <li>{@code enable: true|false} — enables builder generation</li>
+     *   <li>{@code singular: true|false} — enables {@code @Singular} on collection fields</li>
+     *   <li>{@code builderDefault: true|false} — enables {@code @Builder.Default} on fields with defaults</li>
+     * </ul>
+     *
+     * @param lombokProperties target Lombok config to update
+     * @param lombokProps      parsed {@code lombok} map from YAML
+     */
+    public static void fillLombokBuilder(LombokProperties lombokProperties, Map<String, Object> lombokProps) {
+        if (lombokProps.containsKey(BUILDER)) {
+            Map<String, Object> builderMap = castObjectToMap(lombokProps.get(BUILDER));
+            if (builderMap != null) {
+                BuilderProperties bp = new BuilderProperties();
+                if (getStringValueIfExistOrElseNull(ENABLE, builderMap) != null) {
+                    bp.setEnable(Boolean.parseBoolean(getStringValueIfExistOrElseNull(ENABLE, builderMap)));
+                }
+                if (getStringValueIfExistOrElseNull(SINGULAR, builderMap) != null) {
+                    bp.setSingular(Boolean.parseBoolean(getStringValueIfExistOrElseNull(SINGULAR, builderMap)));
+                }
+                if (getStringValueIfExistOrElseNull(BUILDER_DEFAULT, builderMap) != null) {
+                    bp.setBuilderDefault(Boolean.parseBoolean(getStringValueIfExistOrElseNull(BUILDER_DEFAULT, builderMap)));
+                }
+                lombokProperties.setBuilder(bp);
             }
         }
     }

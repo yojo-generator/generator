@@ -1,0 +1,43 @@
+asyncapi: 2.0.0
+info:
+  title: Builder Test
+  version: 1.0.0
+  description: "Contract for testing Lombok @Builder, @Singular, @Builder.Default and manual builder generation"
+channels:
+  BuilderMessage:
+    subscribe:
+      message:
+        $ref: '#/components/messages/BuilderMessage'
+components:
+  messages:
+    BuilderMessage:
+      payload:
+        $ref: '#/components/schemas/BuilderDto'
+  schemas:
+    BuilderDto:
+      type: object
+      x-lombok:
+        builder:
+          enable: true
+          singular: true
+          builderDefault: true
+      description: DTO with builder pattern support
+      properties:
+        names:
+          type: array
+          items:
+            type: string
+          description: List of names for @Singular test
+        scores:
+          type: array
+          format: set
+          items:
+            type: integer
+          description: Set of scores for @Singular test
+        message:
+          type: string
+          default: Hello
+          description: Default value for @Builder.Default test
+        count:
+          type: integer
+          description: Regular field without builder annotations
