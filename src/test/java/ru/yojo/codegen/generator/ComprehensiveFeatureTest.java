@@ -1065,6 +1065,56 @@ class ComprehensiveFeatureTest {
     }
 
     // ———————————————————————————————————————————————————————————————————————
+    // ✅ 29. Schema-level Lombok disable (x-lombok enable:false) overrides per-spec
+    // ———————————————————————————————————————————————————————————————————————
+
+    @Test
+    @Order(29)
+    void schemaLevelLombokDisableOverridesPerSpec() throws IOException {
+        // given — per-spec Lombok enabled, but SomeObject has lombok: { enable: false } in YAML
+        SpecificationProperties spec = new SpecificationProperties();
+        spec.setSpecName("test.yaml");
+        spec.setInputDirectory("src/test/resources/example/contract");
+        spec.setOutputDirectory(BASE_DIR + "schema-level-lombok/");
+        spec.setPackageLocation("example.testGenerate.schemaLevelLombok");
+        spec.setLombokProperties(new LombokProperties(true, true, new Accessors(true, true, true)));
+
+        YojoContext ctx = new YojoContext();
+        ctx.setSpecificationProperties(Collections.singletonList(spec));
+        ctx.setLombokProperties(new LombokProperties(false, false, new Accessors(false, false, false)));
+        ctx.setValidationApi(ValidationApi.JAKARTA);
+
+        // when
+        yojoGenerator.generateAll(ctx);
+
+        // then — SomeObject has lombok: { enable: false } in YAML → no Lombok annotations
+        String someObject = readFile("schema-level-lombok/common/SomeObject.java");
+        assertThat(someObject)
+                .doesNotContain("@Data")
+                .doesNotContain("@NoArgsConstructor")
+                .doesNotContain("@AllArgsConstructor")
+                .doesNotContain("@Accessors");
+
+        // then — SomeObjectImpl has no x-lombok in YAML → gets per-spec Lombok
+        String someObjectImpl = readFile("schema-level-lombok/common/SomeObjectImpl.java");
+        assertThat(someObjectImpl)
+                .contains("@Data")
+                .contains("@NoArgsConstructor")
+                .contains("@Accessors");
+
+        // Cleanup after this test
+        Path testDir = Paths.get(BASE_DIR + "schema-level-lombok/");
+        if (Files.exists(testDir)) {
+            try (Stream<Path> walk = Files.walk(testDir)) {
+                walk.sorted((a, b) -> -a.compareTo(b))
+                        .forEach(p -> {
+                            try { Files.deleteIfExists(p); } catch (IOException ignore) {}
+                        });
+            }
+        }
+    }
+
+    // ———————————————————————————————————————————————————————————————————————
     // 🔧 Вспомогательные методы
     // ———————————————————————————————————————————————————————————————————————
 
