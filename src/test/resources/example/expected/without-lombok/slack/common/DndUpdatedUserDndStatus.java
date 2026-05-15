@@ -1,6 +1,7 @@
 package slack.common;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 
 @Generated("Yojo")
@@ -29,5 +30,28 @@ public class DndUpdatedUserDndStatus {
     }
     public BigDecimal getNextDndEndTs() {
         return nextDndEndTs;
+    }
+    @Override
+    public String toString() {
+        return "DndUpdatedUserDndStatus{" +
+                "dndEnabled=" + dndEnabled + ", " +
+                "nextDndStartTs=" + nextDndStartTs + ", " +
+                "nextDndEndTs=" + nextDndEndTs +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DndUpdatedUserDndStatus that = (DndUpdatedUserDndStatus) o;
+        return Objects.equals(dndEnabled, that.dndEnabled) &&
+                Objects.equals(nextDndStartTs, that.nextDndStartTs) &&
+                Objects.equals(nextDndEndTs, that.nextDndEndTs);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dndEnabled, nextDndStartTs, nextDndEndTs);
     }
 }

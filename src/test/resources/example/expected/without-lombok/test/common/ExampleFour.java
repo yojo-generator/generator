@@ -1,5 +1,6 @@
 package example.testGenerate.test.common;
 
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 
 @Generated("Yojo")
@@ -28,5 +29,28 @@ public class ExampleFour {
     }
     public String getFromFive() {
         return fromFive;
+    }
+    @Override
+    public String toString() {
+        return "ExampleFour{" +
+                "fromFour=" + fromFour + ", " +
+                "oneMoreField=" + oneMoreField + ", " +
+                "fromFive=" + fromFive +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ExampleFour that = (ExampleFour) o;
+        return Objects.equals(fromFour, that.fromFour) &&
+                Objects.equals(oneMoreField, that.oneMoreField) &&
+                Objects.equals(fromFive, that.fromFive);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fromFour, oneMoreField, fromFive);
     }
 }

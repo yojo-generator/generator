@@ -1,5 +1,6 @@
 package oneMore.common;
 
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -37,5 +38,26 @@ public class ApproveV1 {
     }
     public ApproveV1RequestData getRequestData() {
         return requestData;
+    }
+    @Override
+    public String toString() {
+        return "ApproveV1{" +
+                "context=" + context + ", " +
+                "requestData=" + requestData +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ApproveV1 that = (ApproveV1) o;
+        return Objects.equals(context, that.context) &&
+                Objects.equals(requestData, that.requestData);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(context, requestData);
     }
 }

@@ -30,12 +30,24 @@ public class GenerateExpectedFilesTest {
         generateForSpec("discriminator.yaml", "discriminator", false);
         generateForSpec("test-create-app.yaml", "testCreateApp", false);
         generateForSpec("builder-test.yaml", "example.testGenerate.builder", false);
-        generateForSpec("builder-test.yaml", "nosplit", false, false);
+        // splitModels=false variants (flat directory)
+        generateForSpec("test.yaml", "example.testGenerate.test", false, false, "nosplit-test");
+        generateForSpec("async-api-official-v3.0.yaml", "asyncapi", false, false, "nosplit-asyncapi");
+        generateForSpec("gitter-streaming-async-api-v3.0.yaml", "gitter", false, false, "nosplit-gitter");
+        generateForSpec("slack-real-time-async-api-v3.0.yaml", "slack", false, false, "nosplit-slack");
+        generateForSpec("spec-from-issue.yaml", "specFromIssue", false, false, "nosplit-specfromissue");
+        generateForSpec("one-more.yaml", "oneMore", false, false, "nosplit-onemore");
+        generateForSpec("discriminator.yaml", "discriminator", false, false, "nosplit-discriminator");
+        generateForSpec("test-create-app.yaml", "testCreateApp", false, false, "nosplit-testcreateapp");
+        generateForSpec("builder-test.yaml", "example.testGenerate.builder", false, false, "nosplit-builder");
+        // enum-values.yaml
+        generateForSpec("enum-values.yaml", "enumvalues", false);
     }
 
     @Test
     void generateWithLombok() throws java.io.IOException {
         generateForSpec("test.yaml", "example.testGenerate.test", true);
+        generateForSpec("enum-values.yaml", "enumvalues", true);
         generateForSpec("async-api-official-v3.0.yaml", "asyncapi", true);
         generateForSpec("gitter-streaming-async-api-v3.0.yaml", "gitter", true);
         generateForSpec("slack-real-time-async-api-v3.0.yaml", "slack", true);
@@ -44,7 +56,16 @@ public class GenerateExpectedFilesTest {
         generateForSpec("discriminator.yaml", "discriminator", true);
         generateForSpec("test-create-app.yaml", "testCreateApp", true);
         generateForSpec("builder-test.yaml", "example.testGenerate.builder", true);
-        generateForSpec("builder-test.yaml", "nosplit", true, false);
+        // splitModels=false variants (flat directory)
+        generateForSpec("test.yaml", "example.testGenerate.test", true, false, "nosplit-test");
+        generateForSpec("async-api-official-v3.0.yaml", "asyncapi", true, false, "nosplit-asyncapi");
+        generateForSpec("gitter-streaming-async-api-v3.0.yaml", "gitter", true, false, "nosplit-gitter");
+        generateForSpec("slack-real-time-async-api-v3.0.yaml", "slack", true, false, "nosplit-slack");
+        generateForSpec("spec-from-issue.yaml", "specFromIssue", true, false, "nosplit-specfromissue");
+        generateForSpec("one-more.yaml", "oneMore", true, false, "nosplit-onemore");
+        generateForSpec("discriminator.yaml", "discriminator", true, false, "nosplit-discriminator");
+        generateForSpec("test-create-app.yaml", "testCreateApp", true, false, "nosplit-testcreateapp");
+        generateForSpec("builder-test.yaml", "example.testGenerate.builder", true, false, "nosplit-builder");
     }
 
     private void generateForSpec(String specName, String packageLocation, boolean useLombok) throws java.io.IOException {
@@ -52,12 +73,18 @@ public class GenerateExpectedFilesTest {
     }
 
     private void generateForSpec(String specName, String packageLocation, boolean useLombok, boolean splitModels) throws java.io.IOException {
+        generateForSpec(specName, packageLocation, useLombok, splitModels, null);
+    }
+
+    private void generateForSpec(String specName, String packageLocation, boolean useLombok, boolean splitModels, String outputDirName) throws java.io.IOException {
         String lombokDir = useLombok ? "with-lombok" : "without-lombok";
         
-        // Extract expected directory name from package
-        String expectedDir = packageLocation.contains(".") 
-            ? packageLocation.substring(packageLocation.lastIndexOf(".") + 1)
-            : packageLocation;
+        // Use explicit output directory name if provided, otherwise derive from package
+        String expectedDir = outputDirName != null
+            ? outputDirName
+            : (packageLocation.contains(".")
+                ? packageLocation.substring(packageLocation.lastIndexOf(".") + 1)
+                : packageLocation);
         
         String outputDir = "src/test/resources/example/expected/" + lombokDir + "/" + expectedDir;
         

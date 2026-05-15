@@ -62,7 +62,7 @@ public abstract class GenerationComparisonTestBase {
             String[] parts = packageLocation.split("\\.");
             // Find the part that matches expected directory names
             for (String part : parts) {
-                if (part.matches("test|asyncapi|gitter|slack|specFromIssue|oneMore|discriminator|testCreateApp|builder|nosplit")) {
+                if (part.matches("test|asyncapi|gitter|slack|specFromIssue|oneMore|discriminator|testCreateApp|builder")) {
                     expectedDir = part;
                     return base + lombokDir + "/" + expectedDir;
                 }

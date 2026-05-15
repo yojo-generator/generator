@@ -43,6 +43,49 @@ public class LombokProperties {
     private BuilderProperties builder;
 
     /**
+     * Whether {@code @Value} (immutable DTO) should be used instead of {@code @Data}.
+     * When enabled: class is annotated with @Value, fields become final, setters are skipped.
+     * Mutually exclusive with {@code @Data}.
+     */
+    private boolean value;
+
+    /**
+     * Whether {@code @With} (wither methods for immutable modification) should be generated.
+     * Commonly paired with {@code @Value}.
+     */
+    private boolean with;
+
+    /**
+     * Whether {@code @Getter} should be generated on the class (standalone, without @Data).
+     * When @Data is already enabled, this is redundant but harmless.
+     */
+    private boolean getter;
+
+    /**
+     * Whether {@code @Setter} should be generated on the class (standalone, without @Data).
+     * Ignored when {@code @Value} is enabled (immutable).
+     */
+    private boolean setter;
+
+    /**
+     * Whether {@code @ToString} should be generated on the class (standalone, without @Data).
+     * When @Data is already enabled, this is redundant but harmless.
+     */
+    private boolean toString;
+
+    /**
+     * Whether {@code @RequiredArgsConstructor} should be generated.
+     * Generates a constructor with parameters for all final / @NonNull fields.
+     */
+    private boolean requiredArgsConstructor;
+
+    /**
+     * Whether {@code @Slf4j} logger field should be generated.
+     * Adds: {@code private static final Logger log = LoggerFactory.getLogger(ClassName.class);}
+     */
+    private boolean slf4j;
+
+    /**
      * Constructs an empty Lombok configuration (defaults apply).
      */
     public LombokProperties() {
@@ -70,6 +113,13 @@ public class LombokProperties {
         );
         copy.equalsAndHashCode = lombokProperties.equalsAndHashCode;
         copy.builder = lombokProperties.builder;
+        copy.value = lombokProperties.value;
+        copy.with = lombokProperties.with;
+        copy.getter = lombokProperties.getter;
+        copy.setter = lombokProperties.setter;
+        copy.toString = lombokProperties.toString;
+        copy.requiredArgsConstructor = lombokProperties.requiredArgsConstructor;
+        copy.slf4j = lombokProperties.slf4j;
         return copy;
     }
 
@@ -207,5 +257,136 @@ public class LombokProperties {
      */
     public void setNoArgsConstructor(boolean noArgsConstructor) {
         this.noArgsConstructor = noArgsConstructor;
+    }
+
+    // ============================================================
+    // New Lombok annotations (4.5.0)
+    // ============================================================
+
+    /**
+     * Returns whether {@code @Value} (immutable DTO) should replace {@code @Data}.
+     *
+     * @return {@code true} if @Value mode is active
+     */
+    public boolean isValue() {
+        return value;
+    }
+
+    /**
+     * Enables or disables {@code @Value} mode.
+     *
+     * @param value {@code true} to use @Value instead of @Data
+     */
+    public void setValue(boolean value) {
+        this.value = value;
+    }
+
+    /**
+     * Returns whether {@code @With} (wither methods) should be generated.
+     *
+     * @return {@code true} if @With is enabled
+     */
+    public boolean isWith() {
+        return with;
+    }
+
+    /**
+     * Enables or disables {@code @With}.
+     *
+     * @param with {@code true} to generate @With
+     */
+    public void setWith(boolean with) {
+        this.with = with;
+    }
+
+    /**
+     * Returns whether {@code @Getter} should be generated on the class (standalone).
+     *
+     * @return {@code true} if @Getter is enabled
+     */
+    public boolean isGetter() {
+        return getter;
+    }
+
+    /**
+     * Enables or disables standalone {@code @Getter}.
+     *
+     * @param getter {@code true} to generate @Getter
+     */
+    public void setGetter(boolean getter) {
+        this.getter = getter;
+    }
+
+    /**
+     * Returns whether {@code @Setter} should be generated on the class (standalone).
+     *
+     * @return {@code true} if @Setter is enabled
+     */
+    public boolean isSetter() {
+        return setter;
+    }
+
+    /**
+     * Enables or disables standalone {@code @Setter}.
+     * Ignored when {@code @Value} is enabled.
+     *
+     * @param setter {@code true} to generate @Setter
+     */
+    public void setSetter(boolean setter) {
+        this.setter = setter;
+    }
+
+    /**
+     * Returns whether {@code @ToString} should be generated on the class (standalone).
+     *
+     * @return {@code true} if @ToString is enabled
+     */
+    public boolean isToString() {
+        return toString;
+    }
+
+    /**
+     * Enables or disables standalone {@code @ToString}.
+     *
+     * @param toString {@code true} to generate @ToString
+     */
+    public void setToString(boolean toString) {
+        this.toString = toString;
+    }
+
+    /**
+     * Returns whether {@code @RequiredArgsConstructor} should be generated.
+     *
+     * @return {@code true} if @RequiredArgsConstructor is enabled
+     */
+    public boolean isRequiredArgsConstructor() {
+        return requiredArgsConstructor;
+    }
+
+    /**
+     * Enables or disables {@code @RequiredArgsConstructor}.
+     *
+     * @param requiredArgsConstructor {@code true} to generate @RequiredArgsConstructor
+     */
+    public void setRequiredArgsConstructor(boolean requiredArgsConstructor) {
+        this.requiredArgsConstructor = requiredArgsConstructor;
+    }
+
+    /**
+     * Returns whether {@code @Slf4j} logger field should be generated.
+     *
+     * @return {@code true} if @Slf4j is enabled
+     */
+    public boolean isSlf4j() {
+        return slf4j;
+    }
+
+    /**
+     * Enables or disables {@code @Slf4j}.
+     *
+     * @param slf4j {@code true} to generate @Slf4j
+     */
+    public void setSlf4j(boolean slf4j) {
+        this.slf4j = slf4j;
     }
 }

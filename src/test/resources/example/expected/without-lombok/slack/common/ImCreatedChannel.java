@@ -1,6 +1,7 @@
 package slack.common;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 
 @Generated("Yojo")
@@ -37,5 +38,30 @@ public class ImCreatedChannel {
     }
     public String getCreator() {
         return creator;
+    }
+    @Override
+    public String toString() {
+        return "ImCreatedChannel{" +
+                "id=" + id + ", " +
+                "name=" + name + ", " +
+                "created=" + created + ", " +
+                "creator=" + creator +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ImCreatedChannel that = (ImCreatedChannel) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(created, that.created) &&
+                Objects.equals(creator, that.creator);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, created, creator);
     }
 }

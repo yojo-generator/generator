@@ -1,5 +1,6 @@
 package discriminator.common;
 
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 import javax.validation.constraints.Min;
 
@@ -20,5 +21,24 @@ public class Dog extends Pet {
     }
     public Integer getPackSize() {
         return packSize;
+    }
+    @Override
+    public String toString() {
+        return "Dog{" +
+                "packSize=" + packSize +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Dog that = (Dog) o;
+        return Objects.equals(packSize, that.packSize);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(packSize);
     }
 }

@@ -2,6 +2,7 @@ package asyncapi.common;
 
 import asyncapi.common.TurnOnOffPayloadCommand;
 import java.time.OffsetDateTime;
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 
 @Generated("Yojo")
@@ -28,5 +29,26 @@ public class TurnOnOffPayload {
     }
     public OffsetDateTime getSentAt() {
         return sentAt;
+    }
+    @Override
+    public String toString() {
+        return "TurnOnOffPayload{" +
+                "command=" + command + ", " +
+                "sentAt=" + sentAt +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TurnOnOffPayload that = (TurnOnOffPayload) o;
+        return Objects.equals(command, that.command) &&
+                Objects.equals(sentAt, that.sentAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(command, sentAt);
     }
 }

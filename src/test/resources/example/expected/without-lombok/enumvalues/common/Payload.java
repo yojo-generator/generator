@@ -3,6 +3,7 @@ package enumvalues.common;
 import enumvalues.common.ErrorCode;
 import enumvalues.common.PayloadStatus;
 import enumvalues.common.PayloadStatusWithDefault;
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 
 @Generated("Yojo")
@@ -31,5 +32,28 @@ public class Payload {
     }
     public ErrorCode getError() {
         return error;
+    }
+    @Override
+    public String toString() {
+        return "Payload{" +
+                "status=" + status + ", " +
+                "statusWithDefault=" + statusWithDefault + ", " +
+                "error=" + error +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Payload that = (Payload) o;
+        return Objects.equals(status, that.status) &&
+                Objects.equals(statusWithDefault, that.statusWithDefault) &&
+                Objects.equals(error, that.error);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(status, statusWithDefault, error);
     }
 }

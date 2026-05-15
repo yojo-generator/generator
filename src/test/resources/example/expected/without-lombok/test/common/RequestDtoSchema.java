@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
@@ -402,5 +403,88 @@ public class RequestDtoSchema extends ClassForExtends implements InterfaceForImp
     }
     public SomeObject getSomeObject() {
         return someObject;
+    }
+    @Override
+    public String toString() {
+        return "RequestDtoSchema{" +
+                "polymorph=" + polymorph + ", " +
+                "polymorphWithInsidePolymorph=" + polymorphWithInsidePolymorph + ", " +
+                "objectTypes=" + objectTypes + ", " +
+                "StringValues=" + StringValues + ", " +
+                "numericsValues=" + numericsValues + ", " +
+                "collectionTypes=" + collectionTypes + ", " +
+                "integerValidationField=" + integerValidationField + ", " +
+                "uuidValidationList=" + uuidValidationList + ", " +
+                "innerSchema=" + innerSchema + ", " +
+                "mapStringInteger=" + mapStringInteger + ", " +
+                "mapStringObject=" + mapStringObject + ", " +
+                "mapStringObjectWithHashMap=" + mapStringObjectWithHashMap + ", " +
+                "mapStringObjectWithLinkedHashMap=" + mapStringObjectWithLinkedHashMap + ", " +
+                "mapStringCustomObject=" + mapStringCustomObject + ", " +
+                "mapStringExistingObject=" + mapStringExistingObject + ", " +
+                "mapStringSetOfCustomObject=" + mapStringSetOfCustomObject + ", " +
+                "mapStringSetOfStrings=" + mapStringSetOfStrings + ", " +
+                "mapStringSetOfExistingObject=" + mapStringSetOfExistingObject + ", " +
+                "mapUUIDInteger=" + mapUUIDInteger + ", " +
+                "mapUUIDObject=" + mapUUIDObject + ", " +
+                "mapUUIDObjectWithHashMap=" + mapUUIDObjectWithHashMap + ", " +
+                "mapUUIDObjectWithLinkedHashMap=" + mapUUIDObjectWithLinkedHashMap + ", " +
+                "mapUUIDCustomObject=" + mapUUIDCustomObject + ", " +
+                "mapUUIDExistingObject=" + mapUUIDExistingObject + ", " +
+                "mapUUIDSetOfCustomObject=" + mapUUIDSetOfCustomObject + ", " +
+                "mapUUIDSetOfStrings=" + mapUUIDSetOfStrings + ", " +
+                "mapUUIDSetOfExistingObject=" + mapUUIDSetOfExistingObject + ", " +
+                "innerEnumWithDescription=" + innerEnumWithDescription + ", " +
+                "innerEnumWithoutDescription=" + innerEnumWithoutDescription + ", " +
+                "innerEnumWithoutDescriptionSmall=" + innerEnumWithoutDescriptionSmall + ", " +
+                "enumResultWithDescription=" + enumResultWithDescription + ", " +
+                "enumResultWithoutDescription=" + enumResultWithoutDescription + ", " +
+                "someObject=" + someObject +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RequestDtoSchema that = (RequestDtoSchema) o;
+        return Objects.equals(polymorph, that.polymorph) &&
+                Objects.equals(polymorphWithInsidePolymorph, that.polymorphWithInsidePolymorph) &&
+                Objects.equals(objectTypes, that.objectTypes) &&
+                Objects.equals(StringValues, that.StringValues) &&
+                Objects.equals(numericsValues, that.numericsValues) &&
+                Objects.equals(collectionTypes, that.collectionTypes) &&
+                Objects.equals(integerValidationField, that.integerValidationField) &&
+                Objects.equals(uuidValidationList, that.uuidValidationList) &&
+                Objects.equals(innerSchema, that.innerSchema) &&
+                Objects.equals(mapStringInteger, that.mapStringInteger) &&
+                Objects.equals(mapStringObject, that.mapStringObject) &&
+                Objects.equals(mapStringObjectWithHashMap, that.mapStringObjectWithHashMap) &&
+                Objects.equals(mapStringObjectWithLinkedHashMap, that.mapStringObjectWithLinkedHashMap) &&
+                Objects.equals(mapStringCustomObject, that.mapStringCustomObject) &&
+                Objects.equals(mapStringExistingObject, that.mapStringExistingObject) &&
+                Objects.equals(mapStringSetOfCustomObject, that.mapStringSetOfCustomObject) &&
+                Objects.equals(mapStringSetOfStrings, that.mapStringSetOfStrings) &&
+                Objects.equals(mapStringSetOfExistingObject, that.mapStringSetOfExistingObject) &&
+                Objects.equals(mapUUIDInteger, that.mapUUIDInteger) &&
+                Objects.equals(mapUUIDObject, that.mapUUIDObject) &&
+                Objects.equals(mapUUIDObjectWithHashMap, that.mapUUIDObjectWithHashMap) &&
+                Objects.equals(mapUUIDObjectWithLinkedHashMap, that.mapUUIDObjectWithLinkedHashMap) &&
+                Objects.equals(mapUUIDCustomObject, that.mapUUIDCustomObject) &&
+                Objects.equals(mapUUIDExistingObject, that.mapUUIDExistingObject) &&
+                Objects.equals(mapUUIDSetOfCustomObject, that.mapUUIDSetOfCustomObject) &&
+                Objects.equals(mapUUIDSetOfStrings, that.mapUUIDSetOfStrings) &&
+                Objects.equals(mapUUIDSetOfExistingObject, that.mapUUIDSetOfExistingObject) &&
+                Objects.equals(innerEnumWithDescription, that.innerEnumWithDescription) &&
+                Objects.equals(innerEnumWithoutDescription, that.innerEnumWithoutDescription) &&
+                Objects.equals(innerEnumWithoutDescriptionSmall, that.innerEnumWithoutDescriptionSmall) &&
+                Objects.equals(enumResultWithDescription, that.enumResultWithDescription) &&
+                Objects.equals(enumResultWithoutDescription, that.enumResultWithoutDescription) &&
+                Objects.equals(someObject, that.someObject);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(polymorph, polymorphWithInsidePolymorph, objectTypes, StringValues, numericsValues, collectionTypes, integerValidationField, uuidValidationList, innerSchema, mapStringInteger, mapStringObject, mapStringObjectWithHashMap, mapStringObjectWithLinkedHashMap, mapStringCustomObject, mapStringExistingObject, mapStringSetOfCustomObject, mapStringSetOfStrings, mapStringSetOfExistingObject, mapUUIDInteger, mapUUIDObject, mapUUIDObjectWithHashMap, mapUUIDObjectWithLinkedHashMap, mapUUIDCustomObject, mapUUIDExistingObject, mapUUIDSetOfCustomObject, mapUUIDSetOfStrings, mapUUIDSetOfExistingObject, innerEnumWithDescription, innerEnumWithoutDescription, innerEnumWithoutDescriptionSmall, enumResultWithDescription, enumResultWithoutDescription, someObject);
     }
 }

@@ -130,4 +130,40 @@ public class LombokUtils {
             }
         }
     }
+
+    // ============================================================
+    // New Lombok YAML fill methods (4.5.0)
+    // ============================================================
+
+    /**
+     * Populates simple boolean flags for new Lombok annotations from YAML.
+     * Handles: {@code value}, {@code with}, {@code getter}, {@code setter},
+     * {@code toString}, {@code requiredArgsConstructor}, {@code slf4j}.
+     *
+     * @param lombokProperties target Lombok config to update
+     * @param lombokProps      parsed {@code lombok} map from YAML
+     */
+    public static void fillLombokNewAnnotations(LombokProperties lombokProperties, Map<String, Object> lombokProps) {
+        if (lombokProps.containsKey(VALUE)) {
+            lombokProperties.setValue(Boolean.parseBoolean(lombokProps.get(VALUE).toString()));
+        }
+        if (lombokProps.containsKey(WITH)) {
+            lombokProperties.setWith(Boolean.parseBoolean(lombokProps.get(WITH).toString()));
+        }
+        if (lombokProps.containsKey(LOMBOK_GETTER)) {
+            lombokProperties.setGetter(Boolean.parseBoolean(lombokProps.get(LOMBOK_GETTER).toString()));
+        }
+        if (lombokProps.containsKey(LOMBOK_SETTER)) {
+            lombokProperties.setSetter(Boolean.parseBoolean(lombokProps.get(LOMBOK_SETTER).toString()));
+        }
+        if (lombokProps.containsKey(TO_STRING)) {
+            lombokProperties.setToString(Boolean.parseBoolean(lombokProps.get(TO_STRING).toString()));
+        }
+        if (lombokProps.containsKey(REQUIRED_ARGS)) {
+            lombokProperties.setRequiredArgsConstructor(Boolean.parseBoolean(lombokProps.get(REQUIRED_ARGS).toString()));
+        }
+        if (lombokProps.containsKey(SLF4J)) {
+            lombokProperties.setSlf4j(Boolean.parseBoolean(lombokProps.get(SLF4J).toString()));
+        }
+    }
 }

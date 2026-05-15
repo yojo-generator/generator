@@ -1,6 +1,7 @@
 package oneMore.common;
 
 import java.time.OffsetDateTime;
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -48,5 +49,28 @@ public class ApproveV1RequestData {
     }
     public OffsetDateTime getUpdatedAt() {
         return updatedAt;
+    }
+    @Override
+    public String toString() {
+        return "ApproveV1RequestData{" +
+                "status=" + status + ", " +
+                "comment=" + comment + ", " +
+                "updatedAt=" + updatedAt +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ApproveV1RequestData that = (ApproveV1RequestData) o;
+        return Objects.equals(status, that.status) &&
+                Objects.equals(comment, that.comment) &&
+                Objects.equals(updatedAt, that.updatedAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(status, comment, updatedAt);
     }
 }

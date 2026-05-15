@@ -1,5 +1,7 @@
 package ru.yojo.codegen.context;
 
+import ru.yojo.codegen.domain.lombok.LombokProperties;
+
 /**
  * Holds configuration for a single AsyncAPI specification to be processed.
  * Used by {@link ru.yojo.codegen.generator.YojoGenerator} in multi-spec scenarios.
@@ -32,6 +34,14 @@ public class SpecificationProperties {
     private String packageLocation;
 
     private boolean splitModels = true;
+
+    /**
+     * Per-spec Lombok configuration (full override of global Lombok when set).
+     * When non-null, this completely replaces the global Lombok configuration
+     * for this specification only. Fine-grained per-schema overrides remain
+     * available via YAML {@code x-lombok}.
+     */
+    private LombokProperties lombokProperties;
 
     /**
      * Constructs an empty specification properties instance.
@@ -127,5 +137,24 @@ public class SpecificationProperties {
      */
     public void setSplitModels(boolean splitModels) {
         this.splitModels = splitModels;
+    }
+
+    /**
+     * Returns the per-spec Lombok configuration, if set.
+     *
+     * @return Lombok config or {@code null} to use global configuration
+     */
+    public LombokProperties getLombokProperties() {
+        return lombokProperties;
+    }
+
+    /**
+     * Sets the per-spec Lombok configuration.
+     * When set, this fully overrides the global Lombok configuration for this specification.
+     *
+     * @param lombokProperties Lombok config (may be {@code null} to fall back to global)
+     */
+    public void setLombokProperties(LombokProperties lombokProperties) {
+        this.lombokProperties = lombokProperties;
     }
 }
