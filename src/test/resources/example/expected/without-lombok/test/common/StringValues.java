@@ -1,5 +1,6 @@
 package example.testGenerate.test.common;
 
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -110,5 +111,44 @@ public class StringValues {
     }
     public String getStringWithAllAnnotations() {
         return stringWithAllAnnotations;
+    }
+    @Override
+    public String toString() {
+        return "StringValues{" +
+                "stringWithDefaultValue=" + stringWithDefaultValue + ", " +
+                "stringWithDefaultValueWithoutBrackets=" + stringWithDefaultValueWithoutBrackets + ", " +
+                "stringValueWithoutRequired=" + stringValueWithoutRequired + ", " +
+                "stringValueWithRequired=" + stringValueWithRequired + ", " +
+                "stringFinalValue=" + stringFinalValue + ", " +
+                "stringFinalWithoutDefault=" + stringFinalWithoutDefault + ", " +
+                "stringValueNotBlankSizeMinLength=" + stringValueNotBlankSizeMinLength + ", " +
+                "stringValueNotBlankSizeMaxLength=" + stringValueNotBlankSizeMaxLength + ", " +
+                "stringValueSizeMinMaxLength=" + stringValueSizeMinMaxLength + ", " +
+                "stringWithPattern=" + stringWithPattern + ", " +
+                "stringWithAllAnnotations=" + stringWithAllAnnotations +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StringValues that = (StringValues) o;
+        return Objects.equals(stringWithDefaultValue, that.stringWithDefaultValue) &&
+                Objects.equals(stringWithDefaultValueWithoutBrackets, that.stringWithDefaultValueWithoutBrackets) &&
+                Objects.equals(stringValueWithoutRequired, that.stringValueWithoutRequired) &&
+                Objects.equals(stringValueWithRequired, that.stringValueWithRequired) &&
+                Objects.equals(stringFinalValue, that.stringFinalValue) &&
+                Objects.equals(stringFinalWithoutDefault, that.stringFinalWithoutDefault) &&
+                Objects.equals(stringValueNotBlankSizeMinLength, that.stringValueNotBlankSizeMinLength) &&
+                Objects.equals(stringValueNotBlankSizeMaxLength, that.stringValueNotBlankSizeMaxLength) &&
+                Objects.equals(stringValueSizeMinMaxLength, that.stringValueSizeMinMaxLength) &&
+                Objects.equals(stringWithPattern, that.stringWithPattern) &&
+                Objects.equals(stringWithAllAnnotations, that.stringWithAllAnnotations);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(stringWithDefaultValue, stringWithDefaultValueWithoutBrackets, stringValueWithoutRequired, stringValueWithRequired, stringFinalValue, stringFinalWithoutDefault, stringValueNotBlankSizeMinLength, stringValueNotBlankSizeMaxLength, stringValueSizeMinMaxLength, stringWithPattern, stringWithAllAnnotations);
     }
 }

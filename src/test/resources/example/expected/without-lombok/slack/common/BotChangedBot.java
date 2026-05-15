@@ -1,6 +1,7 @@
 package slack.common;
 
 import java.util.Map;
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 
 @Generated("Yojo")
@@ -37,5 +38,30 @@ public class BotChangedBot {
     }
     public Map<String, String> getIcons() {
         return icons;
+    }
+    @Override
+    public String toString() {
+        return "BotChangedBot{" +
+                "id=" + id + ", " +
+                "appId=" + appId + ", " +
+                "name=" + name + ", " +
+                "icons=" + icons +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BotChangedBot that = (BotChangedBot) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(appId, that.appId) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(icons, that.icons);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, appId, name, icons);
     }
 }

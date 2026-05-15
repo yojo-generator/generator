@@ -419,6 +419,39 @@ public final class Dictionary {
      */
     public static final String BUILDER_DEFAULT = "builderDefault";
 
+    // ============================================================
+    // New Lombok config keys (4.5.0)
+    // ============================================================
+
+    /**
+     * Lombok @Value flag (nested inside {@code lombok} / {@code x-lombok})
+     */
+    public static final String VALUE = "value";
+    /**
+     * Lombok @With flag (nested inside {@code lombok} / {@code x-lombok})
+     */
+    public static final String WITH = "with";
+    /**
+     * Lombok @Getter standalone flag (nested inside {@code lombok} / {@code x-lombok})
+     */
+    public static final String LOMBOK_GETTER = "getter";
+    /**
+     * Lombok @Setter standalone flag (nested inside {@code lombok} / {@code x-lombok})
+     */
+    public static final String LOMBOK_SETTER = "setter";
+    /**
+     * Lombok @ToString standalone flag (nested inside {@code lombok} / {@code x-lombok})
+     */
+    public static final String TO_STRING = "toString";
+    /**
+     * Lombok @RequiredArgsConstructor flag (nested inside {@code lombok} / {@code x-lombok})
+     */
+    public static final String REQUIRED_ARGS = "requiredArgsConstructor";
+    /**
+     * Lombok @Slf4j flag (nested inside {@code lombok} / {@code x-lombok})
+     */
+    public static final String SLF4J = "slf4j";
+
     /**
      * Schema format identifiers used to map YAML types to Java.
      */
@@ -633,6 +666,31 @@ public final class Dictionary {
     // ============================================================
 
     /**
+     * Lombok @Value annotation (immutable DTO)
+     */
+    public static final String LOMBOK_VALUE_ANNOTATION = "@Value";
+    /**
+     * Lombok @With annotation (wither methods)
+     */
+    public static final String LOMBOK_WITH_ANNOTATION = "@With";
+    /**
+     * Lombok @Setter annotation
+     */
+    public static final String LOMBOK_SETTER_ANNOTATION = "@Setter";
+    /**
+     * Lombok @ToString annotation
+     */
+    public static final String LOMBOK_TO_STRING_ANNOTATION = "@ToString";
+    /**
+     * Lombok @RequiredArgsConstructor annotation
+     */
+    public static final String LOMBOK_REQUIRED_ARGS_CONSTRUCTOR_ANNOTATION = "@RequiredArgsConstructor";
+    /**
+     * Lombok @Slf4j annotation
+     */
+    public static final String LOMBOK_SLF4J_ANNOTATION = "@Slf4j";
+
+    /**
      * Lombok @Builder annotation
      */
     public static final String LOMBOK_BUILDER_ANNOTATION = "@Builder";
@@ -702,6 +760,35 @@ public final class Dictionary {
      * Import for Lombok EqualsAndHashCode
      */
     public static final String LOMBOK_EQUALS_AND_HASH_CODE_IMPORT = "lombok.EqualsAndHashCode;";
+
+    // ============================================================
+    // New Lombok imports (4.5.0)
+    // ============================================================
+
+    /**
+     * Import for Lombok Value
+     */
+    public static final String LOMBOK_VALUE_IMPORT = "lombok.Value;";
+    /**
+     * Import for Lombok With
+     */
+    public static final String LOMBOK_WITH_IMPORT = "lombok.With;";
+    /**
+     * Import for Lombok Setter
+     */
+    public static final String LOMBOK_SETTER_IMPORT = "lombok.Setter;";
+    /**
+     * Import for Lombok ToString
+     */
+    public static final String LOMBOK_TO_STRING_IMPORT = "lombok.ToString;";
+    /**
+     * Import for Lombok RequiredArgsConstructor
+     */
+    public static final String LOMBOK_REQUIRED_ARGS_CONSTRUCTOR_IMPORT = "lombok.RequiredArgsConstructor;";
+    /**
+     * Import for Lombok Slf4j
+     */
+    public static final String LOMBOK_SLF4J_IMPORT = "lombok.extern.slf4j.Slf4j;";
 
     /**
      * Jackson @JsonTypeInfo import

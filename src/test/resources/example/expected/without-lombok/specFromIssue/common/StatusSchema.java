@@ -1,5 +1,6 @@
 package specFromIssue.common;
 
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 import javax.validation.constraints.NotBlank;
 
@@ -23,5 +24,26 @@ public class StatusSchema {
     }
     public String getDescription() {
         return description;
+    }
+    @Override
+    public String toString() {
+        return "StatusSchema{" +
+                "code=" + code + ", " +
+                "description=" + description +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StatusSchema that = (StatusSchema) o;
+        return Objects.equals(code, that.code) &&
+                Objects.equals(description, that.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(code, description);
     }
 }

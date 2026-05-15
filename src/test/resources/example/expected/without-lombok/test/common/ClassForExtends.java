@@ -1,5 +1,6 @@
 package example.testGenerate.test.common;
 
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 
 /**
@@ -15,5 +16,24 @@ public class ClassForExtends {
     }
     public String getSomeAnotherString() {
         return someAnotherString;
+    }
+    @Override
+    public String toString() {
+        return "ClassForExtends{" +
+                "someAnotherString=" + someAnotherString +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ClassForExtends that = (ClassForExtends) o;
+        return Objects.equals(someAnotherString, that.someAnotherString);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(someAnotherString);
     }
 }

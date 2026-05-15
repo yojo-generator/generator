@@ -154,6 +154,127 @@ abstract class AbstractCodeGenerator {
     }
 
     /**
+     * Generates a manual {@code toString()} method, including the field values in the output.
+     * <p>
+     * Produces:
+     * <pre>{@code
+     * @Override
+     * public String toString() {
+     *     return "ClassName{field1=" + field1 + ", field2=" + field2 + "}";
+     * }
+     * }</pre>
+     *
+     * @param className the class name
+     * @param fields    list of non-enum variable properties (field definitions)
+     * @return the generated toString method source code
+     */
+    protected String generateToString(String className, List<VariableProperties> fields) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("    @Override").append(lineSeparator());
+        sb.append("    public String toString() {").append(lineSeparator());
+        sb.append("        return \"").append(className).append("{\" +").append(lineSeparator());
+
+        for (int i = 0; i < fields.size(); i++) {
+            VariableProperties vp = fields.get(i);
+            String fieldName = vp.getName();
+            sb.append("                \"").append(fieldName).append("=\" + ").append(fieldName);
+            if (i < fields.size() - 1) {
+                sb.append(" + \", \" +").append(lineSeparator());
+            } else {
+                sb.append(" +").append(lineSeparator());
+            }
+        }
+
+        sb.append("                \"}\";").append(lineSeparator());
+        sb.append("    }");
+        return sb.toString();
+    }
+
+    /**
+     * Generates a manual {@code equals(Object)} method using {@link java.util.Objects#equals(Object, Object)}.
+     * <p>
+     * Produces:
+     * <pre>{@code
+     * @Override
+     * public boolean equals(Object o) {
+     *     if (this == o) return true;
+     *     if (o == null || getClass() != o.getClass()) return false;
+     *     ClassName that = (ClassName) o;
+     *     return Objects.equals(field1, that.field1) &&
+     *             Objects.equals(field2, that.field2);
+     * }
+     * }</pre>
+     *
+     * @param className the class name
+     * @param fields    list of non-enum variable properties
+     * @param imports   import set to populate with {@code java.util.Objects}
+     * @return the generated equals method source code
+     */
+    protected String generateEquals(String className, List<VariableProperties> fields, Set<String> imports) {
+        imports.add("java.util.Objects;");
+        StringBuilder sb = new StringBuilder();
+        sb.append("    @Override").append(lineSeparator());
+        sb.append("    public boolean equals(Object o) {").append(lineSeparator());
+        sb.append("        if (this == o) return true;").append(lineSeparator());
+        sb.append("        if (o == null || getClass() != o.getClass()) return false;").append(lineSeparator());
+        sb.append("        ").append(className).append(" that = (").append(className).append(") o;").append(lineSeparator());
+
+        if (fields.size() == 1) {
+            VariableProperties vp = fields.get(0);
+            sb.append("        return Objects.equals(").append(vp.getName()).append(", that.").append(vp.getName()).append(");");
+        } else {
+            sb.append("        return ");
+            for (int i = 0; i < fields.size(); i++) {
+                VariableProperties vp = fields.get(i);
+                if (i > 0) {
+                    sb.append(" &&");
+                    if (i < fields.size()) {
+                        sb.append(lineSeparator()).append("                ");
+                    }
+                }
+                sb.append("Objects.equals(").append(vp.getName()).append(", that.").append(vp.getName()).append(")");
+            }
+            sb.append(";");
+        }
+
+        sb.append(lineSeparator()).append("    }");
+        return sb.toString();
+    }
+
+    /**
+     * Generates a manual {@code hashCode()} method using {@link java.util.Objects#hash(Object...)}.
+     * <p>
+     * Produces:
+     * <pre>{@code
+     * @Override
+     * public int hashCode() {
+     *     return Objects.hash(field1, field2);
+     * }
+     * }</pre>
+     *
+     * @param className the class name (unused, for consistency with other generation methods)
+     * @param fields    list of non-enum variable properties
+     * @param imports   import set to populate with {@code java.util.Objects}
+     * @return the generated hashCode method source code
+     */
+    protected String generateHashCode(String className, List<VariableProperties> fields, Set<String> imports) {
+        imports.add("java.util.Objects;");
+        StringBuilder sb = new StringBuilder();
+        sb.append("    @Override").append(lineSeparator());
+        sb.append("    public int hashCode() {").append(lineSeparator());
+
+        sb.append("        return Objects.hash(");
+        for (int i = 0; i < fields.size(); i++) {
+            if (i > 0) sb.append(", ");
+            sb.append(fields.get(i).getName());
+        }
+        sb.append(");").append(lineSeparator());
+
+        sb.append("    }");
+        return sb.toString();
+    }
+
+    /**
      * Builds Lombok annotations based on LombokProperties.
      *
      * @param props      Lombok configuration
@@ -162,7 +283,19 @@ abstract class AbstractCodeGenerator {
      */
     protected void buildLombokAnnotations(LombokProperties props, Set<String> imports, StringBuilder sb) {
         if (props == null) return;
-        
+
+        // @Value (immutable DTO) — mutually exclusive with @Data, handled in SchemaCodeGenerator
+        if (props.isValue()) {
+            sb.append(LOMBOK_VALUE_ANNOTATION).append(lineSeparator());
+            imports.add(LOMBOK_VALUE_IMPORT);
+        }
+
+        // @With (wither methods) — typically paired with @Value for immutable modification
+        if (props.isWith()) {
+            sb.append(LOMBOK_WITH_ANNOTATION).append(lineSeparator());
+            imports.add(LOMBOK_WITH_IMPORT);
+        }
+
         if (props.noArgsConstructor()) {
             sb.append(LOMBOK_NO_ARGS_CONSTRUCTOR_ANNOTATION).append(lineSeparator());
             imports.add(LOMBOK_NO_ARGS_CONSTRUCTOR_IMPORT);
@@ -183,10 +316,34 @@ abstract class AbstractCodeGenerator {
             sb.append(lineSeparator());
             imports.add(LOMBOK_ACCESSORS_IMPORT);
         }
-        
+
+        // @Getter (standalone, not via @Data)
+        if (props.isGetter()) {
+            sb.append(LOMBOK_GETTER_ANNOTATION).append(lineSeparator());
+            imports.add(LOMBOK_GETTER_IMPORT);
+        }
+
+        // @Setter (standalone, not via @Data) — skipped when @Value is active
+        if (props.isSetter() && !props.isValue()) {
+            sb.append(LOMBOK_SETTER_ANNOTATION).append(lineSeparator());
+            imports.add(LOMBOK_SETTER_IMPORT);
+        }
+
+        // @ToString (standalone, not via @Data)
+        if (props.isToString()) {
+            sb.append(LOMBOK_TO_STRING_ANNOTATION).append(lineSeparator());
+            imports.add(LOMBOK_TO_STRING_IMPORT);
+        }
+
         if (props.allArgsConstructor()) {
             sb.append(LOMBOK_ALL_ARGS_CONSTRUCTOR_ANNOTATION).append(lineSeparator());
             imports.add(LOMBOK_ALL_ARGS_CONSTRUCTOR_IMPORT);
+        }
+
+        // @RequiredArgsConstructor — standalone constructor for required/final fields
+        if (props.isRequiredArgsConstructor()) {
+            sb.append(LOMBOK_REQUIRED_ARGS_CONSTRUCTOR_ANNOTATION).append(lineSeparator());
+            imports.add(LOMBOK_REQUIRED_ARGS_CONSTRUCTOR_IMPORT);
         }
         
         if (props.getEqualsAndHashCode() != null && props.getEqualsAndHashCode().isEnable()) {
@@ -213,6 +370,12 @@ abstract class AbstractCodeGenerator {
             if (props.getBuilder().isSingular()) {
                 imports.add(LOMBOK_SINGULAR_IMPORT);
             }
+        }
+
+        // @Slf4j — logger field
+        if (props.isSlf4j()) {
+            sb.append(LOMBOK_SLF4J_ANNOTATION).append(lineSeparator());
+            imports.add(LOMBOK_SLF4J_IMPORT);
         }
     }
 

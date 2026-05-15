@@ -1,5 +1,6 @@
 package oneMore.common;
 
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -36,5 +37,26 @@ public class RequestCommonFieldsRequestData {
     }
     public Integer getOrderNumber() {
         return orderNumber;
+    }
+    @Override
+    public String toString() {
+        return "RequestCommonFieldsRequestData{" +
+                "source=" + source + ", " +
+                "orderNumber=" + orderNumber +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RequestCommonFieldsRequestData that = (RequestCommonFieldsRequestData) o;
+        return Objects.equals(source, that.source) &&
+                Objects.equals(orderNumber, that.orderNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(source, orderNumber);
     }
 }

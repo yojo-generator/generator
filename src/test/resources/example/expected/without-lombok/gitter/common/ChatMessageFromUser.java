@@ -2,6 +2,7 @@ package gitter.common;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 
 /**
@@ -108,5 +109,40 @@ public class ChatMessageFromUser {
     }
     public String getGv() {
         return gv;
+    }
+    @Override
+    public String toString() {
+        return "ChatMessageFromUser{" +
+                "id=" + id + ", " +
+                "username=" + username + ", " +
+                "displayName=" + displayName + ", " +
+                "url=" + url + ", " +
+                "avatarUrl=" + avatarUrl + ", " +
+                "avatarUrlSmall=" + avatarUrlSmall + ", " +
+                "avatarUrlMedium=" + avatarUrlMedium + ", " +
+                "v=" + v + ", " +
+                "gv=" + gv +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChatMessageFromUser that = (ChatMessageFromUser) o;
+        return Objects.equals(id, that.id) &&
+                Objects.equals(username, that.username) &&
+                Objects.equals(displayName, that.displayName) &&
+                Objects.equals(url, that.url) &&
+                Objects.equals(avatarUrl, that.avatarUrl) &&
+                Objects.equals(avatarUrlSmall, that.avatarUrlSmall) &&
+                Objects.equals(avatarUrlMedium, that.avatarUrlMedium) &&
+                Objects.equals(v, that.v) &&
+                Objects.equals(gv, that.gv);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, displayName, url, avatarUrl, avatarUrlSmall, avatarUrlMedium, v, gv);
     }
 }

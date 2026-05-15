@@ -81,18 +81,27 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
                 boolean hasUninitializedFinalFields = !finalFieldsWithoutDefaults.isEmpty();
 
                 if (lombokProperties != null && lombokProperties.enableLombok()) {
-                    if (schema.getSchemaName().equals("Data") ||
-                            schema.getFillParameters().getVariableProperties().stream()
-                                    .anyMatch(prop -> "Data".equals(prop.getType()))) {
-                        lombokAnnotationBuilder
-                                .append(LOMBOK_DATA_ANNOTATION.replace("@", "@lombok."))
-                                .append(lineSeparator());
+                    // @Value is mutually exclusive with @Data
+                    if (lombokProperties.isValue()) {
+                        // For @Value: make all fields final so they're treated as immutable
+                        for (VariableProperties vp : schema.getFillParameters().getVariableProperties()) {
+                            vp.setFinal(true);
+                        }
                     } else {
-                        if (!schema.getFillParameters().getVariableProperties().isEmpty()) {
+                        // @Data (default when Lombok enabled, unless @Value is used)
+                        if (schema.getSchemaName().equals("Data") ||
+                                schema.getFillParameters().getVariableProperties().stream()
+                                        .anyMatch(prop -> "Data".equals(prop.getType()))) {
                             lombokAnnotationBuilder
-                                    .append(LOMBOK_DATA_ANNOTATION)
+                                    .append(LOMBOK_DATA_ANNOTATION.replace("@", "@lombok."))
                                     .append(lineSeparator());
-                            requiredImports.add(LOMBOK_DATA_IMPORT);
+                        } else {
+                            if (!schema.getFillParameters().getVariableProperties().isEmpty()) {
+                                lombokAnnotationBuilder
+                                        .append(LOMBOK_DATA_ANNOTATION)
+                                        .append(lineSeparator());
+                                requiredImports.add(LOMBOK_DATA_IMPORT);
+                            }
                         }
                     }
                     // @NoArgsConstructor fails with uninitialized final fields — skip it
@@ -145,7 +154,9 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
                             Set<String> i = variableProperties.getRequiredImports();
                             if (lombokProperties == null || !lombokProperties.enableLombok()) {
                                 if (variableProperties.getEnumeration() == null) {
-                                    if (!variableProperties.isFinal()) {
+                                    // Skip setters when @Value mode is active (all fields are final)
+                                    if (!variableProperties.isFinal()
+                                            && (lombokProperties == null || !lombokProperties.isValue())) {
                                         finalStringBuilder
                                                 .append(lineSeparator())
                                                 .append(generateSetter(variableProperties.getType(), variableProperties.getName()))
@@ -158,6 +169,27 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
                             return i.stream();
                         })
                         .forEach(requiredImports::add);
+
+                // Manual toString/equals/hashCode (without-Lombok path)
+                if (lombokProperties == null || !lombokProperties.enableLombok()) {
+                    List<VariableProperties> nonEnumFields = new ArrayList<>();
+                    for (VariableProperties vp : schema.getFillParameters().getVariableProperties()) {
+                        if (vp.getEnumeration() == null) {
+                            nonEnumFields.add(vp);
+                        }
+                    }
+                    if (!nonEnumFields.isEmpty()) {
+                        finalStringBuilder
+                                .append(lineSeparator())
+                                .append(generateToString(schema.getSchemaName(), nonEnumFields))
+                                .append(lineSeparator())
+                                .append(lineSeparator())
+                                .append(generateEquals(schema.getSchemaName(), nonEnumFields, requiredImports))
+                                .append(lineSeparator())
+                                .append(lineSeparator())
+                                .append(generateHashCode(schema.getSchemaName(), nonEnumFields, requiredImports));
+                    }
+                }
 
                 // Manual builder class (without-Lombok path)
                 if (builderProps != null && builderProps.isEnable() &&

@@ -1,5 +1,6 @@
 package example.testGenerate.test.common;
 
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 
 @Generated("Yojo")
@@ -12,5 +13,24 @@ public class RequestDtoSchemaInnerSchema {
     }
     public String getSomeString() {
         return someString;
+    }
+    @Override
+    public String toString() {
+        return "RequestDtoSchemaInnerSchema{" +
+                "someString=" + someString +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RequestDtoSchemaInnerSchema that = (RequestDtoSchemaInnerSchema) o;
+        return Objects.equals(someString, that.someString);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(someString);
     }
 }

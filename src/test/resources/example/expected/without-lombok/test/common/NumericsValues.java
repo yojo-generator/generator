@@ -2,6 +2,7 @@ package example.testGenerate.test.common;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.Max;
@@ -156,5 +157,52 @@ public class NumericsValues {
     }
     public BigInteger getBigIntegerValueWithAnnotations() {
         return bigIntegerValueWithAnnotations;
+    }
+    @Override
+    public String toString() {
+        return "NumericsValues{" +
+                "byteValue=" + byteValue + ", " +
+                "integerValue=" + integerValue + ", " +
+                "integerValueWithFormat=" + integerValueWithFormat + ", " +
+                "longValue=" + longValue + ", " +
+                "doubleValue=" + doubleValue + ", " +
+                "floatValue=" + floatValue + ", " +
+                "bigDecimalValue=" + bigDecimalValue + ", " +
+                "bigIntegerValue=" + bigIntegerValue + ", " +
+                "byteValueWithAnnotations=" + byteValueWithAnnotations + ", " +
+                "integerValueWithAnnotations=" + integerValueWithAnnotations + ", " +
+                "longValueWithAnnotations=" + longValueWithAnnotations + ", " +
+                "doubleValueWithAnnotations=" + doubleValueWithAnnotations + ", " +
+                "floatValueWithAnnotations=" + floatValueWithAnnotations + ", " +
+                "bigDecimalValueWithAnnotations=" + bigDecimalValueWithAnnotations + ", " +
+                "bigIntegerValueWithAnnotations=" + bigIntegerValueWithAnnotations +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        NumericsValues that = (NumericsValues) o;
+        return Objects.equals(byteValue, that.byteValue) &&
+                Objects.equals(integerValue, that.integerValue) &&
+                Objects.equals(integerValueWithFormat, that.integerValueWithFormat) &&
+                Objects.equals(longValue, that.longValue) &&
+                Objects.equals(doubleValue, that.doubleValue) &&
+                Objects.equals(floatValue, that.floatValue) &&
+                Objects.equals(bigDecimalValue, that.bigDecimalValue) &&
+                Objects.equals(bigIntegerValue, that.bigIntegerValue) &&
+                Objects.equals(byteValueWithAnnotations, that.byteValueWithAnnotations) &&
+                Objects.equals(integerValueWithAnnotations, that.integerValueWithAnnotations) &&
+                Objects.equals(longValueWithAnnotations, that.longValueWithAnnotations) &&
+                Objects.equals(doubleValueWithAnnotations, that.doubleValueWithAnnotations) &&
+                Objects.equals(floatValueWithAnnotations, that.floatValueWithAnnotations) &&
+                Objects.equals(bigDecimalValueWithAnnotations, that.bigDecimalValueWithAnnotations) &&
+                Objects.equals(bigIntegerValueWithAnnotations, that.bigIntegerValueWithAnnotations);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(byteValue, integerValue, integerValueWithFormat, longValue, doubleValue, floatValue, bigDecimalValue, bigIntegerValue, byteValueWithAnnotations, integerValueWithAnnotations, longValueWithAnnotations, doubleValueWithAnnotations, floatValueWithAnnotations, bigDecimalValueWithAnnotations, bigIntegerValueWithAnnotations);
     }
 }

@@ -11,6 +11,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import javax.annotation.processing.Generated;
 import javax.validation.Valid;
@@ -239,5 +240,74 @@ public class CollectionTypes {
     }
     public Set<Long> getSetOfLongsWithRealization() {
         return setOfLongsWithRealization;
+    }
+    @Override
+    public String toString() {
+        return "CollectionTypes{" +
+                "listOfDate=" + listOfDate + ", " +
+                "listOfStandAloneUri=" + listOfStandAloneUri + ", " +
+                "listOfStandAloneDate=" + listOfStandAloneDate + ", " +
+                "listOfLocalDateTime=" + listOfLocalDateTime + ", " +
+                "listOfOffsetDateTime=" + listOfOffsetDateTime + ", " +
+                "listOfInteger=" + listOfInteger + ", " +
+                "listOfByte=" + listOfByte + ", " +
+                "listOfDouble=" + listOfDouble + ", " +
+                "listOfFloat=" + listOfFloat + ", " +
+                "listOfBigInteger=" + listOfBigInteger + ", " +
+                "listOfBigDecimal=" + listOfBigDecimal + ", " +
+                "listOfLongsWithRealization=" + listOfLongsWithRealization + ", " +
+                "listWithInnerSchemaAndExistingObject=" + listWithInnerSchemaAndExistingObject + ", " +
+                "listOfExistingObject=" + listOfExistingObject + ", " +
+                "setOfExistingObject=" + setOfExistingObject + ", " +
+                "innerSchema=" + innerSchema + ", " +
+                "setOfDate=" + setOfDate + ", " +
+                "setOfLocalDateTime=" + setOfLocalDateTime + ", " +
+                "setOfOffsetDateTime=" + setOfOffsetDateTime + ", " +
+                "setOfInteger=" + setOfInteger + ", " +
+                "setOfByte=" + setOfByte + ", " +
+                "setOfDouble=" + setOfDouble + ", " +
+                "setOfFloat=" + setOfFloat + ", " +
+                "setOfBigInteger=" + setOfBigInteger + ", " +
+                "setOfBigDecimal=" + setOfBigDecimal + ", " +
+                "setOfLongsWithRealization=" + setOfLongsWithRealization +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CollectionTypes that = (CollectionTypes) o;
+        return Objects.equals(listOfDate, that.listOfDate) &&
+                Objects.equals(listOfStandAloneUri, that.listOfStandAloneUri) &&
+                Objects.equals(listOfStandAloneDate, that.listOfStandAloneDate) &&
+                Objects.equals(listOfLocalDateTime, that.listOfLocalDateTime) &&
+                Objects.equals(listOfOffsetDateTime, that.listOfOffsetDateTime) &&
+                Objects.equals(listOfInteger, that.listOfInteger) &&
+                Objects.equals(listOfByte, that.listOfByte) &&
+                Objects.equals(listOfDouble, that.listOfDouble) &&
+                Objects.equals(listOfFloat, that.listOfFloat) &&
+                Objects.equals(listOfBigInteger, that.listOfBigInteger) &&
+                Objects.equals(listOfBigDecimal, that.listOfBigDecimal) &&
+                Objects.equals(listOfLongsWithRealization, that.listOfLongsWithRealization) &&
+                Objects.equals(listWithInnerSchemaAndExistingObject, that.listWithInnerSchemaAndExistingObject) &&
+                Objects.equals(listOfExistingObject, that.listOfExistingObject) &&
+                Objects.equals(setOfExistingObject, that.setOfExistingObject) &&
+                Objects.equals(innerSchema, that.innerSchema) &&
+                Objects.equals(setOfDate, that.setOfDate) &&
+                Objects.equals(setOfLocalDateTime, that.setOfLocalDateTime) &&
+                Objects.equals(setOfOffsetDateTime, that.setOfOffsetDateTime) &&
+                Objects.equals(setOfInteger, that.setOfInteger) &&
+                Objects.equals(setOfByte, that.setOfByte) &&
+                Objects.equals(setOfDouble, that.setOfDouble) &&
+                Objects.equals(setOfFloat, that.setOfFloat) &&
+                Objects.equals(setOfBigInteger, that.setOfBigInteger) &&
+                Objects.equals(setOfBigDecimal, that.setOfBigDecimal) &&
+                Objects.equals(setOfLongsWithRealization, that.setOfLongsWithRealization);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(listOfDate, listOfStandAloneUri, listOfStandAloneDate, listOfLocalDateTime, listOfOffsetDateTime, listOfInteger, listOfByte, listOfDouble, listOfFloat, listOfBigInteger, listOfBigDecimal, listOfLongsWithRealization, listWithInnerSchemaAndExistingObject, listOfExistingObject, setOfExistingObject, innerSchema, setOfDate, setOfLocalDateTime, setOfOffsetDateTime, setOfInteger, setOfByte, setOfDouble, setOfFloat, setOfBigInteger, setOfBigDecimal, setOfLongsWithRealization);
     }
 }

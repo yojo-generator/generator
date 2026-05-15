@@ -40,11 +40,14 @@ public class GenerateExpectedFilesTest {
         generateForSpec("discriminator.yaml", "discriminator", false, false, "nosplit-discriminator");
         generateForSpec("test-create-app.yaml", "testCreateApp", false, false, "nosplit-testcreateapp");
         generateForSpec("builder-test.yaml", "example.testGenerate.builder", false, false, "nosplit-builder");
+        // enum-values.yaml
+        generateForSpec("enum-values.yaml", "enumvalues", false);
     }
 
     @Test
     void generateWithLombok() throws java.io.IOException {
         generateForSpec("test.yaml", "example.testGenerate.test", true);
+        generateForSpec("enum-values.yaml", "enumvalues", true);
         generateForSpec("async-api-official-v3.0.yaml", "asyncapi", true);
         generateForSpec("gitter-streaming-async-api-v3.0.yaml", "gitter", true);
         generateForSpec("slack-real-time-async-api-v3.0.yaml", "slack", true);

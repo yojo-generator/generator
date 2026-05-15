@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
 import javax.validation.constraints.NotNull;
@@ -106,5 +107,44 @@ public class ObjectTypes {
     }
     public OffsetDateTime getOffsetDateTimeValueWithRequired() {
         return offsetDateTimeValueWithRequired;
+    }
+    @Override
+    public String toString() {
+        return "ObjectTypes{" +
+                "uuidValue=" + uuidValue + ", " +
+                "uuidWithDefaultValue=" + uuidWithDefaultValue + ", " +
+                "uuidValueWithRequired=" + uuidValueWithRequired + ", " +
+                "dateValue=" + dateValue + ", " +
+                "dateValueWithRequired=" + dateValueWithRequired + ", " +
+                "localDateValue=" + localDateValue + ", " +
+                "localDateValueWithRequired=" + localDateValueWithRequired + ", " +
+                "localDateTimeValue=" + localDateTimeValue + ", " +
+                "localDateTimeValueWithRequired=" + localDateTimeValueWithRequired + ", " +
+                "offsetDateTimeValue=" + offsetDateTimeValue + ", " +
+                "offsetDateTimeValueWithRequired=" + offsetDateTimeValueWithRequired +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ObjectTypes that = (ObjectTypes) o;
+        return Objects.equals(uuidValue, that.uuidValue) &&
+                Objects.equals(uuidWithDefaultValue, that.uuidWithDefaultValue) &&
+                Objects.equals(uuidValueWithRequired, that.uuidValueWithRequired) &&
+                Objects.equals(dateValue, that.dateValue) &&
+                Objects.equals(dateValueWithRequired, that.dateValueWithRequired) &&
+                Objects.equals(localDateValue, that.localDateValue) &&
+                Objects.equals(localDateValueWithRequired, that.localDateValueWithRequired) &&
+                Objects.equals(localDateTimeValue, that.localDateTimeValue) &&
+                Objects.equals(localDateTimeValueWithRequired, that.localDateTimeValueWithRequired) &&
+                Objects.equals(offsetDateTimeValue, that.offsetDateTimeValue) &&
+                Objects.equals(offsetDateTimeValueWithRequired, that.offsetDateTimeValueWithRequired);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuidValue, uuidWithDefaultValue, uuidValueWithRequired, dateValue, dateValueWithRequired, localDateValue, localDateValueWithRequired, localDateTimeValue, localDateTimeValueWithRequired, offsetDateTimeValue, offsetDateTimeValueWithRequired);
     }
 }

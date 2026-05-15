@@ -1,5 +1,6 @@
 package oneMore.common;
 
+import java.util.Objects;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
 import javax.validation.constraints.NotBlank;
@@ -60,5 +61,30 @@ public class RequestCommonFieldsContext {
     }
     public UUID getRequestId() {
         return requestId;
+    }
+    @Override
+    public String toString() {
+        return "RequestCommonFieldsContext{" +
+                "methodName=" + methodName + ", " +
+                "businessKey=" + businessKey + ", " +
+                "instanceId=" + instanceId + ", " +
+                "requestId=" + requestId +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RequestCommonFieldsContext that = (RequestCommonFieldsContext) o;
+        return Objects.equals(methodName, that.methodName) &&
+                Objects.equals(businessKey, that.businessKey) &&
+                Objects.equals(instanceId, that.instanceId) &&
+                Objects.equals(requestId, that.requestId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(methodName, businessKey, instanceId, requestId);
     }
 }

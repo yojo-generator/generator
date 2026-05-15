@@ -1,5 +1,6 @@
 package oneMore.common;
 
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -54,5 +55,28 @@ public class CompanyPerson {
     }
     public Integer getSex() {
         return sex;
+    }
+    @Override
+    public String toString() {
+        return "CompanyPerson{" +
+                "actualAddress=" + actualAddress + ", " +
+                "name=" + name + ", " +
+                "sex=" + sex +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CompanyPerson that = (CompanyPerson) o;
+        return Objects.equals(actualAddress, that.actualAddress) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(sex, that.sex);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(actualAddress, name, sex);
     }
 }

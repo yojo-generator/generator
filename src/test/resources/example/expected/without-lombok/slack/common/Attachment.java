@@ -3,6 +3,7 @@ package slack.common;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.processing.Generated;
 import javax.validation.Valid;
 import slack.common.AttachmentFields;
@@ -130,5 +131,52 @@ public class Attachment {
     }
     public BigDecimal getTs() {
         return ts;
+    }
+    @Override
+    public String toString() {
+        return "Attachment{" +
+                "fallback=" + fallback + ", " +
+                "color=" + color + ", " +
+                "pretext=" + pretext + ", " +
+                "authorName=" + authorName + ", " +
+                "authorLink=" + authorLink + ", " +
+                "authorIcon=" + authorIcon + ", " +
+                "title=" + title + ", " +
+                "titleLink=" + titleLink + ", " +
+                "text=" + text + ", " +
+                "fields=" + fields + ", " +
+                "imageUrl=" + imageUrl + ", " +
+                "thumbUrl=" + thumbUrl + ", " +
+                "footer=" + footer + ", " +
+                "footerIcon=" + footerIcon + ", " +
+                "ts=" + ts +
+                "}";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Attachment that = (Attachment) o;
+        return Objects.equals(fallback, that.fallback) &&
+                Objects.equals(color, that.color) &&
+                Objects.equals(pretext, that.pretext) &&
+                Objects.equals(authorName, that.authorName) &&
+                Objects.equals(authorLink, that.authorLink) &&
+                Objects.equals(authorIcon, that.authorIcon) &&
+                Objects.equals(title, that.title) &&
+                Objects.equals(titleLink, that.titleLink) &&
+                Objects.equals(text, that.text) &&
+                Objects.equals(fields, that.fields) &&
+                Objects.equals(imageUrl, that.imageUrl) &&
+                Objects.equals(thumbUrl, that.thumbUrl) &&
+                Objects.equals(footer, that.footer) &&
+                Objects.equals(footerIcon, that.footerIcon) &&
+                Objects.equals(ts, that.ts);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fallback, color, pretext, authorName, authorLink, authorIcon, title, titleLink, text, fields, imageUrl, thumbUrl, footer, footerIcon, ts);
     }
 }

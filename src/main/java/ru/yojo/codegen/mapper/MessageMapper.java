@@ -322,6 +322,7 @@ public class MessageMapper extends AbstractMapper {
                 fillLombokEqualsAndHashCode(lombokProperties, lombokProps);
                 fillLombokConstructors(lombokProperties, lombokProps);
                 fillLombokBuilder(lombokProperties, lombokProps);
+                fillLombokNewAnnotations(lombokProperties, lombokProps);
             }
         }
 
