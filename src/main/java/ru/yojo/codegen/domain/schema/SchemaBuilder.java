@@ -42,6 +42,7 @@ public class SchemaBuilder {
     private Map<String, Object> methods = new LinkedHashMap<>();
     private Set<String> interfaceImports = new HashSet<>();
     private Set<String> classAnnotations = new HashSet<>();
+    private String jsonInclude;
     private String discriminator;
     private String discriminatorField;
     private boolean enumDefault = false;
@@ -225,6 +226,17 @@ public class SchemaBuilder {
     }
 
     /**
+     * Sets the class-level {@code @JsonInclude} value.
+     *
+     * @param jsonInclude include value (e.g., {@code NON_NULL})
+     * @return this builder
+     */
+    public SchemaBuilder jsonInclude(String jsonInclude) {
+        this.jsonInclude = jsonInclude;
+        return this;
+    }
+
+    /**
      * Builds the Schema instance.
      *
      * @return a new Schema with all configured properties
@@ -247,6 +259,7 @@ public class SchemaBuilder {
         if (!methods.isEmpty()) schema.getMethods().putAll(methods);
         if (!interfaceImports.isEmpty()) schema.getInterfaceImports().addAll(interfaceImports);
         if (!classAnnotations.isEmpty()) schema.getClassAnnotations().addAll(classAnnotations);
+        if (jsonInclude != null) schema.setJsonInclude(jsonInclude);
         if (discriminator != null) schema.setDiscriminator(discriminator);
         if (discriminatorField != null) {
             schema.setDiscriminatorField(discriminatorField);

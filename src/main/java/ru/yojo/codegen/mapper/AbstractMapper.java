@@ -148,6 +148,32 @@ public class AbstractMapper {
         if (!fieldAnnotations.isEmpty()) {
             variableProperties.getFieldAnnotations().addAll(fieldAnnotations);
         }
+        // ─── Jackson field annotations (4.6.0) ──────────────────────────────────────────────
+        // x-json-property: "wire_name" → @JsonProperty("wire_name")
+        String jsonProperty = getStringValueIfExistOrElseNull(X_JSON_PROPERTY, propertiesMap);
+        if (jsonProperty != null && !jsonProperty.trim().isEmpty()) {
+            variableProperties.getAnnotationSet().add(String.format(JSON_PROPERTY_ANNOTATION, jsonProperty));
+            variableProperties.addRequiredImports(JSON_PROPERTY_IMPORT);
+        }
+        // x-json-format: "dd.MM.yyyy" → @JsonFormat(pattern = "dd.MM.yyyy")
+        String jsonFormat = getStringValueIfExistOrElseNull(X_JSON_FORMAT, propertiesMap);
+        if (jsonFormat != null && !jsonFormat.trim().isEmpty()) {
+            variableProperties.getAnnotationSet().add(String.format(JSON_FORMAT_ANNOTATION, jsonFormat));
+            variableProperties.addRequiredImports(JSON_FORMAT_IMPORT);
+        }
+        // x-json-include: NON_NULL → @JsonInclude(JsonInclude.Include.NON_NULL)
+        String jsonInclude = getStringValueIfExistOrElseNull(X_JSON_INCLUDE, propertiesMap);
+        if (jsonInclude != null && !jsonInclude.trim().isEmpty()) {
+            variableProperties.getAnnotationSet().add(String.format(JSON_INCLUDE_ANNOTATION, jsonInclude));
+            variableProperties.addRequiredImports(JSON_INCLUDE_IMPORT);
+        }
+        // x-json-ignore: true → @JsonIgnore
+        String jsonIgnore = getStringValueIfExistOrElseNull(X_JSON_IGNORE, propertiesMap);
+        if ("true".equalsIgnoreCase(jsonIgnore)) {
+            variableProperties.getAnnotationSet().add(JSON_IGNORE_ANNOTATION);
+            variableProperties.addRequiredImports(JSON_IGNORE_IMPORT);
+        }
+        // ─── End Jackson field annotations ───────────────────────────────────────────────────
         fillVariableProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, processContext, innerSchemas);
         fillRequiredAnnotationsAndImports(variableProperties, currentSchema, propertyName);
     }

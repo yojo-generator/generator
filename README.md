@@ -8,7 +8,7 @@
 [![Javadoc](https://img.shields.io/badge/docs-javadoc-blue.svg)](https://javadoc.io/doc/io.github.yojo-generator/generator)
 ![Build](https://img.shields.io/github/actions/workflow/status/yojo-generator/generator/build.yml?branch=develop)
 
-**Java DTO generator for AsyncAPI** — transforms YAML specifications into production-ready Java POJOs. Supports Lombok annotations (`@Data`, `@Builder`, `@Value`, `@Slf4j`), Jackson polymorphism (`@JsonTypeInfo`, `@JsonSubTypes`), Jakarta Bean Validation (`@NotBlank`, `@Email`, `@Pattern`), and manual `toString`/`equals`/`hashCode`. Works with AsyncAPI v2.0/v2.6/v3.0 and schema-driven YAML contracts.
+**Java DTO generator for AsyncAPI** — transforms YAML specifications into production-ready Java POJOs. Supports Lombok annotations (`@Data`, `@Builder`, `@Value`, `@Slf4j`), Jackson annotations (`@JsonProperty`, `@JsonFormat`, `@JsonInclude`, `@JsonIgnore`, `@JsonTypeInfo`, `@JsonSubTypes`, `@JsonValue`/`@JsonCreator`), Jakarta Bean Validation (`@NotBlank`, `@Email`, `@Pattern`), and manual `toString`/`equals`/`hashCode`. Schema-level `x-json-naming: SNAKE_CASE` auto-generates `@JsonProperty` for all fields. Works with AsyncAPI v2.0/v2.6/v3.0 and schema-driven YAML contracts.
 
 ---
 
@@ -548,6 +548,79 @@ public class MyDto {
 
 ---
 
+### Jackson annotations (`x-json-property`, `x-json-format`, `x-json-include`, `x-json-ignore`, `x-json-naming`)
+
+Yojo supports fine-grained Jackson serialization annotations via `x-json-*` attributes on YAML schemas and properties.
+
+#### Field-level annotations
+
+| YAML Attribute | → Java Annotation | Description |
+|---|---|---|
+| `x-json-property` | `@JsonProperty("wireName")` | Custom serialized name for the field |
+| `x-json-format` | `@JsonFormat(pattern = "...", shape = ...)` | Date/time format pattern |
+| `x-json-ignore` | `@JsonIgnore` | Exclude field from serialization/deserialization |
+| `x-json-include` | `@JsonInclude(Include.NON_NULL)` | Class-level inclusion rule |
+
+#### Schema-level naming strategy
+
+Setting `x-json-naming: SNAKE_CASE` at the schema level automatically generates `@JsonProperty("snake_name")` for **all** fields in that schema, converting camelCase field names to snake_case. Individual `x-json-property` overrides take precedence.
+
+#### Example
+
+```yaml
+JacksonTestSchema:
+  type: object
+  x-json-naming: SNAKE_CASE
+  x-json-include: NON_NULL
+  properties:
+    userId:
+      type: integer
+      format: int64
+      description: Gets @JsonProperty("user_id") from naming strategy
+    createdAt:
+      type: string
+      format: date-time
+      x-json-format:
+        pattern: "yyyy-MM-dd'T'HH:mm:ss"
+        timezone: "UTC"
+      description: Gets @JsonFormat on the field
+    internalCode:
+      type: string
+      x-json-ignore: true
+      description: Gets @JsonIgnore
+    displayName:
+      type: string
+      x-json-property: display_name_custom
+      description: Overrides naming strategy with custom @JsonProperty
+```
+
+#### Generated output
+
+```java
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class JacksonTestSchema {
+
+    @JsonProperty("user_id")
+    private Long userId;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "UTC")
+    @JsonProperty("created_at")
+    private OffsetDateTime createdAt;
+
+    @JsonIgnore
+    @JsonProperty("internal_code")
+    private String internalCode;
+
+    @JsonProperty("display_name_custom")
+    private String displayName;
+}
+```
+
+> 💡 The schema-level `x-json-naming: SNAKE_CASE` applies `@JsonProperty("snake_name")` to every field automatically.
+> Use `x-json-property` on individual fields to override the auto-generated name.
+
+---
+
 ### Final fields (`x-final`)
 
 ```yaml
@@ -671,6 +744,11 @@ All custom Yojo attributes now have `x-` prefixed equivalents. While the old nam
 | `x-class-annotation` | — | schema, message | `list` | `[com.example.MyAnnotation]` | Class-level annotations |
 | `x-field-annotation` | — | field | `list` | `[com.example.MyAnnotation("v")]` | Field-level annotations |
 | `x-final` | — | field | `boolean` | `true` | Generates `final` field declaration |
+| `x-json-property` | — | field | `string` | `"display_name"` | `@JsonProperty("display_name")` on field |
+| `x-json-format` | — | field | `map` | `{pattern: "...", timezone: "UTC"}` | `@JsonFormat(...)` on field |
+| `x-json-include` | — | schema | `string` | `NON_NULL` | `@JsonInclude(Include.NON_NULL)` on class |
+| `x-json-ignore` | — | field | `boolean` | `true` | `@JsonIgnore` on field |
+| `x-json-naming` | — | schema | `string` | `SNAKE_CASE` | Auto-generates `@JsonProperty` for all fields |
 
 ---
 
@@ -700,7 +778,7 @@ If you discover a security issue, please contact the maintainer directly (email 
 | **Discriminator** | ✅ Done | `@JsonTypeInfo`, `@JsonSubTypes` for polymorphism |
 | **`@JsonTypeId` on fields** | ✅ Done | Discriminator field annotation in subtypes |
 | **Discriminator `const`** | ✅ Done | Override default discriminator value via `const` |
-| **Jackson annotations** | 🟡 Partial | `@JsonProperty`, `@JsonInclude`, `@JsonValue`/`@JsonCreator` (via `x-enumValues`) done |
+| **Jackson annotations** | ✅ Done (4.6.0) | `@JsonProperty`, `@JsonFormat`, `@JsonInclude`, `@JsonIgnore`, `@JsonValue`/`@JsonCreator` (via `x-enumValues`), and `x-json-naming: SNAKE_CASE` |
 | **x- prefixed attributes** | ✅ Done (4.3.0) | All custom attributes deprecated in favour of `x-` equivalents |
 | **AsyncAPI spec validation** | 🚧 Planned | Validate `$ref`, `type`, `format`, detect circular refs |
 | **Lombok extensions** | ✅ Done (4.4.0) | `@Builder`, `@Singular`, `@Builder.Default` + manual Builder class |

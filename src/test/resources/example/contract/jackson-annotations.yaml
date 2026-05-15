@@ -1,0 +1,33 @@
+asyncapi: 2.6.0
+info:
+  title: Jackson Annotations Test
+  version: 1.0.0
+channels:
+  TestEvent:
+    subscribe:
+      message:
+        payload:
+          $ref: '#/components/schemas/JacksonTestSchema'
+components:
+  schemas:
+    JacksonTestSchema:
+      type: object
+      x-json-include: NON_NULL
+      x-json-naming: SNAKE_CASE
+      properties:
+        firstName:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+          x-json-format: "dd.MM.yyyy HH:mm"
+        internalCode:
+          type: string
+          x-json-ignore: true
+        extraData:
+          type: string
+          x-json-property: "extra_data_custom"
+        tags:
+          type: array
+          items:
+            type: string

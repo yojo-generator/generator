@@ -778,6 +778,38 @@ public class MapperUtil {
     }
 
     /**
+     * Converts a camelCase string to snake_case.
+     * <p>
+     * Examples:
+     * <ul>
+     *   <li>{@code "firstName"} → {@code "first_name"}</li>
+     *   <li>{@code "myFieldName"} → {@code "my_field_name"}</li>
+     *   <li>{@code "HTMLParser"} → {@code "h_t_m_l_parser"} (simple algorithm, use with awareness)</li>
+     * </ul>
+     *
+     * @param camelCase the input in camelCase (may be {@code null})
+     * @return snake_case equivalent, or {@code null} if input was {@code null}
+     */
+    public static String camelToSnake(String camelCase) {
+        if (camelCase == null || camelCase.isEmpty()) {
+            return camelCase;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < camelCase.length(); i++) {
+            char c = camelCase.charAt(i);
+            if (Character.isUpperCase(c)) {
+                if (sb.length() > 0 && sb.charAt(sb.length() - 1) != '_') {
+                    sb.append('_');
+                }
+                sb.append(Character.toLowerCase(c));
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
      * Recursively registers nested inline object definitions as synthetic inner schemas.
      * <p>
      * This method traverses the given {@code properties} map and, for every field of type {@code object}

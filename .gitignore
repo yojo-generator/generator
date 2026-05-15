@@ -39,6 +39,7 @@ dependency-reduced-pom.xml
 **/expected/**/*.java
 !**/expected/**/discriminator/**/*.java
 !**/expected/**/enumvalues/**/*.java
+!**/expected/**/jackson/**/*.java
 
 # Temporary test run files
 test_*.txt
