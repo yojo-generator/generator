@@ -8,7 +8,7 @@
 [![Javadoc](https://img.shields.io/badge/docs-javadoc-blue.svg)](https://javadoc.io/doc/io.github.yojo-generator/generator)
 ![Build](https://img.shields.io/github/actions/workflow/status/yojo-generator/generator/build.yml?branch=develop)
 
-**YAML-to-POJO for AsyncAPI v2.0/v2.6/v3.0** — generates clean, production-ready Java DTOs with Lombok, Jackson, and Bean Validation support.
+**Java DTO generator for AsyncAPI & OpenAPI** — transforms YAML specifications into production-ready Java POJOs. Supports Lombok annotations (`@Data`, `@Builder`, `@Value`, `@Slf4j`), Jackson polymorphism (`@JsonTypeInfo`, `@JsonSubTypes`), Jakarta Bean Validation (`@NotBlank`, `@Email`, `@Pattern`), and manual `toString`/`equals`/`hashCode`. Works with AsyncAPI v2.0/v2.6/v3.0 and schema-driven YAML contracts.
 
 ---
 
