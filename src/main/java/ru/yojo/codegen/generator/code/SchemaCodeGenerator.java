@@ -403,6 +403,13 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
             }
         }
 
+        // Add class-level @JsonInclude if specified via x-json-include
+        if (schema.getJsonInclude() != null && !schema.getJsonInclude().isEmpty()) {
+            lombokAnnotationBuilder.append(String.format(JSON_INCLUDE_ANNOTATION, schema.getJsonInclude()))
+                    .append(lineSeparator());
+            requiredImports.add(JSON_INCLUDE_IMPORT);
+        }
+
         // Add Jackson polymorphic annotations (discriminator)
         String discriminator = schema.getDiscriminator();
         if (discriminator != null && !discriminator.isEmpty()) {

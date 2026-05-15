@@ -88,6 +88,12 @@ public class Schema {
     private Set<String> classAnnotations = new HashSet<>();
 
     /**
+     * Class-level Jackson {@code @JsonInclude} value (e.g., {@code NON_NULL}, {@code NON_EMPTY}).
+     * Set via {@code x-json-include} on the schema.
+     */
+    private String jsonInclude;
+
+    /**
      * Discriminator field name for polymorphic serialization.
      */
     private String discriminator;
@@ -350,6 +356,24 @@ public class Schema {
      */
     public Set<String> getClassAnnotations() {
         return classAnnotations;
+    }
+
+    /**
+     * Returns the class-level {@code @JsonInclude} value (e.g., {@code NON_NULL}).
+     *
+     * @return include value, or {@code null} if not set
+     */
+    public String getJsonInclude() {
+        return jsonInclude;
+    }
+
+    /**
+     * Sets the class-level {@code @JsonInclude} value.
+     *
+     * @param jsonInclude include value (e.g., {@code NON_NULL})
+     */
+    public void setJsonInclude(String jsonInclude) {
+        this.jsonInclude = jsonInclude;
     }
 
     /**

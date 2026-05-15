@@ -96,6 +96,33 @@ public final class Dictionary {
      */
     public static final String X_FINAL = "x-final";
 
+    /**
+     * Custom YAML property for Jackson {@code @JsonProperty("wire_name")} on a field.
+     * Value: the wire name to use during serialization/deserialization.
+     */
+    public static final String X_JSON_PROPERTY = "x-json-property";
+    /**
+     * Custom YAML property for Jackson {@code @JsonFormat(pattern = "...")} on a field.
+     * Value: the date/time format pattern (e.g., "dd.MM.yyyy").
+     */
+    public static final String X_JSON_FORMAT = "x-json-format";
+    /**
+     * Custom YAML property for Jackson {@code @JsonInclude(JsonInclude.Include....)} on a field or class.
+     * Value: Include type name (e.g., NON_NULL, NON_EMPTY, NON_ABSENT).
+     */
+    public static final String X_JSON_INCLUDE = "x-json-include";
+    /**
+     * Custom YAML property for Jackson {@code @JsonIgnore} on a field.
+     * Value: {@code true} to exclude the field from JSON serialization/deserialization.
+     */
+    public static final String X_JSON_IGNORE = "x-json-ignore";
+    /**
+     * Custom YAML property for automatic naming convention on a schema level.
+     * When set to {@code SNAKE_CASE}, all fields get {@code @JsonProperty("snake_case_name")}.
+     * This is a class-level (schema) attribute, not a field-level one.
+     */
+    public static final String X_JSON_NAMING = "x-json-naming";
+
     // ============================================================
     // Extension attributes migrated to x- prefix (Groups 1-3)
     // Old names are @Deprecated for backward compatibility
@@ -620,6 +647,23 @@ public final class Dictionary {
     public static final String JSON_TYPE_ID_IMPORT = "com.fasterxml.jackson.annotation.JsonTypeId;";
 
     /**
+     * Jackson @JsonProperty annotation template (with wire name).
+     */
+    public static final String JSON_PROPERTY_ANNOTATION = "@JsonProperty(\"%s\")";
+    /**
+     * Jackson @JsonFormat annotation template (with pattern).
+     */
+    public static final String JSON_FORMAT_ANNOTATION = "@JsonFormat(pattern = \"%s\")";
+    /**
+     * Jackson @JsonInclude annotation template (field/class level).
+     */
+    public static final String JSON_INCLUDE_ANNOTATION = "@JsonInclude(JsonInclude.Include.%s)";
+    /**
+     * Jackson @JsonIgnore annotation (no-arg).
+     */
+    public static final String JSON_IGNORE_ANNOTATION = "@JsonIgnore";
+
+    /**
      * Lombok annotation string templates.
      */
     /**
@@ -1053,6 +1097,22 @@ public final class Dictionary {
      * Import for JsonPropertyDescription annotation
      */
     public static final String JSON_PROPERTY_DESCRIPTION_IMPORT = "com.fasterxml.jackson.annotation.JsonPropertyDescription;";
+    /**
+     * Import for @JsonProperty annotation
+     */
+    public static final String JSON_PROPERTY_IMPORT = "com.fasterxml.jackson.annotation.JsonProperty;";
+    /**
+     * Import for @JsonFormat annotation
+     */
+    public static final String JSON_FORMAT_IMPORT = "com.fasterxml.jackson.annotation.JsonFormat;";
+    /**
+     * Import for @JsonInclude annotation
+     */
+    public static final String JSON_INCLUDE_IMPORT = "com.fasterxml.jackson.annotation.JsonInclude;";
+    /**
+     * Import for @JsonIgnore annotation
+     */
+    public static final String JSON_IGNORE_IMPORT = "com.fasterxml.jackson.annotation.JsonIgnore;";
 
     /**
      * Import for URI class

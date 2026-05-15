@@ -154,6 +154,13 @@ public class SchemaMapper extends AbstractMapper {
                         Set<String> classAnnotations = getSetValueIfExistsOrElseEmptySet(X_CLASS_ANNOTATION, schemaMap);
                         classAnnotations.forEach(builder::addClassAnnotation);
                     }
+                    // Process x-json-include (class-level @JsonInclude)
+                    if (sk.equals(X_JSON_INCLUDE)) {
+                        String jsonInclude = getStringValueIfExistOrElseNull(X_JSON_INCLUDE, schemaMap);
+                        if (jsonInclude != null && !jsonInclude.trim().isEmpty()) {
+                            builder.jsonInclude(jsonInclude);
+                        }
+                    }
                 });
 
                 // ——— Discriminator: set discriminator field on base schemas ——— //
@@ -306,6 +313,9 @@ public class SchemaMapper extends AbstractMapper {
                         processContext,
                         innerSchemas);
 
+                // Apply schema-level x-json-naming to each field
+                applyJsonNaming(currentSchema, vp);
+
                 variableProperties.add(vp);
             });
         }
@@ -339,6 +349,9 @@ public class SchemaMapper extends AbstractMapper {
                             castObjectToMap(propertyValue),
                             processContext,
                             processContext.getHelper().getInnerSchemas());
+
+                    // Apply schema-level x-json-naming to each field
+                    applyJsonNaming(currentSchema, vp);
 
                     variableProperties.add(vp);
                 }
@@ -478,5 +491,28 @@ public class SchemaMapper extends AbstractMapper {
      */
     public Set<String> getDiscriminatorBases() {
         return discriminatorProcessor.getDiscriminatorBases();
+    }
+
+    /**
+     * Applies schema-level {@code x-json-naming} to a field's {@code @JsonProperty} annotation.
+     * <p>
+     * When the schema has {@code x-json-naming: SNAKE_CASE}, every field that does NOT already
+     * have an explicit {@code @JsonProperty} gets one with the snake_case version of its Java name.
+     *
+     * @param schemaMap the current schema definition (may contain {@code x-json-naming})
+     * @param vp        the variable properties to modify
+     */
+    private void applyJsonNaming(Map<String, Object> schemaMap, VariableProperties vp) {
+        String jsonNaming = getStringValueIfExistOrElseNull(X_JSON_NAMING, schemaMap);
+        if ("SNAKE_CASE".equalsIgnoreCase(jsonNaming) && vp.getName() != null) {
+            // Don't override if the field already has an explicit @JsonProperty
+            boolean hasExplicitJsonProperty = vp.getAnnotationSet().stream()
+                    .anyMatch(a -> a.startsWith("@JsonProperty"));
+            if (!hasExplicitJsonProperty) {
+                String snakeName = MapperUtil.camelToSnake(vp.getName());
+                vp.getAnnotationSet().add(String.format(JSON_PROPERTY_ANNOTATION, snakeName));
+                vp.addRequiredImports(JSON_PROPERTY_IMPORT);
+            }
+        }
     }
 }

@@ -42,6 +42,8 @@ public class GenerateExpectedFilesTest {
         generateForSpec("builder-test.yaml", "example.testGenerate.builder", false, false, "nosplit-builder");
         // enum-values.yaml
         generateForSpec("enum-values.yaml", "enumvalues", false);
+        // jackson-annotations.yaml
+        generateForSpec("jackson-annotations.yaml", "jackson", false);
     }
 
     @Test
@@ -56,6 +58,8 @@ public class GenerateExpectedFilesTest {
         generateForSpec("discriminator.yaml", "discriminator", true);
         generateForSpec("test-create-app.yaml", "testCreateApp", true);
         generateForSpec("builder-test.yaml", "example.testGenerate.builder", true);
+        // jackson-annotations.yaml
+        generateForSpec("jackson-annotations.yaml", "jackson", true);
         // splitModels=false variants (flat directory)
         generateForSpec("test.yaml", "example.testGenerate.test", true, false, "nosplit-test");
         generateForSpec("async-api-official-v3.0.yaml", "asyncapi", true, false, "nosplit-asyncapi");
