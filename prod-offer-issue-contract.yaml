@@ -1,0 +1,79 @@
+asyncapi: '2.6.0'
+info:
+  title: Product Offer Issue Reproduction
+  version: '1.0.0'
+  description: Minimal AsyncAPI contract reproducing compilation errors
+
+channels:
+  syncProductOffers:
+    subscribe:
+      operationId: syncProductOffersRequest
+      message:
+        payload:
+          $ref: '#/components/schemas/SyncProductOffersRequest'
+
+components:
+  messages:
+    syncProductOffersRequest:
+      payload:
+        $ref: '#/components/schemas/SyncProductOffersRequest'
+
+  schemas:
+    SyncProductOffersRequest:
+      type: object
+      properties:
+        characteristic:
+          $ref: '#/components/schemas/Characteristic'
+        specificationCharacteristic:
+          $ref: '#/components/schemas/SpecificationCharacteristic'
+        booleanRestriction:
+          $ref: '#/components/schemas/BooleanRestriction'
+
+    # Bug: Enum with 'ARRAY' value - causes List<Object>; in generated enum
+    CharacteristicType:
+      type: string
+      enum:
+        - SCALAR
+        - ARRAY
+
+    CharacteristicValueType:
+      type: string
+      enum:
+        - STRING
+        - LONG
+        - BOOLEAN
+        - DATE
+        - INSTANT
+        - TIME
+        - DECIMAL
+        - DICTIONARY
+
+    # Schema that references enum with ARRAY value
+    Characteristic:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          $ref: '#/components/schemas/CharacteristicType'
+        valueType:
+          $ref: '#/components/schemas/CharacteristicValueType'
+
+    # Schema using allOf with the above
+    SpecificationCharacteristic:
+      allOf:
+        - $ref: '#/components/schemas/Characteristic'
+      properties:
+        specificationCharacteristicCode:
+          type: string
+
+    # Bug: Array items with type: boolean causes import common.boolean;
+    BooleanRestriction:
+      type: object
+      properties:
+        possibleValues:
+          type: array
+          items:
+            type: boolean
+        defaultValue:
+          type: boolean
