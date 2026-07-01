@@ -1,6 +1,7 @@
 package ru.yojo.codegen.mapper;
 
 import static ru.yojo.codegen.constants.Dictionary.ARRAY;
+import static ru.yojo.codegen.constants.Dictionary.ENUMERATION;
 import static ru.yojo.codegen.constants.Dictionary.TYPE;
 import static ru.yojo.codegen.util.MapperUtil.getStringValueIfExistOrElseNull;
 import static ru.yojo.codegen.util.MapperUtil.uncapitalize;
@@ -27,6 +28,10 @@ public class ArrayTypeHandler implements PropertyTypeHandler {
     @Override
     public boolean canHandle(PropertyResolutionContext ctx) {
         String type = getStringValueIfExistOrElseNull(TYPE, ctx.propertiesMap());
+        // Don't match if this property has an 'enum' field - it's an enum constant, not an array
+        if (getStringValueIfExistOrElseNull(ENUMERATION, ctx.propertiesMap()) != null) {
+            return false;
+        }
         return ARRAY.equals(uncapitalize(ctx.variableProperties().getType())) ||
                (type != null && ARRAY.equalsIgnoreCase(type));
     }

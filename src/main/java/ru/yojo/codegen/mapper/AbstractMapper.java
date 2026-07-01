@@ -612,8 +612,11 @@ public class AbstractMapper {
                         if (getStringValueIfExistOrElseNull(PACKAGE, items) != null) {
                             fillCollectionWithExistingObject(variableProperties, items);
                         } else {
-                            variableProperties.setItems(items.get(TYPE).toString());
-                            variableProperties.setFormat(items.get(TYPE).toString());
+                            String itemType = items.get(TYPE).toString();
+                            variableProperties.setItems(capitalize(itemType));
+                            variableProperties.setFormat(itemType); // lowercase — let setFormat() handle type/valid
+                            fillCollectionType(variableProperties); // handles types not in setFormat switch (e.g. boolean)
+                            variableProperties.setValid(false);    // simple array items don't need @Valid
                         }
                     }
                 }
