@@ -150,6 +150,24 @@ class XAttributesTest {
 
     @Test
     @Order(8)
+    void xFieldAnnotationsWithSameSimpleName() throws IOException {
+        generate();
+
+        String fa = readFile("common/FieldAnnotations.java");
+        // lombok.EqualsAndHashCode.Exclude and lombok.ToString.Exclude share the simple name
+        // "Exclude", so the enclosing type must be used instead of a conflicting import.
+        assertThat(fa)
+                .contains("import lombok.EqualsAndHashCode;")
+                .contains("import lombok.ToString;")
+                .contains("@EqualsAndHashCode.Exclude")
+                .contains("@ToString.Exclude")
+                .contains("import lombok.NonNull;")
+                .contains("@NonNull")
+                .doesNotContain("@Exclude");
+    }
+
+    @Test
+    @Order(9)
     void allGeneratedCodeCompiles() throws IOException {
         generate();
 

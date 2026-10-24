@@ -546,6 +546,28 @@ public class MyDto {
 | `x-class-annotation` | <pre lang="yaml">x-class-annotation:<br>  - com.example.MyAnnotation<br>  - com.example.Another("param")</pre> | <pre lang="java">@MyAnnotation<br>@Another("param")<br>public class MySchema { ... }</pre> |
 | `x-field-annotation` | <pre lang="yaml">myField:<br>  type: string<br>  x-field-annotation:<br>    - com.example.MyFieldAnnotation</pre> | <pre lang="java">@MyFieldAnnotation<br>private String myField;</pre> |
 
+If several annotations of one field share the same simple name, the enclosing type is used to avoid conflicting imports:
+
+```yaml
+content:
+  type: string
+  x-field-annotation:
+    - lombok.NonNull
+    - lombok.EqualsAndHashCode.Exclude
+    - lombok.ToString.Exclude
+```
+
+```java
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
+import lombok.ToString;
+
+@EqualsAndHashCode.Exclude
+@ToString.Exclude
+@NonNull
+private String content;
+```
+
 ---
 
 ### Jackson annotations (`x-json-property`, `x-json-format`, `x-json-include`, `x-json-ignore`, `x-json-naming`)

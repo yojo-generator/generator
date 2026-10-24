@@ -1,7 +1,9 @@
 package ru.yojo.codegen.domain;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import static java.lang.String.format;
@@ -1161,18 +1163,7 @@ public class VariableProperties {
         generateJavaDoc(stringBuilder, getDescription(), getExample());
         
         // Add field-level annotations from x-field-annotation
-        if (!fieldAnnotations.isEmpty()) {
-            for (String annotation : fieldAnnotations) {
-                String simpleName = annotation.contains(".") 
-                    ? annotation.substring(annotation.lastIndexOf('.') + 1) 
-                    : annotation;
-                stringBuilder.append(lineSeparator())
-                        .append(TABULATION)
-                        .append("@")
-                        .append(simpleName);
-                requiredImports.add(annotation.endsWith(";") ? annotation : annotation + ";");
-            }
-        }
+        appendFieldAnnotations(stringBuilder);
         
         // Add @JsonTypeId for discriminator fields in subtypes
         if (isDiscriminatorField) {
@@ -1266,6 +1257,111 @@ public class VariableProperties {
         }
         return stringBuilder.append(lineSeparator())
                 .append(format(FIELD, getType(), getName())).toString();
+    }
+
+    /**
+     * Appends the annotations declared via {@code x-field-annotation} to the field source code.
+     * <p>
+     * Java does not allow importing two types with the same simple name, so when several
+     * annotations of one field share it (e.g. {@code lombok.EqualsAndHashCode.Exclude} and
+     * {@code lombok.ToString.Exclude}) the enclosing type is used in the annotation:
+     * {@code @EqualsAndHashCode.Exclude} and {@code @ToString.Exclude}, with the enclosing
+     * types imported. If the enclosing type cannot be derived (annotation without a nested
+     * type), the fully qualified name is emitted and no import is added.
+     *
+     * @param stringBuilder target field source
+     */
+    private void appendFieldAnnotations(StringBuilder stringBuilder) {
+        if (fieldAnnotations.isEmpty()) {
+            return;
+        }
+        Map<String, Integer> simpleNameCounts = new HashMap<>();
+        for (String annotation : fieldAnnotations) {
+            simpleNameCounts.merge(simpleNameOf(fieldAnnotationName(annotation)), 1, Integer::sum);
+        }
+        Map<String, Integer> enclosingNameCounts = new HashMap<>();
+        for (String annotation : fieldAnnotations) {
+            String name = fieldAnnotationName(annotation);
+            if (simpleNameCounts.get(simpleNameOf(name)) > 1) {
+                String enclosingType = enclosingTypeOf(name);
+                if (enclosingType != null) {
+                    enclosingNameCounts.merge(simpleNameOf(enclosingType), 1, Integer::sum);
+                }
+            }
+        }
+        for (String annotation : fieldAnnotations) {
+            String name = fieldAnnotationName(annotation);
+            String simpleName = simpleNameOf(name);
+            String renderedName = simpleName;
+            String importName = name;
+            if (simpleNameCounts.get(simpleName) > 1) {
+                String enclosingType = enclosingTypeOf(name);
+                if (enclosingType != null
+                        && Integer.valueOf(1).equals(enclosingNameCounts.get(simpleNameOf(enclosingType)))) {
+                    renderedName = simpleNameOf(enclosingType) + "." + simpleName;
+                    importName = enclosingType;
+                } else {
+                    renderedName = name;
+                    importName = null;
+                }
+            }
+            stringBuilder.append(lineSeparator())
+                    .append(TABULATION)
+                    .append("@")
+                    .append(renderedName);
+            if (importName != null) {
+                requiredImports.add(importName + ";");
+            }
+        }
+    }
+
+    /**
+     * Normalizes an {@code x-field-annotation} value: strips an optional leading {@code @}
+     * and a trailing semicolon.
+     *
+     * @param annotation raw annotation name (e.g. {@code "@lombok.NonNull"})
+     * @return annotation name without decoration
+     */
+    private static String fieldAnnotationName(String annotation) {
+        String name = annotation;
+        if (name.startsWith("@")) {
+            name = name.substring(1);
+        }
+        if (name.endsWith(";")) {
+            name = name.substring(0, name.length() - 1);
+        }
+        return name;
+    }
+
+    /**
+     * Returns the last segment of a fully qualified type name.
+     *
+     * @param typeName fully qualified or simple type name
+     * @return simple name
+     */
+    private static String simpleNameOf(String typeName) {
+        int lastDot = typeName.lastIndexOf('.');
+        return lastDot >= 0 ? typeName.substring(lastDot + 1) : typeName;
+    }
+
+    /**
+     * Returns the enclosing type of a nested type name, if the name has one.
+     *
+     * @param typeName fully qualified type name (e.g. {@code lombok.EqualsAndHashCode.Exclude})
+     * @return enclosing type (e.g. {@code lombok.EqualsAndHashCode}) or {@code null} if the
+     *         preceding segment is a package
+     */
+    private static String enclosingTypeOf(String typeName) {
+        int lastDot = typeName.lastIndexOf('.');
+        if (lastDot <= 0) {
+            return null;
+        }
+        String enclosingType = typeName.substring(0, lastDot);
+        String enclosingSimpleName = simpleNameOf(enclosingType);
+        if (enclosingSimpleName.isEmpty() || !Character.isUpperCase(enclosingSimpleName.charAt(0))) {
+            return null;
+        }
+        return enclosingType;
     }
 
     /**
