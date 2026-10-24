@@ -104,7 +104,14 @@ public class SchemaMapper extends AbstractMapper {
                 }
             }
 
-            if ((schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType))) || POLYMORPHS.stream().anyMatch(p -> schemaMap.containsKey(p))) {
+            // A schema with a top-level enum must always be generated as a Java enum,
+            // even when its `type` is primitive (e.g. `type: string`), because other
+            // schemas reference it by $ref.
+            boolean hasTopLevelEnum = schemaMap != null && schemaMap.containsKey(ENUMERATION);
+
+            if ((schemaType != null && !JAVA_DEFAULT_TYPES.contains(capitalize(schemaType)))
+                    || hasTopLevelEnum
+                    || POLYMORPHS.stream().anyMatch(p -> schemaMap.containsKey(p))) {
                 SchemaBuilder builder = Schema.builder()
                         .name(capitalize(schemaName))
                         .description(getStringValueIfExistOrElseNull(DESCRIPTION, schemaMap))
