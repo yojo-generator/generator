@@ -90,6 +90,16 @@ components:
             - lombok.EqualsAndHashCode.Exclude
             - lombok.ToString.Exclude
 
+    ClassAnnotationsWithParameters:
+      type: object
+      x-class-annotation:
+        - com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
+      properties:
+        value:
+          type: string
+          x-field-annotation:
+            - com.fasterxml.jackson.annotation.JsonProperty(value = "val", required = true)
+
     InterfaceWithMethods:
       type: object
       format: interface
