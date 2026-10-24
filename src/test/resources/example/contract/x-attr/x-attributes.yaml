@@ -80,6 +80,16 @@ components:
         x-from-class: BaseClass
         x-from-package: example.testGenerate.xattr.common
 
+    FieldAnnotations:
+      type: object
+      properties:
+        content:
+          type: string
+          x-field-annotation:
+            - lombok.NonNull
+            - lombok.EqualsAndHashCode.Exclude
+            - lombok.ToString.Exclude
+
     InterfaceWithMethods:
       type: object
       format: interface
