@@ -168,6 +168,22 @@ class XAttributesTest {
 
     @Test
     @Order(9)
+    void annotationsWithParametersKeepImportClean() throws IOException {
+        generate();
+
+        String ca = readFile("common/ClassAnnotationsWithParameters.java");
+        // Annotation parameters must stay on the annotation and must not leak into the import
+        assertThat(ca)
+                .contains("import com.fasterxml.jackson.annotation.JsonIgnoreProperties;")
+                .contains("@JsonIgnoreProperties(ignoreUnknown = true)")
+                .doesNotContain("import com.fasterxml.jackson.annotation.JsonIgnoreProperties(")
+                .contains("import com.fasterxml.jackson.annotation.JsonProperty;")
+                .contains("@JsonProperty(value = \"val\", required = true)")
+                .doesNotContain("import com.fasterxml.jackson.annotation.JsonProperty(");
+    }
+
+    @Test
+    @Order(10)
     void allGeneratedCodeCompiles() throws IOException {
         generate();
 

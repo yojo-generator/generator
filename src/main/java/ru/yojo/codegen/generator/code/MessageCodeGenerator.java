@@ -13,6 +13,8 @@ import java.util.Set;
 
 import static java.lang.System.lineSeparator;
 import static ru.yojo.codegen.constants.Dictionary.*;
+import static ru.yojo.codegen.util.AnnotationUtils.toImport;
+import static ru.yojo.codegen.util.AnnotationUtils.toUsage;
 
 /**
  * Generates Java source code for a {@link Message} object.
@@ -187,8 +189,8 @@ public class MessageCodeGenerator extends AbstractCodeGenerator {
         Set<String> classAnnotations = message.getClassAnnotations();
         if (classAnnotations != null && !classAnnotations.isEmpty()) {
             for (String annotation : classAnnotations) {
-                lombokAnnotationBuilder.append("@").append(annotation).append(lineSeparator());
-                requiredImports.add(annotation.endsWith(";") ? annotation : annotation + ";");
+                lombokAnnotationBuilder.append(toUsage(annotation)).append(lineSeparator());
+                requiredImports.add(toImport(annotation));
             }
         }
 

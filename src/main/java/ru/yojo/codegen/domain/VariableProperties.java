@@ -9,6 +9,8 @@ import java.util.Set;
 import static java.lang.String.format;
 import static java.lang.System.lineSeparator;
 import static ru.yojo.codegen.constants.Dictionary.*;
+import static ru.yojo.codegen.util.AnnotationUtils.annotationName;
+import static ru.yojo.codegen.util.AnnotationUtils.annotationParameters;
 import static ru.yojo.codegen.util.MapperUtil.*;
 
 /**
@@ -1277,11 +1279,11 @@ public class VariableProperties {
         }
         Map<String, Integer> simpleNameCounts = new HashMap<>();
         for (String annotation : fieldAnnotations) {
-            simpleNameCounts.merge(simpleNameOf(fieldAnnotationName(annotation)), 1, Integer::sum);
+            simpleNameCounts.merge(simpleNameOf(annotationName(annotation)), 1, Integer::sum);
         }
         Map<String, Integer> enclosingNameCounts = new HashMap<>();
         for (String annotation : fieldAnnotations) {
-            String name = fieldAnnotationName(annotation);
+            String name = annotationName(annotation);
             if (simpleNameCounts.get(simpleNameOf(name)) > 1) {
                 String enclosingType = enclosingTypeOf(name);
                 if (enclosingType != null) {
@@ -1290,7 +1292,8 @@ public class VariableProperties {
             }
         }
         for (String annotation : fieldAnnotations) {
-            String name = fieldAnnotationName(annotation);
+            String name = annotationName(annotation);
+            String parameters = annotationParameters(annotation);
             String simpleName = simpleNameOf(name);
             String renderedName = simpleName;
             String importName = name;
@@ -1308,29 +1311,12 @@ public class VariableProperties {
             stringBuilder.append(lineSeparator())
                     .append(TABULATION)
                     .append("@")
-                    .append(renderedName);
+                    .append(renderedName)
+                    .append(parameters);
             if (importName != null) {
                 requiredImports.add(importName + ";");
             }
         }
-    }
-
-    /**
-     * Normalizes an {@code x-field-annotation} value: strips an optional leading {@code @}
-     * and a trailing semicolon.
-     *
-     * @param annotation raw annotation name (e.g. {@code "@lombok.NonNull"})
-     * @return annotation name without decoration
-     */
-    private static String fieldAnnotationName(String annotation) {
-        String name = annotation;
-        if (name.startsWith("@")) {
-            name = name.substring(1);
-        }
-        if (name.endsWith(";")) {
-            name = name.substring(0, name.length() - 1);
-        }
-        return name;
     }
 
     /**

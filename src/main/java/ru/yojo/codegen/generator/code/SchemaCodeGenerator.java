@@ -14,6 +14,8 @@ import java.util.Set;
 
 import static java.lang.System.lineSeparator;
 import static ru.yojo.codegen.constants.Dictionary.*;
+import static ru.yojo.codegen.util.AnnotationUtils.toImport;
+import static ru.yojo.codegen.util.AnnotationUtils.toUsage;
 import static ru.yojo.codegen.util.MapperUtil.castObjectToMap;
 import static ru.yojo.codegen.util.MapperUtil.getStringValueIfExistOrElseNull;
 import static ru.yojo.codegen.util.MapperUtil.getXValueOrElseDeprecated;
@@ -395,11 +397,8 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
         Set<String> classAnnotations = schema.getClassAnnotations();
         if (classAnnotations != null && !classAnnotations.isEmpty()) {
             for (String annotation : classAnnotations) {
-                String simpleName = annotation.contains(".")
-                        ? annotation.substring(annotation.lastIndexOf('.') + 1)
-                        : annotation;
-                lombokAnnotationBuilder.append("@").append(simpleName).append(lineSeparator());
-                requiredImports.add(annotation.endsWith(";") ? annotation : annotation + ";");
+                lombokAnnotationBuilder.append(toUsage(annotation)).append(lineSeparator());
+                requiredImports.add(toImport(annotation));
             }
         }
 

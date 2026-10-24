@@ -546,6 +546,20 @@ public class MyDto {
 | `x-class-annotation` | <pre lang="yaml">x-class-annotation:<br>  - com.example.MyAnnotation<br>  - com.example.Another("param")</pre> | <pre lang="java">@MyAnnotation<br>@Another("param")<br>public class MySchema { ... }</pre> |
 | `x-field-annotation` | <pre lang="yaml">myField:<br>  type: string<br>  x-field-annotation:<br>    - com.example.MyFieldAnnotation</pre> | <pre lang="java">@MyFieldAnnotation<br>private String myField;</pre> |
 
+Annotation parameters are preserved in the annotation and never leak into the import:
+
+```yaml
+x-class-annotation:
+  - com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
+```
+
+```java
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class MySchema { ... }
+```
+
 If several annotations of one field share the same simple name, the enclosing type is used to avoid conflicting imports:
 
 ```yaml
