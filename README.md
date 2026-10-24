@@ -195,6 +195,27 @@ private Map<UUID, User> mapUUIDCustomObject;
 
 ---
 
+### Enum schemas with a primitive `type`
+
+An enum does not have to be declared with `type: object`. A primitive type is accepted too — the generator still emits a Java enum, because other schemas reference it by `$ref`:
+
+```yaml
+MyLovelyEnum:
+  type: string
+  enum:
+    - FIRST_CASE
+    - SECOND_CASE
+```
+
+```java
+public enum MyLovelyEnum {
+    FIRST_CASE,
+    SECOND_CASE;
+}
+```
+
+---
+
 ### Enums with descriptions (`x-enumNames`)
 
 ```yaml

@@ -16,7 +16,7 @@ java {
 
 group 'io.github.yojo-generator'
 //archivesBaseName = "generator"
-version '4.6.3'
+version '4.6.4'
 
 publishing {
     repositories {

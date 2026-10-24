@@ -1,0 +1,31 @@
+asyncapi: 3.0.0
+info:
+  title: enum-string-type
+  version: 1.0.0
+  description: Enum schema declared with type=string must still be generated
+
+components:
+  schemas:
+    MyLovelyEnum:
+      type: string
+      description: description
+      enum:
+        - FIRST_CASE
+        - SECOND_CASE
+
+  messages:
+    MyLovelyMessage:
+      name: MyLovelyMessage
+      title: description
+      summary: description-summary
+      contentType: application/json
+      payload:
+        type: object
+        description: description
+        required:
+          - enumField
+        properties:
+          enumField:
+            x-field-annotation:
+              - lombok.NonNull
+            $ref: '#/components/schemas/MyLovelyEnum'
