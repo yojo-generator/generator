@@ -1,0 +1,39 @@
+asyncapi: 3.0.0
+info:
+  title: Builder Enum Test
+  version: 1.0.0
+  description: >
+    Contract for the regression where Lombok @Builder was generated for enums
+    when the builder pattern is enabled (lombok.builder.enabled = true).
+    @Builder is only supported on classes, records, constructors, and methods.
+
+components:
+  schemas:
+    StatusEnum:
+      type: string
+      description: Plain enum referenced from a message payload
+      enum:
+        - ACTIVE
+        - INACTIVE
+
+    OrderStatus:
+      type: object
+      description: Enum with wire values (constructor + fields inside the enum body)
+      enum:
+        - PENDING
+        - CONFIRMED
+      x-enumValues:
+        PENDING: "P"
+        CONFIRMED: "C"
+
+  messages:
+    StatusMessage:
+      name: StatusMessage
+      contentType: application/json
+      payload:
+        type: object
+        properties:
+          status:
+            $ref: '#/components/schemas/StatusEnum'
+          orderStatus:
+            $ref: '#/components/schemas/OrderStatus'

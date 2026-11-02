@@ -380,7 +380,7 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
                     stringBuilder.append(schema.getFillParameters().toWrite()).append(lineSeparator());
                 }
 
-                // 4️⃣ Lombok (exclude constructors, equalsAndHashCode, and accessors for enums)
+                // 4️⃣ Lombok (exclude constructors, equalsAndHashCode, accessors, and builder for enums)
                 LombokProperties lombokProperties = schema.getLombokProperties();
                 if (lombokProperties != null && lombokProperties.enableLombok()) {
                     LombokProperties effectiveLombok = LombokProperties.newLombokProperties(lombokProperties);
@@ -388,6 +388,7 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
                     effectiveLombok.setAllArgsConstructor(false);
                     effectiveLombok.setEqualsAndHashCode(null);
                     effectiveLombok.setAccessors(null);
+                    effectiveLombok.setBuilder(null);
                     buildLombokAnnotations(effectiveLombok, requiredImports, lombokAnnotationBuilder);
                 }
             }
