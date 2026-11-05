@@ -54,6 +54,8 @@ public class VariablePropertiesBuilder {
     private boolean isFinal = false;
     private boolean nullableAnnotation = false;
     private String collectionType;
+    private boolean masked = false;
+    private String maskMethod;
 
     /**
      * Sets the field name (required).
@@ -356,6 +358,31 @@ public class VariablePropertiesBuilder {
     }
 
     /**
+     * Masks the field value in {@code toString()} with the default mask (optional).
+     * Resets the mask method set by {@link #maskMethod(String)}.
+     *
+     * @param masked {@code true} to mask the value with the default mask, {@code false} to show it as is
+     * @return this builder
+     */
+    public VariablePropertiesBuilder masked(boolean masked) {
+        this.masked = masked;
+        this.maskMethod = null;
+        return this;
+    }
+
+    /**
+     * Masks the field value in {@code toString()} with a static method (optional).
+     *
+     * @param maskMethod fully qualified method (e.g. {@code com.example.Masker.mask})
+     * @return this builder
+     */
+    public VariablePropertiesBuilder maskMethod(String maskMethod) {
+        this.masked = true;
+        this.maskMethod = maskMethod;
+        return this;
+    }
+
+    /**
      * Builds the VariableProperties instance.
      *
      * @return a new VariableProperties with all configured properties
@@ -396,6 +423,8 @@ public class VariablePropertiesBuilder {
         vp.setNullableAnnotation(nullableAnnotation ? "org.springframework.lang.Nullable" : null);
         vp.setFinal(isFinal);
         if (collectionType != null) vp.setCollectionType(collectionType);
+        vp.setMasked(masked);
+        if (maskMethod != null) vp.setMaskMethod(maskMethod);
 
         return vp;
     }

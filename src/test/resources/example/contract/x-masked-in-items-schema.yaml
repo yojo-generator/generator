@@ -1,0 +1,18 @@
+asyncapi: 3.0.0
+info:
+  title: Masked Items In Schema Test
+  version: 1.0.0
+  description: >
+    Contract with x-masked inside items of a schema field: the generation must stop,
+    because x-masked is read only on the field level.
+
+components:
+  schemas:
+    MaskedPhones:
+      type: object
+      properties:
+        phones:
+          type: array
+          items:
+            type: string
+            x-masked: true

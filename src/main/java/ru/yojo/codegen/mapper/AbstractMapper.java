@@ -8,6 +8,7 @@ import ru.yojo.codegen.util.MapperUtil;
 import ru.yojo.codegen.util.NamingStrategy;
 
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.lang.String.format;
@@ -34,6 +35,13 @@ import static ru.yojo.codegen.util.MapperUtil.*;
 @SuppressWarnings("all")
 public class AbstractMapper {
     private static final Logger LOG = new Logger(AbstractMapper.class);
+
+    /**
+     * Fully qualified static method for {@code x-masked}: class name and method name
+     * separated by dots, e.g. {@code com.example.Masker.mask}.
+     */
+    private static final Pattern MASK_METHOD_PATTERN = Pattern.compile(
+            "\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*(\\.\\p{javaJavaIdentifierStart}\\p{javaJavaIdentifierPart}*)+");
 
     /** Naming strategy for field/method name transformations. */
     protected final NamingStrategy namingStrategy;
@@ -143,6 +151,11 @@ public class AbstractMapper {
                 "true".equalsIgnoreCase(getStringValueIfExistOrElseNull(X_FINAL, propertiesMap)));
         variableProperties.setPolymorph(
                 !collectPolymorphRefs(propertiesMap).isEmpty());
+        // x-masked: true or com.example.Masker.mask → masked value in toString()
+        if (propertiesMap.containsKey(X_MASKED)) {
+            fillMasked(variableProperties, schemaName, propertyName, Objects.toString(propertiesMap.get(X_MASKED), ""));
+        }
+        checkNoMaskInItems(schemaName, propertyName, propertiesMap);
         // Process x-field-annotation
         Set<String> fieldAnnotations = getSetValueIfExistsOrElseEmptySet(X_FIELD_ANNOTATION, propertiesMap);
         if (!fieldAnnotations.isEmpty()) {
@@ -176,6 +189,62 @@ public class AbstractMapper {
         // ─── End Jackson field annotations ───────────────────────────────────────────────────
         fillVariableProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, propertiesMap, processContext, innerSchemas);
         fillRequiredAnnotationsAndImports(variableProperties, currentSchema, propertyName);
+    }
+
+    /**
+     * Fills the mask settings of a field from {@code x-masked}.
+     * <ul>
+     *   <li>{@code true}: the default mask</li>
+     *   <li>a fully qualified static method ({@code com.example.Masker.mask}): a custom mask</li>
+     *   <li>{@code false}: no mask</li>
+     * </ul>
+     * Any other value (including an empty one) stops the generation: if the mask is ignored,
+     * the field value is shown in {@code toString()} without masking, and nobody notices it.
+     *
+     * @param variableProperties field to fill
+     * @param schemaName         name of the containing schema (for the error message)
+     * @param propertyName       field name in YAML (for the error message)
+     * @param masked             raw value from YAML
+     * @throws SchemaFillException if the value is not {@code true}, {@code false} or a fully qualified method
+     */
+    static void fillMasked(VariableProperties variableProperties, String schemaName, String propertyName, String masked) {
+        String value = masked.trim();
+        if ("true".equalsIgnoreCase(value)) {
+            variableProperties.setMasked(true);
+        } else if ("false".equalsIgnoreCase(value)) {
+            variableProperties.setMasked(false);
+        } else if (MASK_METHOD_PATTERN.matcher(value).matches()) {
+            variableProperties.setMasked(true);
+            variableProperties.setMaskMethod(value);
+        } else {
+            throw new SchemaFillException(format(
+                    "Wrong %s value '%s' for field '%s' in schema '%s': expected true, false or a fully qualified static method, e.g. com.example.Masker.mask",
+                    X_MASKED, masked, propertyName, schemaName));
+        }
+    }
+
+    /**
+     * Stops the generation if {@code x-masked} is set inside {@code items} of a collection field
+     * (also of a nested one: {@code items.items}).
+     * <p>
+     * {@code x-masked} is read only on the field level and masks the whole field.
+     * Inside {@code items} it would be ignored, and the values would be shown without masking.
+     *
+     * @param schemaName    name of the containing schema (for the error message)
+     * @param propertyName  field name in YAML (for the error message)
+     * @param propertiesMap field definition
+     * @throws SchemaFillException if {@code items} has {@code x-masked}
+     */
+    static void checkNoMaskInItems(String schemaName, String propertyName, Map<String, Object> propertiesMap) {
+        Object items = propertiesMap.get(ITEMS);
+        while (items instanceof Map<?, ?> itemsMap) {
+            if (itemsMap.containsKey(X_MASKED)) {
+                throw new SchemaFillException(format(
+                        "%s is not supported inside items of field '%s' in schema '%s': set it on the field itself to mask the whole collection",
+                        X_MASKED, propertyName, schemaName));
+            }
+            items = itemsMap.get(ITEMS);
+        }
     }
 
     /**

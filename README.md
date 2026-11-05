@@ -720,6 +720,94 @@ public class ImmutableDto {
 
 > Fields marked with `x-final: true` are declared as `final` and must be initialized via constructor. A constructor is generated automatically for all final fields without default values. Lombok's `@NoArgsConstructor` is skipped when uninitialized final fields exist.
 
+### Masking values in `toString()` (`x-masked`)
+
+Use `x-masked` to hide sensitive data (passwords, tokens, message texts) when a DTO is written to logs. It changes only the generated `toString()`: serialization, `equals()` and `hashCode()` still use the real field values.
+
+| Value | `toString()` shows |
+|-------|--------------------|
+| `true` | `***` instead of the value; `null` is shown as `null` |
+| fully qualified static method, e.g. `com.example.logging.Masker.mask` | the result of this method |
+| `false` | the value as is (same as no `x-masked`) |
+
+```yaml
+UserCredentials:
+  type: object
+  properties:
+    login:
+      type: string
+    password:
+      type: string
+      x-masked: true
+    phone:
+      type: string
+      x-masked: com.example.logging.Masker.maskPhone
+```
+
+A mask method is your own code. It must be static, take the field value (or its supertype, e.g. `Object`) and return a `String`. The field value can be `null`.
+
+```java
+package com.example.logging;
+
+public final class Masker {
+    public static String maskPhone(Object value) {
+        if (value == null) {
+            return "null";
+        }
+        String phone = value.toString();
+        return phone.length() <= 4 ? "***" : "***" + phone.substring(phone.length() - 4);
+    }
+}
+```
+
+#### Generated output (with Lombok)
+
+```java
+@Generated("Yojo")
+@Data
+@NoArgsConstructor
+public class UserCredentials {
+
+    private String login;
+
+    @ToString.Exclude
+    private String password;
+
+    @ToString.Exclude
+    private String phone;
+
+    @ToString.Include(name = "password")
+    private String toStringMaskedPassword() {
+        return this.password == null ? null : "***";
+    }
+
+    @ToString.Include(name = "phone")
+    private String toStringMaskedPhone() {
+        return com.example.logging.Masker.maskPhone(this.phone);
+    }
+}
+```
+
+`toString()` returns `UserCredentials(login=john, password=***, phone=***4567)`. Lombok shows the masked fields after the other fields.
+
+#### Generated output (without Lombok)
+
+```java
+@Override
+public String toString() {
+    return "UserCredentials{" +
+            "login=" + login + ", " +
+            "password=" + (this.password == null ? null : "***") + ", " +
+            "phone=" + com.example.logging.Masker.maskPhone(this.phone) +
+            "}";
+}
+```
+
+> - The generation stops with an error if the value is not `true`, `false` or a fully qualified method (e.g. `yes`, `mask`, `Masker::mask`, `Masker.mask()`): an ignored mask would show the data without masking.
+> - `x-masked` is set on the field itself; on a collection field it masks the whole collection. Inside `items` it is not supported and stops the generation with an error.
+> - Message classes without Lombok get a manual `toString()` only when one of their fields has `x-masked`.
+> - With Lombok, a field that already has `lombok.ToString.Exclude` in `x-field-annotation` is not shown at all, so no mask method is generated for it. The manual `toString()` (without Lombok) does not read Lombok annotations, so the mask is applied there.
+
 ---
 
 ## YAML ↔ Java Type Mapping
@@ -801,6 +889,7 @@ All custom Yojo attributes now have `x-` prefixed equivalents. While the old nam
 | `x-class-annotation` | — | schema, message | `list` | `[com.example.MyAnnotation]` | Class-level annotations |
 | `x-field-annotation` | — | field | `list` | `[com.example.MyAnnotation("v")]` | Field-level annotations |
 | `x-final` | — | field | `boolean` | `true` | Generates `final` field declaration |
+| `x-masked` | — | field | `boolean` or `string` | `true` or `com.example.Masker.mask` | Shows `***` (or the result of the static mask method) instead of the value in `toString()` |
 | `x-json-property` | — | field | `string` | `"display_name"` | `@JsonProperty("display_name")` on field |
 | `x-json-format` | — | field | `map` | `{pattern: "...", timezone: "UTC"}` | `@JsonFormat(...)` on field |
 | `x-json-include` | — | schema | `string` | `NON_NULL` | `@JsonInclude(Include.NON_NULL)` on class |

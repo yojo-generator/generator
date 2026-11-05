@@ -95,6 +95,20 @@ public final class Dictionary {
      * When {@code true}, generates {@code private final Type name;} instead of {@code private Type name;}.
      */
     public static final String X_FINAL = "x-final";
+    /**
+     * Custom YAML property for masking a field value in the generated {@code toString()}.
+     * <ul>
+     *   <li>{@code true}: the value is replaced with {@link #DEFAULT_MASK}, {@code null} is shown as is</li>
+     *   <li>a fully qualified static method, e.g. {@code com.example.Masker.mask}: the method takes
+     *       the field value and returns the text to show instead of it</li>
+     *   <li>{@code false}: the value is shown as is</li>
+     * </ul>
+     */
+    public static final String X_MASKED = "x-masked";
+    /**
+     * Text that replaces a field value in {@code toString()} for {@code x-masked: true}.
+     */
+    public static final String DEFAULT_MASK = "***";
 
     /**
      * Custom YAML property for Jackson {@code @JsonProperty("wire_name")} on a field.
@@ -725,6 +739,25 @@ public final class Dictionary {
      * Lombok @ToString annotation
      */
     public static final String LOMBOK_TO_STRING_ANNOTATION = "@ToString";
+    /**
+     * Lombok @ToString.Exclude annotation (used with {@code lombok.ToString} import)
+     */
+    public static final String LOMBOK_TO_STRING_EXCLUDE_ANNOTATION = "@ToString.Exclude";
+    /**
+     * Fully qualified name of Lombok @ToString.Exclude annotation
+     */
+    public static final String LOMBOK_TO_STRING_EXCLUDE_FQN = "lombok.ToString.Exclude";
+    /**
+     * Template of a private method that returns a masked field value for Lombok {@code toString()}.
+     * <p>
+     * Parameters: field name (shown in {@code toString()}), method name, masked value expression.
+     */
+    public static final String TO_STRING_MASK_METHOD = "    @ToString.Include(name = \"%s\")" +
+                                                       System.lineSeparator() +
+                                                       "    private String %s() {" +
+                                                       System.lineSeparator() +
+                                                       "        return %s;" +
+                                                       System.lineSeparator() + "    }";
     /**
      * Lombok @RequiredArgsConstructor annotation
      */
