@@ -126,6 +126,7 @@ public class YojoGenerator {
             ctx.setLombokProperties(yojoContext.getLombokProperties());
         }
         ctx.setValidationApi(yojoContext.getValidationApi());
+        ctx.setDateTimeType(yojoContext.getDateTimeType());
         ctx.setSpringBootVersion(yojoContext.getSpringBootVersion());
         ctx.setNullableAnnotation(yojoContext.getNullableAnnotation());
         ctx.setOutputDirectory(spec.getOutputDirectory());

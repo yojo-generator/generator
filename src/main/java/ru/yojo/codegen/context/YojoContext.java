@@ -1,5 +1,6 @@
 package ru.yojo.codegen.context;
 
+import ru.yojo.codegen.domain.DateTimeType;
 import ru.yojo.codegen.domain.ValidationApi;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
 
@@ -39,6 +40,12 @@ public class YojoContext {
      * If {@code null}, falls back to {@link #springBootVersion} detection.
      */
     private ValidationApi validationApi;
+
+    /**
+     * Java type for {@code format: date-time} properties.
+     * If {@code null}, {@link DateTimeType#OFFSET_DATE_TIME} is used.
+     */
+    private DateTimeType dateTimeType;
 
     /**
      * Spring Boot version (e.g., {@code "3.x.x"}) used to select jakarta vs javax validation imports.
@@ -194,6 +201,24 @@ public class YojoContext {
      */
     public void setValidationApi(ValidationApi validationApi) {
         this.validationApi = validationApi;
+    }
+
+    /**
+     * Returns the Java type for {@code format: date-time} properties.
+     *
+     * @return OFFSET_DATE_TIME, INSTANT or {@code null} if not configured
+     */
+    public DateTimeType getDateTimeType() {
+        return dateTimeType;
+    }
+
+    /**
+     * Sets the Java type for {@code format: date-time} properties.
+     *
+     * @param dateTimeType OFFSET_DATE_TIME or INSTANT; {@code null} means OFFSET_DATE_TIME
+     */
+    public void setDateTimeType(DateTimeType dateTimeType) {
+        this.dateTimeType = dateTimeType;
     }
 
     /**
