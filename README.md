@@ -803,7 +803,7 @@ All custom Yojo attributes now have `x-` prefixed equivalents. While the old nam
 | `x-final` | — | field | `boolean` | `true` | Generates `final` field declaration |
 | `x-json-property` | — | field | `string` | `"display_name"` | `@JsonProperty("display_name")` on field |
 | `x-json-format` | — | field | `map` | `{pattern: "...", timezone: "UTC"}` | `@JsonFormat(...)` on field |
-| `x-json-include` | — | schema | `string` | `NON_NULL` | `@JsonInclude(Include.NON_NULL)` on class |
+| `x-json-include` | — | schema, message | `string` | `NON_NULL` | `@JsonInclude(Include.NON_NULL)` on class |
 | `x-json-ignore` | — | field | `boolean` | `true` | `@JsonIgnore` on field |
 | `x-json-naming` | — | schema | `string` | `SNAKE_CASE` | Auto-generates `@JsonProperty` for all fields |
 

@@ -1,0 +1,49 @@
+asyncapi: 2.6.0
+info:
+  title: Message Json Include Test
+  version: 1.0.0
+  description: >
+    Contract for class-level x-json-include on message payloads.
+    It must produce the same @JsonInclude as on components/schemas.
+
+channels:
+  orders:
+    publish:
+      message:
+        $ref: '#/components/messages/OrderCreated'
+
+components:
+  messages:
+    OrderCreated:
+      name: OrderCreated
+      payload:
+        type: object
+        x-json-include: NON_NULL
+        properties:
+          orderId:
+            type: string
+          amount:
+            type: integer
+
+    OrderUpdated:
+      name: OrderUpdated
+      payload:
+        type: object
+        x-json-include: NON_EMPTY
+        x-class-annotation:
+          - com.fasterxml.jackson.annotation.JsonIgnoreProperties(ignoreUnknown = true)
+        properties:
+          orderId:
+            type: string
+          tags:
+            type: array
+            items:
+              type: string
+
+    OrderDeleted:
+      name: OrderDeleted
+      payload:
+        type: object
+        properties:
+          orderId:
+            type: string
