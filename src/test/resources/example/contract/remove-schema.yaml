@@ -1,0 +1,25 @@
+asyncapi: 3.0.0
+info:
+  title: Remove Schema Test
+  version: 1.0.0
+  description: >
+    Contract for x-remove-schema: the message referencing a schema via $ref
+    must contain the schema fields, while the schema itself is not generated.
+
+components:
+  schemas:
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: string
+        age:
+          type: integer
+
+  messages:
+    UserCreated:
+      name: UserCreated
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/UserDto'
+        x-remove-schema: true
