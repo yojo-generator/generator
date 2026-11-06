@@ -1,0 +1,72 @@
+asyncapi: 3.0.0
+info:
+  title: Enum Default Test
+  version: 1.0.0
+  description: >
+    Contract for default values of enum fields: a bare constant must be qualified
+    with the enum class name, already qualified values must be kept as is.
+
+components:
+  schemas:
+    ExecutionStatus:
+      type: object
+      enum:
+        - NOT_EXECUTED
+        - EXECUTED
+
+    UserStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - BLOCKED
+
+    User:
+      type: object
+      properties:
+        accountStatus:
+          $ref: '#/components/schemas/UserStatus'
+          description: Current account status
+          default: ACTIVE
+        executionStatus:
+          $ref: '#/components/schemas/ExecutionStatus'
+          default: NOT_EXECUTED
+        shortStatus:
+          $ref: '#/components/schemas/ExecutionStatus'
+          default: ExecutionStatus.EXECUTED
+        fqnStatus:
+          $ref: '#/components/schemas/ExecutionStatus'
+          default: example.enumDefault.common.ExecutionStatus.EXECUTED
+        noDefaultStatus:
+          $ref: '#/components/schemas/ExecutionStatus'
+        inlineStatus:
+          type: string
+          enum:
+            - FIRST
+            - SECOND
+          default: SECOND
+
+  messages:
+    UserMessage:
+      name: UserMessage
+      contentType: application/json
+      payload:
+        type: object
+        properties:
+          userStatus:
+            $ref: '#/components/schemas/UserStatus'
+            default: BLOCKED
+          executionStatus:
+            $ref: '#/components/schemas/ExecutionStatus'
+            default: NOT_EXECUTED
+          shortStatus:
+            $ref: '#/components/schemas/ExecutionStatus'
+            default: ExecutionStatus.EXECUTED
+          fqnStatus:
+            $ref: '#/components/schemas/ExecutionStatus'
+            default: example.enumDefault.common.ExecutionStatus.EXECUTED
+          inlineStatus:
+            type: object
+            enum:
+              - FIRST
+              - SECOND
+            default: FIRST

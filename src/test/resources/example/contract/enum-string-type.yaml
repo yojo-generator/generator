@@ -13,6 +13,17 @@ components:
         - FIRST_CASE
         - SECOND_CASE
 
+    MyLovelySchema:
+      type: object
+      properties:
+        enumField:
+          $ref: '#/components/schemas/MyLovelyEnum'
+        inlineEnumField:
+          type: string
+          enum:
+            - INLINE_FIRST
+            - INLINE_SECOND
+
   messages:
     MyLovelyMessage:
       name: MyLovelyMessage
