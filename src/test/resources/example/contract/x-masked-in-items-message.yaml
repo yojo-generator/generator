@@ -1,0 +1,21 @@
+asyncapi: 3.0.0
+info:
+  title: Masked Items In Message Test
+  version: 1.0.0
+  description: >
+    Contract with x-masked inside items of a message field: the generation must stop,
+    because x-masked is read only on the field level.
+
+components:
+  messages:
+    MaskedPhonesEvent:
+      name: MaskedPhonesEvent
+      contentType: application/json
+      payload:
+        type: object
+        properties:
+          phones:
+            type: array
+            items:
+              type: string
+              x-masked: ru.yojo.codegen.generator.support.TestMasker.mask

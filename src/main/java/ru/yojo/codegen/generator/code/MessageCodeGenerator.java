@@ -125,11 +125,19 @@ public class MessageCodeGenerator extends AbstractCodeGenerator {
             }
         }
 
+        // x-masked with Lombok: @ToString.Exclude on fields (before declarations are written)
+        List<VariableProperties> lombokMaskedFields = lombokEnabled
+                ? excludeMaskedFieldsFromLombokToString(message.getFillParameters().getVariableProperties(), requiredImports)
+                : List.of();
+
         // Add field declarations
         String fields = message.getFillParameters().toWrite();
         if (fields != null && !fields.isEmpty()) {
             stringBuilder.append(fields);
         }
+
+        // x-masked with Lombok: methods that give masked values to toString()
+        stringBuilder.append(generateLombokToStringMaskMethods(lombokMaskedFields));
 
         // For without-Lombok: generate constructor for uninitialized final fields
         if (!finalFieldsWithoutDefaults.isEmpty() && (lombokProperties == null || !lombokProperties.enableLombok())) {
@@ -176,6 +184,21 @@ public class MessageCodeGenerator extends AbstractCodeGenerator {
                             .forEach(requiredImports::add);
                 }
             });
+
+            // Manual toString() (without-Lombok path): message classes get it only when a field
+            // has x-masked, so the output of existing contracts stays the same
+            List<VariableProperties> nonEnumFields = new ArrayList<>();
+            for (VariableProperties vp : message.getFillParameters().getVariableProperties()) {
+                if (vp.getEnumeration() == null) {
+                    nonEnumFields.add(vp);
+                }
+            }
+            if (nonEnumFields.stream().anyMatch(VariableProperties::isMasked)) {
+                stringBuilder
+                        .append(lineSeparator())
+                        .append(generateToString(message.getMessageName(), nonEnumFields))
+                        .append(lineSeparator());
+            }
 
             // Manual builder class (without-Lombok path)
             if (builderProps != null && builderProps.isEnable()) {

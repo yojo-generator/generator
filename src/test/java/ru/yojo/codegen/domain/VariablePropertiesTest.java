@@ -71,4 +71,97 @@ class VariablePropertiesTest {
         assertThat(properties.toWrite()).contains("@NonNull");
         assertThat(properties.getRequiredImports()).contains("lombok.NonNull;");
     }
+
+    /**
+     * {@code x-masked} with a mask method: the field knows the mask call and the name of the method
+     * that gives the masked value to Lombok {@code toString()}.
+     */
+    @Test
+    void maskMethodBuildsMaskCallAndMethodName() {
+        VariableProperties properties = VariableProperties.builder()
+                .name("password")
+                .type("String")
+                .maskMethod("com.example.Masker.mask")
+                .build();
+
+        assertThat(properties.isMasked()).isTrue();
+        assertThat(properties.maskedValue()).isEqualTo("com.example.Masker.mask(this.password)");
+        assertThat(properties.toStringMaskMethodName()).isEqualTo("toStringMaskedPassword");
+        assertThat(properties.isExcludedFromLombokToString()).isFalse();
+    }
+
+    /**
+     * {@code x-masked: true}: the default mask keeps {@code null} as is.
+     */
+    @Test
+    void defaultMaskBuildsNullSafeExpression() {
+        VariableProperties properties = VariableProperties.builder()
+                .name("password")
+                .type("String")
+                .masked(true)
+                .build();
+
+        assertThat(properties.isMasked()).isTrue();
+        assertThat(properties.getMaskMethod()).isNull();
+        assertThat(properties.maskedValue()).isEqualTo("this.password == null ? null : \"***\"");
+    }
+
+    /**
+     * {@code masked(...)} sets the whole mask mode: it resets the mask method set before.
+     */
+    @Test
+    void maskedResetsMaskMethod() {
+        VariableProperties defaultMask = VariableProperties.builder()
+                .name("password")
+                .type("String")
+                .maskMethod("com.example.Masker.mask")
+                .masked(true)
+                .build();
+        VariableProperties noMask = VariableProperties.builder()
+                .name("password")
+                .type("String")
+                .maskMethod("com.example.Masker.mask")
+                .masked(false)
+                .build();
+
+        assertThat(defaultMask.isMasked()).isTrue();
+        assertThat(defaultMask.getMaskMethod()).isNull();
+        assertThat(noMask.isMasked()).isFalse();
+        assertThat(noMask.getMaskMethod()).isNull();
+    }
+
+    /**
+     * A field without {@code x-masked} and an enum constant are not masked.
+     */
+    @Test
+    void maskIsNotAppliedWithoutValueAndToEnumConstants() {
+        VariableProperties plainField = VariableProperties.builder()
+                .name("login")
+                .type("String")
+                .build();
+        VariableProperties enumConstant = VariableProperties.builder()
+                .name("ACTIVE")
+                .enumeration("ACTIVE")
+                .masked(true)
+                .build();
+
+        assertThat(plainField.isMasked()).isFalse();
+        assertThat(enumConstant.isMasked()).isFalse();
+    }
+
+    /**
+     * {@code lombok.ToString.Exclude} from {@code x-field-annotation} is found with any decoration.
+     */
+    @Test
+    void toStringExcludeFromFieldAnnotationIsFound() {
+        VariableProperties properties = VariableProperties.builder()
+                .name("secret")
+                .type("String")
+                .addFieldAnnotation("@lombok.ToString.Exclude;")
+                .masked(true)
+                .build();
+
+        assertThat(properties.isExcludedFromLombokToString()).isTrue();
+        assertThat(properties.isMasked()).isTrue();
+    }
 }
