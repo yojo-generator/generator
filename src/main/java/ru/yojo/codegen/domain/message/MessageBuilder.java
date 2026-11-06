@@ -38,6 +38,7 @@ public class MessageBuilder {
     private Set<String> implementsFrom = new HashSet<>();
     private Set<String> importSet = new HashSet<>();
     private Set<String> classAnnotations = new HashSet<>();
+    private String jsonInclude;
     private String pathForGenerateMessage;
 
     /**
@@ -151,6 +152,17 @@ public class MessageBuilder {
     }
 
     /**
+     * Sets the class-level {@code @JsonInclude} value (optional).
+     *
+     * @param jsonInclude include value (e.g., {@code NON_NULL})
+     * @return this builder
+     */
+    public MessageBuilder jsonInclude(String jsonInclude) {
+        this.jsonInclude = jsonInclude;
+        return this;
+    }
+
+    /**
      * Sets the custom path for message generation (optional).
      *
      * @param pathForGenerateMessage custom path
@@ -218,6 +230,7 @@ public class MessageBuilder {
         if (!implementsFrom.isEmpty()) message.getImplementsFrom().addAll(implementsFrom);
         if (!importSet.isEmpty()) message.getImportSet().addAll(importSet);
         if (!classAnnotations.isEmpty()) message.getClassAnnotations().addAll(classAnnotations);
+        if (jsonInclude != null) message.setJsonInclude(jsonInclude);
         if (pathForGenerateMessage != null) message.setPathForGenerateMessage(pathForGenerateMessage);
 
         return message;

@@ -168,6 +168,11 @@ public class MessageMapper extends AbstractMapper {
             // Process x-class-annotation for messages
             Set<String> classAnnotations = getSetValueIfExistsOrElseEmptySet(X_CLASS_ANNOTATION, payloadMap);
             classAnnotations.forEach(builder::addClassAnnotation);
+            // Process x-json-include (class-level @JsonInclude) for messages
+            String jsonInclude = getStringValueIfExistOrElseNull(X_JSON_INCLUDE, payloadMap);
+            if (jsonInclude != null && !jsonInclude.trim().isEmpty()) {
+                builder.jsonInclude(jsonInclude);
+            }
 
             Message message = builder
                     .summary(getStringValueIfExistOrElseNull(SUMMARY, messageMap))
