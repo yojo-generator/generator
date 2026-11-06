@@ -72,6 +72,25 @@ class EnumWithStringTypeTest {
     }
 
     @Test
+    void schemaFieldReferencesEnumWithStringType() throws IOException {
+        generate();
+
+        String schema = Files.readString(Paths.get(BASE_DIR + "common/MyLovelySchema.java"));
+        assertThat(schema)
+                .contains("private MyLovelyEnum enumField;")
+                .contains("import example.testGenerate.enumstringtype.common.MyLovelyEnum;")
+                .doesNotContain("MyLovelySchemaEnumField");
+        assertThat(Paths.get(BASE_DIR + "common/MyLovelySchemaEnumField.java")).doesNotExist();
+
+        // An inline enum (without $ref) is still generated as a separate enum named after schema and field
+        assertThat(schema).contains("private MyLovelySchemaInlineEnumField inlineEnumField;");
+        assertThat(Files.readString(Paths.get(BASE_DIR + "common/MyLovelySchemaInlineEnumField.java")))
+                .contains("public enum MyLovelySchemaInlineEnumField")
+                .contains("INLINE_FIRST")
+                .contains("INLINE_SECOND");
+    }
+
+    @Test
     void generatedCodeCompiles() throws IOException {
         generate();
 
