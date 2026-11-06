@@ -1,0 +1,95 @@
+asyncapi: 3.0.0
+info:
+  title: Date-Time Type Test
+  version: 1.0.0
+  description: >
+    Contract for the configurable Java type of format: date-time
+    (OffsetDateTime by default, Instant when dateTimeType = INSTANT).
+
+components:
+  schemas:
+    Event:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+        history:
+          type: array
+          items:
+            type: string
+            format: date-time
+        checkpoints:
+          type: array
+          format: set
+          items:
+            type: string
+            format: date-time
+        birthDate:
+          type: string
+          format: date
+        byTime:
+          type: object
+          format: date-time
+          additionalProperties:
+            type: string
+        timeToTime:
+          type: object
+          format: date-time
+          additionalProperties:
+            type: date-time
+
+    MapValues:
+      type: object
+      properties:
+        scalar:
+          type: object
+          additionalProperties:
+            type: date-time
+        byId:
+          type: object
+          format: uuid
+          additionalProperties:
+            type: date-time
+    MapCollectionValues:
+      type: object
+      properties:
+        lists:
+          type: object
+          additionalProperties:
+            type: array
+            x-additional-format: date-time
+        sets:
+          type: object
+          format: uuid
+          additionalProperties:
+            type: array
+            format: set
+            x-additional-format: date-time
+        listsWithRef:
+          type: object
+          additionalProperties:
+            type: array
+            x-additional-format: date-time
+            $ref: '#/components/schemas/Event'
+        setsWithRef:
+          type: object
+          format: uuid
+          additionalProperties:
+            type: array
+            format: set
+            x-additional-format: date-time
+            $ref: '#/components/schemas/Event'
+
+  messages:
+    EventMessage:
+      name: EventMessage
+      contentType: application/json
+      payload:
+        type: object
+        properties:
+          occurredAt:
+            type: string
+            format: date-time
+          event:
+            $ref: '#/components/schemas/Event'

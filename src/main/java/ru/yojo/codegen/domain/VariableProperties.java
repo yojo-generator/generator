@@ -38,6 +38,11 @@ public class VariableProperties {
     private ValidationApi validationApi;
 
     /**
+     * Java type for {@code format: date-time}; {@code null} means {@link DateTimeType#OFFSET_DATE_TIME}.
+     */
+    private DateTimeType dateTimeType;
+
+    /**
      * Spring Boot version string (e.g., {@code "3.x.x"}) used to select jakarta vs javax validation imports.
      *
      * @deprecated Use {@link #validationApi} instead.
@@ -742,15 +747,17 @@ public class VariableProperties {
                     }
                     break;
                 case "date-time":
-                    this.type = OFFSET_DATE_TIME;
-                    requiredImports.add(OFFSET_DATE_TIME_IMPORT);
+                    boolean instant = dateTimeType == DateTimeType.INSTANT;
+                    String dateTimeClass = instant ? INSTANT : OFFSET_DATE_TIME;
+                    this.type = dateTimeClass;
+                    requiredImports.add(instant ? INSTANT_IMPORT : OFFSET_DATE_TIME_IMPORT);
                     if (items != null) {
                         String collectionPattern = LIST_TYPE;
                         if ("set".equalsIgnoreCase(collectionType)) {
                             collectionPattern = SET_TYPE;
                         }
-                        this.items = OFFSET_DATE_TIME;
-                        this.type = format(collectionPattern, OFFSET_DATE_TIME);
+                        this.items = dateTimeClass;
+                        this.type = format(collectionPattern, dateTimeClass);
                         this.valid = false;
                     }
                     break;
@@ -1367,6 +1374,25 @@ public class VariableProperties {
      */
     public void setValidationApi(ValidationApi validationApi) {
         this.validationApi = validationApi;
+    }
+
+    /**
+     * Returns the Java type used for {@code format: date-time}.
+     *
+     * @return date-time type or {@code null} (means {@link DateTimeType#OFFSET_DATE_TIME})
+     */
+    public DateTimeType getDateTimeType() {
+        return dateTimeType;
+    }
+
+    /**
+     * Sets the Java type used for {@code format: date-time}.
+     * Must be set before {@link #setFormat(String)}.
+     *
+     * @param dateTimeType OFFSET_DATE_TIME or INSTANT; {@code null} means OFFSET_DATE_TIME
+     */
+    public void setDateTimeType(DateTimeType dateTimeType) {
+        this.dateTimeType = dateTimeType;
     }
 
     /**

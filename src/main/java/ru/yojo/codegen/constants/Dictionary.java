@@ -871,6 +871,10 @@ public final class Dictionary {
      */
     public static final String OFFSET_DATE_TIME = "OffsetDateTime";
     /**
+     * Simple name for Instant class
+     */
+    public static final String INSTANT = "Instant";
+    /**
      * Simple name for Byte class
      */
     public static final String BYTE = "Byte";
@@ -946,6 +950,10 @@ public final class Dictionary {
      * Import for OffsetDateTime
      */
     public static final String OFFSET_DATE_TIME_IMPORT = "java.time.OffsetDateTime;";
+    /**
+     * Import for Instant
+     */
+    public static final String INSTANT_IMPORT = "java.time.Instant;";
     /**
      * Import for UUID
      */
@@ -1454,6 +1462,7 @@ public final class Dictionary {
             LOCAL_DATE,
             LOCAL_DATE_TIME,
             OFFSET_DATE_TIME,
+            INSTANT,
             UUID,
             URI
     );
