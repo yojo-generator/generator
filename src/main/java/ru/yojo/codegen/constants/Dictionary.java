@@ -1503,7 +1503,7 @@ public final class Dictionary {
     /**
      * Maps YAML {@code format} values (e.g., {@code "date"}) to Java type names (e.g., {@code "LocalDate"}).
      */
-    public static final Map<String, Object> JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER = Map.ofEntries(
+    public static final Map<String, String> JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER = Map.ofEntries(
             Map.entry(ST_STRING, STRING),
             Map.entry(ST_BYTE, BYTE),
             Map.entry(ST_INTEGER, INTEGER),
@@ -1525,7 +1525,7 @@ public final class Dictionary {
     /**
      * Reverse map: Java type names → YAML format strings.
      */
-    public static final Map<String, Object> JAVA_UPPER_CASE_TYPES_CHECK_CONVERTER = Map.ofEntries(
+    public static final Map<String, String> JAVA_UPPER_CASE_TYPES_CHECK_CONVERTER = Map.ofEntries(
             Map.entry(STRING, ST_STRING),
             Map.entry(BYTE, ST_BYTE),
             Map.entry(INTEGER, ST_INTEGER),

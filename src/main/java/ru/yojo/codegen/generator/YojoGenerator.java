@@ -208,6 +208,8 @@ public class YojoGenerator {
     }
 
     private void writeSchemas(ProcessContext ctx, SchemaMapper schemaMapper) {
+        // Second mapping pass is intentional: nested schemas discovered while mapping
+        // the first pass are registered in the schemas map and only become mappable now.
         List<Schema> schemaList = schemaMapper.mapSchemasToObjects(ctx);
         for (Schema schema : schemaList) {
             writeFileUnified(ctx, schema.getSchemaName(), new SchemaCodeGenerator(schema).generate(), false, null);

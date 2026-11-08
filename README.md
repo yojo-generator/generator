@@ -859,7 +859,7 @@ All custom Yojo attributes now have `x-` prefixed equivalents. While the old nam
 | `realization` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
 | — | `x-digits` | number | `string` | `"integer=2, fraction=2"` | `@Digits(...)` |
 | `digits` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
-| — | `x-additional-format` | `additionalProperties` | `string` | `uuid` | Map collection element format |
+| — | `x-additional-format` | `additionalProperties` | `string` | `uuid` | Format of the map key (`format` on the field) or of collection elements (`x-additional-format` inside `additionalProperties`) |
 | `additionalFormat` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
 | — | `x-validation-groups` | schema | `list` | `[Create.class]` | `@NotBlank(groups = {Create.class})` |
 | `validationGroups` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |

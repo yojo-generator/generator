@@ -5,7 +5,7 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [4.7.1] - 2026-11-08
 
 ### Changed
 
@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   removed schema is still referenced by another schema. Previously such a
   contract produced uncompilable output: a field of a class that was never
   generated.
+- `JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER` and
+  `JAVA_UPPER_CASE_TYPES_CHECK_CONVERTER` are now typed as `Map<String, String>`,
+  removing an unchecked cast in `AbstractMapper.resolveMapType`.
+- `x-additional-format` documentation now states that it covers both the map key
+  format and the collection element format.
+- `AGENTS.md` describes the current package layout and build requirements.
+- CI (`pr-check.yml`) also runs on pushes to `master`, so merged code is built
+  even when a contributor pull request could not be approved first.
 
 ## [4.7.0] - 2026-11-08
 

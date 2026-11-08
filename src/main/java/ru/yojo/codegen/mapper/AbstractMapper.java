@@ -484,7 +484,7 @@ public class AbstractMapper {
             variableProperties.addRequiredImports(instant ? INSTANT_IMPORT : OFFSET_DATE_TIME_IMPORT);
             return instant ? INSTANT : OFFSET_DATE_TIME;
         }
-        return (String) JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(type);
+        return JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(type);
     }
 
     /**
