@@ -1,0 +1,18 @@
+asyncapi: 3.0.0
+info:
+  title: Masked Additional Properties Test
+  version: 1.0.0
+  description: >
+    Contract with x-masked inside additionalProperties of a map field: the generation
+    must stop, because x-masked is read only on the field level.
+
+components:
+  schemas:
+    MaskedHeaders:
+      type: object
+      properties:
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+            x-masked: true

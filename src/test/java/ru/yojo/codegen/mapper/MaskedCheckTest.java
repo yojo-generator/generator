@@ -124,4 +124,35 @@ class MaskedCheckTest {
                     .hasMessageContaining("Schema");
         }
     }
+
+    /**
+     * {@code x-masked} inside {@code additionalProperties} stops the generation.
+     */
+    @Test
+    void maskInsideAdditionalPropertiesIsRejected() {
+        Map<String, Object> field = Map.of(
+                "type", "object",
+                "additionalProperties", Map.of("type", "string", "x-masked", true));
+
+        assertThatThrownBy(() -> AbstractMapper.checkNoMaskInAdditionalProperties("Schema", "headers", field))
+                .isInstanceOf(SchemaFillException.class)
+                .hasMessageContaining("x-masked")
+                .hasMessageContaining("additionalProperties")
+                .hasMessageContaining("headers")
+                .hasMessageContaining("Schema");
+    }
+
+    /**
+     * {@code x-masked} on the map field itself is fine.
+     */
+    @Test
+    void maskOnMapFieldIsAccepted() {
+        Map<String, Object> field = Map.of(
+                "type", "object",
+                "additionalProperties", Map.of("type", "string"),
+                "x-masked", true);
+
+        assertThatCode(() -> AbstractMapper.checkNoMaskInAdditionalProperties("Schema", "headers", field))
+                .doesNotThrowAnyException();
+    }
 }

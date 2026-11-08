@@ -804,7 +804,8 @@ public String toString() {
 ```
 
 > - The generation stops with an error if the value is not `true`, `false` or a fully qualified method (e.g. `yes`, `mask`, `Masker::mask`, `Masker.mask()`): an ignored mask would show the data without masking.
-> - `x-masked` is set on the field itself; on a collection field it masks the whole collection. Inside `items` it is not supported and stops the generation with an error.
+> - `x-masked` is set on the field itself; on a collection or map field it masks the whole field. Inside `items` and `additionalProperties` it is not supported and stops the generation with an error.
+> - Enum fields are not masked: a constant name is not sensitive data, and `***` instead of `ACTIVE` only makes the log less useful. `x-masked` on such a field has no effect.
 > - Message classes without Lombok get a manual `toString()` only when one of their fields has `x-masked`.
 > - With Lombok, a field that already has `lombok.ToString.Exclude` in `x-field-annotation` is not shown at all, so no mask method is generated for it. The manual `toString()` (without Lombok) does not read Lombok annotations, so the mask is applied there.
 

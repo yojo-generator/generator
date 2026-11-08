@@ -582,12 +582,15 @@ public class VariableProperties {
 
     /**
      * Checks whether the field value must be masked in {@code toString()}.
-     * Enum constants are never masked.
+     * <p>
+     * Enum constants are never masked: a constant name carries no sensitive data,
+     * and {@code ***} instead of {@code ACTIVE} only makes the log less useful.
+     * {@code x-masked} on an enum field has no effect.
      *
      * @return {@code true} if a mask must be applied
      */
     public boolean isMasked() {
-        return masked && enumeration == null;
+        return masked && !isEnum;
     }
 
     /**

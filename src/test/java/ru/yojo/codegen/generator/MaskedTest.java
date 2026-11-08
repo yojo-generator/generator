@@ -64,15 +64,17 @@ class MaskedTest {
                 .contains("@ToString.Exclude" + System.lineSeparator() + "    private String password;")
                 .contains("@ToString.Exclude" + System.lineSeparator() + "    private UUID token;")
                 .contains("@ToString.Exclude" + System.lineSeparator() + "    private Integer age;")
-                .contains("@ToString.Exclude" + System.lineSeparator() + "    private MaskedUserStatus status;")
                 .contains("@ToString.Include(name = \"password\")")
                 .contains("private String toStringMaskedPassword() {")
                 .contains("return this.password == null ? null : \"" + DEFAULT_MASK + "\";")
                 .contains("@ToString.Include(name = \"token\")")
                 .contains("return " + MASK_CALL + "(this.token);")
-                .contains("return this.age == null ? null : \"" + DEFAULT_MASK + "\";")
-                .as("enum field is masked as any other field")
-                .contains("return this.status == null ? null : \"" + DEFAULT_MASK + "\";");
+                .contains("return this.age == null ? null : \"" + DEFAULT_MASK + "\";");
+        assertThat(user)
+                .as("enum constants are not masked: x-masked is ignored")
+                .contains("    private MaskedUserStatus status;")
+                .doesNotContain("@ToString.Exclude" + System.lineSeparator() + "    private MaskedUserStatus status;")
+                .doesNotContain("toStringMaskedStatus");
         assertThat(user)
                 .as("fields without mask and with x-masked: false stay as is")
                 .contains("    private String login;")
@@ -113,8 +115,8 @@ class MaskedTest {
                 .contains("\"password=\" + (this.password == null ? null : \"" + DEFAULT_MASK + "\")")
                 .contains("\"token=\" + " + MASK_CALL + "(this.token)")
                 .contains("\"age=\" + (this.age == null ? null : \"" + DEFAULT_MASK + "\")")
-                .contains("\"status=\" + (this.status == null ? null : \"" + DEFAULT_MASK + "\")")
                 .as("manual toString() does not read lombok.ToString.Exclude, so the mask is applied")
+                .contains("\"status=\" + status")
                 .contains("\"secretNote=\" + (this.secretNote == null ? null : \"" + DEFAULT_MASK + "\")");
 
         String event = read("messages/MaskedEvent.java");
@@ -138,9 +140,9 @@ class MaskedTest {
 
         Object user = newMaskedUser(classLoader);
         assertThat(user.toString())
-                .as("Lombok shows the masked fields after the other fields")
-                .isEqualTo("MaskedUser(login=john, nickname=jj, password=" + DEFAULT_MASK
-                        + ", token=" + TestMasker.MASK + ", age=" + DEFAULT_MASK + ", status=" + DEFAULT_MASK + ")");
+                .as("Lombok shows the masked fields after the other fields, enum constants stay visible")
+                .isEqualTo("MaskedUser(login=john, nickname=jj, status=ACTIVE, password=" + DEFAULT_MASK
+                        + ", token=" + TestMasker.MASK + ", age=" + DEFAULT_MASK + ")");
 
         Object event = newMaskedEvent(classLoader);
         assertThat(event.toString())
@@ -155,7 +157,7 @@ class MaskedTest {
         Object user = newMaskedUser(classLoader);
         assertThat(user.toString())
                 .isEqualTo("MaskedUser{login=john, nickname=jj, password=" + DEFAULT_MASK
-                        + ", token=" + TestMasker.MASK + ", age=" + DEFAULT_MASK + ", status=" + DEFAULT_MASK
+                        + ", token=" + TestMasker.MASK + ", age=" + DEFAULT_MASK + ", status=ACTIVE"
                         + ", secretNote=" + DEFAULT_MASK + "}");
 
         Object event = newMaskedEvent(classLoader);
@@ -171,7 +173,7 @@ class MaskedTest {
         Object user = classLoader.loadClass(PACKAGE + ".common.MaskedUser").getConstructor().newInstance();
         assertThat(user.toString())
                 .as("the default mask shows null as is, the mask method gets null")
-                .isEqualTo("MaskedUser(login=null, nickname=null, password=null, token=null, age=null, status=null)");
+                .isEqualTo("MaskedUser(login=null, nickname=null, status=null, password=null, token=null, age=null)");
     }
 
     @Test
@@ -192,6 +194,16 @@ class MaskedTest {
                 .hasMessageContaining("items")
                 .hasMessageContaining("phones")
                 .hasMessageContaining("MaskedPhones");
+    }
+
+    @Test
+    void maskInsideAdditionalPropertiesStopsGeneration() {
+        assertThatThrownBy(() -> generate("x-masked-in-additional-properties.yaml", true))
+                .isInstanceOf(SchemaFillException.class)
+                .hasMessageContaining("x-masked")
+                .hasMessageContaining("additionalProperties")
+                .hasMessageContaining("headers")
+                .hasMessageContaining("MaskedHeaders");
     }
 
     @Test

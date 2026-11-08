@@ -156,6 +156,7 @@ public class AbstractMapper {
             fillMasked(variableProperties, schemaName, propertyName, Objects.toString(propertiesMap.get(X_MASKED), ""));
         }
         checkNoMaskInItems(schemaName, propertyName, propertiesMap);
+        checkNoMaskInAdditionalProperties(schemaName, propertyName, propertiesMap);
         // Process x-field-annotation
         Set<String> fieldAnnotations = getSetValueIfExistsOrElseEmptySet(X_FIELD_ANNOTATION, propertiesMap);
         if (!fieldAnnotations.isEmpty()) {
@@ -244,6 +245,29 @@ public class AbstractMapper {
                         X_MASKED, propertyName, schemaName));
             }
             items = itemsMap.get(ITEMS);
+        }
+    }
+
+    /**
+     * Stops the generation if {@code x-masked} is set inside {@code additionalProperties} of a map field.
+     * <p>
+     * {@code x-masked} is read only on the field level and masks the whole field.
+     * Inside {@code additionalProperties} it would be ignored, and the values would be shown without masking.
+     *
+     * @param schemaName    name of the containing schema (for the error message)
+     * @param propertyName  field name in YAML (for the error message)
+     * @param propertiesMap field definition
+     * @throws SchemaFillException if {@code additionalProperties} has {@code x-masked}
+     */
+    static void checkNoMaskInAdditionalProperties(String schemaName, String propertyName, Map<String, Object> propertiesMap) {
+        Object additional = propertiesMap.get(ADDITIONAL_PROPERTIES);
+        while (additional instanceof Map<?, ?> additionalMap) {
+            if (additionalMap.containsKey(X_MASKED)) {
+                throw new SchemaFillException(format(
+                        "%s is not supported inside additionalProperties of field '%s' in schema '%s': set it on the field itself to mask the whole map",
+                        X_MASKED, propertyName, schemaName));
+            }
+            additional = additionalMap.get(ADDITIONAL_PROPERTIES);
         }
     }
 

@@ -140,10 +140,11 @@ class VariablePropertiesTest {
                 .type("String")
                 .build();
         VariableProperties enumConstant = VariableProperties.builder()
-                .name("ACTIVE")
-                .enumeration("ACTIVE")
+                .name("status")
+                .type("Status")
                 .masked(true)
                 .build();
+        enumConstant.setEnum(true);
 
         assertThat(plainField.isMasked()).isFalse();
         assertThat(enumConstant.isMasked()).isFalse();
