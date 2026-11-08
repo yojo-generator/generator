@@ -68,6 +68,12 @@ public class Message {
     private Set<String> classAnnotations = new HashSet<>();
 
     /**
+     * Class-level Jackson {@code @JsonInclude} value (e.g., {@code NON_NULL}, {@code NON_EMPTY}).
+     * Set via {@code x-json-include} on the message payload.
+     */
+    private String jsonInclude;
+
+    /**
      * Optional custom package path (e.g., {@code "io.github.somepath"}), overrides {@link #messagePackageName}.
      * Used when {@code pathForGenerateMessage} is specified in the contract.
      */
@@ -253,6 +259,24 @@ public class Message {
      */
     public void setClassAnnotations(Set<String> classAnnotations) {
         this.classAnnotations = classAnnotations;
+    }
+
+    /**
+     * Returns the class-level {@code @JsonInclude} value (e.g., {@code NON_NULL}).
+     *
+     * @return include value, or {@code null} if not set
+     */
+    public String getJsonInclude() {
+        return jsonInclude;
+    }
+
+    /**
+     * Sets the class-level {@code @JsonInclude} value.
+     *
+     * @param jsonInclude include value (e.g., {@code NON_NULL})
+     */
+    public void setJsonInclude(String jsonInclude) {
+        this.jsonInclude = jsonInclude;
     }
 
     /**

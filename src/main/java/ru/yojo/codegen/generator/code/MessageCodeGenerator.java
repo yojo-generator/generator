@@ -217,6 +217,13 @@ public class MessageCodeGenerator extends AbstractCodeGenerator {
             }
         }
 
+        // Add class-level @JsonInclude if specified via x-json-include
+        if (message.getJsonInclude() != null && !message.getJsonInclude().isEmpty()) {
+            lombokAnnotationBuilder.append(String.format(JSON_INCLUDE_ANNOTATION, message.getJsonInclude()))
+                    .append(lineSeparator());
+            requiredImports.add(JSON_INCLUDE_IMPORT);
+        }
+
         stringBuilder.insert(0, lombokAnnotationBuilder);
 
         message.getFillParameters().getVariableProperties().forEach(vp -> requiredImports.addAll(vp.getRequiredImports()));
