@@ -186,8 +186,69 @@ public class MessageMapper extends AbstractMapper {
             processContext.getHelper().getExcludeRemoveSchemas().forEach(processContext.getHelper().getRemoveSchemas()::remove);
         }
         LOG.info("FINISH MAPPING OF MESSAGES! CLEAN UP SCHEMAS: " + processContext.getHelper().getRemoveSchemas());
+        checkRemovedSchemasAreUnreferenced(processContext);
         processContext.getHelper().getRemoveSchemas().forEach(processContext.getSchemasMap()::remove);
         return messageList;
+    }
+
+    /**
+     * Fails generation when a schema marked with {@code x-remove-schema} is still referenced
+     * from another schema. Such a reference would point to a class that is never generated,
+     * producing uncompilable output, so the contract is rejected instead.
+     *
+     * @param processContext current generation context holding schemas and removal registries
+     * @throws SchemaFillException if a removed schema is referenced from a remaining schema
+     */
+    private static void checkRemovedSchemasAreUnreferenced(ProcessContext processContext) {
+        Set<String> removedSchemas = processContext.getHelper().getRemoveSchemas();
+        if (removedSchemas.isEmpty()) {
+            return;
+        }
+        processContext.getSchemasMap().forEach((schemaName, schemaValue) -> {
+            if (removedSchemas.contains(schemaName)) {
+                return;
+            }
+            removedSchemas.stream()
+                    .filter(removedName -> containsReference(schemaValue, removedName))
+                    .findFirst()
+                    .ifPresent(removedName -> {
+                        throw new SchemaFillException(String.format(
+                                "x-remove-schema removes schema '%s', but it is still referenced by schema '%s'. "
+                                        + "Remove the reference or the x-remove-schema flag.",
+                                removedName, schemaName));
+                    });
+        });
+    }
+
+    /**
+     * Recursively checks whether a parsed YAML node contains a {@code $ref} to the given schema.
+     *
+     * @param node       parsed YAML node (map, collection or scalar)
+     * @param schemaName schema name to look for
+     * @return {@code true} if a matching {@code $ref} is found
+     */
+    private static boolean containsReference(Object node, String schemaName) {
+        if (node instanceof Map) {
+            for (Map.Entry<?, ?> entry : ((Map<?, ?>) node).entrySet()) {
+                if (REFERENCE.equals(entry.getKey())
+                        && entry.getValue() instanceof String
+                        && refReplace((String) entry.getValue()).equals(schemaName)) {
+                    return true;
+                }
+                if (containsReference(entry.getValue(), schemaName)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        if (node instanceof Collection) {
+            for (Object item : (Collection<?>) node) {
+                if (containsReference(item, schemaName)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

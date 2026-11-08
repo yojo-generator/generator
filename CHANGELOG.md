@@ -5,6 +5,15 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- `x-remove-schema` now fails generation with `SchemaFillException` when the
+  removed schema is still referenced by another schema. Previously such a
+  contract produced uncompilable output: a field of a class that was never
+  generated.
+
 ## [4.7.0] - 2026-11-08
 
 ### Added
@@ -12,8 +21,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `x-masked` attribute to hide sensitive values in the generated `toString()`:
   `true` replaces the value with `***`, `false` leaves it as is, and a
   fully-qualified static method name is used as a custom masker. With Lombok the
-  field is excluded from the generated `toString()` and a `toString<FieldName>()
-  method is added instead. Masking a whole collection or map field is supported;
+  field is excluded from the generated `toString()` and a dedicated masked
+  getter (`toString<FieldName>()`) is added instead. Masking a whole collection or map field is supported;
   `x-masked` inside `items` or `additionalProperties` is rejected with
   `SchemaFillException`. Enum fields are never masked, because their constants are
   not sensitive. (#81)

@@ -1,0 +1,33 @@
+asyncapi: 3.0.0
+info:
+  title: Remove Schema Referenced Test
+  version: 1.0.0
+  description: >
+    Contract where x-remove-schema removes UserDto while UserProfile still
+    references it. Generation must fail fast instead of producing uncompilable code.
+
+components:
+  schemas:
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: string
+        age:
+          type: integer
+
+    UserProfile:
+      type: object
+      properties:
+        nickname:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserDto'
+
+  messages:
+    UserCreated:
+      name: UserCreated
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/UserDto'
+        x-remove-schema: true

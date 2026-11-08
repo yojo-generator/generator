@@ -1,5 +1,6 @@
 package ru.yojo.codegen.generator;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -8,6 +9,7 @@ import ru.yojo.codegen.context.YojoContext;
 import ru.yojo.codegen.domain.ValidationApi;
 import ru.yojo.codegen.domain.lombok.Accessors;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
+import ru.yojo.codegen.exception.SchemaFillException;
 
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
@@ -22,6 +24,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 /**
@@ -82,8 +85,23 @@ class RemoveSchemaTest {
     }
 
     private void generate(boolean useLombok) throws IOException {
+        generate(SPEC, useLombok);
+    }
+
+    @Test
+    void removedSchemaStillReferencedByAnotherSchemaFailsFast() {
+        SchemaFillException error = assertThrows(SchemaFillException.class,
+                () -> generate("remove-schema-referenced.yaml", true));
+
+        assertThat(error.getMessage())
+                .contains("UserDto")
+                .contains("UserProfile")
+                .contains("x-remove-schema");
+    }
+
+    private void generate(String specName, boolean useLombok) throws IOException {
         SpecificationProperties spec = new SpecificationProperties();
-        spec.setSpecName(SPEC);
+        spec.setSpecName(specName);
         spec.setInputDirectory("src/test/resources/example/contract");
         spec.setOutputDirectory(outputDir.toString());
         spec.setPackageLocation("example.removeSchema");

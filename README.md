@@ -877,7 +877,7 @@ All custom Yojo attributes now have `x-` prefixed equivalents. While the old nam
 | `fromPackage` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
 | — | `x-from-interface` | inside `x-implements` | `list` | `[com.example.Ifc]` | Interface FQN list |
 | `fromInterface` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
-| — | `x-remove-schema` | `message.payload` | `boolean` | `true` | Skip DTO generation for `$ref` target; its fields are generated in the message class. To reuse the schema class instead, use `x-extends` with the same class |
+| — | `x-remove-schema` | `message.payload` | `boolean` | `true` | Skip DTO generation for `$ref` target; its fields are generated in the message class. To reuse the schema class instead, use `x-extends` with the same class. Generation fails if another schema still references the removed one |
 | `removeSchema` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
 | — | `x-methods` | schema (interface) | map | *see [interface example](#custom-annotations-x-class-annotation-x-field-annotation)* | Interface method definitions |
 | `methods` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
