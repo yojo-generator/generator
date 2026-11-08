@@ -68,7 +68,8 @@ class EnumDefaultTest {
                 .contains("private ExecutionStatus shortStatus = ExecutionStatus.EXECUTED;")
                 .contains("private ExecutionStatus fqnStatus = example.enumDefault.common.ExecutionStatus.EXECUTED;")
                 .contains("private UserMessageInlineStatus inlineStatus = UserMessageInlineStatus.FIRST;")
-                .doesNotContain("ExecutionStatus.ExecutionStatus");
+                .doesNotContain("ExecutionStatus.ExecutionStatus")
+                .doesNotContain("@Valid");
     }
 
     @ParameterizedTest(name = "lombok={0}")

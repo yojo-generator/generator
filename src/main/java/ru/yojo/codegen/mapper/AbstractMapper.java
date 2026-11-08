@@ -453,6 +453,27 @@ public class AbstractMapper {
     }
 
     /**
+     * Checks whether the schema targeted by {@code $ref} is an enum.
+     * <p>
+     * Message payloads pass their own properties map as {@code schemas}, so the referenced schema
+     * may only be present in the schema registry of the context.
+     *
+     * @param schemaKey      referenced schema name without the {@code #/components/schemas/} prefix
+     * @param schemas        schema map of the current mapping step
+     * @param processContext context
+     * @return {@code true} if the referenced schema declares {@code enum}
+     */
+    protected static boolean isEnumReference(String schemaKey,
+                                             Map<String, Object> schemas,
+                                             ProcessContext processContext) {
+        Map<String, Object> referencedSchema = castObjectToMap(schemas.get(schemaKey));
+        if (referencedSchema.isEmpty()) {
+            referencedSchema = castObjectToMap(processContext.getSchemasMap().get(schemaKey));
+        }
+        return getStringValueIfExistOrElseNull(ENUMERATION, referencedSchema) != null;
+    }
+
+    /**
      * Processes inner/anonymous object schemas and registers them for separate DTO generation.
      * <p>
      * Generates a unique name (e.g., {@code ParentSchemaPropertyName}) and stores the synthetic schema
@@ -529,16 +550,8 @@ public class AbstractMapper {
                 variableProperties.addRequiredImports(prepareImport(processContext, className));
             } else {
                 variableProperties.setType(className);
-                String possibleReferencedEnum = getStringValueIfExistOrElseNull(schemaKey, schemas);
-                if (possibleReferencedEnum != null) {
-                    Map<String, Object> possibleEnumSchema = castObjectToMap(schemas.get(schemaKey));
-                    if (!possibleEnumSchema.isEmpty() && getStringValueIfExistOrElseNull(ENUMERATION, possibleEnumSchema) != null) {
-                        variableProperties.setValid(false);
-                    }
-                }
-                // Message payloads pass their own map as schemas, so look the enum up among all schemas
-                Map<String, Object> referencedSchema = castObjectToMap(processContext.getSchemasMap().get(schemaKey));
-                if (getStringValueIfExistOrElseNull(ENUMERATION, referencedSchema) != null) {
+                if (isEnumReference(schemaKey, schemas, processContext)) {
+                    variableProperties.setValid(false);
                     qualifyEnumDefault(variableProperties);
                 }
                 String externalPackage = getStringValueIfExistOrElseNull("package", propertiesMap);
