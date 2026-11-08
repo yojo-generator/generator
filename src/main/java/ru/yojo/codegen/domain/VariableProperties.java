@@ -210,6 +210,18 @@ public class VariableProperties {
     private boolean isFinal = false;
 
     /**
+     * Whether the field value is masked in {@code toString()} (from {@code x-masked}).
+     */
+    private boolean masked = false;
+
+    /**
+     * Fully qualified static method that masks the field value in {@code toString()}
+     * (from {@code x-masked}), e.g. {@code com.example.Masker.mask}.
+     * {@code null} if the default mask {@link ru.yojo.codegen.constants.Dictionary#DEFAULT_MASK} is used.
+     */
+    private String maskMethod;
+
+    /**
      * Fully qualified class name of the @Nullable annotation to apply when the field is not required.
      * Used only if the field is not annotated with @NotNull/@NotBlank/@NotEmpty.
      */
@@ -566,6 +578,90 @@ public class VariableProperties {
      */
     public void setFinal(boolean isFinal) {
         this.isFinal = isFinal;
+    }
+
+    /**
+     * Checks whether the field value must be masked in {@code toString()}.
+     * <p>
+     * Enum constants are never masked: a constant name carries no sensitive data,
+     * and {@code ***} instead of {@code ACTIVE} only makes the log less useful.
+     * {@code x-masked} on an enum field has no effect.
+     *
+     * @return {@code true} if a mask must be applied
+     */
+    public boolean isMasked() {
+        return masked && !isEnum;
+    }
+
+    /**
+     * Sets whether the field value is masked in {@code toString()}.
+     *
+     * @param masked {@code true} to mask the value
+     */
+    public void setMasked(boolean masked) {
+        this.masked = masked;
+    }
+
+    /**
+     * Returns the static method that masks the field value in {@code toString()}.
+     *
+     * @return fully qualified method (e.g. {@code com.example.Masker.mask}),
+     *         or {@code null} if the default mask is used
+     */
+    public String getMaskMethod() {
+        return maskMethod;
+    }
+
+    /**
+     * Sets the static method that masks the field value in {@code toString()}.
+     *
+     * @param maskMethod fully qualified method (e.g. {@code com.example.Masker.mask}),
+     *                   or {@code null} for the default mask
+     */
+    public void setMaskMethod(String maskMethod) {
+        this.maskMethod = maskMethod;
+    }
+
+    /**
+     * Checks whether the field is excluded from Lombok {@code toString()}
+     * via {@code x-field-annotation: [lombok.ToString.Exclude]}.
+     * <p>
+     * Such a field needs no mask with Lombok, because its value is not shown at all.
+     * The manual {@code toString()} (without Lombok) does not read this annotation.
+     *
+     * @return {@code true} if the field has {@code lombok.ToString.Exclude}
+     */
+    public boolean isExcludedFromLombokToString() {
+        return fieldAnnotations.stream()
+                .anyMatch(annotation -> LOMBOK_TO_STRING_EXCLUDE_FQN.equals(annotationName(annotation)));
+    }
+
+    /**
+     * Builds the expression that returns the masked field value:
+     * <ul>
+     *   <li>with a mask method: {@code com.example.Masker.mask(this.secret)}</li>
+     *   <li>with the default mask: {@code this.secret == null ? null : "***"}</li>
+     * </ul>
+     * The default mask expression is a conditional one: put it in parentheses
+     * when it is a part of a string concatenation.
+     *
+     * @return masked value expression
+     */
+    public String maskedValue() {
+        if (maskMethod != null) {
+            return maskMethod + "(this." + name + ")";
+        }
+        return "this." + name + " == null ? null : \"" + DEFAULT_MASK + "\"";
+    }
+
+    /**
+     * Returns the name of the private method that gives the masked value to Lombok {@code toString()},
+     * e.g. {@code toStringMaskedSecret} for the field {@code secret}.
+     *
+     * @return method name
+     */
+    public String toStringMaskMethodName() {
+        return "toStringMasked" + name.substring(0, 1).toUpperCase() + name.substring(1);
     }
 
     /**

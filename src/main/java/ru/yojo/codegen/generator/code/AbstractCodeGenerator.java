@@ -163,6 +163,9 @@ abstract class AbstractCodeGenerator {
      *     return "ClassName{field1=" + field1 + ", field2=" + field2 + "}";
      * }
      * }</pre>
+     * A field with {@code x-masked} shows the masked value instead of its value:
+     * {@code "secret=" + (this.secret == null ? null : "***")} or
+     * {@code "secret=" + com.example.Masker.mask(this.secret)}.
      *
      * @param className the class name
      * @param fields    list of non-enum variable properties (field definitions)
@@ -177,7 +180,11 @@ abstract class AbstractCodeGenerator {
         for (int i = 0; i < fields.size(); i++) {
             VariableProperties vp = fields.get(i);
             String fieldName = vp.getName();
-            sb.append("                \"").append(fieldName).append("=\" + ").append(fieldName);
+            String fieldValue = fieldName;
+            if (vp.isMasked()) {
+                fieldValue = vp.getMaskMethod() != null ? vp.maskedValue() : "(" + vp.maskedValue() + ")";
+            }
+            sb.append("                \"").append(fieldName).append("=\" + ").append(fieldValue);
             if (i < fields.size() - 1) {
                 sb.append(" + \", \" +").append(lineSeparator());
             } else {
@@ -187,6 +194,58 @@ abstract class AbstractCodeGenerator {
 
         sb.append("                \"}\";").append(lineSeparator());
         sb.append("    }");
+        return sb.toString();
+    }
+
+    /**
+     * Prepares the fields with {@code x-masked} for Lombok {@code toString()}.
+     * <p>
+     * Each such field gets {@code @ToString.Exclude}, so Lombok does not show its value.
+     * A field that already has {@code lombok.ToString.Exclude} from {@code x-field-annotation}
+     * is skipped: its value is not shown, so it needs no mask.
+     * Call this method before the field declarations are written.
+     *
+     * @param fields  field definitions of the class
+     * @param imports import set to populate with {@code lombok.ToString}
+     * @return the fields that are masked (empty if there are none)
+     */
+    protected List<VariableProperties> excludeMaskedFieldsFromLombokToString(List<VariableProperties> fields, Set<String> imports) {
+        List<VariableProperties> maskedFields = new ArrayList<>();
+        for (VariableProperties vp : fields) {
+            if (vp.isMasked() && !vp.isExcludedFromLombokToString()) {
+                vp.getAnnotationSet().add(LOMBOK_TO_STRING_EXCLUDE_ANNOTATION);
+                maskedFields.add(vp);
+            }
+        }
+        if (!maskedFields.isEmpty()) {
+            imports.add(LOMBOK_TO_STRING_IMPORT);
+        }
+        return maskedFields;
+    }
+
+    /**
+     * Generates private methods that give masked field values to Lombok {@code toString()}.
+     * <p>
+     * Produces for each field:
+     * <pre>{@code
+     * @ToString.Include(name = "secret")
+     * private String toStringMaskedSecret() {
+     *     return this.secret == null ? null : "***"; // or com.example.Masker.mask(this.secret);
+     * }
+     * }</pre>
+     * Lombok shows the included methods after the fields, so masked fields are at the end
+     * of the {@code toString()} output.
+     *
+     * @param maskedFields fields returned by {@link #excludeMaskedFieldsFromLombokToString}
+     * @return the generated methods source code (empty if there are no masked fields)
+     */
+    protected String generateLombokToStringMaskMethods(List<VariableProperties> maskedFields) {
+        StringBuilder sb = new StringBuilder();
+        for (VariableProperties vp : maskedFields) {
+            sb.append(lineSeparator())
+                    .append(String.format(TO_STRING_MASK_METHOD, vp.getName(), vp.toStringMaskMethodName(), vp.maskedValue()))
+                    .append(lineSeparator());
+        }
         return sb.toString();
     }
 

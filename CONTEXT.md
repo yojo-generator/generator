@@ -20,6 +20,7 @@ Java library that parses AsyncAPI v2.0/v2.6/v3.0 specifications and generates:
 - Per-schema Lombok override via `x-lombok`
 - `x-final` immutable fields
 - Custom class/field annotations via `x-class-annotation`/`x-field-annotation`
+- Masked field values in `toString()` via `x-masked`
 
 ## Published
 - **Maven Central:** `io.github.yojo-generator:generator`

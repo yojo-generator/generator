@@ -1,0 +1,68 @@
+asyncapi: 3.0.0
+info:
+  title: Masked Fields Test
+  version: 1.0.0
+  description: >
+    Contract for x-masked: the generated toString() must show the default mask
+    (x-masked: true) or the result of the mask method (x-masked: <method>)
+    instead of the field value.
+
+components:
+  schemas:
+    MaskedUser:
+      type: object
+      description: Schema with masked fields
+      properties:
+        login:
+          type: string
+        nickname:
+          type: string
+          x-masked: false
+        password:
+          type: string
+          x-masked: true
+        token:
+          type: string
+          format: uuid
+          x-masked: ru.yojo.codegen.generator.support.TestMasker.mask
+        age:
+          type: integer
+          x-masked: true
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - BLOCKED
+          x-masked: true
+        secretNote:
+          type: string
+          x-field-annotation:
+            - lombok.ToString.Exclude
+          x-masked: true
+
+  messages:
+    MaskedEvent:
+      name: MaskedEvent
+      contentType: application/json
+      payload:
+        type: object
+        properties:
+          eventId:
+            type: string
+          body:
+            type: string
+            x-masked: true
+          phones:
+            type: array
+            items:
+              type: string
+            x-masked: ru.yojo.codegen.generator.support.TestMasker.mask
+
+    PlainEvent:
+      name: PlainEvent
+      contentType: application/json
+      payload:
+        type: object
+        properties:
+          eventId:
+            type: string

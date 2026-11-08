@@ -135,11 +135,19 @@ public class SchemaCodeGenerator extends AbstractCodeGenerator {
                     }
                 }
 
+                // x-masked with Lombok: @ToString.Exclude on fields (before declarations are written)
+                List<VariableProperties> lombokMaskedFields = lombokEnabled
+                        ? excludeMaskedFieldsFromLombokToString(schema.getFillParameters().getVariableProperties(), requiredImports)
+                        : List.of();
+
                 // Add field declarations
                 String fields = schema.getFillParameters().toWrite();
                 if (fields != null && !fields.isEmpty()) {
                     stringBuilder.append(fields);
                 }
+
+                // x-masked with Lombok: methods that give masked values to toString()
+                stringBuilder.append(generateLombokToStringMaskMethods(lombokMaskedFields));
 
                 StringBuilder finalStringBuilder = stringBuilder;
 
