@@ -195,12 +195,11 @@ public class YojoGenerator {
         List<Message> messageList = messageMapper.mapMessagesToObjects(ctx);
         LOG.info("START WRITING JAVA CLASS FROM MESSAGES:");
         messageList.forEach(message -> LOG.info(message.getMessageName()));
-        writeMessages(ctx, messageMapper);
+        writeMessages(ctx, messageList);
         LOG.info(LOG_DELIMETER);
     }
 
-    private void writeMessages(ProcessContext ctx, MessageMapper messageMapper) {
-        List<Message> messageList = messageMapper.mapMessagesToObjects(ctx);
+    private void writeMessages(ProcessContext ctx, List<Message> messageList) {
         for (Message message : messageList) {
             String customPath = message.getPathForGenerateMessage();
             writeFileUnified(ctx, message.getMessageName(), new MessageCodeGenerator(message).generate(), true, customPath);
