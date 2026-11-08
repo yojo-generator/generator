@@ -828,6 +828,15 @@ public String toString() {
 | `type: number`, `format: float`                                     | `Float`           | —                                                    |
 | `type: boolean`                                                     | `Boolean`         | —                                                    |
 
+`format: date-time` maps to `OffsetDateTime` by default. To generate `java.time.Instant` instead, set `dateTimeType("INSTANT")` in the Gradle plugin configuration (or `YojoContext.setDateTimeType(DateTimeType.INSTANT)` when calling the generator directly). The setting also applies to collection items, map keys, and map values (using `additionalProperties.type: date-time` or `x-additional-format: date-time` for collection elements).
+
+With the CLI, pass the date-time type after the three existing optional boolean arguments. Omitting it keeps `OffsetDateTime`.
+
+```sh
+./gradlew installDist
+java -cp 'build/install/generator/lib/*' ru.yojo.codegen.YojoCLI events.yaml generated com.example.events false false false INSTANT
+```
+
 ### Collections & maps
 
 | YAML | → Java |
@@ -850,7 +859,7 @@ All custom Yojo attributes now have `x-` prefixed equivalents. While the old nam
 | `realization` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
 | — | `x-digits` | number | `string` | `"integer=2, fraction=2"` | `@Digits(...)` |
 | `digits` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
-| — | `x-additional-format` | `additionalProperties` | `string` | `uuid` | Custom map key type |
+| — | `x-additional-format` | `additionalProperties` | `string` | `uuid` | Map collection element format |
 | `additionalFormat` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |
 | — | `x-validation-groups` | schema | `list` | `[Create.class]` | `@NotBlank(groups = {Create.class})` |
 | `validationGroups` | — | ↑ | ↑ | ↑ | ↑ (deprecated) |

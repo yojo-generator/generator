@@ -2,6 +2,7 @@ package ru.yojo.codegen;
 
 import ru.yojo.codegen.context.SpecificationProperties;
 import ru.yojo.codegen.context.YojoContext;
+import ru.yojo.codegen.domain.DateTimeType;
 import ru.yojo.codegen.domain.ValidationApi;
 import ru.yojo.codegen.domain.lombok.Accessors;
 import ru.yojo.codegen.domain.lombok.LombokProperties;
@@ -9,6 +10,7 @@ import ru.yojo.codegen.generator.YojoGenerator;
 import ru.yojo.codegen.util.Logger;
 
 import java.util.Collections;
+import java.util.Locale;
 
 import static ru.yojo.codegen.util.MapperUtil.isTrue;
 
@@ -26,7 +28,8 @@ import static ru.yojo.codegen.util.MapperUtil.isTrue;
  *   &lt;packageLocation&gt; \
  *   [lombokEnabled=false] \
  *   [allArgs=false] \
- *   [accessors=false]
+ *   [accessors=false] \
+ *   [dateTimeType=OFFSET_DATE_TIME]
  * </pre>
  *
  * <h3>Arguments</h3>
@@ -37,6 +40,7 @@ import static ru.yojo.codegen.util.MapperUtil.isTrue;
  *   <li>{@code lombokEnabled} — enable Lombok annotations (default: {@code false})</li>
  *   <li>{@code allArgs} — generate {@code @AllArgsConstructor} (default: {@code false})</li>
  *   <li>{@code accessors} — enable {@code @Accessors(fluent = true, chain = true)} (default: {@code false})</li>
+ *   <li>{@code dateTimeType} sets the Java type for date-time values ({@code OFFSET_DATE_TIME} or {@code INSTANT})</li>
  * </ul>
  *
  * @author Vladimir Morozkin (TG @vmorozkin)
@@ -53,7 +57,7 @@ public class YojoCLI {
      */
     public static void main(String[] args) {
         if (args.length < 3) {
-            LOG.error("Usage: java -cp ... YojoCLI <inputFileOrDir> <outputDir> <packageLocation> [lombokEnabled=false] [allArgs=false] [accessors=false]");
+            LOG.error("Usage: java -cp ... YojoCLI <inputFileOrDir> <outputDir> <packageLocation> [lombokEnabled=false] [allArgs=false] [accessors=false] [dateTimeType=OFFSET_DATE_TIME]");
             System.exit(1);
         }
 
@@ -74,8 +78,8 @@ public class YojoCLI {
         String specName;
         if (isFile) {
             java.io.File inputFile = new java.io.File(inputPath);
-            inputDir = inputFile.getParentFile().getAbsolutePath();
-            specName = inputFile.getName().replaceFirst("\\.[^.]+$", ""); // strip extension
+            inputDir = inputFile.getAbsoluteFile().getParent();
+            specName = inputFile.getName();
         } else {
             inputDir = inputPath;
             specName = "cli-spec";
@@ -98,6 +102,9 @@ public class YojoCLI {
 
         // --- Run generator ---
         try {
+            if (args.length > 6) {
+                context.setDateTimeType(DateTimeType.valueOf(args[6].toUpperCase(Locale.ROOT)));
+            }
             YojoGenerator yojoGenerator = new YojoGenerator();
             yojoGenerator.generateAll(context);
             LOG.info(" Generation completed successfully.");

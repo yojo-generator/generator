@@ -1,6 +1,7 @@
 package ru.yojo.codegen.mapper;
 
 import ru.yojo.codegen.context.ProcessContext;
+import ru.yojo.codegen.domain.DateTimeType;
 import ru.yojo.codegen.domain.VariableProperties;
 import ru.yojo.codegen.exception.SchemaFillException;
 import ru.yojo.codegen.util.Logger;
@@ -120,6 +121,7 @@ public class AbstractMapper {
                                Map<String, Object> innerSchemas) {
         variableProperties.setSpringBootVersion(processContext.getSpringBootVersion());
         variableProperties.setValidationApi(processContext.getValidationApi());
+        variableProperties.setDateTimeType(processContext.getDateTimeType());
         // Keep original case from contract: "FirstName" stays "FirstName", "firstName" stays "firstName"
         variableProperties.setName(safeFieldName(propertyName));
         // ⬇️ const → defaultProperty
@@ -360,24 +362,22 @@ public class AbstractMapper {
         Map<String, Object> additionalPropertiesMap = castObjectToMap(propertiesMap.get(ADDITIONAL_PROPERTIES));
         String type = getStringValueIfExistOrElseNull(TYPE, additionalPropertiesMap);
         String format = variableProperties.getFormat();
+        String keyType = format == null ? null : resolveMapType(format, variableProperties);
         String referencedObject = getStringValueIfExistOrElseNull(REFERENCE, additionalPropertiesMap);
         variableProperties.addRequiredImports(MAP_IMPORT);
         variableProperties.setRealisation(getXValueOrElseDeprecated(X_REALIZATION, REALIZATION, propertiesMap, LOG));
         variableProperties.setValid(false);
         if (type != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(type)) {
             LOG.debug("CORRECT TYPE!");
-            if (format != null) {
-                variableProperties.setType(format(MAP_CUSTOM_TYPE,
-                        JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(format),
-                        JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(type)));
-            } else {
-                variableProperties.setType(format(MAP_TYPE, JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(type)));
-            }
+            String valueType = resolveMapType(type, variableProperties);
+            variableProperties.setType(format != null
+                    ? format(MAP_CUSTOM_TYPE, keyType, valueType)
+                    : format(MAP_TYPE, valueType));
         } else if (OBJECT.equals(type) && referencedObject == null) {
             if (getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap) != null) {
                 if (format != null) {
                     variableProperties.setType(format(MAP_CUSTOM_TYPE,
-                            JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(variableProperties.getFormat()),
+                            keyType,
                             capitalize(getStringValueIfExistOrElseNull(NAME, additionalPropertiesMap))));
                     variableProperties.addRequiredImports(getStringValueIfExistOrElseNull(PACKAGE, additionalPropertiesMap)
                             .concat(".")
@@ -393,7 +393,7 @@ public class AbstractMapper {
             } else {
                 if (format != null) {
                     variableProperties.setType(format(MAP_CUSTOM_TYPE,
-                            JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(variableProperties.getFormat()),
+                            keyType,
                             OBJECT_TYPE));
                 } else {
                     variableProperties.setType(format(MAP_TYPE, OBJECT_TYPE));
@@ -407,16 +407,17 @@ public class AbstractMapper {
                 if (collectionType != null) {
                     variableProperties.setCollectionType(collectionType);
                 }
-                String javaType = getXValueOrElseDeprecated(X_ADDITIONAL_FORMAT, ADDITIONAL_FORMAT, additionalPropertiesMap, LOG);
-                if (javaType != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(javaType)) {
+                String itemFormat = getXValueOrElseDeprecated(X_ADDITIONAL_FORMAT, ADDITIONAL_FORMAT, additionalPropertiesMap, LOG);
+                String itemType = itemFormat == null ? null : resolveMapType(itemFormat, variableProperties);
+                if (itemType != null) {
                     if (format != null) {
-                        variableProperties.setItems(JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(javaType).toString());
+                        variableProperties.setItems(itemType);
                         fillCollectionType(variableProperties);
                         variableProperties.setType(format(MAP_CUSTOM_TYPE,
-                                JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(variableProperties.getFormat()),
+                                keyType,
                                 variableProperties.getType()));
                     } else {
-                        variableProperties.setItems(JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(javaType).toString());
+                        variableProperties.setItems(itemType);
                         fillCollectionType(variableProperties);
                         variableProperties.setType(format(MAP_TYPE, format(variableProperties.getType())));
                     }
@@ -425,7 +426,7 @@ public class AbstractMapper {
                         variableProperties.setItems(refObjectName);
                         fillCollectionType(variableProperties);
                         variableProperties.setType(format(MAP_CUSTOM_TYPE,
-                                JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(variableProperties.getFormat()),
+                                keyType,
                                 variableProperties.getType()));
                         variableProperties.addRequiredImports(prepareImport(processContext, refObjectName));
                     } else {
@@ -438,7 +439,7 @@ public class AbstractMapper {
             } else {
                 if (format != null) {
                     variableProperties.setType(format(MAP_CUSTOM_TYPE,
-                            JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(variableProperties.getFormat()),
+                            keyType,
                             refObjectName));
                     variableProperties.addRequiredImports(prepareImport(processContext, refObjectName));
                 } else {
@@ -452,11 +453,11 @@ public class AbstractMapper {
                 variableProperties.setCollectionType(collectionType);
             }
             String additionalFormatValue = getXValueOrElseDeprecated(X_ADDITIONAL_FORMAT, ADDITIONAL_FORMAT, additionalPropertiesMap, LOG);
-            variableProperties.setItems(JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(additionalFormatValue).toString());
+            variableProperties.setItems(Objects.requireNonNull(resolveMapType(additionalFormatValue, variableProperties)));
             fillCollectionType(variableProperties);
             if (format != null) {
                 variableProperties.setType(format(MAP_CUSTOM_TYPE,
-                        JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(variableProperties.getFormat()),
+                        keyType,
                         variableProperties.getType()));
             } else {
                 variableProperties.setType(format(MAP_TYPE, format(variableProperties.getType())));
@@ -469,12 +470,21 @@ public class AbstractMapper {
             fillCollectionWithExistingObject(variableProperties, additionalPropertiesMap);
             if (format != null) {
                 variableProperties.setType(format(MAP_CUSTOM_TYPE,
-                        JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(variableProperties.getFormat()),
+                        keyType,
                         variableProperties.getType()));
             } else {
                 variableProperties.setType(format(MAP_TYPE, format(variableProperties.getType())));
             }
         }
+    }
+
+    private static String resolveMapType(String type, VariableProperties variableProperties) {
+        if (ST_DATE_TIME.equals(type)) {
+            boolean instant = variableProperties.getDateTimeType() == DateTimeType.INSTANT;
+            variableProperties.addRequiredImports(instant ? INSTANT_IMPORT : OFFSET_DATE_TIME_IMPORT);
+            return instant ? INSTANT : OFFSET_DATE_TIME;
+        }
+        return (String) JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.get(type);
     }
 
     /**
