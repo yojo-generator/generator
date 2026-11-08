@@ -528,6 +528,42 @@ public class AbstractMapper {
         variableProperties.setEnumeration(null);
         variableProperties.setEnum(true);
         variableProperties.addRequiredImports(prepareImport(processContext, enumClassName));
+        qualifyEnumDefault(variableProperties);
+    }
+
+    /**
+     * Qualifies a bare enum constant used as the field default with the enum class name
+     * (e.g. {@code NOT_EXECUTED} becomes {@code ExecutionStatus.NOT_EXECUTED}).
+     * Values that are already qualified (by simple or fully qualified class name) are kept as is.
+     *
+     * @param variableProperties enum field with its type already set
+     */
+    private static void qualifyEnumDefault(VariableProperties variableProperties) {
+        String defaultValue = variableProperties.getDefaultProperty();
+        if (defaultValue != null && !defaultValue.contains(".")) {
+            variableProperties.setDefaultProperty(variableProperties.getType() + "." + defaultValue);
+        }
+    }
+
+    /**
+     * Checks whether the schema targeted by {@code $ref} is an enum.
+     * <p>
+     * Message payloads pass their own properties map as {@code schemas}, so the referenced schema
+     * may only be present in the schema registry of the context.
+     *
+     * @param schemaKey      referenced schema name without the {@code #/components/schemas/} prefix
+     * @param schemas        schema map of the current mapping step
+     * @param processContext context
+     * @return {@code true} if the referenced schema declares {@code enum}
+     */
+    protected static boolean isEnumReference(String schemaKey,
+                                             Map<String, Object> schemas,
+                                             ProcessContext processContext) {
+        Map<String, Object> referencedSchema = castObjectToMap(schemas.get(schemaKey));
+        if (referencedSchema.isEmpty()) {
+            referencedSchema = castObjectToMap(processContext.getSchemasMap().get(schemaKey));
+        }
+        return getStringValueIfExistOrElseNull(ENUMERATION, referencedSchema) != null;
     }
 
     /**
@@ -587,7 +623,10 @@ public class AbstractMapper {
         String referenceObject = propertiesMap.get(REFERENCE).toString();
         Map<String, Object> stringObjectMap = castObjectToMap(schemas.get(referenceObject.replaceAll(".+/", "")));
         String objectType = getStringValueIfExistOrElseNull(TYPE, stringObjectMap);
-        if (objectType != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(objectType)) {
+        // An enum schema with a primitive type (e.g. `type: string`) is generated as a standalone
+        // Java enum (Issue #76), so the field must reference it instead of inlining a copy.
+        boolean referencedEnum = getStringValueIfExistOrElseNull(ENUMERATION, stringObjectMap) != null;
+        if (objectType != null && JAVA_LOWER_CASE_TYPES_CHECK_CONVERTER.containsKey(objectType) && !referencedEnum) {
             LOG.debug("Start Recursive fillProperties " + propertyName);
             fillProperties(schemaName, variableProperties, currentSchema, schemas, propertyName, stringObjectMap, processContext, innerSchemas);
         }
@@ -604,12 +643,9 @@ public class AbstractMapper {
                 variableProperties.addRequiredImports(prepareImport(processContext, className));
             } else {
                 variableProperties.setType(className);
-                String possibleReferencedEnum = getStringValueIfExistOrElseNull(schemaKey, schemas);
-                if (possibleReferencedEnum != null) {
-                    Map<String, Object> possibleEnumSchema = castObjectToMap(schemas.get(schemaKey));
-                    if (!possibleEnumSchema.isEmpty() && getStringValueIfExistOrElseNull(ENUMERATION, possibleEnumSchema) != null) {
-                        variableProperties.setValid(false);
-                    }
+                if (isEnumReference(schemaKey, schemas, processContext)) {
+                    variableProperties.setValid(false);
+                    qualifyEnumDefault(variableProperties);
                 }
                 String externalPackage = getStringValueIfExistOrElseNull("package", propertiesMap);
                 if (externalPackage != null) {
